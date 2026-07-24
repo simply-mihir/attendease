@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  fullName        String
+  passwordHash    String
+  timezone        String   @default("Asia/Kolkata")
+  isEmailVerified Boolean  @default(false)
+  whatsappOptedIn Boolean  @default(false)
+  whatsappNumber  String?
+  avatarUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastLoginAt     DateTime?
+  isActive        Boolean  @default(true)
+
+  subjects            Subject[]
+  semesters           Semester[]
+  schedules           Schedule[]
+  attendanceRecords   AttendanceRecord[]
+  auditLogs           AuditLog[]
+  achievements        Achievement[]
+  refreshTokens       RefreshToken[]
+  notificationSetting NotificationSetting?
+  classExceptions     ClassException[]
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  tokenHash  String
+  deviceInfo String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  isRevoked  Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Semester {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects Subject[]
+
+  @@index([userId])
+  @@index([userId, isCurrent])
+}
+
+model Subject {
+  id                 String   @id @default(uuid())
+  userId             String
+  semesterId         String?
+  name               String
+  code               String?
+  instructorName     String?
+  minAttendancePct   Float    @default(75.0)
+  colorHex           String   @default("#6366F1")
+  icon               String   @default("book")
+  totalClassesHeld   Int      @default(0)
+  totalPresent       Int      @default(0)
+  totalAbsent        Int      @default(0)
+  totalLate          Int      @default(0)
+  totalExcused       Int      @default(0)
+  currentPercentage  Float    @default(0.0)
+  streakCount        Int      @default(0)
+  longestStreak      Int      @default(0)
+  isArchived         Boolean  @default(false)
+  archiveReason      String?
+  reminderEnabled    Boolean  @default(true)
+  reminderBeforeMin  Int      @default(15)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semester          Semester?           @relation(fields: [semesterId], references: [id], onDelete: SetNull)
+  schedules         Schedule[]
+  attendanceRecords AttendanceRecord[]
+  achievements      Achievement[]
+  classExceptions   ClassException[]
+
+  @@index([userId])
+  @@index([semesterId])
+  @@index([userId, isArchived])
+}
+
+model Schedule {
+  id             String   @id @default(uuid())
+  subjectId      String
+  userId         String
+  dayOfWeek      Int      // 0=Sunday ... 6=Saturday
+  startTime      String   // "09:00"
+  endTime        String   // "10:00"
+  room           String?
+  building       String?
+  isActive       Boolean  @default(true)
+  effectiveFrom  DateTime?
+  effectiveUntil DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subject           Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendanceRecords AttendanceRecord[]
+
+  @@index([subjectId])
+  @@index([userId, dayOfWeek])
+}
+
+model AttendanceRecord {
+  id           String   @id @default(uuid())
+  subjectId    String
+  userId       String
+  scheduleId   String?
+  date         DateTime // stored as date
+  status       String   // present, absent, late, excused, cancelled, holiday
+  source       String   @default("manual") // manual, quick_widget, notification, bulk
+  notes        String?
+  markedAt     DateTime @default(now())
+  editedAt     DateTime?
+  editedReason String?
+
+  subject  Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule Schedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+
+  @@unique([subjectId, userId, date, scheduleId])
+  @@index([userId])
+  @@index([subjectId])
+  @@index([date])
+  @@index([userId, date])
+  @@index([subjectId, date])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String   // create, update, delete, archive, restore
+  entityType String
+  entityId   String
+  oldValue   String?  // JSON string
+  newValue   String?  // JSON string
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+}
+
+model NotificationSetting {
+  id                      String  @id @default(uuid())
+  userId                  String  @unique
+  whatsappEnabled         Boolean @default(false)
+  whatsappPreClass        Boolean @default(true)
+  whatsappDangerAlert     Boolean @default(true)
+  whatsappDailyBrief      Boolean @default(true)
+  whatsappWeeklyReport    Boolean @default(false)
+  whatsappBeforeMinutes   Int     @default(15)
+  alarmEnabled            Boolean @default(true)
+  alarmPreClass           Boolean @default(true)
+  alarmDangerThreshold    Float   @default(5.0)
+  alarmSound              String  @default("default")
+  alarmVibrate            Boolean @default(true)
+  alarmBeforeMinutes      Int     @default(10)
+  emailEnabled            Boolean @default(false)
+  pushEnabled             Boolean @default(true)
+  pushToken               String?
+  quietHoursEnabled       Boolean @default(true)
+  quietHoursStart         String  @default("22:00")
+  quietHoursEnd           String  @default("07:00")
+  dailyBriefTime          String  @default("08:00")
+  weeklyReportDay         Int     @default(0) // Sunday
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ClassException {
+  id            String   @id @default(uuid())
+  userId        String
+  subjectId     String?
+  exceptionType String   // holiday, class_cancelled, extra_class, exam, event
+  date          DateTime
+  reason        String?
+  allSubjects   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+}
+
+model Achievement {
+  id        String   @id @default(uuid())
+  userId    String
+  badgeKey  String
+  subjectId String?
+  earnedAt  DateTime @default(now())
+  metadata  String?  // JSON string
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeKey, subjectId])
+  @@index([userId])
+}
