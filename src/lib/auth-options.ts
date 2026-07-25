@@ -1,5 +1,5 @@
 import { NextAuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -7,15 +7,17 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./db";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       name: "credentials",
@@ -54,23 +56,26 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.id = user.id;
-      }
-      // On first OAuth sign-in, create notification settings
-      if (account && user) {
-        await prisma.notificationSetting.upsert({
-          where: { userId: user.id },
-          update: {},
-          create: { userId: user.id },
-        });
+    async jwt({ token, user }) {
+      const userId = user?.id || (token.id as string) || token.sub;
+      if (userId) {
+        token.id = userId;
+        try {
+          await prisma.notificationSetting.upsert({
+            where: { userId },
+            update: {},
+            create: { userId },
+          });
+        } catch (err) {
+          console.error("Error setting notification defaults:", err);
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
-        (session.user as any).id = token.id as string;
+      const userId = (token.id as string) || token.sub;
+      if (session.user && userId) {
+        (session.user as any).id = userId;
       }
       return session;
     },
@@ -78,6 +83,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
     newUser: "/dashboard",
+    error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
 };
