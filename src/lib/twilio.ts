@@ -1,14 +1,22 @@
 import twilio from "twilio";
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
-);
+let clientInstance: ReturnType<typeof twilio> | null = null;
+
+function getTwilioClient() {
+  if (!clientInstance && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_ACCOUNT_SID.startsWith("AC") && process.env.TWILIO_AUTH_TOKEN) {
+    clientInstance = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
+  }
+  return clientInstance;
+}
 
 const FROM_WHATSAPP = `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER || "+14155238886"}`;
 
 export async function sendWhatsApp(to: string, body: string) {
-  if (!process.env.TWILIO_ACCOUNT_SID) {
+  const client = getTwilioClient();
+  if (!client) {
     console.log("[WhatsApp] Twilio not configured, skipping:", body);
     return null;
   }

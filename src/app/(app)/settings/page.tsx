@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useAuthStore } from "@/store/authStore";
+import { useSession } from "next-auth/react";
 import { Bell, Calendar, Download, User, Moon, ChevronRight, Trophy } from "lucide-react";
 
 const settingsItems = [
@@ -10,7 +10,8 @@ const settingsItems = [
 ];
 
 export default function SettingsPage() {
-  const { user } = useAuthStore();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
@@ -20,12 +21,11 @@ export default function SettingsPage() {
       <div className="glass rounded-2xl p-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-500/20">
-            {user?.fullName.charAt(0).toUpperCase()}
+            {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-white">{user?.fullName}</h2>
+            <h2 className="text-lg font-semibold text-white">{user?.name || "Student"}</h2>
             <p className="text-sm text-gray-400">{user?.email}</p>
-            <p className="text-xs text-gray-500 mt-1">Timezone: {user?.timezone}</p>
           </div>
         </div>
       </div>

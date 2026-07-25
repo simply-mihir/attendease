@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
-  const { id } = await params;
+  const { id } = params;
   const body = await req.json();
 
   if (body.isCurrent) {
@@ -24,10 +24,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return Response.json({ semester });
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
-  const { id } = await params;
+  const { id } = params;
   await prisma.semester.delete({ where: { id } });
   return Response.json({ success: true });
 }

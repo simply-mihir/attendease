@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
-  const { id } = await params;
+  const { id } = params;
 
   const existing = await prisma.attendanceRecord.findFirst({
     where: { id, userId: user.id },
@@ -58,10 +58,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return Response.json({ record });
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
-  const { id } = await params;
+  const { id } = params;
 
   const existing = await prisma.attendanceRecord.findFirst({
     where: { id, userId: user.id },

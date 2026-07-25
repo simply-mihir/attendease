@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiFetch, getToken } from "@/hooks/useApi";
+import { apiFetch } from "@/hooks/useApi";
 import { Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -16,14 +16,11 @@ export default function ExportPage() {
   async function handleExport() {
     setExporting(true);
     try {
-      const token = getToken();
       const url = selectedSubject === "all"
         ? "/api/v1/export/csv"
         : `/api/v1/export/csv?subjectId=${selectedSubject}`;
 
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(url);
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);

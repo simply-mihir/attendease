@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import { calculateAttendance } from "@/lib/attendance-calc";
@@ -19,8 +19,8 @@ const STATUS_COLORS: Record<string, string> = {
   holiday: "bg-white/10 text-gray-500",
 };
 
-export default function SubjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function SubjectDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [subject, setSubject] = useState<any>(null);
   const [marking, setMarking] = useState(false);
   const [markDate, setMarkDate] = useState(new Date().toISOString().slice(0, 10));

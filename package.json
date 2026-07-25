@@ -16,20 +16,21 @@
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.0.0",
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.500.0",
     "next": "^14.2.0",
+    "next-auth": "^4.24.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "@prisma/client": "^6.9.0",
-    "@auth/prisma-adapter": "^2.0.0",
-    "next-auth": "^4.24.0",
-    "bcryptjs": "^2.4.3",
-    "zod": "^3.24.0",
     "recharts": "^2.15.0",
-    "date-fns": "^4.1.0",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.500.0",
     "twilio": "^5.0.0",
-    "web-push": "^3.6.0"
+    "web-push": "^3.6.0",
+    "zod": "^3.24.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

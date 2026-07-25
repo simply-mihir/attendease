@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    if (!user || !user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
       return Response.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
