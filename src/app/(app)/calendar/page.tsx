@@ -6,8 +6,8 @@ import clsx from "clsx";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const STATUS_DOT: Record<string, string> = {
-  present: "bg-success", absent: "bg-danger", late: "bg-warning",
-  excused: "bg-primary", cancelled: "bg-surface-3", holiday: "bg-surface-3",
+  present: "bg-green-400 shadow-green-400/50", absent: "bg-red-400 shadow-red-400/50", late: "bg-yellow-400 shadow-yellow-400/50",
+  excused: "bg-purple-400 shadow-purple-400/50", cancelled: "bg-gray-600", holiday: "bg-gray-600",
 };
 
 export default function CalendarPage() {
@@ -67,29 +67,33 @@ export default function CalendarPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Calendar</h1>
+        <h1 className="text-2xl font-bold text-gradient">Calendar</h1>
         <div className="flex gap-2">
           <button onClick={() => setView("week")}
-            className={clsx("px-3 py-1.5 rounded-lg text-sm font-medium transition",
-              view === "week" ? "bg-primary text-white" : "bg-surface-2 text-text-secondary hover:bg-surface-3"
+            className={clsx("px-3 py-1.5 rounded-xl text-sm font-medium transition",
+              view === "week" ? "btn-gradient" : "bg-white/5 text-gray-400 hover:bg-white/10"
             )}>Week</button>
           <button onClick={() => setView("month")}
-            className={clsx("px-3 py-1.5 rounded-lg text-sm font-medium transition",
-              view === "month" ? "bg-primary text-white" : "bg-surface-2 text-text-secondary hover:bg-surface-3"
+            className={clsx("px-3 py-1.5 rounded-xl text-sm font-medium transition",
+              view === "month" ? "btn-gradient" : "bg-white/5 text-gray-400 hover:bg-white/10"
             )}>Month</button>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between bg-surface rounded-xl border border-border p-3">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-surface-2 rounded-lg"><ChevronLeft className="w-5 h-5" /></button>
-        <span className="font-semibold">
+      <div className="flex items-center justify-between glass rounded-2xl p-3">
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-xl transition">
+          <ChevronLeft className="w-5 h-5 text-gray-400" />
+        </button>
+        <span className="font-semibold text-white">
           {view === "week"
             ? `${weekDates[0].toLocaleDateString("en-IN", { month: "short", day: "numeric" })} — ${weekDates[6].toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}`
             : currentDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })
           }
         </span>
-        <button onClick={() => navigate(1)} className="p-2 hover:bg-surface-2 rounded-lg"><ChevronRight className="w-5 h-5" /></button>
+        <button onClick={() => navigate(1)} className="p-2 hover:bg-white/10 rounded-xl transition">
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+        </button>
       </div>
 
       {view === "week" ? (
@@ -100,25 +104,25 @@ export default function CalendarPage() {
             const dateStr = date.toISOString().slice(0, 10);
             const dayRecords = recordMap.get(dateStr) || [];
             return (
-              <div key={i} className={clsx("bg-surface rounded-xl border p-3 min-h-[180px]",
-                isToday(date) ? "border-primary" : "border-border"
+              <div key={i} className={clsx("glass rounded-2xl p-3 min-h-[180px]",
+                isToday(date) ? "border-purple-500/50 shadow-lg shadow-purple-500/10" : ""
               )}>
                 <div className="text-center mb-2">
-                  <p className="text-xs text-text-muted">{DAYS[date.getDay()]}</p>
-                  <p className={clsx("text-lg font-bold", isToday(date) ? "text-primary" : "")}>{date.getDate()}</p>
+                  <p className="text-xs text-gray-500">{DAYS[date.getDay()]}</p>
+                  <p className={clsx("text-lg font-bold", isToday(date) ? "text-purple-400" : "text-white")}>{date.getDate()}</p>
                 </div>
                 <div className="space-y-1.5">
                   {dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     return (
-                      <div key={cls.id} className="p-2 rounded-lg text-xs" style={{ backgroundColor: cls.subject.colorHex + "20", borderLeft: `3px solid ${cls.subject.colorHex}` }}>
-                        <p className="font-medium truncate">{cls.subject.name}</p>
-                        <p className="text-text-muted">{cls.startTime}</p>
-                        {rec && <span className={clsx("inline-block mt-0.5 w-2 h-2 rounded-full", STATUS_DOT[rec.status])} />}
+                      <div key={cls.id} className="p-2 rounded-xl text-xs bg-white/5 backdrop-blur-sm" style={{ borderLeft: `3px solid ${cls.subject.colorHex}` }}>
+                        <p className="font-medium truncate text-gray-200">{cls.subject.name}</p>
+                        <p className="text-gray-500">{cls.startTime}</p>
+                        {rec && <span className={clsx("inline-block mt-0.5 w-2 h-2 rounded-full shadow-sm", STATUS_DOT[rec.status])} />}
                       </div>
                     );
                   })}
-                  {dayClasses.length === 0 && <p className="text-xs text-text-muted text-center mt-4">No classes</p>}
+                  {dayClasses.length === 0 && <p className="text-xs text-gray-600 text-center mt-4">No classes</p>}
                 </div>
               </div>
             );
@@ -126,9 +130,9 @@ export default function CalendarPage() {
         </div>
       ) : (
         /* Month View */
-        <div className="bg-surface rounded-xl border border-border p-4">
+        <div className="glass rounded-2xl p-4">
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((d) => <div key={d} className="text-center text-xs font-medium text-text-muted py-1">{d}</div>)}
+            {DAYS.map((d) => <div key={d} className="text-center text-xs font-medium text-gray-500 py-1">{d}</div>)}
           </div>
           <div className="grid grid-cols-7 gap-1">
             {monthDays.map((date, i) => {
@@ -136,13 +140,13 @@ export default function CalendarPage() {
               const dateStr = date.toISOString().slice(0, 10);
               const dayRecords = recordMap.get(dateStr) || [];
               return (
-                <div key={i} className={clsx("p-2 rounded-lg text-center min-h-[60px]",
-                  isToday(date) ? "bg-primary/10 border border-primary" : "hover:bg-surface-2"
+                <div key={i} className={clsx("p-2 rounded-xl text-center min-h-[60px] transition",
+                  isToday(date) ? "bg-purple-500/10 border border-purple-500/50" : "hover:bg-white/5"
                 )}>
-                  <p className={clsx("text-sm", isToday(date) ? "font-bold text-primary" : "")}>{date.getDate()}</p>
+                  <p className={clsx("text-sm", isToday(date) ? "font-bold text-purple-400" : "text-gray-300")}>{date.getDate()}</p>
                   <div className="flex justify-center gap-0.5 mt-1 flex-wrap">
                     {dayRecords.map((r: any, ri: number) => (
-                      <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
+                      <div key={ri} className={clsx("w-2 h-2 rounded-full shadow-sm", STATUS_DOT[r.status])}
                         title={`${r.subject?.name}: ${r.status}`} />
                     ))}
                   </div>
@@ -150,10 +154,10 @@ export default function CalendarPage() {
               );
             })}
           </div>
-          <div className="flex items-center gap-4 mt-4 text-xs text-text-muted justify-center">
+          <div className="flex items-center gap-4 mt-4 text-xs text-gray-500 justify-center">
             {Object.entries(STATUS_DOT).slice(0, 4).map(([k, v]) => (
               <span key={k} className="flex items-center gap-1">
-                <div className={clsx("w-2 h-2 rounded-full", v)} /> {k}
+                <div className={clsx("w-2 h-2 rounded-full", v.split(" ")[0])} /> {k}
               </span>
             ))}
           </div>

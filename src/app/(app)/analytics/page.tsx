@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
-import { BarChart3, TrendingUp, Flame } from "lucide-react";
+import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert } from "lucide-react";
 import clsx from "clsx";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -20,7 +20,7 @@ export default function AnalyticsPage() {
     apiFetch(`/analytics/heatmap?year=${year}`).then((d) => setHeatmap(d.data)).catch(console.error);
   }, [year]);
 
-  if (!dashboard) return <div className="text-center py-16 text-text-muted">Loading analytics...</div>;
+  if (!dashboard) return <div className="text-center py-16 text-gray-500">Loading analytics...</div>;
 
   const barData = dashboard.subjectsSummary.map((s: any) => ({
     name: s.name.length > 12 ? s.name.slice(0, 12) + "..." : s.name,
@@ -57,44 +57,60 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold">Analytics</h1>
+      <h1 className="text-2xl font-bold text-gradient">Analytics</h1>
 
       {/* Overview cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-surface rounded-xl border border-border p-4 text-center">
-          <TrendingUp className="w-6 h-6 mx-auto mb-2 text-primary" />
-          <p className="text-3xl font-bold">{dashboard.overallPct}%</p>
-          <p className="text-xs text-text-muted">Overall</p>
+        <div className="glass rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-2">
+            <TrendingUp className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-white">{dashboard.overallPct}%</p>
+          <p className="text-xs text-gray-500">Overall</p>
         </div>
-        <div className="bg-surface rounded-xl border border-border p-4 text-center">
-          <div className="w-6 h-6 mx-auto mb-2 rounded-full bg-success" />
-          <p className="text-3xl font-bold text-success">{dashboard.safeSubjects}</p>
-          <p className="text-xs text-text-muted">Safe</p>
+        <div className="glass rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-2">
+            <ShieldCheck className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-green-400">{dashboard.safeSubjects}</p>
+          <p className="text-xs text-gray-500">Safe</p>
         </div>
-        <div className="bg-surface rounded-xl border border-border p-4 text-center">
-          <div className="w-6 h-6 mx-auto mb-2 rounded-full bg-danger" />
-          <p className="text-3xl font-bold text-danger">{dashboard.dangerSubjects}</p>
-          <p className="text-xs text-text-muted">In Danger</p>
+        <div className="glass rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center mx-auto mb-2">
+            <ShieldAlert className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-red-400">{dashboard.dangerSubjects}</p>
+          <p className="text-xs text-gray-500">In Danger</p>
         </div>
-        <div className="bg-surface rounded-xl border border-border p-4 text-center">
-          <Flame className="w-6 h-6 mx-auto mb-2 text-warning" />
-          <p className="text-3xl font-bold text-warning">{dashboard.currentStreak}</p>
-          <p className="text-xs text-text-muted">Streak</p>
+        <div className="glass rounded-2xl p-4 text-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center mx-auto mb-2">
+            <Flame className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-3xl font-bold text-yellow-400">{dashboard.currentStreak}</p>
+          <p className="text-xs text-gray-500">Streak</p>
         </div>
       </div>
 
       {/* Charts row */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Bar chart */}
-        <div className="lg:col-span-2 bg-surface rounded-xl border border-border p-5">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Subject Comparison</h3>
+        <div className="lg:col-span-2 glass rounded-2xl p-5">
+          <h3 className="font-semibold mb-4 flex items-center gap-2 text-white">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-white" />
+            </div>
+            Subject Comparison
+          </h3>
           {barData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 40, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-35} textAnchor="end" />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [`${v}%`, "Attendance"]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} angle={-35} textAnchor="end" />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} />
+                <Tooltip
+                  formatter={(v: number) => [`${v}%`, "Attendance"]}
+                  contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "#fff" }}
+                />
                 <Bar dataKey="percentage" radius={[4, 4, 0, 0]}>
                   {barData.map((entry: any, i: number) => (
                     <Cell key={i} fill={entry.fill} />
@@ -103,31 +119,31 @@ export default function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-text-muted text-sm text-center py-12">No data yet</p>
+            <p className="text-gray-500 text-sm text-center py-12">No data yet</p>
           )}
         </div>
 
         {/* Pie chart */}
-        <div className="bg-surface rounded-xl border border-border p-5">
-          <h3 className="font-semibold mb-4">Status Distribution</h3>
+        <div className="glass rounded-2xl p-5">
+          <h3 className="font-semibold mb-4 text-white">Status Distribution</h3>
           {pieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
                   {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "#fff" }} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-text-muted text-sm text-center py-12">No data</p>
+            <p className="text-gray-500 text-sm text-center py-12">No data</p>
           )}
         </div>
       </div>
 
       {/* Heatmap */}
-      <div className="bg-surface rounded-xl border border-border p-5">
-        <h3 className="font-semibold mb-4">Attendance Heatmap — {year}</h3>
+      <div className="glass rounded-2xl p-5">
+        <h3 className="font-semibold mb-4 text-white">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-0.5" style={{ minWidth: "700px" }}>
             {weeks.map((week, wi) => (
@@ -142,7 +158,7 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-3 text-xs text-text-muted">
+          <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
             <span>Less</span>
             {INTENSITY_COLORS.map((c, i) => (
               <div key={i} className="w-3 h-3 rounded-sm" style={{ backgroundColor: c }} />
@@ -153,25 +169,25 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Per-subject details */}
-      <div className="bg-surface rounded-xl border border-border p-5">
-        <h3 className="font-semibold mb-4">Subject Breakdown</h3>
+      <div className="glass rounded-2xl p-5">
+        <h3 className="font-semibold mb-4 text-white">Subject Breakdown</h3>
         <div className="space-y-3">
           {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="flex items-center gap-4 p-3 bg-surface-2 rounded-lg">
+            <div key={s.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition">
               <div className="w-2.5 h-8 rounded-full" style={{ backgroundColor: s.colorHex }} />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{s.name}</p>
-                <div className="h-1.5 bg-surface-3 rounded-full mt-1">
+                <p className="font-medium text-sm text-gray-200 truncate">{s.name}</p>
+                <div className="h-1.5 bg-white/10 rounded-full mt-1">
                   <div className={clsx("h-full rounded-full",
-                    s.statusColor === "green" ? "bg-success" : s.statusColor === "yellow" ? "bg-warning" : "bg-danger"
+                    s.statusColor === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" : s.statusColor === "yellow" ? "bg-gradient-to-r from-yellow-500 to-amber-400" : "bg-gradient-to-r from-red-500 to-rose-400"
                   )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
                 </div>
               </div>
               <div className="text-right">
                 <span className={clsx("text-sm font-bold",
-                  s.statusColor === "green" ? "text-success" : s.statusColor === "yellow" ? "text-warning" : "text-danger"
+                  s.statusColor === "green" ? "text-green-400" : s.statusColor === "yellow" ? "text-yellow-400" : "text-red-400"
                 )}>{s.currentPercentage}%</span>
-                <p className="text-xs text-text-muted">
+                <p className="text-xs text-gray-500">
                   {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
                 </p>
               </div>

@@ -1,9 +1,5 @@
 import { prisma } from "@/lib/db";
-import {
-  verifyPassword,
-  generateAccessToken,
-  generateRefreshToken,
-} from "@/lib/auth";
+import { verifyPassword } from "@/lib/auth";
 import { loginSchema } from "@/lib/validations/auth";
 
 export async function POST(req: Request) {
@@ -21,9 +17,9 @@ export async function POST(req: Request) {
       select: {
         id: true,
         email: true,
-        fullName: true,
+        name: true,
         timezone: true,
-        avatarUrl: true,
+        image: true,
         passwordHash: true,
       },
     });
@@ -38,23 +34,10 @@ export async function POST(req: Request) {
       data: { lastLoginAt: new Date() },
     });
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
-
-    const bcrypt = await import("bcryptjs");
-    await prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        tokenHash: await bcrypt.hash(refreshToken, 10),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    });
-
     const { passwordHash: _, ...userWithoutPassword } = user;
     return Response.json({
+      success: true,
       user: userWithoutPassword,
-      accessToken,
-      refreshToken,
     });
   } catch (error) {
     console.error("Login error:", error);

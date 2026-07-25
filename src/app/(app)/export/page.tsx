@@ -36,33 +36,35 @@ export default function ExportPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition">
+      <Link href="/settings" className="flex items-center gap-2 text-gray-400 text-sm hover:text-white transition">
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
-      <h1 className="text-2xl font-bold">Export Data</h1>
+      <h1 className="text-2xl font-bold text-gradient">Export Data</h1>
 
-      <div className="bg-surface rounded-xl border border-border p-6 space-y-5">
+      <div className="glass rounded-2xl p-6 space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-2">Subject</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
           <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-surface-2 text-sm">
+            className="input-glass w-full px-4 py-2.5 rounded-xl text-sm">
             <option value="all">All Subjects</option>
             {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
 
-        <div className="p-4 bg-surface-2 rounded-lg">
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10">
           <div className="flex items-center gap-3 mb-2">
-            <FileSpreadsheet className="w-8 h-8 text-success" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+              <FileSpreadsheet className="w-5 h-5 text-white" />
+            </div>
             <div>
-              <p className="font-medium">CSV Export</p>
-              <p className="text-xs text-text-muted">Date, Subject, Code, Status, Notes, Marked At</p>
+              <p className="font-medium text-white">CSV Export</p>
+              <p className="text-xs text-gray-500">Date, Subject, Code, Status, Notes, Marked At</p>
             </div>
           </div>
         </div>
 
         <button onClick={handleExport} disabled={exporting}
-          className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2">
+          className="btn-gradient w-full py-3 rounded-xl font-medium transition disabled:opacity-50 flex items-center justify-center gap-2">
           <Download className="w-5 h-5" />
           {exporting ? "Exporting..." : "Download CSV"}
         </button>

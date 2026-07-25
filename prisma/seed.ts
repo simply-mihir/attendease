@@ -13,10 +13,10 @@ async function main() {
     update: {},
     create: {
       email: "demo@attendease.app",
-      fullName: "Demo Student",
+      name: "Demo Student",
       passwordHash,
       timezone: "Asia/Kolkata",
-      isEmailVerified: true,
+      emailVerified: new Date(),
     },
   });
 

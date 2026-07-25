@@ -1,10 +1,9 @@
-import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { calculateAttendance } from "@/lib/attendance-calc";
 
-export async function GET(req: NextRequest) {
-  const user = await getAuthUser(req);
+export async function GET() {
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   const subjects = await prisma.subject.findMany({

@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
@@ -12,8 +11,8 @@ const BADGE_DEFS = [
   { key: "all_safe", label: "All Green", description: "All subjects in safe zone simultaneously", icon: "heart" },
 ];
 
-export async function GET(req: NextRequest) {
-  const user = await getAuthUser(req);
+export async function GET() {
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   const earned = await prisma.achievement.findMany({

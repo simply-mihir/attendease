@@ -3,52 +3,81 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id              String   @id @default(uuid())
-  email           String   @unique
-  fullName        String
-  passwordHash    String
-  timezone        String   @default("Asia/Kolkata")
-  isEmailVerified Boolean  @default(false)
-  whatsappOptedIn Boolean  @default(false)
-  whatsappNumber  String?
-  avatarUrl       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  lastLoginAt     DateTime?
-  isActive        Boolean  @default(true)
+// ─── NextAuth Models ─────────────────────────────────────────
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-  subjects            Subject[]
-  semesters           Semester[]
-  schedules           Schedule[]
-  attendanceRecords   AttendanceRecord[]
-  auditLogs           AuditLog[]
-  achievements        Achievement[]
-  refreshTokens       RefreshToken[]
-  notificationSetting NotificationSetting?
-  classExceptions     ClassException[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
-model RefreshToken {
-  id         String   @id @default(uuid())
-  userId     String
-  tokenHash  String
-  deviceInfo String?
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  isRevoked  Boolean  @default(false)
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── App Models ──────────────────────────────────────────────
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  emailVerified   DateTime?
+  image           String?
+  passwordHash    String?
+  timezone        String    @default("Asia/Kolkata")
+  whatsappOptedIn Boolean   @default(false)
+  whatsappNumber  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLoginAt     DateTime?
+  isActive        Boolean   @default(true)
+
+  accounts            Account[]
+  sessions            Session[]
+  subjects            Subject[]
+  semesters           Semester[]
+  schedules           Schedule[]
+  attendanceRecords   AttendanceRecord[]
+  auditLogs           AuditLog[]
+  achievements        Achievement[]
+  notificationSetting NotificationSetting?
+  classExceptions     ClassException[]
+  pushSubscriptions   PushSubscription[]
+}
+
 model Semester {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   userId    String
   name      String
   startDate DateTime
@@ -65,14 +94,14 @@ model Semester {
 }
 
 model Subject {
-  id                 String   @id @default(uuid())
+  id                 String   @id @default(cuid())
   userId             String
   semesterId         String?
   name               String
   code               String?
   instructorName     String?
   minAttendancePct   Float    @default(75.0)
-  colorHex           String   @default("#6366F1")
+  colorHex           String   @default("#7C3AED")
   icon               String   @default("book")
   totalClassesHeld   Int      @default(0)
   totalPresent       Int      @default(0)
@@ -102,19 +131,19 @@ model Subject {
 }
 
 model Schedule {
-  id             String   @id @default(uuid())
+  id             String    @id @default(cuid())
   subjectId      String
   userId         String
-  dayOfWeek      Int      // 0=Sunday ... 6=Saturday
-  startTime      String   // "09:00"
-  endTime        String   // "10:00"
+  dayOfWeek      Int
+  startTime      String
+  endTime        String
   room           String?
   building       String?
-  isActive       Boolean  @default(true)
+  isActive       Boolean   @default(true)
   effectiveFrom  DateTime?
   effectiveUntil DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   subject           Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -125,15 +154,15 @@ model Schedule {
 }
 
 model AttendanceRecord {
-  id           String   @id @default(uuid())
+  id           String    @id @default(cuid())
   subjectId    String
   userId       String
   scheduleId   String?
-  date         DateTime // stored as date
-  status       String   // present, absent, late, excused, cancelled, holiday
-  source       String   @default("manual") // manual, quick_widget, notification, bulk
+  date         DateTime  @db.Date
+  status       String
+  source       String    @default("manual")
   notes        String?
-  markedAt     DateTime @default(now())
+  markedAt     DateTime  @default(now())
   editedAt     DateTime?
   editedReason String?
 
@@ -150,13 +179,13 @@ model AttendanceRecord {
 }
 
 model AuditLog {
-  id         String   @id @default(uuid())
+  id         String   @id @default(cuid())
   userId     String
-  action     String   // create, update, delete, archive, restore
+  action     String
   entityType String
   entityId   String
-  oldValue   String?  // JSON string
-  newValue   String?  // JSON string
+  oldValue   String?
+  newValue   String?
   createdAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -166,7 +195,7 @@ model AuditLog {
 }
 
 model NotificationSetting {
-  id                      String  @id @default(uuid())
+  id                      String  @id @default(cuid())
   userId                  String  @unique
   whatsappEnabled         Boolean @default(false)
   whatsappPreClass        Boolean @default(true)
@@ -182,24 +211,36 @@ model NotificationSetting {
   alarmBeforeMinutes      Int     @default(10)
   emailEnabled            Boolean @default(false)
   pushEnabled             Boolean @default(true)
-  pushToken               String?
   quietHoursEnabled       Boolean @default(true)
   quietHoursStart         String  @default("22:00")
   quietHoursEnd           String  @default("07:00")
   dailyBriefTime          String  @default("08:00")
-  weeklyReportDay         Int     @default(0) // Sunday
+  weeklyReportDay         Int     @default(0)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model ClassException {
-  id            String   @id @default(uuid())
+  id            String   @id @default(cuid())
   userId        String
   subjectId     String?
-  exceptionType String   // holiday, class_cancelled, extra_class, exam, event
-  date          DateTime
+  exceptionType String
+  date          DateTime @db.Date
   reason        String?
   allSubjects   Boolean  @default(false)
   createdAt     DateTime @default(now())
@@ -211,12 +252,12 @@ model ClassException {
 }
 
 model Achievement {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   userId    String
   badgeKey  String
   subjectId String?
   earnedAt  DateTime @default(now())
-  metadata  String?  // JSON string
+  metadata  String?
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)

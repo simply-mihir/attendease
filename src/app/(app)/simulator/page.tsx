@@ -36,18 +36,21 @@ export default function SimulatorPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Sliders className="w-6 h-6 text-primary" /> What-If Simulator
+        <h1 className="text-2xl font-bold flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <Sliders className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-gradient">What-If Simulator</span>
         </h1>
-        <p className="text-text-secondary text-sm mt-1">See how skipping or attending classes affects your attendance</p>
+        <p className="text-gray-400 text-sm mt-1 ml-[52px]">See how skipping or attending classes affects your attendance</p>
       </div>
 
-      <div className="bg-surface rounded-xl border border-border p-6 space-y-6">
+      <div className="glass rounded-2xl p-6 space-y-6">
         {/* Subject picker */}
         <div>
-          <label className="block text-sm font-medium mb-2">Select Subject</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Select Subject</label>
           <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+            className="input-glass w-full px-4 py-2.5 rounded-xl text-sm">
             {subjects.map((s) => (
               <option key={s.id} value={s.id}>{s.name} ({s.currentPercentage}%)</option>
             ))}
@@ -56,17 +59,17 @@ export default function SimulatorPage() {
 
         {/* Scenario toggle */}
         <div>
-          <label className="block text-sm font-medium mb-2">Scenario</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Scenario</label>
           <div className="flex gap-2">
             <button onClick={() => setScenario("skip")}
-              className={clsx("flex-1 py-3 rounded-lg font-medium text-sm border transition",
-                scenario === "skip" ? "border-danger bg-danger/10 text-danger" : "border-border hover:bg-surface-2"
+              className={clsx("flex-1 py-3 rounded-xl font-medium text-sm border transition",
+                scenario === "skip" ? "border-red-500/50 bg-red-500/10 text-red-400 shadow-lg shadow-red-500/10" : "border-white/10 hover:bg-white/5 text-gray-400"
               )}>
               <XCircle className="w-4 h-4 inline mr-1.5" />Skip Classes
             </button>
             <button onClick={() => setScenario("attend")}
-              className={clsx("flex-1 py-3 rounded-lg font-medium text-sm border transition",
-                scenario === "attend" ? "border-success bg-success/10 text-success" : "border-border hover:bg-surface-2"
+              className={clsx("flex-1 py-3 rounded-xl font-medium text-sm border transition",
+                scenario === "attend" ? "border-green-500/50 bg-green-500/10 text-green-400 shadow-lg shadow-green-500/10" : "border-white/10 hover:bg-white/5 text-gray-400"
               )}>
               <CheckCircle2 className="w-4 h-4 inline mr-1.5" />Attend Classes
             </button>
@@ -75,49 +78,51 @@ export default function SimulatorPage() {
 
         {/* Count slider */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Number of classes to {scenario}: <span className="text-primary font-bold text-lg">{count}</span>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Number of classes to {scenario}: <span className="text-purple-400 font-bold text-lg">{count}</span>
           </label>
           <input type="range" min={1} max={30} value={count} onChange={(e) => setCount(parseInt(e.target.value))}
-            className="w-full accent-primary" />
-          <div className="flex justify-between text-xs text-text-muted"><span>1</span><span>15</span><span>30</span></div>
+            className="w-full accent-purple-500" />
+          <div className="flex justify-between text-xs text-gray-500"><span>1</span><span>15</span><span>30</span></div>
         </div>
       </div>
 
       {/* Result */}
       {result && !loading && (
-        <div className="bg-surface rounded-xl border border-border p-6">
-          <h3 className="font-semibold mb-4">Simulation Result</h3>
+        <div className="glass rounded-2xl p-6">
+          <h3 className="font-semibold mb-4 text-white">Simulation Result</h3>
 
           <div className="flex items-center gap-4 justify-center mb-6">
             {/* Current */}
             <div className="text-center">
-              <p className="text-sm text-text-muted mb-1">Current</p>
+              <p className="text-sm text-gray-500 mb-1">Current</p>
               <p className={clsx("text-4xl font-bold",
-                result.currentStatus === "green" ? "text-success" : result.currentStatus === "yellow" ? "text-warning" : "text-danger"
+                result.currentStatus === "green" ? "text-green-400" : result.currentStatus === "yellow" ? "text-yellow-400" : "text-red-400"
               )}>{result.currentPct}%</p>
             </div>
-            <ArrowRight className="w-8 h-8 text-text-muted" />
+            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+              <ArrowRight className="w-5 h-5 text-gray-500" />
+            </div>
             {/* After */}
             <div className="text-center">
-              <p className="text-sm text-text-muted mb-1">After {scenario === "skip" ? "skipping" : "attending"} {count}</p>
+              <p className="text-sm text-gray-500 mb-1">After {scenario === "skip" ? "skipping" : "attending"} {count}</p>
               <p className={clsx("text-4xl font-bold",
-                result.newStatus === "green" ? "text-success" : result.newStatus === "yellow" ? "text-warning" : "text-danger"
+                result.newStatus === "green" ? "text-green-400" : result.newStatus === "yellow" ? "text-yellow-400" : "text-red-400"
               )}>{result.simulatedPct}%</p>
             </div>
           </div>
 
           {/* Status indicator */}
-          <div className={clsx("text-center p-4 rounded-xl",
-            result.safe ? "bg-success/10" : "bg-danger/10"
+          <div className={clsx("text-center p-4 rounded-xl border",
+            result.safe ? "bg-green-500/10 border-green-500/20" : "bg-red-500/10 border-red-500/20"
           )}>
             {result.safe ? (
-              <p className="text-success font-semibold">
+              <p className="text-green-400 font-semibold">
                 <CheckCircle2 className="w-5 h-5 inline mr-1" />
                 Safe! You&apos;ll still be above {selected?.minAttendancePct}%
               </p>
             ) : (
-              <p className="text-danger font-semibold">
+              <p className="text-red-400 font-semibold">
                 <XCircle className="w-5 h-5 inline mr-1" />
                 Dangerous! You&apos;ll fall below {selected?.minAttendancePct}%
               </p>
@@ -125,20 +130,20 @@ export default function SimulatorPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="p-3 bg-surface-2 rounded-lg text-center">
-              <p className="text-lg font-bold">{result.newCanSkip}</p>
-              <p className="text-xs text-text-muted">Can still skip after</p>
+            <div className="p-3 bg-white/5 rounded-xl text-center">
+              <p className="text-lg font-bold text-white">{result.newCanSkip}</p>
+              <p className="text-xs text-gray-500">Can still skip after</p>
             </div>
-            <div className="p-3 bg-surface-2 rounded-lg text-center">
-              <p className="text-lg font-bold">{result.newMustAttend}</p>
-              <p className="text-xs text-text-muted">Must attend to recover</p>
+            <div className="p-3 bg-white/5 rounded-xl text-center">
+              <p className="text-lg font-bold text-white">{result.newMustAttend}</p>
+              <p className="text-xs text-gray-500">Must attend to recover</p>
             </div>
           </div>
         </div>
       )}
 
       {loading && (
-        <div className="text-center py-8 text-text-muted">Calculating...</div>
+        <div className="text-center py-8 text-gray-500">Calculating...</div>
       )}
     </div>
   );

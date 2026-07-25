@@ -2,106 +2,110 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/store/authStore";
+import { useSession, signOut } from "next-auth/react";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight
+  Sliders, Settings, LogOut, Menu, X, ChevronRight, Sparkles
 } from "lucide-react";
 import clsx from "clsx";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/subjects", label: "Subjects", icon: BookOpen },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/simulator", label: "Simulator", icon: Sliders },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500" },
+  { href: "/subjects", label: "Subjects", icon: BookOpen, gradient: "from-cyan-500 to-blue-500" },
+  { href: "/calendar", label: "Calendar", icon: Calendar, gradient: "from-orange-500 to-red-500" },
+  { href: "/analytics", label: "Analytics", icon: BarChart3, gradient: "from-green-500 to-emerald-500" },
+  { href: "/simulator", label: "Simulator", icon: Sliders, gradient: "from-yellow-500 to-orange-500" },
+  { href: "/settings", label: "Settings", icon: Settings, gradient: "from-pink-500 to-purple-500" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, setAuth, logout, isLoading, setLoading } = useAuthStore();
+  const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
+    if (status === "unauthenticated") {
       router.push("/login");
-      return;
     }
-    fetch("/api/v1/auth/me", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => setAuth(data.user, token))
-      .catch(() => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        router.push("/login");
-      });
-  }, [router, setAuth, setLoading]);
+  }, [status, router]);
 
   function handleLogout() {
-    logout();
-    router.push("/login");
+    signOut({ callbackUrl: "/login" });
   }
 
-  if (isLoading || !user) {
+  if (status === "loading" || !session?.user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <GraduationCap className="w-12 h-12 text-primary animate-pulse" />
-          <p className="text-text-muted text-sm">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-mesh">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 animate-pulse-glow">
+            <GraduationCap className="w-9 h-9 text-white" />
+          </div>
+          <p className="text-text-muted text-sm">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
+  const user = session.user;
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-mesh">
       {/* Sidebar */}
       <aside className={clsx(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-surface border-r border-border flex flex-col transition-transform lg:translate-x-0 lg:static",
+        "fixed inset-y-0 left-0 z-40 w-[280px] glass-strong flex flex-col transition-transform lg:translate-x-0 lg:static",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <GraduationCap className="w-8 h-8 text-primary" />
-            <span className="text-lg font-bold">AttendEase</span>
+        <div className="flex items-center justify-between px-5 py-5 border-b border-glass-border">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <GraduationCap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-gradient">AttendEase</span>
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-text-muted">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-text-muted hover:text-text">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-5 space-y-1">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
                 className={clsx(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition",
-                  active ? "bg-primary/10 text-primary" : "text-text-secondary hover:bg-surface-2 hover:text-text"
+                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                  active
+                    ? "nav-active"
+                    : "text-text-secondary hover:text-text hover:bg-white/5"
                 )}>
-                <item.icon className="w-5 h-5" />
+                <div className={clsx(
+                  "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                  active
+                    ? `bg-gradient-to-br ${item.gradient} shadow-lg`
+                    : "bg-white/5"
+                )}>
+                  <item.icon className={clsx("w-4 h-4", active ? "text-white" : "text-text-muted")} />
+                </div>
                 {item.label}
-                {active && <ChevronRight className="w-4 h-4 ml-auto" />}
+                {active && <ChevronRight className="w-4 h-4 ml-auto text-purple-400" />}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-border">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-              {user.fullName.charAt(0).toUpperCase()}
+        <div className="p-3 border-t border-glass-border">
+          <div className="flex items-center gap-3 px-3 py-2.5 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-cyan-500/20">
+              {(user.name || user.email || "U").charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user.fullName}</p>
+              <p className="text-sm font-medium truncate">{user.name || "Student"}</p>
               <p className="text-xs text-text-muted truncate">{user.email}</p>
             </div>
           </div>
           <button onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-danger/10 hover:text-danger transition">
+            className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition">
             <LogOut className="w-4 h-4" /> Sign out
           </button>
         </div>
@@ -109,19 +113,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex items-center gap-4 px-4 sm:px-6 py-3 border-b border-border bg-surface lg:hidden">
-          <button onClick={() => setSidebarOpen(true)} className="text-text-secondary">
+        <header className="flex items-center gap-4 px-4 sm:px-6 py-3.5 glass border-b border-glass-border lg:hidden">
+          <button onClick={() => setSidebarOpen(true)} className="text-text-secondary hover:text-text transition">
             <Menu className="w-6 h-6" />
           </button>
-          <GraduationCap className="w-6 h-6 text-primary" />
-          <span className="font-semibold">AttendEase</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <GraduationCap className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-semibold text-gradient">AttendEase</span>
         </header>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-surface-2">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
         </main>
       </div>

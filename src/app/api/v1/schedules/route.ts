@@ -4,7 +4,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { createScheduleSchema } from "@/lib/validations/subject";
 
 export async function GET(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   const schedules = await prisma.schedule.findMany({
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   try {

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   let settings = await prisma.notificationSetting.findUnique({ where: { userId: user.id } });
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
   const body = await req.json();
 

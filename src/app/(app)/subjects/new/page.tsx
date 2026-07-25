@@ -79,102 +79,102 @@ export default function NewSubjectPage() {
 
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
-      <Link href="/subjects" className="flex items-center gap-2 text-text-secondary text-sm mb-6 hover:text-text transition">
+      <Link href="/subjects" className="flex items-center gap-2 text-gray-400 text-sm mb-6 hover:text-white transition">
         <ArrowLeft className="w-4 h-4" /> Back to Subjects
       </Link>
 
       <div className="flex items-center gap-3 mb-6">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 1 ? "bg-primary text-white" : "bg-surface-3 text-text-muted"}`}>1</div>
-        <div className={`h-0.5 w-12 ${step >= 2 ? "bg-primary" : "bg-surface-3"}`} />
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 2 ? "bg-primary text-white" : "bg-surface-3 text-text-muted"}`}>2</div>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 1 ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white" : "bg-white/10 text-gray-500"}`}>1</div>
+        <div className={`h-0.5 w-12 ${step >= 2 ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-white/10"}`} />
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= 2 ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white" : "bg-white/10 text-gray-500"}`}>2</div>
       </div>
 
-      {error && <div className="bg-danger/10 text-danger text-sm p-3 rounded-lg mb-4">{error}</div>}
+      {error && <div className="bg-red-500/10 text-red-400 text-sm p-3 rounded-xl mb-4 border border-red-500/20">{error}</div>}
 
       {step === 1 ? (
-        <form onSubmit={handleCreateSubject} className="bg-surface rounded-xl border border-border p-6 space-y-5">
-          <h2 className="text-xl font-bold">Subject Details</h2>
+        <form onSubmit={handleCreateSubject} className="glass rounded-2xl p-6 space-y-5">
+          <h2 className="text-xl font-bold text-gradient">Subject Details</h2>
           <div>
-            <label className="block text-sm font-medium mb-1">Subject Name *</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Subject Name *</label>
             <input type="text" value={form.name} onChange={(e) => updateForm("name", e.target.value)} required
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
               placeholder="e.g., Data Structures" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Subject Code</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Subject Code</label>
               <input type="text" value={form.code} onChange={(e) => updateForm("code", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
                 placeholder="CS301" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Instructor</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Instructor</label>
               <input type="text" value={form.instructorName} onChange={(e) => updateForm("instructorName", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
                 placeholder="Prof. Sharma" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Minimum Attendance Required: {form.minAttendancePct}%</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Minimum Attendance Required: {form.minAttendancePct}%</label>
             <input type="range" min={50} max={100} step={5} value={form.minAttendancePct}
               onChange={(e) => updateForm("minAttendancePct", parseInt(e.target.value))}
-              className="w-full accent-primary" />
-            <div className="flex justify-between text-xs text-text-muted"><span>50%</span><span>100%</span></div>
+              className="w-full accent-purple-500" />
+            <div className="flex justify-between text-xs text-gray-500"><span>50%</span><span>100%</span></div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Color</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Color</label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map((c) => (
                 <button key={c} type="button" onClick={() => updateForm("colorHex", c)}
-                  className={`w-8 h-8 rounded-full border-2 transition ${form.colorHex === c ? "border-text scale-110" : "border-transparent"}`}
+                  className={`w-8 h-8 rounded-full border-2 transition hover:scale-110 ${form.colorHex === c ? "border-white scale-110 shadow-lg" : "border-transparent"}`}
                   style={{ backgroundColor: c }} />
               ))}
             </div>
           </div>
-          <div className="flex items-center justify-between p-3 bg-surface-2 rounded-lg">
-            <span className="text-sm">WhatsApp Reminder</span>
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+            <span className="text-sm text-gray-300">WhatsApp Reminder</span>
             <button type="button" onClick={() => updateForm("reminderEnabled", !form.reminderEnabled)}
-              className={`w-10 h-6 rounded-full transition ${form.reminderEnabled ? "bg-primary" : "bg-surface-3"}`}>
+              className={`w-10 h-6 rounded-full transition ${form.reminderEnabled ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-white/10"}`}>
               <div className={`w-4 h-4 bg-white rounded-full transform transition ${form.reminderEnabled ? "translate-x-5" : "translate-x-1"}`} />
             </button>
           </div>
           <button type="submit" disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2">
+            className="btn-gradient w-full py-3 rounded-xl font-medium transition disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <Loader2 className="w-4 h-4 animate-spin" />} Next: Add Schedule
           </button>
         </form>
       ) : (
-        <div className="bg-surface rounded-xl border border-border p-6 space-y-5">
-          <h2 className="text-xl font-bold">Class Schedule</h2>
-          <p className="text-sm text-text-secondary">When does this class meet?</p>
+        <div className="glass rounded-2xl p-6 space-y-5">
+          <h2 className="text-xl font-bold text-gradient">Class Schedule</h2>
+          <p className="text-sm text-gray-400">When does this class meet?</p>
 
           {schedules.map((sched, i) => (
-            <div key={i} className="grid grid-cols-12 gap-3 items-end p-4 bg-surface-2 rounded-lg">
+            <div key={i} className="grid grid-cols-12 gap-3 items-end p-4 bg-white/5 rounded-xl">
               <div className="col-span-3">
-                <label className="block text-xs font-medium mb-1">Day</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Day</label>
                 <select value={sched.dayOfWeek} onChange={(e) => updateSchedule(i, "dayOfWeek", parseInt(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-sm">
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm">
                   {DAYS.map((d, di) => <option key={di} value={di}>{d}</option>)}
                 </select>
               </div>
               <div className="col-span-3">
-                <label className="block text-xs font-medium mb-1">Start</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Start</label>
                 <input type="time" value={sched.startTime} onChange={(e) => updateSchedule(i, "startTime", e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-sm" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" />
               </div>
               <div className="col-span-3">
-                <label className="block text-xs font-medium mb-1">End</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">End</label>
                 <input type="time" value={sched.endTime} onChange={(e) => updateSchedule(i, "endTime", e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-sm" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" />
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-medium mb-1">Room</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Room</label>
                 <input type="text" value={sched.room} onChange={(e) => updateSchedule(i, "room", e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-sm" placeholder="301" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" placeholder="301" />
               </div>
               <div className="col-span-1">
                 {schedules.length > 1 && (
-                  <button onClick={() => removeScheduleSlot(i)} className="p-2 text-danger hover:bg-danger/10 rounded-lg">
+                  <button onClick={() => removeScheduleSlot(i)} className="p-2 text-red-400 hover:bg-red-500/10 rounded-xl transition">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
@@ -182,17 +182,17 @@ export default function NewSubjectPage() {
             </div>
           ))}
 
-          <button onClick={addScheduleSlot} className="flex items-center gap-2 text-primary text-sm font-medium hover:underline">
+          <button onClick={addScheduleSlot} className="flex items-center gap-2 text-purple-400 text-sm font-medium hover:text-purple-300 transition">
             <Plus className="w-4 h-4" /> Add another time slot
           </button>
 
           <div className="flex gap-3">
             <button onClick={() => router.push("/subjects")}
-              className="flex-1 py-3 border border-border rounded-lg font-medium hover:bg-surface-2 transition">
+              className="btn-ghost flex-1 py-3 rounded-xl font-medium transition">
               Skip Schedule
             </button>
             <button onClick={handleSaveSchedules} disabled={loading}
-              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2">
+              className="btn-gradient flex-1 py-3 rounded-xl font-medium transition disabled:opacity-50 flex items-center justify-center gap-2">
               {loading && <Loader2 className="w-4 h-4 animate-spin" />} Save & Finish
             </button>
           </div>

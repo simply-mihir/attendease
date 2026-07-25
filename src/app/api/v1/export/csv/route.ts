@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   const url = new URL(req.url);

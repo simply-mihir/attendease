@@ -4,7 +4,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { bulkAttendanceSchema } from "@/lib/validations/subject";
 
 export async function POST(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   try {

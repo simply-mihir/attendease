@@ -4,48 +4,27 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap
 } from "lucide-react";
 import clsx from "clsx";
 
 interface TodayClass {
-  scheduleId: string;
-  subjectId: string;
-  subjectName: string;
-  colorHex: string;
-  startTime: string;
-  endTime: string;
-  room: string | null;
-  currentPct: number;
-  minPct: number;
-  statusColor: string;
-  streakCount: number;
-  attendanceMarked: boolean;
-  attendanceStatus: string | null;
+  scheduleId: string; subjectId: string; subjectName: string; colorHex: string;
+  startTime: string; endTime: string; room: string | null; currentPct: number;
+  minPct: number; statusColor: string; streakCount: number;
+  attendanceMarked: boolean; attendanceStatus: string | null;
 }
 
 interface SubjectSummary {
-  id: string;
-  name: string;
-  code: string | null;
-  colorHex: string;
-  currentPercentage: number;
-  statusColor: string;
-  statusLabel: string;
-  canSkipCount: number;
-  mustAttendCount: number;
-  streakCount: number;
-  totalClasses: number;
-  minAttendancePct: number;
+  id: string; name: string; code: string | null; colorHex: string;
+  currentPercentage: number; statusColor: string; statusLabel: string;
+  canSkipCount: number; mustAttendCount: number; streakCount: number;
+  totalClasses: number; minAttendancePct: number;
 }
 
 interface DashboardData {
-  overallPct: number;
-  totalSubjects: number;
-  safeSubjects: number;
-  warningSubjects: number;
-  dangerSubjects: number;
-  currentStreak: number;
+  overallPct: number; totalSubjects: number; safeSubjects: number;
+  warningSubjects: number; dangerSubjects: number; currentStreak: number;
   subjectsSummary: SubjectSummary[];
 }
 
@@ -56,15 +35,9 @@ export default function DashboardPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [t, d] = await Promise.all([
-        apiFetch("/schedules/today"),
-        apiFetch("/analytics/dashboard"),
-      ]);
-      setToday(t);
-      setDashboard(d);
-    } catch (err) {
-      console.error(err);
-    }
+      const [t, d] = await Promise.all([apiFetch("/schedules/today"), apiFetch("/analytics/dashboard")]);
+      setToday(t); setDashboard(d);
+    } catch (err) { console.error(err); }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -72,17 +45,13 @@ export default function DashboardPage() {
   async function quickMark(subjectId: string, scheduleId: string, status: string) {
     setMarking(`${subjectId}-${status}`);
     try {
-      const todayDate = new Date().toISOString().slice(0, 10);
       await apiFetch("/attendance", {
         method: "POST",
-        body: JSON.stringify({ subjectId, scheduleId, date: todayDate, status, source: "quick_widget" }),
+        body: JSON.stringify({ subjectId, scheduleId, date: new Date().toISOString().slice(0, 10), status, source: "quick_widget" }),
       });
       await loadData();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setMarking(null);
-    }
+    } catch (err) { console.error(err); }
+    finally { setMarking(null); }
   }
 
   const dangerSubjects = dashboard?.subjectsSummary.filter((s) => s.statusColor === "red") || [];
@@ -95,17 +64,19 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-text-secondary text-sm">{today?.dayName}, {today?.date}</p>
         </div>
-        <Link href="/subjects/new" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition">
+        <Link href="/subjects/new" className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Subject
         </Link>
       </div>
 
       {/* Danger Alert */}
       {dangerSubjects.length > 0 && (
-        <div className="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
+        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30" style={{ borderColor: "rgba(239,68,68,0.3)" }}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
+            <AlertTriangle className="w-5 h-5 text-white" />
+          </div>
           <div>
-            <p className="font-semibold text-danger text-sm">Attendance Danger Zone</p>
+            <p className="font-semibold text-red-400 text-sm">Attendance Danger Zone</p>
             <p className="text-sm text-text-secondary mt-1">
               {dangerSubjects.map((s) => s.name).join(", ")} — below minimum threshold. Attend classes immediately!
             </p>
@@ -118,37 +89,41 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard label="Overall" value={`${dashboard.overallPct}%`}
             icon={<TrendingUp className="w-5 h-5" />}
-            color={dashboard.overallPct >= 75 ? "text-success" : "text-danger"} />
+            gradient={dashboard.overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
           <StatCard label="Subjects" value={dashboard.totalSubjects.toString()}
-            icon={<BookOpen className="w-5 h-5" />} color="text-primary" />
-          <StatCard label="Streak" value={`${dashboard.currentStreak} days`}
-            icon={<Flame className="w-5 h-5" />} color="text-warning" />
+            icon={<BookOpen className="w-5 h-5" />} gradient="from-cyan-500 to-blue-500" />
+          <StatCard label="Streak" value={`${dashboard.currentStreak}d`}
+            icon={<Flame className="w-5 h-5" />} gradient="from-orange-500 to-yellow-500" />
           <StatCard label="In Danger" value={dashboard.dangerSubjects.toString()}
-            icon={<AlertTriangle className="w-5 h-5" />}
-            color={dashboard.dangerSubjects > 0 ? "text-danger" : "text-success"} />
+            icon={<Zap className="w-5 h-5" />}
+            gradient={dashboard.dangerSubjects > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
         </div>
       )}
 
       {/* Today's Classes */}
       {today && today.classes.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3">Today&apos;s Classes</h2>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
+          </h2>
           <div className="grid gap-3">
             {today.classes.map((cls) => (
-              <div key={cls.scheduleId} className="bg-surface rounded-xl border border-border p-4">
+              <div key={cls.scheduleId} className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-10 rounded-full" style={{ backgroundColor: cls.colorHex }} />
+                    <div className="w-1.5 h-12 rounded-full" style={{ backgroundColor: cls.colorHex, boxShadow: `0 0 12px ${cls.colorHex}40` }} />
                     <div>
                       <h3 className="font-semibold">{cls.subjectName}</h3>
-                      <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5">
+                      <div className="flex items-center gap-3 text-xs text-text-secondary mt-1">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{cls.startTime} - {cls.endTime}</span>
                         {cls.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{cls.room}</span>}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={clsx("text-lg font-bold", cls.statusColor === "green" ? "text-success" : cls.statusColor === "yellow" ? "text-warning" : "text-danger")}>
+                    <span className={clsx("text-xl font-bold",
+                      cls.statusColor === "green" ? "text-green-400" : cls.statusColor === "yellow" ? "text-yellow-400" : "text-red-400"
+                    )}>
                       {cls.currentPct}%
                     </span>
                     <p className="text-xs text-text-muted">min {cls.minPct}%</p>
@@ -156,24 +131,24 @@ export default function DashboardPage() {
                 </div>
 
                 {cls.attendanceMarked ? (
-                  <div className={clsx("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium",
-                    cls.attendanceStatus === "present" ? "bg-success/10 text-success" :
-                    cls.attendanceStatus === "late" ? "bg-warning/10 text-warning" :
-                    "bg-danger/10 text-danger"
+                  <div className={clsx("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium",
+                    cls.attendanceStatus === "present" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
+                    cls.attendanceStatus === "late" ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" :
+                    "bg-red-500/10 text-red-400 border border-red-500/20"
                   )}>
                     <CheckCircle2 className="w-4 h-4" />
                     Marked: {cls.attendanceStatus}
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                    {["present", "absent", "late"].map((status) => (
+                    {(["present", "absent", "late"] as const).map((status) => (
                       <button key={status} onClick={() => quickMark(cls.subjectId, cls.scheduleId, status)}
                         disabled={marking === `${cls.subjectId}-${status}`}
-                        className={clsx("flex-1 py-2 rounded-lg text-sm font-medium transition border",
-                          status === "present" ? "border-success/30 text-success hover:bg-success/10" :
-                          status === "absent" ? "border-danger/30 text-danger hover:bg-danger/10" :
-                          "border-warning/30 text-warning hover:bg-warning/10"
-                        )}>
+                        className={clsx("flex-1 py-2.5 rounded-xl text-sm font-medium transition-all",
+                          status === "present" ? "glass border-green-500/20 text-green-400 hover:bg-green-500/10 hover:shadow-lg hover:shadow-green-500/10" :
+                          status === "absent" ? "glass border-red-500/20 text-red-400 hover:bg-red-500/10 hover:shadow-lg hover:shadow-red-500/10" :
+                          "glass border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10 hover:shadow-lg hover:shadow-yellow-500/10"
+                        )} style={{ borderColor: status === "present" ? "rgba(34,197,94,0.2)" : status === "absent" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)" }}>
                         {status === "present" ? <CheckCircle2 className="w-4 h-4 inline mr-1" /> :
                          status === "absent" ? <XCircle className="w-4 h-4 inline mr-1" /> :
                          <Timer className="w-4 h-4 inline mr-1" />}
@@ -195,36 +170,34 @@ export default function DashboardPage() {
           <div className="grid gap-3 md:grid-cols-2">
             {dashboard.subjectsSummary.map((s) => (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="bg-surface rounded-xl border border-border p-4 hover:shadow-md transition group">
+                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-8 rounded-full" style={{ backgroundColor: s.colorHex }} />
+                    <div className="w-2 h-10 rounded-full" style={{ backgroundColor: s.colorHex, boxShadow: `0 0 10px ${s.colorHex}30` }} />
                     <div>
-                      <h3 className="font-semibold group-hover:text-primary transition">{s.name}</h3>
+                      <h3 className="font-semibold group-hover:text-purple-400 transition">{s.name}</h3>
                       {s.code && <p className="text-xs text-text-muted">{s.code}</p>}
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-primary transition" />
+                  <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
                 </div>
                 {/* Progress bar */}
-                <div className="h-2 bg-surface-3 rounded-full overflow-hidden mb-2">
+                <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-2">
                   <div className={clsx("h-full rounded-full transition-all",
-                    s.statusColor === "green" ? "bg-success" : s.statusColor === "yellow" ? "bg-warning" : "bg-danger"
+                    s.statusColor === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" :
+                    s.statusColor === "yellow" ? "bg-gradient-to-r from-yellow-500 to-orange-400" :
+                    "bg-gradient-to-r from-red-500 to-pink-400"
                   )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className={clsx("font-semibold",
-                    s.statusColor === "green" ? "text-success" : s.statusColor === "yellow" ? "text-warning" : "text-danger"
-                  )}>
-                    {s.currentPercentage}%
-                  </span>
+                    s.statusColor === "green" ? "text-green-400" : s.statusColor === "yellow" ? "text-yellow-400" : "text-red-400"
+                  )}>{s.currentPercentage}%</span>
                   <span className="text-text-muted text-xs">
-                    {s.statusColor === "red"
-                      ? `Attend ${s.mustAttendCount} more`
-                      : `Can skip ${s.canSkipCount}`}
+                    {s.statusColor === "red" ? `Attend ${s.mustAttendCount} more` : `Can skip ${s.canSkipCount}`}
                   </span>
                   {s.streakCount > 0 && (
-                    <span className="flex items-center gap-1 text-xs text-warning">
+                    <span className="flex items-center gap-1 text-xs text-orange-400">
                       <Flame className="w-3 h-3" />{s.streakCount}
                     </span>
                   )}
@@ -237,11 +210,13 @@ export default function DashboardPage() {
 
       {/* Empty state */}
       {dashboard && dashboard.totalSubjects === 0 && (
-        <div className="text-center py-16 bg-surface rounded-xl border border-border">
-          <BookOpen className="w-16 h-16 text-text-muted mx-auto mb-4" />
+        <div className="text-center py-16 glass rounded-2xl">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
+            <BookOpen className="w-10 h-10 text-white" />
+          </div>
           <h2 className="text-xl font-semibold mb-2">No subjects yet</h2>
           <p className="text-text-secondary mb-6">Add your first subject to start tracking attendance</p>
-          <Link href="/subjects/new" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition">
+          <Link href="/subjects/new" className="btn-gradient px-6 py-3 rounded-xl inline-flex items-center gap-2">
             <Plus className="w-5 h-5" /> Add Your First Subject
           </Link>
         </div>
@@ -250,14 +225,16 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
+function StatCard({ label, value, icon, gradient }: { label: string; value: string; icon: React.ReactNode; gradient: string }) {
   return (
-    <div className="bg-surface rounded-xl border border-border p-4">
+    <div className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
       <div className="flex items-center justify-between mb-2">
         <span className="text-text-secondary text-sm">{label}</span>
-        <span className={color}>{icon}</span>
+        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg`}>
+          {icon}
+        </div>
       </div>
-      <p className={clsx("text-2xl font-bold", color)}>{value}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 }

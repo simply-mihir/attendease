@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
   const { id } = await params;
 
@@ -59,7 +59,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
   const { id } = await params;
 

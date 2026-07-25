@@ -4,7 +4,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { simulateSkip, simulateAttend, calculateAttendance } from "@/lib/attendance-calc";
 
 export async function POST(req: NextRequest) {
-  const user = await getAuthUser(req);
+  const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
   const body = await req.json();
