@@ -5,7 +5,7 @@ const features = [
   { icon: GraduationCap, title: "Track Attendance", desc: "Mark present, absent, or late with one tap. Supports bulk marking for busy days.", gradient: "from-purple-500 to-pink-500" },
   { icon: BarChart3, title: "Smart Analytics", desc: "Heatmaps, trend charts, and per-subject breakdowns so you always know where you stand.", gradient: "from-cyan-500 to-blue-500" },
   { icon: Calculator, title: "Bunk Calculator", desc: "Know exactly how many classes you can skip — or how many you need to recover.", gradient: "from-orange-500 to-red-500" },
-  { icon: Bell, title: "WhatsApp Reminders", desc: "Get pre-class reminders and danger zone alerts straight to your WhatsApp.", gradient: "from-green-500 to-emerald-500" },
+  { icon: Bell, title: "Telegram & Email Alerts", desc: "Get pre-class reminders, daily briefs, and danger zone alerts via Telegram Bot or Email.", gradient: "from-green-500 to-emerald-500" },
   { icon: Shield, title: "Danger Alerts", desc: "Instant warnings when your attendance drops near the minimum threshold.", gradient: "from-red-500 to-pink-500" },
   { icon: Flame, title: "Streaks & Badges", desc: "Earn achievements for consistent attendance. Keep your streak alive!", gradient: "from-yellow-500 to-orange-500" },
 ];
@@ -51,7 +51,7 @@ export default function LandingPage() {
         </h1>
         <p className="text-lg text-text-secondary max-w-2xl mb-10 leading-relaxed">
           AttendEase tracks your classes, calculates how many you can skip, warns you before it&apos;s too late,
-          and sends reminders right to your WhatsApp. All in one beautiful app.
+          and sends reminders right to Telegram and Email. All in one beautiful app.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link href="/register" className="btn-gradient px-8 py-4 rounded-2xl font-semibold text-lg flex items-center gap-2 group">
@@ -79,7 +79,7 @@ export default function LandingPage() {
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
                   <f.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{f.title}</h3>
+                <h3 className="text-lg font-semibold mb-2 text-text">{f.title}</h3>
                 <p className="text-text-secondary text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}

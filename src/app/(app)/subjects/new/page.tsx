@@ -132,7 +132,7 @@ export default function NewSubjectPage() {
             </div>
           </div>
           <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-            <span className="text-sm text-gray-300">WhatsApp Reminder</span>
+            <span className="text-sm text-text-secondary">Telegram & Email Reminders</span>
             <button type="button" onClick={() => updateForm("reminderEnabled", !form.reminderEnabled)}
               className={`w-10 h-6 rounded-full transition ${form.reminderEnabled ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-white/10"}`}>
               <div className={`w-4 h-4 bg-white rounded-full transform transition ${form.reminderEnabled ? "translate-x-5" : "translate-x-1"}`} />
