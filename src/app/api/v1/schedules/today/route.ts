@@ -1,16 +1,25 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
+
+  const searchParams = req.nextUrl.searchParams;
+  const semesterId = searchParams.get("semesterId");
 
   const now = new Date();
   const dayOfWeek = now.getDay();
   const todayStr = now.toISOString().slice(0, 10);
 
+  const whereClause: any = { userId: user.id, dayOfWeek, isActive: true };
+  if (semesterId) {
+    whereClause.subject = { semesterId };
+  }
+
   const schedules = await prisma.schedule.findMany({
-    where: { userId: user.id, dayOfWeek, isActive: true },
+    where: whereClause,
     include: {
       subject: {
         select: {

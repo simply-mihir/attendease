@@ -1,13 +1,30 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { calculateAttendance } from "@/lib/attendance-calc";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
+  const searchParams = req.nextUrl.searchParams;
+  const semesterId = searchParams.get("semesterId");
+
+  let isCurrentSemester = true;
+  let semesterName = "Global Dashboard";
+
+  const whereClause: any = { userId: user.id, isArchived: false };
+  if (semesterId) {
+    whereClause.semesterId = semesterId;
+    const sem = await prisma.semester.findUnique({ where: { id: semesterId } });
+    if (sem) {
+      isCurrentSemester = sem.isCurrent;
+      semesterName = sem.name;
+    }
+  }
+
   const subjects = await prisma.subject.findMany({
-    where: { userId: user.id, isArchived: false },
+    where: whereClause,
     include: {
       schedules: { where: { isActive: true } },
     },
@@ -64,5 +81,7 @@ export async function GET() {
     currentStreak,
     longestStreak,
     subjectsSummary,
+    isCurrentSemester,
+    semesterName,
   });
 }

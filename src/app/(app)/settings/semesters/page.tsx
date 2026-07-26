@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
-import { ArrowLeft, Plus, Trash2, Star, Loader2, Edit2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Star, Loader2, Edit2, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 
@@ -175,7 +175,10 @@ export default function SemestersPage() {
                 {new Date(s.startDate).toLocaleDateString("en-IN")} — {new Date(s.endDate).toLocaleDateString("en-IN")}
                 {s.subjects && ` · ${s.subjects.length} subjects`}
               </p>
-              <div className="flex gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Link href={`/semesters/${s.id}/dashboard`} className="btn-ghost px-3 py-1.5 text-xs text-text-secondary hover:text-white rounded-lg border border-glass-border transition flex items-center gap-1">
+                  <BarChart3 className="w-3.5 h-3.5" /> Dashboard
+                </Link>
                 <button onClick={() => openLinkModal(s.id)} className="btn-ghost px-3 py-1.5 text-xs text-text-secondary hover:text-text rounded-lg border border-glass-border transition">
                   Link Subjects
                 </button>
