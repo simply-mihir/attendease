@@ -6,7 +6,7 @@ import { apiFetch } from "@/hooks/useApi";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
-  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save
+  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -43,6 +43,12 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [editRecordDate, setEditRecordDate] = useState("");
   const [editRecordStatus, setEditRecordStatus] = useState("");
   const [savingRecord, setSavingRecord] = useState(false);
+
+  // Schedule State
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleMode, setScheduleMode] = useState<"add" | "edit">("add");
+  const [scheduleForm, setScheduleForm] = useState({ id: "", dayOfWeek: 1, startTime: "09:00", endTime: "10:00", room: "", building: "" });
+  const [savingSchedule, setSavingSchedule] = useState(false);
 
   const load = useCallback(async () => {
     const data = await apiFetch(`/subjects/${id}`);
@@ -130,6 +136,47 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       await load();
     } catch (err) { console.error(err); }
     finally { setSavingRecord(false); }
+  }
+
+  function openAddScheduleModal() {
+    setScheduleMode("add");
+    setScheduleForm({ id: "", dayOfWeek: 1, startTime: "09:00", endTime: "10:00", room: "", building: "" });
+    setShowScheduleModal(true);
+  }
+
+  function openEditScheduleModal(s: any) {
+    setScheduleMode("edit");
+    setScheduleForm({ id: s.id, dayOfWeek: s.dayOfWeek, startTime: s.startTime, endTime: s.endTime, room: s.room || "", building: s.building || "" });
+    setShowScheduleModal(true);
+  }
+
+  async function handleSaveSchedule(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingSchedule(true);
+    try {
+      if (scheduleMode === "add") {
+        await apiFetch("/schedules", {
+          method: "POST",
+          body: JSON.stringify({ subjectId: id, dayOfWeek: Number(scheduleForm.dayOfWeek), startTime: scheduleForm.startTime, endTime: scheduleForm.endTime, room: scheduleForm.room, building: scheduleForm.building })
+        });
+      } else {
+        await apiFetch(`/schedules/${scheduleForm.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ dayOfWeek: Number(scheduleForm.dayOfWeek), startTime: scheduleForm.startTime, endTime: scheduleForm.endTime, room: scheduleForm.room, building: scheduleForm.building })
+        });
+      }
+      setShowScheduleModal(false);
+      await load();
+    } catch (err) { console.error(err); }
+    finally { setSavingSchedule(false); }
+  }
+
+  async function handleDeleteSchedule(scheduleId: string) {
+    if (!confirm("Delete this schedule?")) return;
+    try {
+      await apiFetch(`/schedules/${scheduleId}`, { method: "DELETE" });
+      await load();
+    } catch (err) { console.error(err); }
   }
 
   // Progress ring SVG
@@ -287,26 +334,43 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       </div>
 
       {/* Schedule */}
-      {subject.schedules?.length > 0 && (
-        <div className="glass p-5">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="glass p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center border-2 border-border-heavy">
               <Clock className="w-5 h-5 text-border-heavy" />
             </div>
             <h3 className="font-semibold text-text">Schedule</h3>
           </div>
+          <button onClick={openAddScheduleModal} className="btn-ghost px-3 py-1.5 rounded-full text-xs text-text hover:bg-white/10 flex items-center gap-1.5 transition">
+            <Plus className="w-3.5 h-3.5" /> Add
+          </button>
+        </div>
+        {subject.schedules?.length === 0 ? (
+          <p className="text-text-muted text-sm py-4 text-center font-semibold">No schedule set</p>
+        ) : (
           <div className="space-y-2">
-            {subject.schedules.map((s: any) => (
-              <div key={s.id} className="flex items-center gap-3 p-3 bg-white/5 border-2 border-border-heavy rounded-2xl">
-                <span className="text-sm font-black w-12 text-primary">{DAYS[s.dayOfWeek]}</span>
-                <Clock className="w-4 h-4 text-text-muted" />
-                <span className="text-sm font-semibold text-text-secondary">{s.startTime} - {s.endTime}</span>
-                {s.room && <><MapPin className="w-4 h-4 text-text-muted ml-2" /><span className="text-sm font-semibold text-text-secondary">{s.room}</span></>}
+            {subject.schedules?.map((s: any) => (
+              <div key={s.id} className="flex items-center justify-between p-3 bg-white/5 border-2 border-border-heavy rounded-2xl hover:bg-white/10 transition">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-black w-12 text-primary">{DAYS[s.dayOfWeek]}</span>
+                  <Clock className="w-4 h-4 text-text-muted" />
+                  <span className="text-sm font-semibold text-text-secondary">{s.startTime} - {s.endTime}</span>
+                  {s.room && <><MapPin className="w-4 h-4 text-text-muted ml-2" /><span className="text-sm font-semibold text-text-secondary">{s.room} {s.building && `(${s.building})`}</span></>}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => openEditScheduleModal(s)} className="btn-ghost p-2 text-text-muted hover:text-primary transition">
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDeleteSchedule(s.id)} className="btn-ghost p-2 text-text-muted hover:text-red-400 transition">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Attendance History */}
       <div className="glass p-5">
@@ -400,6 +464,47 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button onClick={handleSaveAttendance} disabled={savingRecord} className="btn-gradient flex-1 py-3">{savingRecord ? "Saving..." : "Save"}</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Add / Edit Schedule Modal */}
+      {showScheduleModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50">
+          <form onSubmit={handleSaveSchedule} className="glass-strong rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4">
+            <h3 className="text-xl font-black text-text mb-4">{scheduleMode === "add" ? "Add Schedule" : "Edit Schedule"}</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Day of Week</label>
+                <select value={scheduleForm.dayOfWeek} onChange={e => setScheduleForm({ ...scheduleForm, dayOfWeek: Number(e.target.value) })} className="input-glass w-full py-2.5 appearance-none">
+                  {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Start Time</label>
+                  <input type="time" value={scheduleForm.startTime} onChange={e => setScheduleForm({ ...scheduleForm, startTime: e.target.value })} required className="input-glass w-full py-2.5" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">End Time</label>
+                  <input type="time" value={scheduleForm.endTime} onChange={e => setScheduleForm({ ...scheduleForm, endTime: e.target.value })} required className="input-glass w-full py-2.5" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Room (Optional)</label>
+                  <input type="text" value={scheduleForm.room} onChange={e => setScheduleForm({ ...scheduleForm, room: e.target.value })} className="input-glass w-full py-2.5" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Building (Optional)</label>
+                  <input type="text" value={scheduleForm.building} onChange={e => setScheduleForm({ ...scheduleForm, building: e.target.value })} className="input-glass w-full py-2.5" />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <button type="button" onClick={() => setShowScheduleModal(false)} className="btn-ghost flex-1 py-3">Cancel</button>
+              <button type="submit" disabled={savingSchedule} className="btn-gradient flex-1 py-3">{savingSchedule ? "Saving..." : "Save"}</button>
+            </div>
+          </form>
         </div>
       )}
 
