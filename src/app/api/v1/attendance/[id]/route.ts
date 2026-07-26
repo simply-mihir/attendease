@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { recalcSubjectStats } from "@/lib/subject-stats";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
@@ -37,26 +38,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     },
   });
 
-  // Recalc stats (inline simplified version)
-  const records = await prisma.attendanceRecord.findMany({
-    where: { subjectId: record.subjectId },
-  });
-  const countable = records.filter((r) => !["holiday", "cancelled"].includes(r.status));
-  const present = countable.filter((r) => r.status === "present" || r.status === "late").length;
-  const currentPercentage = countable.length === 0 ? 0 : Math.round((present / countable.length) * 10000) / 100;
-  await prisma.subject.update({
-    where: { id: record.subjectId },
-    data: {
-      totalClassesHeld: countable.length,
-      totalPresent: countable.filter((r) => r.status === "present").length,
-      totalAbsent: countable.filter((r) => r.status === "absent").length,
-      totalLate: countable.filter((r) => r.status === "late").length,
-      totalExcused: countable.filter((r) => r.status === "excused").length,
-      currentPercentage,
-    },
-  });
+  const updatedStats = await recalcSubjectStats(record.subjectId);
 
-  return Response.json({ record });
+  return Response.json({ record, updatedStats });
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
@@ -80,5 +64,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   });
 
   await prisma.attendanceRecord.delete({ where: { id } });
-  return Response.json({ success: true });
+  
+  const updatedStats = await recalcSubjectStats(existing.subjectId);
+
+  return Response.json({ success: true, updatedStats });
 }
