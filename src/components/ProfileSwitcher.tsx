@@ -145,9 +145,7 @@ export function ProfileSwitcher() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             animation: "onboard-in 0.25s ease-out forwards",
           }}
         >
