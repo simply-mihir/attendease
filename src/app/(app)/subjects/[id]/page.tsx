@@ -243,10 +243,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-5 gap-4 mt-6">
           <div className="text-center p-3 bg-white/5 rounded-2xl border-2 border-transparent">
             <p className="text-2xl font-bold text-text">{subject.totalClassesHeld}</p>
-            <p className="text-xs text-text-muted">Total</p>
+            <p className="text-xs text-text-muted">Conducted</p>
           </div>
           <div className="text-center p-3 bg-green-500/10 rounded-2xl border-2 border-green-500/20">
             <p className="text-2xl font-bold text-green-400">{subject.totalPresent}</p>
@@ -259,6 +259,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <div className="text-center p-3 bg-yellow-500/10 rounded-2xl border-2 border-yellow-500/20">
             <p className="text-2xl font-bold text-yellow-400">{subject.totalLate}</p>
             <p className="text-xs text-text-muted">Late</p>
+          </div>
+          <div className="text-center p-3 bg-slate-500/10 rounded-2xl border-2 border-slate-500/20">
+            <p className="text-2xl font-bold text-slate-400">{subject.totalCancelled || 0}</p>
+            <p className="text-xs text-text-muted">Cancelled</p>
           </div>
         </div>
       </div>
