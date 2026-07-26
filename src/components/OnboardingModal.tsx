@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/hooks/useApi";
-import { GraduationCap, Building2, BookOpen, Calendar, Sparkles, Loader2 } from "lucide-react";
+import { GraduationCap, Building2, BookOpen, Calendar, Sparkles, Loader2, UserCheck } from "lucide-react";
 
 export function OnboardingModal() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const [profileName, setProfileName] = useState("Primary Degree");
   const [institution, setInstitution] = useState("");
   const [courseName, setCourseName] = useState("");
   const [semesterName, setSemesterName] = useState("Semester 1");
@@ -30,14 +31,14 @@ export function OnboardingModal() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!courseName.trim() || !institution.trim()) return;
+    if (!profileName.trim() || !courseName.trim() || !institution.trim()) return;
     setSubmitting(true);
 
     try {
       await apiFetch("/profiles", {
         method: "POST",
         body: JSON.stringify({
-          name: courseName,
+          name: profileName,
           degreeType: courseName,
           institution,
           semesterName: semesterName || "Semester 1",
@@ -45,7 +46,7 @@ export function OnboardingModal() {
         }),
       });
       setShow(false);
-      window.location.reload();
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
     } finally {
@@ -63,49 +64,64 @@ export function OnboardingModal() {
             <GraduationCap className="w-8 h-8 text-white" />
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" /> Complete Your Profile Setup
+            <Sparkles className="w-3.5 h-3.5" /> Academic Profile Setup
           </div>
-          <h2 className="text-2xl font-bold text-gradient">Welcome to AttendEase!</h2>
+          <h2 className="text-2xl font-bold text-gradient">Create Your Degree Profile</h2>
           <p className="text-xs text-text-secondary">
-            Please complete your academic profile to start tracking your attendance accurately.
+            Please enter your academic details to configure your attendance workspace.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-medium text-text-secondary mb-1.5 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-purple-400" />
+            <label className="block text-xs font-medium text-text-secondary mb-1 flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-purple-400" />
+              Profile Name
+            </label>
+            <input
+              type="text"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+              placeholder="e.g. Primary Degree, B.Tech CS Profile, Dual Degree"
+              required
+              className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-text-secondary mb-1 flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-pink-400" />
               College / University Name
             </label>
             <input
               type="text"
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
-              placeholder="e.g. IIT Delhi, Delhi University, Stanford"
+              placeholder="e.g. IIT Bombay, Delhi University, Stanford"
               required
               className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-text-secondary mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-medium text-text-secondary mb-1 flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-              Course / Degree Name
+              Course Pursuing
             </label>
             <input
               type="text"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
-              placeholder="e.g. B.Tech Computer Science, B.Com (Hons), M.Sc"
+              placeholder="e.g. B.Tech Computer Science, B.Com (Hons), M.Sc Data Science"
               required
               className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-text-secondary mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-medium text-text-secondary mb-1 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-              Current Semester / Term
+              Current Semester
             </label>
             <select
               value={semesterName}
