@@ -48,6 +48,7 @@ export async function GET() {
       ...stats,
       streakCount: s.streakCount,
       totalClasses: s.totalClassesHeld,
+      totalCancelled: s.totalCancelled,
       minAttendancePct: s.minAttendancePct,
     };
   });

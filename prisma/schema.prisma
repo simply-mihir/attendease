@@ -128,6 +128,7 @@ model Subject {
   totalAbsent        Int      @default(0)
   totalLate          Int      @default(0)
   totalExcused       Int      @default(0)
+  totalCancelled     Int      @default(0)
   currentPercentage  Float    @default(0.0)
   streakCount        Int      @default(0)
   longestStreak      Int      @default(0)

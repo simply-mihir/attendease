@@ -19,7 +19,7 @@ interface SubjectSummary {
   id: string; name: string; code: string | null; colorHex: string;
   currentPercentage: number; statusColor: string; statusLabel: string;
   canSkipCount: number; mustAttendCount: number; streakCount: number;
-  totalClasses: number; minAttendancePct: number;
+  totalClasses: number; totalCancelled: number; minAttendancePct: number;
 }
 
 interface DashboardData {
@@ -288,11 +288,18 @@ export default function DashboardPage() {
                   <span className="text-text-muted text-xs">
                     {s.statusColor === "red" ? `Attend ${s.mustAttendCount} more` : `Can skip ${s.canSkipCount}`}
                   </span>
-                  {s.streakCount > 0 && (
-                    <span className="flex items-center gap-1 text-xs text-orange-400">
-                      <Flame className="w-3 h-3" />{s.streakCount}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {s.totalCancelled > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-slate-400 font-bold bg-slate-500/10 px-2 py-0.5 rounded-md">
+                        <Ban className="w-3 h-3" /> {s.totalCancelled}
+                      </span>
+                    )}
+                    {s.streakCount > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
+                        <Flame className="w-3 h-3" />{s.streakCount}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Link>
             ))}
