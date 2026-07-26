@@ -39,22 +39,22 @@
 }
 
 html.dark {
-  /* Synthwave / Neon Dark Mode */
-  --color-surface: #0F0826;
-  --color-surface-2: #1A0B2E;
-  --color-surface-3: #2D1445;
+  /* Soothing Youthful Dark Mode (Soft Pastel Midnight) */
+  --color-surface: #181926;
+  --color-surface-2: #24273A;
+  --color-surface-3: #363A4F;
   
-  --color-border: #334155;
-  --color-border-heavy: #05020D;
-  --color-shadow-heavy: #05020D;
+  --color-border: #494D64;
+  --color-border-heavy: #0C0E14;
+  --color-shadow-heavy: #0C0E14;
   
-  --color-text: #F8F5FA;
-  --color-text-secondary: #00E5FF;
-  --color-text-muted: #8E7C8F;
+  --color-text: #CAD3F5;
+  --color-text-secondary: #8AADF4;
+  --color-text-muted: #8087A2;
   
-  --color-glass: #1A0B2E;
-  --color-glass-strong: #2D1445;
-  --color-glass-border: #05020D;
+  --color-glass: #24273A;
+  --color-glass-strong: #363A4F;
+  --color-glass-border: #0C0E14;
 }
 
 * { box-sizing: border-box; }
