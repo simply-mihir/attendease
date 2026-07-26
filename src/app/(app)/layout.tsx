@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { ProfileSwitcher } from "@/components/ProfileSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight, Sparkles
+  Sliders, Settings, LogOut, Menu, X, ChevronRight
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -118,15 +120,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex items-center gap-4 px-4 sm:px-6 py-3.5 glass border-b border-glass-border lg:hidden">
-          <button onClick={() => setSidebarOpen(true)} className="text-text-secondary hover:text-text transition">
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <GraduationCap className="w-5 h-5 text-white" />
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3 glass border-b border-glass-border">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="text-text-secondary hover:text-text transition lg:hidden">
+              <Menu className="w-6 h-6" />
+            </button>
+            <ProfileSwitcher />
           </div>
-          <span className="font-semibold text-gradient">AttendEase</span>
+          <ThemeToggle />
         </header>
+
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
         </main>

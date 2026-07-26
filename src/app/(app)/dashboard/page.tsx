@@ -4,7 +4,7 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -61,7 +61,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gradient">Dashboard</h1>
           <p className="text-text-secondary text-sm">{today?.dayName}, {today?.date}</p>
         </div>
         <Link href="/subjects/new" className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
@@ -71,7 +71,7 @@ export default function DashboardPage() {
 
       {/* Danger Alert */}
       {dangerSubjects.length > 0 && (
-        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30" style={{ borderColor: "rgba(239,68,68,0.3)" }}>
+        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
       {/* Today's Classes */}
       {today && today.classes.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
           <div className="grid gap-3">
@@ -113,7 +113,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-1.5 h-12 rounded-full" style={{ backgroundColor: cls.colorHex, boxShadow: `0 0 12px ${cls.colorHex}40` }} />
                     <div>
-                      <h3 className="font-semibold">{cls.subjectName}</h3>
+                      <h3 className="font-semibold text-text">{cls.subjectName}</h3>
                       <div className="flex items-center gap-3 text-xs text-text-secondary mt-1">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{cls.startTime} - {cls.endTime}</span>
                         {cls.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{cls.room}</span>}
@@ -134,24 +134,27 @@ export default function DashboardPage() {
                   <div className={clsx("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium",
                     cls.attendanceStatus === "present" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
                     cls.attendanceStatus === "late" ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" :
+                    cls.attendanceStatus === "cancelled" ? "bg-slate-500/10 text-slate-400 border border-slate-500/20" :
                     "bg-red-500/10 text-red-400 border border-red-500/20"
                   )}>
                     <CheckCircle2 className="w-4 h-4" />
                     Marked: {cls.attendanceStatus}
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    {(["present", "absent", "late"] as const).map((status) => (
+                  <div className="grid grid-cols-4 gap-2">
+                    {(["present", "absent", "late", "cancelled"] as const).map((status) => (
                       <button key={status} onClick={() => quickMark(cls.subjectId, cls.scheduleId, status)}
                         disabled={marking === `${cls.subjectId}-${status}`}
-                        className={clsx("flex-1 py-2.5 rounded-xl text-sm font-medium transition-all",
-                          status === "present" ? "glass border-green-500/20 text-green-400 hover:bg-green-500/10 hover:shadow-lg hover:shadow-green-500/10" :
-                          status === "absent" ? "glass border-red-500/20 text-red-400 hover:bg-red-500/10 hover:shadow-lg hover:shadow-red-500/10" :
-                          "glass border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10 hover:shadow-lg hover:shadow-yellow-500/10"
-                        )} style={{ borderColor: status === "present" ? "rgba(34,197,94,0.2)" : status === "absent" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)" }}>
-                        {status === "present" ? <CheckCircle2 className="w-4 h-4 inline mr-1" /> :
-                         status === "absent" ? <XCircle className="w-4 h-4 inline mr-1" /> :
-                         <Timer className="w-4 h-4 inline mr-1" />}
+                        className={clsx("py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1",
+                          status === "present" ? "glass border-green-500/20 text-green-400 hover:bg-green-500/10" :
+                          status === "absent" ? "glass border-red-500/20 text-red-400 hover:bg-red-500/10" :
+                          status === "late" ? "glass border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10" :
+                          "glass border-slate-500/20 text-slate-400 hover:bg-slate-500/10"
+                        )}>
+                        {status === "present" ? <CheckCircle2 className="w-3.5 h-3.5" /> :
+                         status === "absent" ? <XCircle className="w-3.5 h-3.5" /> :
+                         status === "late" ? <Timer className="w-3.5 h-3.5" /> :
+                         <Ban className="w-3.5 h-3.5" />}
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </button>
                     ))}
@@ -166,7 +169,7 @@ export default function DashboardPage() {
       {/* Subject Cards */}
       {dashboard && dashboard.subjectsSummary.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3">All Subjects</h2>
+          <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {dashboard.subjectsSummary.map((s) => (
               <Link key={s.id} href={`/subjects/${s.id}`}
@@ -175,7 +178,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-10 rounded-full" style={{ backgroundColor: s.colorHex, boxShadow: `0 0 10px ${s.colorHex}30` }} />
                     <div>
-                      <h3 className="font-semibold group-hover:text-purple-400 transition">{s.name}</h3>
+                      <h3 className="font-semibold group-hover:text-purple-400 transition text-text">{s.name}</h3>
                       {s.code && <p className="text-xs text-text-muted">{s.code}</p>}
                     </div>
                   </div>
@@ -214,7 +217,7 @@ export default function DashboardPage() {
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">No subjects yet</h2>
+          <h2 className="text-xl font-semibold mb-2 text-text">No subjects yet</h2>
           <p className="text-text-secondary mb-6">Add your first subject to start tracking attendance</p>
           <Link href="/subjects/new" className="btn-gradient px-6 py-3 rounded-xl inline-flex items-center gap-2">
             <Plus className="w-5 h-5" /> Add Your First Subject
@@ -234,7 +237,7 @@ function StatCard({ label, value, icon, gradient }: { label: string; value: stri
           {icon}
         </div>
       </div>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-2xl font-bold text-text">{value}</p>
     </div>
   );
 }

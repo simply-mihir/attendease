@@ -65,6 +65,7 @@ model User {
 
   accounts            Account[]
   sessions            Session[]
+  degreeProfiles      DegreeProfile[]
   subjects            Subject[]
   semesters           Semester[]
   schedules           Schedule[]
@@ -76,20 +77,39 @@ model User {
   pushSubscriptions   PushSubscription[]
 }
 
-model Semester {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  startDate DateTime
-  endDate   DateTime
-  isCurrent Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model DegreeProfile {
+  id          String     @id @default(cuid())
+  userId      String
+  name        String
+  degreeType  String?
+  institution String?
+  isCurrent   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subjects Subject[]
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesters   Semester[]
 
   @@index([userId])
+}
+
+model Semester {
+  id              String         @id @default(cuid())
+  userId          String
+  degreeProfileId String?
+  name            String
+  startDate       DateTime
+  endDate         DateTime
+  isCurrent       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  degreeProfile DegreeProfile? @relation(fields: [degreeProfileId], references: [id], onDelete: SetNull)
+  subjects      Subject[]
+
+  @@index([userId])
+  @@index([degreeProfileId])
   @@index([userId, isCurrent])
 }
 
