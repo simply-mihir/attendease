@@ -27,7 +27,8 @@ interface DashboardData {
   warningSubjects: number; dangerSubjects: number; currentStreak: number;
   subjectsSummary: SubjectSummary[];
   isCurrentSemester: boolean;
-  semesterName: string;
+  semesterName: string | null;
+  userName: string;
 }
 
 export function DashboardView({ semesterId }: { semesterId?: string }) {
@@ -140,8 +141,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Header */}
       <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
         <div>
-          <h1 className="text-2xl font-bold text-gradient">{dashboard?.semesterName || "Dashboard"}</h1>
-          <p className="text-text-secondary text-sm">{today?.dayName}, {today?.date}</p>
+          <h1 className="text-2xl font-bold text-gradient">
+            {dashboard?.semesterName ? dashboard.semesterName : `Hello ${dashboard?.userName || "User"}`}
+          </h1>
+          <p className="text-text-secondary text-sm">
+            {!dashboard?.semesterName && "Check your attendance statistics below. "}
+            {today?.dayName}, {today?.date}
+          </p>
         </div>
         <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Subject

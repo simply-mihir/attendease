@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const semesterId = searchParams.get("semesterId");
 
   let isCurrentSemester = true;
-  let semesterName = "Global Dashboard";
+  let semesterName: string | null = null;
 
   const whereClause: any = { userId: user.id, isArchived: false };
   if (semesterId) {
@@ -83,5 +83,6 @@ export async function GET(req: NextRequest) {
     subjectsSummary,
     isCurrentSemester,
     semesterName,
+    userName: user.name,
   });
 }
