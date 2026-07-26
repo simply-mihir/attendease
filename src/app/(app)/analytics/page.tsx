@@ -144,7 +144,10 @@ export default function AnalyticsPage() {
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} />
                 <Tooltip
                   formatter={(v: number) => [`${v}%`, "Attendance"]}
-                  contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "#fff" }}
+                  contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
+                  itemStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#9ca3af" }}
+                  cursor={{ fill: "rgba(255,255,255,0.05)" }}
                 />
                 <Bar dataKey="percentage" radius={[4, 4, 0, 0]}>
                   {barData.map((entry: any, i: number) => (
@@ -167,7 +170,11 @@ export default function AnalyticsPage() {
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
                   {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "#fff" }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
+                  itemStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#9ca3af" }}
+                />
               </PieChart>
             </ResponsiveContainer>
           ) : (
