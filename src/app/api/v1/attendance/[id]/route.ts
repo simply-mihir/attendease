@@ -31,6 +31,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     data: {
       status: body.status,
       notes: body.notes,
+      date: body.date ? new Date(body.date) : undefined,
       editedAt: new Date(),
       editedReason: body.editReason || "Manual edit",
     },
