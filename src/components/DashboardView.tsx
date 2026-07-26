@@ -145,7 +145,6 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             {dashboard?.semesterName ? dashboard.semesterName : `Hello ${dashboard?.userName || "User"}`}
           </h1>
           <p className="text-text-secondary text-sm">
-            {!dashboard?.semesterName && "Check your attendance statistics below. "}
             {today?.dayName}, {today?.date}
           </p>
         </div>
