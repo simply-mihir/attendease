@@ -195,7 +195,7 @@ export function ProfileSwitcher() {
                 </label>
                 <select value={newSemesterName} onChange={(e) => setNewSemesterName(e.target.value)}
                   className="input-glass w-full px-3.5 py-2 rounded-xl text-sm">
-                  {["Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5", "Semester 6", "Semester 7", "Semester 8", "Fall 2026", "Spring 2026"].map((sem) => (
+                  {["Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5", "Semester 6", "Semester 7", "Semester 8", "Semester 9", "Semester 10"].map((sem) => (
                     <option key={sem} value={sem}>{sem}</option>
                   ))}
                 </select>

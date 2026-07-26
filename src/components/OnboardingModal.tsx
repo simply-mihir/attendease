@@ -8,7 +8,7 @@ export function OnboardingModal() {
   const { profiles, loading, reloadProfiles } = useProfiles();
   const [submitting, setSubmitting] = useState(false);
 
-  const [profileName, setProfileName] = useState("Primary Degree");
+  const [profileName, setProfileName] = useState("");
   const [institution, setInstitution] = useState("");
   const [courseName, setCourseName] = useState("");
   const [semesterName, setSemesterName] = useState("Semester 1");
@@ -135,7 +135,7 @@ export function OnboardingModal() {
               onChange={(e) => setSemesterName(e.target.value)}
               className="input-glass w-full px-4 py-2.5 rounded-xl text-sm"
             >
-              {["Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5", "Semester 6", "Semester 7", "Semester 8", "Fall 2026", "Spring 2026"].map((sem) => (
+              {["Semester 1", "Semester 2", "Semester 3", "Semester 4", "Semester 5", "Semester 6", "Semester 7", "Semester 8", "Semester 9", "Semester 10"].map((sem) => (
                 <option key={sem} value={sem}>{sem}</option>
               ))}
             </select>
