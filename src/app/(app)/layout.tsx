@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { ProfileSwitcher } from "@/components/ProfileSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { OnboardingModal } from "@/components/OnboardingModal";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
   Sliders, Settings, LogOut, Menu, X, ChevronRight
@@ -53,6 +54,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex bg-mesh">
+      <OnboardingModal />
+
       {/* Sidebar */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-40 w-[280px] glass-strong flex flex-col transition-transform lg:translate-x-0 lg:static",
