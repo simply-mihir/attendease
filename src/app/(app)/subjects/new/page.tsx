@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/hooks/useApi";
 import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
@@ -19,7 +19,16 @@ export default function NewSubjectPage() {
     name: "", code: "", instructorName: "",
     minAttendancePct: 75, colorHex: "#6366F1",
     reminderEnabled: true, reminderBeforeMin: 15,
+    semesterId: "",
   });
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const sid = searchParams.get("semesterId");
+    if (sid) {
+      setForm((p) => ({ ...p, semesterId: sid }));
+    }
+  }, []);
 
   const [schedules, setSchedules] = useState<{
     dayOfWeek: number; startTime: string; endTime: string; room: string;

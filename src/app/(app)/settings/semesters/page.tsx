@@ -22,6 +22,58 @@ export default function SemestersPage() {
 
   useEffect(() => { load(); }, []);
 
+  const [linkSemesterId, setLinkSemesterId] = useState<string | null>(null);
+  const [allSubjects, setAllSubjects] = useState<any[]>([]);
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<Set<string>>(new Set());
+
+  async function openLinkModal(semesterId: string) {
+    setLoading(true);
+    try {
+      const data = await apiFetch("/subjects?archived=false");
+      setAllSubjects(data.subjects);
+      const sem = semesters.find(s => s.id === semesterId);
+      const initialIds = new Set(sem?.subjects?.map((sub: any) => sub.id) || []);
+      setSelectedSubjectIds(initialIds as Set<string>);
+      setLinkSemesterId(semesterId);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function toggleSubjectSelect(id: string) {
+    const next = new Set(selectedSubjectIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedSubjectIds(next);
+  }
+
+  async function handleLinkSubjects() {
+    if (!linkSemesterId) return;
+    setLoading(true);
+    try {
+      const currentSem = semesters.find(s => s.id === linkSemesterId);
+      const currentlyLinked = currentSem?.subjects?.map((sub: any) => sub.id) || [];
+      const toLink = Array.from(selectedSubjectIds).filter(id => !currentlyLinked.includes(id as string));
+      const toUnlink = currentlyLinked.filter((id: string) => !selectedSubjectIds.has(id));
+
+      for (const id of toLink) {
+        await apiFetch(`/subjects/${id}`, { method: "PUT", body: JSON.stringify({ semesterId: linkSemesterId }) });
+      }
+      for (const id of toUnlink) {
+        await apiFetch(`/subjects/${id}`, { method: "PUT", body: JSON.stringify({ semesterId: null }) });
+      }
+
+      setLinkSemesterId(null);
+      await load();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -123,6 +175,14 @@ export default function SemestersPage() {
                 {new Date(s.startDate).toLocaleDateString("en-IN")} — {new Date(s.endDate).toLocaleDateString("en-IN")}
                 {s.subjects && ` · ${s.subjects.length} subjects`}
               </p>
+              <div className="flex gap-2 mt-4">
+                <button onClick={() => openLinkModal(s.id)} className="btn-ghost px-3 py-1.5 text-xs text-text-secondary hover:text-text rounded-lg border border-glass-border transition">
+                  Link Subjects
+                </button>
+                <Link href={`/subjects/new?semesterId=${s.id}`} className="btn-ghost px-3 py-1.5 text-xs text-primary hover:text-purple-400 rounded-lg border border-primary/20 transition">
+                  + New Subject
+                </Link>
+              </div>
             </div>
             <div className="flex gap-2">
               {!s.isCurrent && (
@@ -174,6 +234,43 @@ export default function SemestersPage() {
               <button type="submit" disabled={loading} className="btn-gradient flex-1 py-3">{loading ? "Saving..." : "Save"}</button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Link Subjects Modal */}
+      {linkSemesterId && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50">
+          <div className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in flex flex-col max-h-[80vh]">
+            <h3 className="text-xl font-black text-text mb-4">Link Existing Subjects</h3>
+            <p className="text-sm text-text-secondary mb-4">Select subjects to associate with this semester.</p>
+            
+            <div className="flex-1 overflow-y-auto space-y-2 pr-2 mb-4">
+              {allSubjects.map(sub => (
+                <label key={sub.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition cursor-pointer border border-transparent hover:border-white/10">
+                  <input 
+                    type="checkbox" 
+                    checked={selectedSubjectIds.has(sub.id)}
+                    onChange={() => toggleSubjectSelect(sub.id)}
+                    className="accent-primary w-5 h-5 rounded" 
+                  />
+                  <div>
+                    <p className="font-semibold text-text">{sub.name}</p>
+                    <p className="text-xs text-text-muted">{sub.code || "No code"} {sub.semester?.name ? `· Currently in ${sub.semester.name}` : "· Unassigned"}</p>
+                  </div>
+                </label>
+              ))}
+              {allSubjects.length === 0 && (
+                <p className="text-sm text-text-muted text-center py-4">No subjects exist yet.</p>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-auto pt-4 border-t border-glass-border">
+              <button type="button" onClick={() => setLinkSemesterId(null)} className="btn-ghost flex-1 py-3 rounded-xl font-bold text-sm">Cancel</button>
+              <button type="button" onClick={handleLinkSubjects} disabled={loading} className="btn-gradient flex-1 py-3 rounded-xl font-bold text-sm">
+                {loading ? "Saving..." : "Save Selection"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
