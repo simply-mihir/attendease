@@ -56,8 +56,8 @@ model User {
   image           String?
   passwordHash    String?
   timezone        String    @default("Asia/Kolkata")
-  whatsappOptedIn Boolean   @default(false)
-  whatsappNumber  String?
+  telegramChatId  String?
+  telegramUsername String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   lastLoginAt     DateTime?
@@ -197,19 +197,23 @@ model AuditLog {
 model NotificationSetting {
   id                      String  @id @default(cuid())
   userId                  String  @unique
-  whatsappEnabled         Boolean @default(false)
-  whatsappPreClass        Boolean @default(true)
-  whatsappDangerAlert     Boolean @default(true)
-  whatsappDailyBrief      Boolean @default(true)
-  whatsappWeeklyReport    Boolean @default(false)
-  whatsappBeforeMinutes   Int     @default(15)
+  telegramEnabled       Boolean @default(false)
+  telegramPreClass      Boolean @default(true)
+  telegramDangerAlert   Boolean @default(true)
+  telegramDailyBrief    Boolean @default(true)
+  telegramWeeklyReport  Boolean @default(false)
+  telegramBeforeMinutes Int     @default(15)
+  emailEnabled          Boolean @default(false)
+  emailPreClass         Boolean @default(true)
+  emailDangerAlert      Boolean @default(true)
+  emailDailyBrief       Boolean @default(true)
+  emailWeeklyReport     Boolean @default(false)
   alarmEnabled            Boolean @default(true)
   alarmPreClass           Boolean @default(true)
   alarmDangerThreshold    Float   @default(5.0)
   alarmSound              String  @default("default")
   alarmVibrate            Boolean @default(true)
   alarmBeforeMinutes      Int     @default(10)
-  emailEnabled            Boolean @default(false)
   pushEnabled             Boolean @default(true)
   quietHoursEnabled       Boolean @default(true)
   quietHoursStart         String  @default("22:00")

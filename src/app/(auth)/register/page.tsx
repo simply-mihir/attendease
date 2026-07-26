@@ -38,7 +38,7 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.error || "Registration failed");
       // Auto sign in after register
       await signIn("credentials", { email: form.email, password: form.password, redirect: false });
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {

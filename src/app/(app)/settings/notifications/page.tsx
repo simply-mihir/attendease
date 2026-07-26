@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/hooks/useApi";
-import { ArrowLeft, Bell, MessageSquare, Volume2, Mail, Moon, Loader2, Save, Phone } from "lucide-react";
+import { useSession } from "next-auth/react";
+import {
+  ArrowLeft, Bell, Send, Volume2, Mail, Moon, Loader2, Save, CheckCircle2, ExternalLink, RefreshCw
+} from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 
@@ -18,48 +21,42 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void 
 }
 
 export default function NotificationSettingsPage() {
+  const { data: session } = useSession();
   const [settings, setSettings] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [whatsappPhone, setWhatsappPhone] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [verifyError, setVerifyError] = useState("");
-  const [verified, setVerified] = useState(false);
+
+  // Telegram status
+  const [telegramStatus, setTelegramStatus] = useState<{ connected: boolean; username: string | null; connectUrl: string }>({
+    connected: false,
+    username: null,
+    connectUrl: "",
+  });
+  const [checkingTelegram, setCheckingTelegram] = useState(false);
+
+  const checkTelegramConnection = useCallback(async () => {
+    setCheckingTelegram(true);
+    try {
+      const res = await apiFetch("/telegram/connect");
+      setTelegramStatus(res);
+    } catch (err) {
+      console.error("Failed to fetch Telegram connection status:", err);
+    } finally {
+      setCheckingTelegram(false);
+    }
+  }, []);
 
   useEffect(() => {
     apiFetch("/notifications/settings").then((d) => {
       setSettings(d.settings);
-      if (d.settings.whatsappPhone) {
-        setWhatsappPhone(d.settings.whatsappPhone);
-        setVerified(true);
-      }
     }).catch(console.error);
-  }, []);
+
+    checkTelegramConnection();
+  }, [checkTelegramConnection]);
 
   function update(key: string, value: unknown) {
     setSettings((prev: any) => ({ ...prev, [key]: value }));
     setSaved(false);
-  }
-
-  async function handleVerifyWhatsApp() {
-    if (!whatsappPhone || !/^\+\d{10,15}$/.test(whatsappPhone)) {
-      setVerifyError("Enter a valid phone number (e.g., +919876543210)");
-      return;
-    }
-    setVerifying(true);
-    setVerifyError("");
-    try {
-      await apiFetch("/whatsapp/verify", {
-        method: "POST",
-        body: JSON.stringify({ phone: whatsappPhone }),
-      });
-      setVerified(true);
-      update("whatsappPhone", whatsappPhone);
-    } catch (err) {
-      setVerifyError(err instanceof Error ? err.message : "Verification failed");
-    } finally {
-      setVerifying(false);
-    }
   }
 
   async function handleSave() {
@@ -71,8 +68,11 @@ export default function NotificationSettingsPage() {
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (err) { console.error(err); }
-    finally { setSaving(false); }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!settings) return <div className="text-center py-16 text-gray-500">Loading...</div>;
@@ -84,71 +84,119 @@ export default function NotificationSettingsPage() {
       </Link>
       <h1 className="text-2xl font-bold text-gradient">Notification Settings</h1>
 
-      {/* WhatsApp Section */}
+      {/* Telegram Section */}
       <div className="glass rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-white" />
+            <Send className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-lg font-semibold text-white">WhatsApp Reminders</h2>
+          <div>
+            <h2 className="text-lg font-semibold text-white">Telegram Bot</h2>
+            <p className="text-xs text-gray-400">Receive free alerts directly on Telegram</p>
+          </div>
         </div>
-        <Row label="Enable WhatsApp" desc="Get reminders on WhatsApp">
-          <Toggle enabled={settings.whatsappEnabled} onChange={() => update("whatsappEnabled", !settings.whatsappEnabled)} />
+
+        <Row label="Enable Telegram" desc="Get reminders & daily briefs on Telegram">
+          <Toggle enabled={settings.telegramEnabled} onChange={() => update("telegramEnabled", !settings.telegramEnabled)} />
         </Row>
-        {settings.whatsappEnabled && (
+
+        {settings.telegramEnabled && (
           <>
-            {/* WhatsApp Phone Number Input */}
-            {!verified && (
+            {!telegramStatus.connected ? (
               <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-3">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                  <Phone className="w-4 h-4 text-green-400" />
-                  WhatsApp Phone Number
-                </div>
-                <p className="text-xs text-gray-500">Enter your WhatsApp number to receive reminders</p>
+                <p className="text-xs text-gray-400">
+                  Connect your Telegram account to start receiving notifications.
+                </p>
                 <div className="flex gap-2">
-                  <input
-                    type="tel"
-                    value={whatsappPhone}
-                    onChange={(e) => { setWhatsappPhone(e.target.value); setVerifyError(""); }}
-                    placeholder="+919876543210"
-                    className="input-glass flex-1 px-4 py-2.5 rounded-xl text-sm"
-                  />
-                  <button
-                    onClick={handleVerifyWhatsApp}
-                    disabled={verifying || !whatsappPhone}
-                    className="btn-gradient-cyan px-4 py-2.5 rounded-xl text-sm font-medium transition disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+                  <a
+                    href={telegramStatus.connectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gradient-cyan px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
                   >
-                    {verifying && <Loader2 className="w-4 h-4 animate-spin" />}
-                    Verify & Connect
+                    <ExternalLink className="w-4 h-4" />
+                    Connect Telegram
+                  </a>
+                  <button
+                    onClick={checkTelegramConnection}
+                    disabled={checkingTelegram}
+                    className="btn-ghost px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                  >
+                    <RefreshCw className={clsx("w-3.5 h-3.5", checkingTelegram && "animate-spin")} />
+                    Check Connection
                   </button>
                 </div>
-                {verifyError && <p className="text-xs text-red-400">{verifyError}</p>}
               </div>
-            )}
-            {verified && (
+            ) : (
               <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-green-400 font-medium">Connected: {whatsappPhone}</span>
-                <button onClick={() => { setVerified(false); setWhatsappPhone(""); }} className="ml-auto text-xs text-gray-500 hover:text-gray-300 transition">Change</button>
+                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-green-400 font-medium">
+                  Connected: {telegramStatus.username ? `@${telegramStatus.username}` : "Telegram Connected"}
+                </span>
+                <button onClick={checkTelegramConnection} className="ml-auto text-xs text-gray-400 hover:text-white transition flex items-center gap-1">
+                  <RefreshCw className={clsx("w-3 h-3", checkingTelegram && "animate-spin")} /> Re-check
+                </button>
               </div>
             )}
+
             <Row label="Pre-class reminder" desc="Reminder before each class">
-              <Toggle enabled={settings.whatsappPreClass} onChange={() => update("whatsappPreClass", !settings.whatsappPreClass)} />
+              <Toggle enabled={settings.telegramPreClass} onChange={() => update("telegramPreClass", !settings.telegramPreClass)} />
             </Row>
             <Row label="Reminder timing">
-              <select value={settings.whatsappBeforeMinutes} onChange={(e) => update("whatsappBeforeMinutes", parseInt(e.target.value))}
+              <select value={settings.telegramBeforeMinutes} onChange={(e) => update("telegramBeforeMinutes", parseInt(e.target.value))}
                 className="input-glass px-3 py-1.5 rounded-xl text-sm">
                 {[5, 10, 15, 30, 60].map((m) => <option key={m} value={m}>{m} min before</option>)}
               </select>
             </Row>
             <Row label="Danger zone alerts" desc="When attendance nears minimum">
-              <Toggle enabled={settings.whatsappDangerAlert} onChange={() => update("whatsappDangerAlert", !settings.whatsappDangerAlert)} />
+              <Toggle enabled={settings.telegramDangerAlert} onChange={() => update("telegramDangerAlert", !settings.telegramDangerAlert)} />
             </Row>
             <Row label="Daily morning brief" desc="Summary of today's classes">
-              <Toggle enabled={settings.whatsappDailyBrief} onChange={() => update("whatsappDailyBrief", !settings.whatsappDailyBrief)} />
+              <Toggle enabled={settings.telegramDailyBrief} onChange={() => update("telegramDailyBrief", !settings.telegramDailyBrief)} />
             </Row>
-            <Row label="Weekly report">
-              <Toggle enabled={settings.whatsappWeeklyReport} onChange={() => update("whatsappWeeklyReport", !settings.whatsappWeeklyReport)} />
+            <Row label="Weekly report" desc="Sunday attendance overview">
+              <Toggle enabled={settings.telegramWeeklyReport} onChange={() => update("telegramWeeklyReport", !settings.telegramWeeklyReport)} />
+            </Row>
+          </>
+        )}
+      </div>
+
+      {/* Email Section */}
+      <div className="glass rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+            <Mail className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-white">Email Notifications</h2>
+            <p className="text-xs text-gray-400">Receive reports and alerts in your inbox via Resend</p>
+          </div>
+        </div>
+
+        <Row label="Enable Email Notifications" desc="Get briefs and alerts sent to your email">
+          <Toggle enabled={settings.emailEnabled} onChange={() => update("emailEnabled", !settings.emailEnabled)} />
+        </Row>
+
+        {settings.emailEnabled && (
+          <>
+            <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 flex items-center gap-2">
+              <Mail className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm text-cyan-300 font-medium">
+                Delivery Address: {session?.user?.email || "Your Account Email"}
+              </span>
+            </div>
+
+            <Row label="Pre-class reminder" desc="Reminder email before each class">
+              <Toggle enabled={settings.emailPreClass} onChange={() => update("emailPreClass", !settings.emailPreClass)} />
+            </Row>
+            <Row label="Danger zone alerts" desc="Warning email when attendance drops">
+              <Toggle enabled={settings.emailDangerAlert} onChange={() => update("emailDangerAlert", !settings.emailDangerAlert)} />
+            </Row>
+            <Row label="Daily morning brief" desc="Schedule overview email">
+              <Toggle enabled={settings.emailDailyBrief} onChange={() => update("emailDailyBrief", !settings.emailDailyBrief)} />
+            </Row>
+            <Row label="Weekly report" desc="Sunday weekly summary email">
+              <Toggle enabled={settings.emailWeeklyReport} onChange={() => update("emailWeeklyReport", !settings.emailWeeklyReport)} />
             </Row>
           </>
         )}

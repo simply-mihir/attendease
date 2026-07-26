@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !user.passwordHash) return null;
+        if (!user || !user.passwordHash || !user.isActive) return null;
 
         const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isValid) return null;
@@ -85,5 +85,5 @@ export const authOptions: NextAuthOptions = {
     newUser: "/dashboard",
     error: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "attendease-secret-key-32-chars-long-fallback-key",
 };

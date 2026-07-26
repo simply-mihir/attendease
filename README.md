@@ -46,14 +46,22 @@ Open [http://localhost:3000](http://localhost:3000) — demo login: **demo@atten
 2. Set callback URL: `https://your-domain.vercel.app/api/auth/callback/github`
 3. Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
 
-### 4. Twilio WhatsApp
+### 4. Telegram Bot
 
-1. Create account at [twilio.com](https://twilio.com)
-2. Set up WhatsApp sandbox (Messaging → Try it out → Send a WhatsApp message)
-3. Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER`
-4. For production: apply for Twilio WhatsApp Business number
+1. Message [@BotFather](https://t.me/BotFather) on Telegram → send `/newbot` → follow prompts to get token
+2. Set bot webhook:
+   ```bash
+   curl -F "url=https://your-app.vercel.app/api/v1/telegram/connect" https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook
+   ```
+3. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME` in Vercel environment variables
 
-### 5. Push Notifications
+### 5. Email Notifications (Resend)
+
+1. Create account at [resend.com](https://resend.com)
+2. Get API key from dashboard
+3. Set `RESEND_API_KEY` and `FROM_EMAIL` (e.g. `AttendEase <onboarding@resend.dev>`) in Vercel environment variables
+
+### 6. Push Notifications
 
 ```bash
 npx web-push generate-vapid-keys
@@ -61,7 +69,7 @@ npx web-push generate-vapid-keys
 
 Set both `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_CONTACT_EMAIL`, and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (same as VAPID_PUBLIC_KEY)
 
-### 6. Deploy to Vercel
+### 7. Deploy to Vercel
 
 ```bash
 npm i -g vercel
@@ -84,9 +92,10 @@ Set all environment variables in Vercel dashboard. The `vercel.json` configures 
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret |
 | `GITHUB_CLIENT_ID` | GitHub OAuth client ID |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth secret |
-| `TWILIO_ACCOUNT_SID` | Twilio account SID |
-| `TWILIO_AUTH_TOKEN` | Twilio auth token |
-| `TWILIO_WHATSAPP_NUMBER` | Twilio WhatsApp number |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token from BotFather |
+| `TELEGRAM_BOT_USERNAME` | Telegram bot username |
+| `RESEND_API_KEY` | Resend API key |
+| `FROM_EMAIL` | Sender email address |
 | `VAPID_PUBLIC_KEY` | Web Push public key |
 | `VAPID_PRIVATE_KEY` | Web Push private key |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Same as VAPID_PUBLIC_KEY |
@@ -101,7 +110,8 @@ Set all environment variables in Vercel dashboard. The `vercel.json` configures 
 - **Analytics** — Recharts bar/pie charts, GitHub-style heatmap
 - **What-If Simulator** — See impact of skipping/attending classes
 - **Calendar** — Week and month views with status dots
-- **WhatsApp Reminders** — Pre-class, danger alerts, daily brief, weekly report
+- **Telegram Reminders** — Free, unlimited pre-class alerts, danger warnings, daily briefs & weekly reports
+- **Email Notifications** — Clean HTML email reports via Resend
 - **Push Notifications** — Browser push via Web Push API
 - **Alarm System** — Sound alerts with configurable timing
 - **Google/GitHub OAuth** — One-click social login
@@ -120,7 +130,8 @@ Set all environment variables in Vercel dashboard. The `vercel.json` configures 
 | Auth | NextAuth.js (Google, GitHub, Credentials) |
 | Styling | Tailwind CSS v4, Glassmorphic design |
 | Charts | Recharts |
-| WhatsApp | Twilio API |
+| Telegram | Telegram Bot API |
+| Email | Resend API |
 | Push | Web Push (VAPID) |
 | Deployment | Vercel (with Cron Jobs) |
 | PWA | Service Worker + Web App Manifest |
