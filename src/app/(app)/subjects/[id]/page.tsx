@@ -290,6 +290,9 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               ? `consecutive classes needed to reach ${subject.minAttendancePct}%`
               : `classes you can still skip safely`}
           </p>
+          <div className="mt-3 pt-3 border-t border-white/10 text-xs text-text-muted leading-relaxed">
+            {stats.reasoning}
+          </div>
         </div>
         <div className="glass-glow p-5 border-yellow-500">
           <div className="flex items-center gap-3 mb-3">

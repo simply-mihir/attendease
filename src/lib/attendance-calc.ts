@@ -16,6 +16,7 @@ export interface AttendanceResult {
   mustAttendCount: number;
   isInDanger: boolean;
   bufferClasses: number;
+  reasoning: string;
 }
 
 export function calculateAttendance(stats: AttendanceStats): AttendanceResult {
@@ -27,36 +28,44 @@ export function calculateAttendance(stats: AttendanceStats): AttendanceResult {
   const statusColor: "green" | "yellow" | "red" =
     buffer >= 10 ? "green" : buffer >= 0 ? "yellow" : "red";
 
-  const canSkip =
-    buffer >= 0
-      ? Math.floor(
-          (effectivePresent - (minRequiredPct / 100) * totalClasses) /
-            (minRequiredPct / 100)
-        )
-      : 0;
+  const req = minRequiredPct / 100;
 
-  const mustAttend =
-    buffer < 0
-      ? Math.ceil(
-          ((minRequiredPct / 100) * totalClasses - effectivePresent) /
-            (1 - minRequiredPct / 100)
-        )
-      : 0;
+  const canSkip = buffer >= 0 ? Math.floor((effectivePresent - req * totalClasses) / req) : 0;
+  const mustAttend = buffer < 0 ? Math.ceil((req * totalClasses - effectivePresent) / (1 - req)) : 0;
+
+  const canSkipCount = Math.max(0, canSkip);
+  const mustAttendCount = Math.max(0, mustAttend);
+  const isInDanger = statusColor === "red";
+
+  let reasoning = "";
+  if (totalClasses === 0) {
+    reasoning = `You haven't had any classes yet!`;
+  } else if (isInDanger) {
+    const newT = totalClasses + mustAttendCount;
+    const newP = effectivePresent + mustAttendCount;
+    const newPct = Math.round((newP / newT) * 10000) / 100;
+    reasoning = `You have ${effectivePresent}/${totalClasses} (${Math.round(currentPct * 100) / 100}%). By attending the next ${mustAttendCount} classes, you will reach ${newP}/${newT} (${newPct}%), meeting your ${minRequiredPct}% requirement.`;
+  } else {
+    if (canSkipCount === 0) {
+      const dropPct = Math.round((effectivePresent / (totalClasses + 1)) * 10000) / 100;
+      reasoning = `You have ${effectivePresent}/${totalClasses} (${Math.round(currentPct * 100) / 100}%). If you skip the very next class, it drops to ${effectivePresent}/${totalClasses + 1} (${dropPct}%), which is below your ${minRequiredPct}% requirement.`;
+    } else {
+      const newT = totalClasses + canSkipCount;
+      const newPct = Math.round((effectivePresent / newT) * 10000) / 100;
+      reasoning = `You have ${effectivePresent}/${totalClasses} (${Math.round(currentPct * 100) / 100}%). If you skip ${canSkipCount} classes, your attendance becomes ${effectivePresent}/${newT} (${newPct}%), staying safe!`;
+    }
+  }
 
   return {
     currentPercentage: Math.round(currentPct * 100) / 100,
     effectivePresent,
     statusColor,
-    statusLabel:
-      statusColor === "green"
-        ? "Safe Zone"
-        : statusColor === "yellow"
-        ? "Warning Zone"
-        : "Danger Zone",
-    canSkipCount: Math.max(0, canSkip),
-    mustAttendCount: Math.max(0, mustAttend),
-    isInDanger: statusColor === "red",
-    bufferClasses: Math.max(0, canSkip),
+    statusLabel: statusColor === "green" ? "Safe Zone" : statusColor === "yellow" ? "Warning Zone" : "Danger Zone",
+    canSkipCount,
+    mustAttendCount,
+    isInDanger,
+    bufferClasses: canSkipCount,
+    reasoning,
   };
 }
 
