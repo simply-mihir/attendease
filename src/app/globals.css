@@ -19,33 +19,42 @@
 }
 
 :root {
-  --color-surface: #F8FAFC;
+  /* Youthful Pastel & Cream Palette */
+  --color-surface: #FFFDF8;
   --color-surface-2: #FFFFFF;
-  --color-surface-3: #F1F5F9;
+  --color-surface-3: #FFEBF0;
+  
   --color-border: #E2E8F0;
-  --color-border-heavy: #0F172A;
-  --color-shadow-heavy: #0F172A;
-  --color-text: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748B;
+  /* Thick cartoon borders - deep indigo/plum */
+  --color-border-heavy: #1E1B4B;
+  --color-shadow-heavy: #1E1B4B;
+  
+  --color-text: #1E1B4B;
+  --color-text-secondary: #4F46E5;
+  --color-text-muted: #8B87AC;
+  
   --color-glass: #FFFFFF;
-  --color-glass-strong: #F1F5F9;
-  --color-glass-border: #0F172A;
+  --color-glass-strong: #FFF0F5;
+  --color-glass-border: #1E1B4B;
 }
 
 html.dark {
-  --color-surface: #0F172A;
-  --color-surface-2: #1E293B;
-  --color-surface-3: #334155;
+  /* Synthwave / Neon Dark Mode */
+  --color-surface: #0F0826;
+  --color-surface-2: #1A0B2E;
+  --color-surface-3: #2D1445;
+  
   --color-border: #334155;
-  --color-border-heavy: #000000;
-  --color-shadow-heavy: #000000;
-  --color-text: #F9FAFB;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted: #6B7280;
-  --color-glass: #1E293B;
-  --color-glass-strong: #334155;
-  --color-glass-border: #000000;
+  --color-border-heavy: #05020D;
+  --color-shadow-heavy: #05020D;
+  
+  --color-text: #F8F5FA;
+  --color-text-secondary: #00E5FF;
+  --color-text-muted: #8E7C8F;
+  
+  --color-glass: #1A0B2E;
+  --color-glass-strong: #2D1445;
+  --color-glass-border: #05020D;
 }
 
 * { box-sizing: border-box; }
@@ -62,122 +71,131 @@ body {
   background: var(--color-surface);
 }
 
-/* 3D Pop Cards */
+/* 3D Pop Cards - Extruded look */
 .glass {
   background: var(--color-glass);
-  border: 2px solid var(--color-border-heavy);
-  box-shadow: 4px 6px 0px var(--color-shadow-heavy);
+  border: 3px solid var(--color-border-heavy);
+  box-shadow: 0px 6px 0px var(--color-shadow-heavy);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border-radius: 1rem;
+  border-radius: 1.5rem;
 }
 
 .glass-card {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .glass-card:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 4px 0px var(--color-shadow-heavy);
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px var(--color-shadow-heavy);
 }
 .glass-card:active {
-  transform: translate(4px, 6px);
+  transform: translateY(6px);
   box-shadow: 0px 0px 0px var(--color-shadow-heavy);
 }
 
 .glass-strong {
   background: var(--color-glass-strong);
-  border: 2px solid var(--color-border-heavy);
-  box-shadow: 4px 6px 0px var(--color-shadow-heavy);
-  border-radius: 1rem;
+  border: 3px solid var(--color-border-heavy);
+  box-shadow: 0px 6px 0px var(--color-shadow-heavy);
+  border-radius: 1.5rem;
 }
 
 .glass-glow {
   background: var(--color-glass);
-  border: 2px solid var(--color-border-heavy);
-  box-shadow: 6px 8px 0px var(--color-shadow-heavy);
-  border-radius: 1rem;
+  border: 3px solid var(--color-border-heavy);
+  box-shadow: 0px 8px 0px var(--color-shadow-heavy);
+  border-radius: 1.5rem;
 }
 
-/* 3D Buttons */
+/* 3D Pill Buttons (Matches Product Image exactly) */
 .btn-gradient {
   background: var(--color-pink);
   color: white;
-  font-weight: 800;
-  border: 2px solid var(--color-border-heavy);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-border-heavy);
   border-radius: 9999px;
-  box-shadow: 3px 5px 0px var(--color-shadow-heavy);
+  box-shadow: 0px 6px 0px var(--color-shadow-heavy);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .btn-gradient:hover {
-  transform: translate(1px, 2px);
-  box-shadow: 2px 3px 0px var(--color-shadow-heavy);
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px var(--color-shadow-heavy);
 }
 .btn-gradient:active {
-  transform: translate(3px, 5px);
+  transform: translateY(6px);
   box-shadow: 0px 0px 0px var(--color-shadow-heavy);
 }
 
 .btn-gradient-cyan {
   background: var(--color-accent);
-  color: white;
-  font-weight: 800;
-  border: 2px solid var(--color-border-heavy);
+  color: var(--color-border-heavy);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-border-heavy);
   border-radius: 9999px;
-  box-shadow: 3px 5px 0px var(--color-shadow-heavy);
+  box-shadow: 0px 6px 0px var(--color-shadow-heavy);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .btn-gradient-cyan:hover {
-  transform: translate(1px, 2px);
-  box-shadow: 2px 3px 0px var(--color-shadow-heavy);
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px var(--color-shadow-heavy);
 }
 .btn-gradient-cyan:active {
-  transform: translate(3px, 5px);
+  transform: translateY(6px);
   box-shadow: 0px 0px 0px var(--color-shadow-heavy);
 }
 
 .btn-ghost {
   background: var(--color-surface-3);
   color: var(--color-text);
-  font-weight: 800;
-  border: 2px solid var(--color-border-heavy);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-border-heavy);
   border-radius: 9999px;
-  box-shadow: 3px 5px 0px var(--color-shadow-heavy);
+  box-shadow: 0px 6px 0px var(--color-shadow-heavy);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .btn-ghost:hover {
-  background: var(--color-border);
-  transform: translate(1px, 2px);
-  box-shadow: 2px 3px 0px var(--color-shadow-heavy);
+  background: var(--color-glass-strong);
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px var(--color-shadow-heavy);
 }
 .btn-ghost:active {
-  transform: translate(3px, 5px);
+  transform: translateY(6px);
   box-shadow: 0px 0px 0px var(--color-shadow-heavy);
 }
 
 /* Vibrant text for Pop UI */
 .text-gradient {
   color: var(--color-primary);
-  font-weight: 800;
+  font-weight: 900;
 }
 .text-gradient-warm {
   color: var(--color-pink);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 /* 3D Input */
 .input-glass {
   background: var(--color-surface-2);
-  border: 2px solid var(--color-border-heavy);
-  border-radius: 1rem;
+  border: 3px solid var(--color-border-heavy);
+  border-radius: 9999px;
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
   color: var(--color-text);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  font-weight: 600;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.06);
   transition: all 0.2s ease;
 }
-.input-glass::placeholder { color: var(--color-text-muted); }
+.input-glass::placeholder { color: var(--color-text-muted); font-weight: 500; }
 .input-glass:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 4px 6px 0px var(--color-primary);
-  transform: translate(-2px, -3px);
+  box-shadow: 0px 6px 0px var(--color-primary);
+  transform: translateY(-4px);
 }
 
 /* Status colors (Solid badges) */
