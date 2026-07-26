@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { ProfileProvider } from "@/components/ProfileContext";
 import { ProfileSwitcher } from "@/components/ProfileSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { OnboardingModal } from "@/components/OnboardingModal";
@@ -53,6 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const user = session.user;
 
   return (
+    <ProfileProvider>
     <div className="min-h-screen flex bg-mesh">
       <OnboardingModal />
 
@@ -138,5 +140,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
+    </ProfileProvider>
   );
 }

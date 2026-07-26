@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useProfiles } from "./ProfileContext";
 import { GraduationCap, Building2, BookOpen, Calendar, Sparkles, Loader2, UserCheck } from "lucide-react";
 
 export function OnboardingModal() {
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { profiles, loading, reloadProfiles } = useProfiles();
   const [submitting, setSubmitting] = useState(false);
 
   const [profileName, setProfileName] = useState("Primary Degree");
@@ -13,21 +13,7 @@ export function OnboardingModal() {
   const [courseName, setCourseName] = useState("");
   const [semesterName, setSemesterName] = useState("Semester 1");
 
-  useEffect(() => {
-    async function checkProfiles() {
-      try {
-        const res = await apiFetch("/profiles");
-        if (!res.profiles || res.profiles.length === 0) {
-          setShow(true);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    checkProfiles();
-  }, []);
+  const needsOnboarding = !loading && profiles.length === 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,8 +31,7 @@ export function OnboardingModal() {
           isCurrent: true,
         }),
       });
-      setShow(false);
-      window.location.href = "/dashboard";
+      await reloadProfiles();
     } catch (err) {
       console.error(err);
     } finally {
@@ -54,11 +39,33 @@ export function OnboardingModal() {
     }
   }
 
-  if (loading || !show) return null;
+  if (!needsOnboarding) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
-      <div className="glass-strong rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 border border-purple-500/30">
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        animation: "onboard-in 0.4s ease-out forwards",
+      }}
+    >
+      <style>{`
+        @keyframes onboard-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes modal-up {
+          from { opacity: 0; transform: translateY(24px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
+
+      <div
+        className="glass-strong rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 border border-purple-500/30"
+        style={{ animation: "modal-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
+      >
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 flex items-center justify-center mx-auto shadow-lg shadow-purple-500/30 animate-pulse-glow">
             <GraduationCap className="w-8 h-8 text-white" />
