@@ -32,12 +32,14 @@ export default function DashboardPage() {
   const [today, setToday] = useState<{ date: string; dayName: string; classes: TodayClass[] } | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [marking, setMarking] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     try {
       const [t, d] = await Promise.all([apiFetch("/schedules/today"), apiFetch("/analytics/dashboard")]);
       setToday(t); setDashboard(d);
     } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -56,10 +58,88 @@ export default function DashboardPage() {
 
   const dangerSubjects = dashboard?.subjectsSummary.filter((s) => s.statusColor === "red") || [];
 
+  // Loading skeleton
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-44 rounded-xl bg-white/10 animate-pulse" />
+            <div className="h-4 w-28 rounded-lg bg-white/5 animate-pulse mt-2" />
+          </div>
+          <div className="h-10 w-32 rounded-xl bg-white/10 animate-pulse" />
+        </div>
+
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-16 rounded-lg bg-white/10 animate-pulse" />
+                <div className="w-9 h-9 rounded-xl bg-white/10 animate-pulse" />
+              </div>
+              <div className="h-7 w-14 rounded-lg bg-white/10 animate-pulse" />
+            </div>
+          ))}
+        </div>
+
+        {/* Classes skeleton */}
+        <div>
+          <div className="h-5 w-36 rounded-lg bg-white/10 animate-pulse mb-3" />
+          <div className="grid gap-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="glass rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-12 rounded-full bg-white/10 animate-pulse" />
+                    <div className="space-y-2">
+                      <div className="h-5 w-32 rounded-lg bg-white/10 animate-pulse" />
+                      <div className="h-3 w-24 rounded-lg bg-white/5 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="h-7 w-12 rounded-lg bg-white/10 animate-pulse" />
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="h-9 rounded-xl bg-white/5 animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Subjects skeleton */}
+        <div>
+          <div className="h-5 w-28 rounded-lg bg-white/10 animate-pulse mb-3" />
+          <div className="grid gap-3 md:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="glass rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-10 rounded-full bg-white/10 animate-pulse" />
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-5 w-28 rounded-lg bg-white/10 animate-pulse" />
+                    <div className="h-3 w-16 rounded-lg bg-white/5 animate-pulse" />
+                  </div>
+                </div>
+                <div className="h-2 rounded-full bg-white/5 animate-pulse" />
+                <div className="flex justify-between">
+                  <div className="h-4 w-10 rounded-lg bg-white/10 animate-pulse" />
+                  <div className="h-4 w-20 rounded-lg bg-white/5 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
         <div>
           <h1 className="text-2xl font-bold text-gradient">Dashboard</h1>
           <p className="text-text-secondary text-sm">{today?.dayName}, {today?.date}</p>
@@ -69,9 +149,16 @@ export default function DashboardPage() {
         </Link>
       </div>
 
+      <style>{`
+        @keyframes dash-in {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {/* Danger Alert */}
       {dangerSubjects.length > 0 && (
-        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30">
+        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
@@ -86,7 +173,7 @@ export default function DashboardPage() {
 
       {/* Stats Row */}
       {dashboard && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
           <StatCard label="Overall" value={`${dashboard.overallPct}%`}
             icon={<TrendingUp className="w-5 h-5" />}
             gradient={dashboard.overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
@@ -102,13 +189,14 @@ export default function DashboardPage() {
 
       {/* Today's Classes */}
       {today && today.classes.length > 0 && (
-        <div>
+        <div style={{ animation: "dash-in 0.4s ease-out 0.15s both" }}>
           <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
           <div className="grid gap-3">
-            {today.classes.map((cls) => (
-              <div key={cls.scheduleId} className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
+            {today.classes.map((cls, i) => (
+              <div key={cls.scheduleId} className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all"
+                style={{ animation: `dash-in 0.35s ease-out ${0.18 + i * 0.05}s both` }}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-1.5 h-12 rounded-full" style={{ backgroundColor: cls.colorHex, boxShadow: `0 0 12px ${cls.colorHex}40` }} />
@@ -168,12 +256,13 @@ export default function DashboardPage() {
 
       {/* Subject Cards */}
       {dashboard && dashboard.subjectsSummary.length > 0 && (
-        <div>
+        <div style={{ animation: "dash-in 0.4s ease-out 0.2s both" }}>
           <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
           <div className="grid gap-3 md:grid-cols-2">
-            {dashboard.subjectsSummary.map((s) => (
+            {dashboard.subjectsSummary.map((s, i) => (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group">
+                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group"
+                style={{ animation: `dash-in 0.35s ease-out ${0.25 + i * 0.04}s both` }}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-10 rounded-full" style={{ backgroundColor: s.colorHex, boxShadow: `0 0 10px ${s.colorHex}30` }} />
@@ -213,7 +302,7 @@ export default function DashboardPage() {
 
       {/* Empty state */}
       {dashboard && dashboard.totalSubjects === 0 && (
-        <div className="text-center py-16 glass rounded-2xl">
+        <div className="text-center py-16 glass rounded-2xl" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
