@@ -14,10 +14,15 @@ export default function SemestersPage() {
   const [editForm, setEditForm] = useState({ id: "", name: "", startDate: "", endDate: "", isCurrent: false });
   
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   async function load() {
-    const data = await apiFetch("/semesters");
-    setSemesters(data.semesters);
+    try {
+      const data = await apiFetch("/semesters");
+      setSemesters(data.semesters);
+    } finally {
+      setPageLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -117,6 +122,39 @@ export default function SemestersPage() {
     if (!confirm("Delete this semester?")) return;
     await apiFetch(`/semesters/${id}`, { method: "DELETE" });
     await load();
+  }
+
+  if (pageLoading) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-4 h-4 rounded bg-white/10 animate-pulse" />
+          <div className="w-24 h-4 rounded bg-white/10 animate-pulse" />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="w-32 h-8 rounded-lg bg-white/10 animate-pulse" />
+          <div className="w-32 h-10 rounded-xl bg-white/10 animate-pulse" />
+        </div>
+        <div className="space-y-3 mt-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass p-5 rounded-2xl flex justify-between items-center h-28 animate-pulse">
+              <div className="space-y-3">
+                <div className="w-48 h-6 rounded bg-white/10" />
+                <div className="w-32 h-4 rounded bg-white/5" />
+                <div className="flex gap-2">
+                  <div className="w-24 h-6 rounded-lg bg-white/5" />
+                  <div className="w-24 h-6 rounded-lg bg-white/5" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-10 h-10 rounded bg-white/5" />
+                <div className="w-10 h-10 rounded bg-white/5" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

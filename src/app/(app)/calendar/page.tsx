@@ -15,15 +15,45 @@ export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [schedules, setSchedules] = useState<any[]>([]);
   const [records, setRecords] = useState<any[]>([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch("/schedules").then((d) => setSchedules(d.schedules)).catch(console.error);
+    setPageLoading(true);
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const from = new Date(year, month, 1).toISOString().slice(0, 10);
     const to = new Date(year, month + 1, 0).toISOString().slice(0, 10);
-    apiFetch(`/attendance?from=${from}&to=${to}`).then((d) => setRecords(d.records)).catch(console.error);
+    
+    Promise.all([
+      apiFetch("/schedules"),
+      apiFetch(`/attendance?from=${from}&to=${to}`)
+    ])
+      .then(([s, r]) => {
+        setSchedules(s.schedules);
+        setRecords(r.records);
+      })
+      .catch(console.error)
+      .finally(() => setPageLoading(false));
   }, [currentDate]);
+
+  if (pageLoading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-40 bg-white/10 rounded-lg animate-pulse mb-2" />
+            <div className="h-4 w-32 bg-white/5 rounded-md animate-pulse" />
+          </div>
+          <div className="h-10 w-24 bg-white/10 rounded-xl animate-pulse" />
+        </div>
+        <div className="glass p-2 rounded-2xl flex max-w-xs animate-pulse">
+          <div className="flex-1 h-10 bg-white/10 rounded-xl" />
+          <div className="flex-1 h-10 bg-transparent rounded-xl" />
+        </div>
+        <div className="h-[400px] w-full bg-white/5 rounded-3xl animate-pulse" />
+      </div>
+    );
+  }
 
   function navigate(dir: number) {
     const d = new Date(currentDate);

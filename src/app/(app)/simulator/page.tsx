@@ -11,12 +11,13 @@ export default function SimulatorPage() {
   const [count, setCount] = useState(3);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
     apiFetch("/subjects").then((d) => {
       setSubjects(d.subjects);
       if (d.subjects.length > 0) setSelectedId(d.subjects[0].id);
-    }).catch(console.error);
+    }).catch(console.error).finally(() => setPageLoading(false));
   }, []);
 
   useEffect(() => {
@@ -32,6 +33,22 @@ export default function SimulatorPage() {
   }, [selectedId, scenario, count]);
 
   const selected = subjects.find((s) => s.id === selectedId);
+
+  if (pageLoading) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
+          <div className="w-48 h-8 rounded-lg bg-white/10 animate-pulse" />
+        </div>
+        <div className="glass rounded-2xl p-6 space-y-6 animate-pulse">
+          <div className="w-full h-10 bg-white/10 rounded-xl" />
+          <div className="w-full h-10 bg-white/5 rounded-xl" />
+          <div className="w-full h-32 bg-white/10 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
