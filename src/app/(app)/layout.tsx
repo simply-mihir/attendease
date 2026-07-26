@@ -7,6 +7,7 @@ import { ProfileProvider } from "@/components/ProfileContext";
 import { ProfileSwitcher } from "@/components/ProfileSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { OnboardingModal } from "@/components/OnboardingModal";
+import { NavigationProgress } from "@/components/NavigationProgress";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
   Sliders, Settings, LogOut, Menu, X, ChevronRight
@@ -55,6 +56,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProfileProvider>
+    <NavigationProgress />
     <div className="min-h-screen flex bg-mesh">
       <OnboardingModal />
 
@@ -136,7 +138,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
-          {children}
+          <div key={pathname} className="animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
     </div>
