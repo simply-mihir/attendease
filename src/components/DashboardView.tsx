@@ -4,7 +4,7 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -31,20 +31,35 @@ interface DashboardData {
   userName: string;
 }
 
+interface GoalPlanData {
+  goalPct: number;
+  goalEnabled: boolean;
+  todaysPlan: {
+    subjectName: string; colorHex: string; startTime: string; endTime: string;
+    room: string | null; currentPct: number; priority: "mandatory" | "recommended" | "optional";
+    canSkipForGoal: number; scheduleId: string; subjectId: string;
+  }[];
+  summary: { mustAttend: number; canSkip: number; total: number };
+}
+
 export function DashboardView({ semesterId }: { semesterId?: string }) {
   const [today, setToday] = useState<{ date: string; dayName: string; classes: TodayClass[] } | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [goalPlan, setGoalPlan] = useState<GoalPlanData | null>(null);
+  const [goalExpanded, setGoalExpanded] = useState(true);
   const [marking, setMarking] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     try {
       const qs = semesterId ? `?semesterId=${semesterId}` : "";
-      const [t, d] = await Promise.all([
+      const [t, d, g] = await Promise.all([
         apiFetch(`/schedules/today${qs}`),
-        apiFetch(`/analytics/dashboard${qs}`)
+        apiFetch(`/analytics/dashboard${qs}`),
+        apiFetch("/analytics/goal-plan").catch(() => null)
       ]);
       setToday(t); setDashboard(d);
+      if (g) setGoalPlan(g);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }, [semesterId]);
@@ -188,6 +203,85 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <StatCard label={isCurrent ? "In Danger" : "Failed"} value={dashboard.dangerSubjects.toString()}
             icon={<Zap className="w-5 h-5" />}
             gradient={dashboard.dangerSubjects > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
+        </div>
+      )}
+
+      {/* Goal Mode Card */}
+      {isCurrent && goalPlan && (
+        <div style={{ animation: "dash-in 0.4s ease-out 0.12s both" }}>
+          {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
+            <div className="glass rounded-2xl overflow-hidden">
+              <button
+                onClick={() => setGoalExpanded(!goalExpanded)}
+                className="w-full flex items-center justify-between p-4 hover:bg-surface-3 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-text text-sm">Today&apos;s Goal Plan</h3>
+                    <p className="text-xs text-text-muted">
+                      Attend {goalPlan.summary.mustAttend} of {goalPlan.summary.total} to stay on track for {goalPlan.goalPct}%
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    {goalPlan.goalPct}% goal
+                  </span>
+                  <ChevronDown className={clsx("w-4 h-4 text-text-muted transition-transform", goalExpanded && "rotate-180")} />
+                </div>
+              </button>
+              {goalExpanded && (
+                <div className="px-4 pb-4 space-y-2">
+                  {goalPlan.todaysPlan.map((cls) => (
+                    <div
+                      key={cls.scheduleId}
+                      className={clsx(
+                        "flex items-center gap-3 p-3 rounded-xl border-2 transition",
+                        cls.priority === "mandatory" ? "border-red-500/30 bg-red-500/5" :
+                        cls.priority === "recommended" ? "border-yellow-500/30 bg-yellow-500/5" :
+                        "border-green-500/30 bg-green-500/5"
+                      )}
+                    >
+                      <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: cls.colorHex }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-text truncate">{cls.subjectName}</p>
+                        <p className="text-xs text-text-muted flex items-center gap-2">
+                          <Clock className="w-3 h-3" /> {cls.startTime} - {cls.endTime}
+                          {cls.room && <><MapPin className="w-3 h-3 ml-1" /> {cls.room}</>}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={clsx(
+                          "text-xs font-black px-2 py-1 rounded-lg",
+                          cls.priority === "mandatory" ? "bg-red-500/10 text-red-400" :
+                          cls.priority === "recommended" ? "bg-yellow-500/10 text-yellow-400" :
+                          "bg-green-500/10 text-green-400"
+                        )}>
+                          {cls.priority === "mandatory" ? "🔴 Must attend" :
+                           cls.priority === "recommended" ? "🟡 Should attend" :
+                           "🟢 Safe to skip"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : !goalPlan.goalEnabled ? (
+            <Link href="/settings/goal" className="glass rounded-2xl p-4 flex items-center gap-3 hover:bg-surface-3 transition group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Target className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-sm text-text">Set Your Attendance Goal</p>
+                <p className="text-xs text-text-muted">Get a daily action plan showing which classes to attend</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
+            </Link>
+          ) : null}
         </div>
       )}
 

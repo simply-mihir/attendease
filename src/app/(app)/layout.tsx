@@ -10,7 +10,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight
+  Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -20,6 +20,9 @@ const navItems = [
   { href: "/calendar", label: "Calendar", icon: Calendar, gradient: "from-orange-500 to-red-500" },
   { href: "/analytics", label: "Analytics", icon: BarChart3, gradient: "from-green-500 to-emerald-500" },
   { href: "/simulator", label: "Simulator", icon: Sliders, gradient: "from-yellow-500 to-orange-500" },
+  { href: "/optimizer", label: "Skip Optimizer", icon: Zap, gradient: "from-emerald-500 to-cyan-500" },
+  { href: "/forecast", label: "Forecast", icon: TrendingUp, gradient: "from-violet-500 to-purple-500" },
+  { href: "/groups", label: "Friends", icon: Users, gradient: "from-pink-500 to-rose-500" },
   { href: "/settings", label: "Settings", icon: Settings, gradient: "from-pink-500 to-purple-500" },
 ];
 

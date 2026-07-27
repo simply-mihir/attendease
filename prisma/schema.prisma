@@ -75,6 +75,7 @@ model User {
   notificationSetting NotificationSetting?
   classExceptions     ClassException[]
   pushSubscriptions   PushSubscription[]
+  friendGroupMemberships FriendGroupMember[]
 }
 
 model DegreeProfile {
@@ -241,6 +242,8 @@ model NotificationSetting {
   quietHoursEnd           String  @default("07:00")
   dailyBriefTime          String  @default("08:00")
   weeklyReportDay         Int     @default(0)
+  goalModeEnabled         Boolean @default(false)
+  goalTargetPct           Float   @default(85.0)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
@@ -288,5 +291,29 @@ model Achievement {
   subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badgeKey, subjectId])
+  @@index([userId])
+}
+
+// ─── Friend Groups ──────────────────────────────────────────
+model FriendGroup {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdBy String
+  createdAt DateTime @default(now())
+
+  members   FriendGroupMember[]
+}
+
+model FriendGroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  group FriendGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
   @@index([userId])
 }
