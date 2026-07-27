@@ -65,7 +65,7 @@ export default function SubjectsPage() {
           <div className="flex-1">
             <p className="font-bold text-sm text-text">Import from Photo</p>
             <p className="text-xs text-text-muted">
-              Snap your timetable and auto-add all subjects & schedules
+              Snap your timetable or upload a PDF/Excel to auto-add all subjects
             </p>
           </div>
           <span className="text-text-muted group-hover:translate-x-1 transition-transform">

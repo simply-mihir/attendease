@@ -163,9 +163,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             {today?.dayName}, {today?.date}
           </p>
         </div>
-        <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Subject
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/import" className="btn-gradient-cyan px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+            <Camera className="w-4 h-4" /> Import
+          </Link>
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Add Subject
+          </Link>
+        </div>
       </div>
 
       <style>{`

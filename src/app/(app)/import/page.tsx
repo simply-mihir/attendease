@@ -4,7 +4,7 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Camera, Upload, Loader2, CheckCircle2, XCircle, Plus, Trash2,
-  ArrowRight, ArrowLeft, Sparkles, BookOpen, Clock, MapPin,
+  ArrowRight, ArrowLeft, Sparkles, BookOpen, Clock, MapPin, FileSpreadsheet,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -47,6 +47,7 @@ export default function ImportPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>("image/jpeg");
+  const [fileName, setFileName] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<ParsedSubject[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -59,25 +60,51 @@ export default function ImportPage() {
   } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // ── Step 1: Image handling ────────────────────────────────────
+  const ACCEPTED_TYPES = new Set([
+    "image/png", "image/jpeg", "image/webp", "image/gif",
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+    "application/vnd.ms-excel", // .xls
+    "text/csv",
+  ]);
+
+  // ── Step 1: File handling ──────────────────────────────────────
   const handleFile = useCallback((file: File) => {
-    if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
+    // Allow matching by extension as fallback (some browsers return empty type for CSV)
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    const isAccepted = ACCEPTED_TYPES.has(file.type) ||
+      ["csv", "xlsx", "xls", "pdf", "png", "jpg", "jpeg", "webp", "gif"].includes(ext || "");
+
+    if (!isAccepted) {
+      setError("Unsupported file type. Use an image, PDF, Excel, or CSV file.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image too large. Max 5MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File too large. Max 10MB.");
       return;
     }
     setError("");
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
-      setImagePreview(dataUrl);
-      // Strip data:image/...;base64, prefix
+      // Only show image preview for image types
+      if (file.type.startsWith("image/")) {
+        setImagePreview(dataUrl);
+      } else {
+        setImagePreview(null); // Non-image files get a file-name based preview
+      }
       const base64 = dataUrl.split(",")[1];
       setImageBase64(base64);
-      setImageMime(file.type);
+      // Map extension to mime if browser didn't provide one
+      let mime = file.type;
+      if (!mime || mime === "application/octet-stream") {
+        if (ext === "csv") mime = "text/csv";
+        else if (ext === "xlsx") mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        else if (ext === "xls") mime = "application/vnd.ms-excel";
+        else if (ext === "pdf") mime = "application/pdf";
+      }
+      setImageMime(mime);
     };
     reader.readAsDataURL(file);
   }, []);
@@ -276,7 +303,7 @@ export default function ImportPage() {
           <span className="text-gradient">Import Timetable</span>
         </h1>
         <p className="text-text-muted text-sm mt-1 ml-[52px]">
-          Snap a photo of your timetable and auto-add all subjects
+          Upload a photo, PDF, or spreadsheet of your timetable to auto-add all subjects
         </p>
       </div>
 
@@ -332,7 +359,20 @@ export default function ImportPage() {
                   className="rounded-xl max-h-72 mx-auto object-contain border-2 border-border-heavy"
                 />
                 <p className="text-center text-xs text-text-muted font-bold">
-                  Click to change image
+                  Click to change file
+                </p>
+              </div>
+            ) : imageBase64 && fileName ? (
+              <div className="text-center space-y-3 py-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+                  <FileSpreadsheet className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">{fileName}</p>
+                  <p className="text-xs text-text-muted">Ready to analyze</p>
+                </div>
+                <p className="text-center text-xs text-text-muted font-bold">
+                  Click to change file
                 </p>
               </div>
             ) : (
@@ -344,17 +384,20 @@ export default function ImportPage() {
                   Upload your timetable
                 </h3>
                 <p className="text-text-muted text-sm mb-4">
-                  Drop an image here, or click to browse
+                  Drop a file here, or click to browse
                 </p>
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-center gap-3 flex-wrap">
                   <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
                     📷 Photo
                   </span>
                   <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
-                    📱 Screenshot
+                    📄 PDF
                   </span>
                   <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
-                    🖼️ Scan
+                    📊 Excel / CSV
+                  </span>
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
+                    📱 Screenshot
                   </span>
                 </div>
               </div>
@@ -364,8 +407,7 @@ export default function ImportPage() {
           <input
             ref={fileRef}
             type="file"
-            accept="image/*"
-            capture="environment"
+            accept="image/*,.pdf,.xlsx,.xls,.csv,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
