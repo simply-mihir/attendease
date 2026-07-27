@@ -4,7 +4,7 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -419,6 +419,10 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <p className="text-text-secondary mb-6">Add your first subject to start tracking attendance</p>
           <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-6 py-3 rounded-xl inline-flex items-center gap-2">
             <Plus className="w-5 h-5" /> Add Your First Subject
+          </Link>
+          <p className="text-text-muted text-sm mt-3">or</p>
+          <Link href="/import" className="btn-gradient-cyan px-6 py-3 rounded-xl inline-flex items-center gap-2 mt-2">
+            <Camera className="w-5 h-5" /> Import from Timetable Photo
           </Link>
         </div>
       )}

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
-import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera } from "lucide-react";
 import clsx from "clsx";
 
 export default function SubjectsPage() {
@@ -53,6 +53,27 @@ export default function SubjectsPage() {
         </div>
       </div>
 
+      {/* Import CTA */}
+      {!showArchived && (
+        <Link
+          href="/import"
+          className="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-surface-3 transition group border-2 border-dashed border-border-heavy hover:border-cyan-500/30"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+            <Camera className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-sm text-text">Import from Photo</p>
+            <p className="text-xs text-text-muted">
+              Snap your timetable and auto-add all subjects & schedules
+            </p>
+          </div>
+          <span className="text-text-muted group-hover:translate-x-1 transition-transform">
+            →
+          </span>
+        </Link>
+      )}
+
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -75,7 +96,17 @@ export default function SubjectsPage() {
       ) : subjects.length === 0 ? (
         <div className="text-center py-16 glass rounded-2xl">
           <BookOpen className="w-12 h-12 text-text-muted mx-auto mb-3" />
-          <p className="text-text-secondary">{showArchived ? "No archived subjects" : "No subjects yet. Add one to get started!"}</p>
+          <p className="text-text-secondary mb-4">{showArchived ? "No archived subjects" : "No subjects yet. Add one to get started!"}</p>
+          {!showArchived && (
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Link href="/subjects/new" className="btn-gradient px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Add Subject
+              </Link>
+              <Link href="/import" className="btn-gradient-cyan px-5 py-2.5 rounded-xl text-sm inline-flex items-center gap-2">
+                <Camera className="w-4 h-4" /> Import from Photo
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
