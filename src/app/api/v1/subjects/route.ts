@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { createSubjectSchema } from "@/lib/validations/subject";
+import { cachedJson } from "@/lib/api-cache";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
     orderBy: { name: "asc" },
   });
 
-  return Response.json({ subjects });
+  return cachedJson({ subjects }, 30);
 }
 
 export async function POST(req: NextRequest) {

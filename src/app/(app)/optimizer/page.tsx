@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/hooks/useApi";
+import { useState } from "react";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
 import clsx from "clsx";
 
@@ -24,20 +24,9 @@ interface OptimizerResult {
 
 export default function OptimizerPage() {
   const [maxSkips, setMaxSkips] = useState(5);
-  const [result, setResult] = useState<OptimizerResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    apiFetch(`/analytics/skip-optimizer?maxSkips=${maxSkips}`)
-      .then(setResult)
-      .catch(console.error)
-      .finally(() => {
-        setLoading(false);
-        setInitialLoad(false);
-      });
-  }, [maxSkips]);
+  
+  const { data: result, isLoading: loading } = useSWRFetch<OptimizerResult>(`/analytics/skip-optimizer?maxSkips=${maxSkips}`);
+  const initialLoad = loading && !result;
 
   if (initialLoad) {
     return (

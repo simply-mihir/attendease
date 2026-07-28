@@ -1,21 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/hooks/useApi";
+import { useState } from "react";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function ExportPage() {
-  const [subjects, setSubjects] = useState<any[]>([]);
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [exporting, setExporting] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
-
-  useEffect(() => {
-    apiFetch("/subjects")
-      .then((d) => setSubjects(d.subjects))
-      .catch(console.error)
-      .finally(() => setPageLoading(false));
-  }, []);
+  
+  const { data, isLoading: pageLoading } = useSWRFetch<{ subjects: any[] }>("/subjects");
+  const subjects = data?.subjects || [];
 
   if (pageLoading) {
     return (

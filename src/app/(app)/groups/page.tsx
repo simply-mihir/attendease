@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import {
   Users, Plus, LogIn, Copy, CheckCircle2, Bell, LogOut,
   Loader2, AlertTriangle,
@@ -33,8 +34,6 @@ interface Group {
 }
 
 export default function GroupsPage() {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [groupName, setGroupName] = useState("");
@@ -47,20 +46,8 @@ export default function GroupsPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
 
-  const loadGroups = useCallback(async () => {
-    try {
-      const data = await apiFetch("/groups");
-      setGroups(data.groups || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadGroups();
-  }, [loadGroups]);
+  const { data, isLoading: loading } = useSWRFetch<{ groups: Group[] }>("/groups");
+  const groups = data?.groups || [];
 
   async function handleCreate() {
     if (!groupName.trim()) return;
@@ -75,7 +62,7 @@ export default function GroupsPage() {
       setGroupName("");
       setSuccessMsg("Group created!");
       setTimeout(() => setSuccessMsg(""), 3000);
-      await loadGroups();
+      await invalidate("/groups");
     } catch (err: any) {
       setError(err.message || "Failed to create group");
     } finally {
@@ -96,7 +83,7 @@ export default function GroupsPage() {
       setJoinCode("");
       setSuccessMsg(`Joined ${res.groupName}!`);
       setTimeout(() => setSuccessMsg(""), 3000);
-      await loadGroups();
+      await invalidate("/groups");
     } catch (err: any) {
       setError(err.message || "Failed to join group");
     } finally {
@@ -123,7 +110,7 @@ export default function GroupsPage() {
       await apiFetch(`/groups/${groupId}`, { method: "DELETE" });
       setSuccessMsg("Left the group");
       setTimeout(() => setSuccessMsg(""), 3000);
-      await loadGroups();
+      await invalidate("/groups");
     } catch (err) {
       console.error(err);
     } finally {

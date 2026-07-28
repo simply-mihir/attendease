@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
 import { ArrowLeft, Target, Save, Loader2 } from "lucide-react";
 import clsx from "clsx";
@@ -8,21 +9,17 @@ import clsx from "clsx";
 export default function GoalSettingsPage() {
   const [enabled, setEnabled] = useState(false);
   const [targetPct, setTargetPct] = useState(85);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const { data, isLoading: loading } = useSWRFetch<any>("/notifications/settings");
+
   useEffect(() => {
-    apiFetch("/notifications/settings")
-      .then((d) => {
-        if (d.settings) {
-          setEnabled(d.settings.goalModeEnabled ?? false);
-          setTargetPct(d.settings.goalTargetPct ?? 85);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    if (data?.settings) {
+      setEnabled(data.settings.goalModeEnabled ?? false);
+      setTargetPct(data.settings.goalTargetPct ?? 85);
+    }
+  }, [data]);
 
   async function handleSave() {
     setSaving(true);

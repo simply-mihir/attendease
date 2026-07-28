@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { ArrowLeft, Plus, Trash2, Star, Loader2, Edit2, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 
 export default function SemestersPage() {
-  const [semesters, setSemesters] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", startDate: "", endDate: "", isCurrent: false });
   
@@ -14,18 +14,9 @@ export default function SemestersPage() {
   const [editForm, setEditForm] = useState({ id: "", name: "", startDate: "", endDate: "", isCurrent: false });
   
   const [loading, setLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
 
-  async function load() {
-    try {
-      const data = await apiFetch("/semesters");
-      setSemesters(data.semesters);
-    } finally {
-      setPageLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
+  const { data, isLoading: pageLoading } = useSWRFetch<{ semesters: any[] }>("/semesters");
+  const semesters = data?.semesters || [];
 
   const [linkSemesterId, setLinkSemesterId] = useState<string | null>(null);
   const [allSubjects, setAllSubjects] = useState<any[]>([]);
@@ -71,7 +62,7 @@ export default function SemestersPage() {
       }
 
       setLinkSemesterId(null);
-      await load();
+      await invalidate("/semesters");
     } catch (err) {
       console.error(err);
     } finally {
@@ -86,7 +77,7 @@ export default function SemestersPage() {
       await apiFetch("/semesters", { method: "POST", body: JSON.stringify(form) });
       setForm({ name: "", startDate: "", endDate: "", isCurrent: false });
       setShowForm(false);
-      await load();
+      await invalidate("/semesters");
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
@@ -108,20 +99,20 @@ export default function SemestersPage() {
     try {
       await apiFetch(`/semesters/${editForm.id}`, { method: "PUT", body: JSON.stringify(editForm) });
       setShowEditModal(false);
-      await load();
+      await invalidate("/semesters");
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
 
   async function setActive(id: string) {
     await apiFetch(`/semesters/${id}`, { method: "PUT", body: JSON.stringify({ isCurrent: true }) });
-    await load();
+    await invalidate("/semesters");
   }
 
   async function deleteSemester(id: string) {
     if (!confirm("Delete this semester?")) return;
     await apiFetch(`/semesters/${id}`, { method: "DELETE" });
-    await load();
+    await invalidate("/semesters");
   }
 
   if (pageLoading) {

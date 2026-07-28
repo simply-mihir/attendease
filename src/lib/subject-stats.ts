@@ -1,30 +1,36 @@
 import { prisma } from "@/lib/db";
 
 export async function recalcSubjectStats(subjectId: string) {
-  const records = await prisma.attendanceRecord.findMany({
+  // Aggregate counts directly in DB
+  const counts = await prisma.attendanceRecord.groupBy({
+    by: ["status"],
     where: { subjectId },
+    _count: true,
   });
 
-  const countable = records.filter((r) => r.status !== "holiday" && r.status !== "cancelled");
-  const totalClassesHeld = countable.length;
-  const totalPresent = countable.filter((r) => r.status === "present").length;
-  const totalAbsent = countable.filter((r) => r.status === "absent").length;
-  const totalLate = countable.filter((r) => r.status === "late").length;
-  const totalExcused = countable.filter((r) => r.status === "excused").length;
+  const present = counts.find((c) => c.status === "present")?._count ?? 0;
+  const late = counts.find((c) => c.status === "late")?._count ?? 0;
+  const absent = counts.find((c) => c.status === "absent")?._count ?? 0;
+  const excused = counts.find((c) => c.status === "excused")?._count ?? 0;
+  const cancelled = counts.find((c) => c.status === "cancelled")?._count ?? 0;
   
-  const totalCancelled = records.filter((r) => r.status === "cancelled").length;
-
-  const effective = totalPresent + totalLate;
+  const totalClassesHeld = present + late + absent + excused;
+  const effective = present + late;
   const currentPercentage =
     totalClassesHeld === 0 ? 0 : Math.round((effective / totalClassesHeld) * 10000) / 100;
 
-  // Calculate streak
-  const sorted = records
-    .filter((r) => !["holiday", "cancelled"].includes(r.status))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Calculate streak by fetching only minimal required data
+  const recentRecords = await prisma.attendanceRecord.findMany({
+    where: { 
+      subjectId,
+      status: { notIn: ["holiday", "cancelled"] }
+    },
+    select: { status: true },
+    orderBy: { date: "desc" }
+  });
 
   let streakCount = 0;
-  for (const rec of sorted) {
+  for (const rec of recentRecords) {
     if (rec.status === "present" || rec.status === "late") {
       streakCount++;
     } else break;
@@ -33,20 +39,21 @@ export async function recalcSubjectStats(subjectId: string) {
   const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
   const longestStreak = Math.max(streakCount, subject?.longestStreak ?? 0);
 
+  // Single update
   await prisma.subject.update({
     where: { id: subjectId },
     data: {
       totalClassesHeld,
-      totalPresent,
-      totalAbsent,
-      totalLate,
-      totalExcused,
-      totalCancelled,
+      totalPresent: present,
+      totalAbsent: absent,
+      totalLate: late,
+      totalExcused: excused,
+      totalCancelled: cancelled,
       currentPercentage,
       streakCount,
       longestStreak,
     },
   });
 
-  return { totalClassesHeld, totalPresent, totalAbsent, totalLate, totalExcused, totalCancelled, currentPercentage, streakCount };
+  return { totalClassesHeld, totalPresent: present, totalAbsent: absent, totalLate: late, totalExcused: excused, totalCancelled: cancelled, currentPercentage, streakCount };
 }

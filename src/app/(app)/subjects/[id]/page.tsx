@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
@@ -23,7 +24,6 @@ const STATUS_COLORS: Record<string, string> = {
 export default function SubjectDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const router = useRouter();
-  const [subject, setSubject] = useState<any>(null);
   
   // Mark Attendance State
   const [marking, setMarking] = useState(false);
@@ -50,14 +50,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [scheduleForm, setScheduleForm] = useState({ id: "", dayOfWeek: 1, startTime: "09:00", endTime: "10:00", room: "", building: "" });
   const [savingSchedule, setSavingSchedule] = useState(false);
 
-  const load = useCallback(async () => {
-    const data = await apiFetch(`/subjects/${id}`);
-    setSubject(data.subject);
-  }, [id]);
+  const { data, isLoading: loading } = useSWRFetch<any>(`/subjects/${id}`);
+  const subject = data?.subject;
 
-  useEffect(() => { load(); }, [load]);
-
-  if (!subject) {
+  if (loading || !subject) {
     return (
       <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         <div className="flex items-center gap-2 mb-2">
@@ -118,7 +114,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         method: "POST",
         body: JSON.stringify({ subjectId: id, date: markDate, status: markStatus }),
       });
-      await load();
+      await invalidate(`/subjects/${id}`);
     } catch (err) { console.error(err); }
     finally { setMarking(false); }
   }
@@ -126,7 +122,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   async function deleteRecord(recordId: string) {
     if (!confirm("Delete this record?")) return;
     await apiFetch(`/attendance/${recordId}`, { method: "DELETE" });
-    await load();
+    await invalidate(`/subjects/${id}`);
   }
 
   async function handleDeleteSubject() {
@@ -156,7 +152,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         body: JSON.stringify(editSubjectData)
       });
       setShowEditSubjectModal(false);
-      await load();
+      await invalidate(`/subjects/${id}`);
     } catch (err) { console.error(err); }
     finally { setSavingSubject(false); }
   }
@@ -176,7 +172,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         body: JSON.stringify({ status: editRecordStatus, date: editRecordDate })
       });
       setEditingRecord(null);
-      await load();
+      await invalidate(`/subjects/${id}`);
     } catch (err) { console.error(err); }
     finally { setSavingRecord(false); }
   }
@@ -209,7 +205,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         });
       }
       setShowScheduleModal(false);
-      await load();
+      await invalidate(`/subjects/${id}`);
     } catch (err) { console.error(err); }
     finally { setSavingSchedule(false); }
   }
@@ -218,7 +214,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     if (!confirm("Delete this schedule?")) return;
     try {
       await apiFetch(`/schedules/${scheduleId}`, { method: "DELETE" });
-      await load();
+      await invalidate(`/subjects/${id}`);
     } catch (err) { console.error(err); }
   }
 

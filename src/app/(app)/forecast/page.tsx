@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { TrendingUp, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import {
@@ -44,15 +43,7 @@ interface ForecastResponse {
 }
 
 export default function ForecastPage() {
-  const [data, setData] = useState<ForecastResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiFetch("/analytics/forecast")
-      .then(setData)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data, isLoading: loading } = useSWRFetch<ForecastResponse>("/analytics/forecast");
 
   if (loading) {
     return (

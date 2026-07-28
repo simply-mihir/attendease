@@ -1,24 +1,26 @@
 "use client";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Sliders, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import clsx from "clsx";
 
 export default function SimulatorPage() {
-  const [subjects, setSubjects] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [scenario, setScenario] = useState<"skip" | "attend">("skip");
   const [count, setCount] = useState(3);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
 
+  const { data, isLoading: pageLoading } = useSWRFetch<{ subjects: any[] }>("/subjects");
+  const subjects = data?.subjects || [];
+
+  // Auto-select first subject
   useEffect(() => {
-    apiFetch("/subjects").then((d) => {
-      setSubjects(d.subjects);
-      if (d.subjects.length > 0) setSelectedId(d.subjects[0].id);
-    }).catch(console.error).finally(() => setPageLoading(false));
-  }, []);
+    if (subjects.length > 0 && !selectedId) {
+      setSelectedId(subjects[0].id);
+    }
+  }, [subjects, selectedId]);
 
   useEffect(() => {
     if (!selectedId) return;

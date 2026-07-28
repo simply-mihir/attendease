@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { calculateAttendance } from "@/lib/attendance-calc";
+import { cachedJson } from "@/lib/api-cache";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
 
   const overallPct = overallTotal === 0 ? 0 : Math.round((overallPresent / overallTotal) * 10000) / 100;
 
-  return Response.json({
+  return cachedJson({
     overallPct,
     totalSubjects: subjects.length,
     safeSubjects,
@@ -84,5 +85,5 @@ export async function GET(req: NextRequest) {
     isCurrentSemester,
     semesterName,
     userName: user.name,
-  });
+  }, 15);
 }

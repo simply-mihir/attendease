@@ -1,38 +1,36 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
+import { SubjectsSkeleton } from "@/components/Skeleton";
 import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera } from "lucide-react";
 import clsx from "clsx";
 
 export default function SubjectsPage() {
-  const [subjects, setSubjects] = useState<any[]>([]);
   const [showArchived, setShowArchived] = useState(false);
   const [deletingSubject, setDeletingSubject] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    apiFetch(`/subjects?archived=${showArchived}`)
-      .then((d) => setSubjects(d.subjects))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [showArchived]);
+  const { data, isLoading: loading } = useSWRFetch<{ subjects: any[] }>(`/subjects?archived=${showArchived}`);
+  const subjects = data?.subjects || [];
 
   async function toggleArchive(id: string, isArchived: boolean) {
     await apiFetch(`/subjects/${id}`, {
       method: "PUT",
       body: JSON.stringify({ isArchived: !isArchived }),
     });
-    setSubjects((prev) => prev.filter((s) => s.id !== id));
+    // Invalidate the cache to fetch updated list
+    await invalidate(`/subjects?archived=${showArchived}`);
+    await invalidate(`/dashboard`); // Subjects can change dashboard stats
   }
 
   async function handleDeleteSubject() {
     if (!deletingSubject) return;
     try {
       await apiFetch(`/subjects/${deletingSubject.id}`, { method: "DELETE" });
-      setSubjects((prev) => prev.filter((s) => s.id !== deletingSubject.id));
       setDeletingSubject(null);
+      await invalidate(`/subjects?archived=${showArchived}`);
+      await invalidate(`/dashboard`);
     } catch (err) {
       console.error(err);
     }
@@ -75,24 +73,7 @@ export default function SubjectsPage() {
       )}
 
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="glass rounded-2xl p-5 h-[160px] animate-pulse flex flex-col justify-between">
-              <div className="flex gap-3 items-center">
-                <div className="w-3 h-12 bg-white/10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-white/10 rounded w-1/2" />
-                  <div className="h-3 bg-white/5 rounded w-1/3" />
-                </div>
-              </div>
-              <div className="h-2 bg-white/10 rounded-full w-full mt-4" />
-              <div className="flex justify-between mt-2">
-                <div className="h-3 bg-white/5 rounded w-8" />
-                <div className="h-3 bg-white/5 rounded w-16" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <SubjectsSkeleton />
       ) : subjects.length === 0 ? (
         <div className="text-center py-16 glass rounded-2xl">
           <BookOpen className="w-12 h-12 text-text-muted mx-auto mb-3" />

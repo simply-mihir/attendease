@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/hooks/useApi";
+import { useState } from "react";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer } from "lucide-react";
 import clsx from "clsx";
 
@@ -13,28 +13,18 @@ const STATUS_DOT: Record<string, string> = {
 export default function CalendarPage() {
   const [view, setView] = useState<"week" | "month">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [schedules, setSchedules] = useState<any[]>([]);
-  const [records, setRecords] = useState<any[]>([]);
-  const [pageLoading, setPageLoading] = useState(true);
 
-  useEffect(() => {
-    setPageLoading(true);
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const from = new Date(year, month, 1).toISOString().slice(0, 10);
-    const to = new Date(year, month + 1, 0).toISOString().slice(0, 10);
-    
-    Promise.all([
-      apiFetch("/schedules"),
-      apiFetch(`/attendance?from=${from}&to=${to}`)
-    ])
-      .then(([s, r]) => {
-        setSchedules(s.schedules);
-        setRecords(r.records);
-      })
-      .catch(console.error)
-      .finally(() => setPageLoading(false));
-  }, [currentDate]);
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const from = new Date(year, month, 1).toISOString().slice(0, 10);
+  const to = new Date(year, month + 1, 0).toISOString().slice(0, 10);
+  
+  const { data: schedData, isLoading: schedLoading } = useSWRFetch<{ schedules: any[] }>("/schedules");
+  const { data: recData, isLoading: recLoading } = useSWRFetch<{ records: any[] }>(`/attendance?from=${from}&to=${to}`);
+
+  const schedules = schedData?.schedules || [];
+  const records = recData?.records || [];
+  const pageLoading = schedLoading || recLoading;
 
   if (pageLoading) {
     return (

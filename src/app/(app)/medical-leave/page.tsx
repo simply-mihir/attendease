@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
 import {
   ArrowLeft, HeartPulse, Calendar, CheckCircle2, AlertTriangle, Loader2,
@@ -14,27 +15,18 @@ interface SubjectOption {
 }
 
 export default function MedicalLeavePage() {
-  const [subjects, setSubjects] = useState<SubjectOption[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
   const [allSubjects, setAllSubjects] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [result, setResult] = useState<{ marked: number; subjects: string[] } | null>(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    apiFetch("/subjects")
-      .then((d) => {
-        const subs = (d.subjects || []).filter((s: any) => !s.isArchived);
-        setSubjects(subs);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: subjectData, isLoading: loading } = useSWRFetch<any>("/subjects");
+  const subjects = (subjectData?.subjects || []).filter((s: any) => !s.isArchived) as SubjectOption[];
 
   function toggleSubject(id: string) {
     setSelectedSubjects((prev) => {

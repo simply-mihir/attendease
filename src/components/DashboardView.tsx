@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
+import { DashboardSkeleton } from "@/components/Skeleton";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
   Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera
@@ -23,12 +25,17 @@ interface SubjectSummary {
 }
 
 interface DashboardData {
-  overallPct: number; totalSubjects: number; safeSubjects: number;
-  warningSubjects: number; dangerSubjects: number; currentStreak: number;
-  subjectsSummary: SubjectSummary[];
-  isCurrentSemester: boolean;
-  semesterName: string | null;
-  userName: string;
+  stats: {
+    overallAttendance: number; totalSubjects: number; dangerCount: number;
+  };
+  subjects: SubjectSummary[];
+  dangerSubjects: SubjectSummary[];
+  todaySchedule: any[];
+  isCurrentSemester?: boolean;
+  semesterName?: string | null;
+  userName?: string;
+  // Fallbacks for older data structure compatibility (optional)
+  overallPct?: number; safeSubjects?: number; warningSubjects?: number; currentStreak?: number; longestStreak?: number; subjectsSummary?: SubjectSummary[]; totalSubjects?: number;
 }
 
 interface GoalPlanData {
@@ -43,28 +50,14 @@ interface GoalPlanData {
 }
 
 export function DashboardView({ semesterId }: { semesterId?: string }) {
-  const [today, setToday] = useState<{ date: string; dayName: string; classes: TodayClass[] } | null>(null);
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
-  const [goalPlan, setGoalPlan] = useState<GoalPlanData | null>(null);
+  const qs = semesterId ? `?semesterId=${semesterId}` : "";
+  const { data: dashboard, isLoading: dashLoading } = useSWRFetch<DashboardData>(`/dashboard${qs}`);
+  const { data: goalPlan, isLoading: goalLoading } = useSWRFetch<GoalPlanData>("/analytics/goal-plan");
+
   const [goalExpanded, setGoalExpanded] = useState(true);
   const [marking, setMarking] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const loadData = useCallback(async () => {
-    try {
-      const qs = semesterId ? `?semesterId=${semesterId}` : "";
-      const [t, d, g] = await Promise.all([
-        apiFetch(`/schedules/today${qs}`),
-        apiFetch(`/analytics/dashboard${qs}`),
-        apiFetch("/analytics/goal-plan").catch(() => null)
-      ]);
-      setToday(t); setDashboard(d);
-      if (g) setGoalPlan(g);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  }, [semesterId]);
-
-  useEffect(() => { loadData(); }, [loadData]);
+  const loading = dashLoading || goalLoading;
 
   async function quickMark(subjectId: string, scheduleId: string, status: string) {
     setMarking(`${subjectId}-${status}`);
@@ -73,82 +66,30 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         method: "POST",
         body: JSON.stringify({ subjectId, scheduleId, date: new Date().toISOString().slice(0, 10), status, source: "quick_widget" }),
       });
-      await loadData();
+      await invalidate(`/dashboard${qs}`);
+      await invalidate("/analytics/goal-plan");
     } catch (err) { console.error(err); }
     finally { setMarking(null); }
   }
 
-  const dangerSubjects = dashboard?.subjectsSummary.filter((s) => s.statusColor === "red") || [];
+  // Normalize data depending on backend response (supporting both new combined and legacy shapes)
   const isCurrent = dashboard?.isCurrentSemester ?? true;
+  const overallPct = dashboard?.stats?.overallAttendance ?? dashboard?.overallPct ?? 0;
+  const currentStreak = dashboard?.currentStreak ?? 0; // Or calculate if missing from new API
+  const totalSubjects = dashboard?.stats?.totalSubjects ?? dashboard?.totalSubjects ?? 0;
+  const dangerCount = dashboard?.stats?.dangerCount ?? dashboard?.dangerSubjects?.length ?? 0;
+  const dangerSubjectsList = dashboard?.dangerSubjects || (dashboard?.subjectsSummary?.filter((s) => s.statusColor === "red")) || [];
+  const subjectsList = dashboard?.subjects || dashboard?.subjectsSummary || [];
+  const todayClasses = dashboard?.todaySchedule || [];
+
+  const d = new Date();
+  const today = {
+    dayName: d.toLocaleDateString("en-IN", { weekday: "long" }),
+    date: d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+  };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-8 w-44 rounded-xl bg-white/10 animate-pulse" />
-            <div className="h-4 w-28 rounded-lg bg-white/5 animate-pulse mt-2" />
-          </div>
-          <div className="h-10 w-32 rounded-xl bg-white/10 animate-pulse" />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="glass rounded-2xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="h-4 w-16 rounded-lg bg-white/10 animate-pulse" />
-                <div className="w-9 h-9 rounded-xl bg-white/10 animate-pulse" />
-              </div>
-              <div className="h-7 w-14 rounded-lg bg-white/10 animate-pulse" />
-            </div>
-          ))}
-        </div>
-        <div>
-          <div className="h-5 w-36 rounded-lg bg-white/10 animate-pulse mb-3" />
-          <div className="grid gap-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="glass rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-12 rounded-full bg-white/10 animate-pulse" />
-                    <div className="space-y-2">
-                      <div className="h-5 w-32 rounded-lg bg-white/10 animate-pulse" />
-                      <div className="h-3 w-24 rounded-lg bg-white/5 animate-pulse" />
-                    </div>
-                  </div>
-                  <div className="h-7 w-12 rounded-lg bg-white/10 animate-pulse" />
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className="h-9 rounded-xl bg-white/5 animate-pulse" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div>
-          <div className="h-5 w-28 rounded-lg bg-white/10 animate-pulse mb-3" />
-          <div className="grid gap-3 md:grid-cols-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="glass rounded-2xl p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-10 rounded-full bg-white/10 animate-pulse" />
-                  <div className="space-y-1.5 flex-1">
-                    <div className="h-5 w-28 rounded-lg bg-white/10 animate-pulse" />
-                    <div className="h-3 w-16 rounded-lg bg-white/5 animate-pulse" />
-                  </div>
-                </div>
-                <div className="h-2 rounded-full bg-white/5 animate-pulse" />
-                <div className="flex justify-between">
-                  <div className="h-4 w-10 rounded-lg bg-white/10 animate-pulse" />
-                  <div className="h-4 w-20 rounded-lg bg-white/5 animate-pulse" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -181,7 +122,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       `}</style>
 
       {/* Danger Alert */}
-      {isCurrent && dangerSubjects.length > 0 && (
+      {isCurrent && dangerSubjectsList.length > 0 && (
         <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
             <AlertTriangle className="w-5 h-5 text-white" />
@@ -189,7 +130,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <div>
             <p className="font-semibold text-red-400 text-sm">Attendance Danger Zone</p>
             <p className="text-sm text-text-secondary mt-1">
-              {dangerSubjects.map((s) => s.name).join(", ")} — below minimum threshold. Attend classes immediately!
+              {dangerSubjectsList.map((s) => s.name).join(", ")} — below minimum threshold. Attend classes immediately!
             </p>
           </div>
         </div>
@@ -198,16 +139,16 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Stats Row */}
       {dashboard && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
-          <StatCard label="Overall" value={`${dashboard.overallPct}%`}
+          <StatCard label="Overall" value={`${overallPct}%`}
             icon={<TrendingUp className="w-5 h-5" />}
-            gradient={dashboard.overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
-          <StatCard label="Subjects" value={dashboard.totalSubjects.toString()}
+            gradient={overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
+          <StatCard label="Subjects" value={totalSubjects.toString()}
             icon={<BookOpen className="w-5 h-5" />} gradient="from-cyan-500 to-blue-500" />
-          <StatCard label="Streak" value={`${dashboard.currentStreak}d`}
+          <StatCard label="Streak" value={`${currentStreak}d`}
             icon={<Flame className="w-5 h-5" />} gradient="from-orange-500 to-yellow-500" />
-          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={dashboard.dangerSubjects.toString()}
+          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={dangerCount.toString()}
             icon={<Zap className="w-5 h-5" />}
-            gradient={dashboard.dangerSubjects > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
+            gradient={dangerCount > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
         </div>
       )}
 
@@ -291,20 +232,20 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Today's Classes */}
-      {isCurrent && today && today.classes.length > 0 && (
+      {isCurrent && todayClasses.length > 0 && (
         <div style={{ animation: "dash-in 0.4s ease-out 0.15s both" }}>
           <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
           <div className="grid gap-3">
-            {today.classes.map((cls, i) => (
+            {todayClasses.map((cls, i) => (
               <div key={cls.scheduleId} className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all"
                 style={{ animation: `dash-in 0.35s ease-out ${0.18 + i * 0.05}s both` }}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-12 rounded-full" style={{ backgroundColor: cls.colorHex, boxShadow: `0 0 12px ${cls.colorHex}40` }} />
+                    <div className="w-1.5 h-12 rounded-full" style={{ backgroundColor: cls.colorHex || cls.subject?.colorHex, boxShadow: `0 0 12px ${cls.colorHex || cls.subject?.colorHex}40` }} />
                     <div>
-                      <h3 className="font-semibold text-text">{cls.subjectName}</h3>
+                      <h3 className="font-semibold text-text">{cls.subjectName || cls.subject?.name}</h3>
                       <div className="flex items-center gap-3 text-xs text-text-secondary mt-1">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{cls.startTime} - {cls.endTime}</span>
                         {cls.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{cls.room}</span>}
@@ -313,28 +254,28 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   </div>
                   <div className="text-right">
                     <span className={clsx("text-xl font-bold",
-                      cls.statusColor === "green" ? "text-green-400" : cls.statusColor === "yellow" ? "text-yellow-400" : "text-red-400"
+                      (cls.currentPct >= cls.minPct || cls.statusColor === "green") ? "text-green-400" : (cls.statusColor === "yellow") ? "text-yellow-400" : "text-red-400"
                     )}>
-                      {cls.currentPct}%
+                      {cls.currentPct ?? cls.subject?.currentPercentage ?? 0}%
                     </span>
-                    <p className="text-xs text-text-muted">min {cls.minPct}%</p>
+                    <p className="text-xs text-text-muted">min {cls.minPct ?? cls.subject?.minAttendancePct ?? 75}%</p>
                   </div>
                 </div>
 
-                {cls.attendanceMarked ? (
+                {cls.attendanceMarked || (cls.attendance && cls.attendance.status) ? (
                   <div className={clsx("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium",
-                    cls.attendanceStatus === "present" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
-                    cls.attendanceStatus === "late" ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" :
-                    cls.attendanceStatus === "cancelled" ? "bg-slate-500/10 text-slate-400 border border-slate-500/20" :
+                    (cls.attendanceStatus || cls.attendance?.status) === "present" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
+                    (cls.attendanceStatus || cls.attendance?.status) === "late" ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20" :
+                    (cls.attendanceStatus || cls.attendance?.status) === "cancelled" ? "bg-slate-500/10 text-slate-400 border border-slate-500/20" :
                     "bg-red-500/10 text-red-400 border border-red-500/20"
                   )}>
                     <CheckCircle2 className="w-4 h-4" />
-                    Marked: {cls.attendanceStatus}
+                    Marked: {cls.attendanceStatus || cls.attendance?.status}
                   </div>
                 ) : (
                   <div className="grid grid-cols-4 gap-2">
                     {(["present", "absent", "late", "cancelled"] as const).map((status) => (
-                      <button key={status} onClick={() => quickMark(cls.subjectId, cls.scheduleId, status)}
+                      <button key={status} onClick={() => quickMark(cls.subjectId, cls.id || cls.scheduleId, status)}
                         disabled={marking === `${cls.subjectId}-${status}`}
                         className={clsx("py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1",
                           status === "present" ? "glass border-green-500/20 text-green-400 hover:bg-green-500/10" :
@@ -358,11 +299,17 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Subject Cards */}
-      {dashboard && dashboard.subjectsSummary.length > 0 && (
+      {dashboard && subjectsList.length > 0 && (
         <div style={{ animation: "dash-in 0.4s ease-out 0.2s both" }}>
           <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
           <div className="grid gap-3 md:grid-cols-2">
-            {dashboard.subjectsSummary.map((s, i) => (
+            {subjectsList.map((s: any, i: number) => {
+              // Handle both new and old properties
+              const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0);
+              const min = s.minAttendancePct ?? 75;
+              const color = s.statusColor || (pct >= min ? "green" : (pct >= min - 5 ? "yellow" : "red"));
+              
+              return (
               <Link key={s.id} href={`/subjects/${s.id}`}
                 className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group"
                 style={{ animation: `dash-in 0.35s ease-out ${0.25 + i * 0.04}s both` }}>
@@ -379,29 +326,29 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                 {/* Progress bar */}
                 <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-2">
                   <div className={clsx("h-full rounded-full transition-all",
-                    s.statusColor === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" :
-                    s.statusColor === "yellow" ? "bg-gradient-to-r from-yellow-500 to-orange-400" :
+                    color === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" :
+                    color === "yellow" ? "bg-gradient-to-r from-yellow-500 to-orange-400" :
                     "bg-gradient-to-r from-red-500 to-pink-400"
-                  )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
+                  )} style={{ width: `${Math.min(100, pct)}%` }} />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className={clsx("font-semibold",
-                    s.statusColor === "green" ? "text-green-400" : s.statusColor === "yellow" ? "text-yellow-400" : "text-red-400"
-                  )}>{s.currentPercentage}%</span>
+                    color === "green" ? "text-green-400" : color === "yellow" ? "text-yellow-400" : "text-red-400"
+                  )}>{pct}%</span>
                   <span className="text-text-muted text-xs">
                     {isCurrent ? (
-                      s.statusColor === "red" ? `Attend ${s.mustAttendCount} more` : `Can skip ${s.canSkipCount}`
+                      color === "red" ? `Action needed` : `On track`
                     ) : (
-                       s.statusColor === "red" ? `Failed requirement` : `Met requirement`
+                       color === "red" ? `Failed requirement` : `Met requirement`
                     )}
                   </span>
                   <div className="flex items-center gap-2">
-                    {s.totalCancelled > 0 && (
+                    {(s.totalCancelled ?? 0) > 0 && (
                       <span className="flex items-center gap-1 text-xs text-slate-400 font-bold bg-slate-500/10 px-2 py-0.5 rounded-md">
                         <Ban className="w-3 h-3" /> {s.totalCancelled}
                       </span>
                     )}
-                    {s.streakCount > 0 && (
+                    {(s.streakCount ?? 0) > 0 && (
                       <span className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
                         <Flame className="w-3 h-3" />{s.streakCount}
                       </span>
@@ -409,13 +356,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   </div>
                 </div>
               </Link>
-            ))}
+            )})}
           </div>
         </div>
       )}
 
       {/* Empty state */}
-      {dashboard && dashboard.totalSubjects === 0 && (
+      {dashboard && totalSubjects === 0 && (
         <div className="text-center py-16 glass rounded-2xl" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
             <BookOpen className="w-10 h-10 text-white" />

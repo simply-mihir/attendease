@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/hooks/useApi";
+import { useState } from "react";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert } from "lucide-react";
 import clsx from "clsx";
 import {
@@ -11,16 +11,15 @@ import {
 const INTENSITY_COLORS = ["#1e293b", "#ef4444", "#f59e0b", "#86efac", "#22c55e"];
 
 export default function AnalyticsPage() {
-  const [dashboard, setDashboard] = useState<any>(null);
-  const [heatmap, setHeatmap] = useState<any[]>([]);
   const [year] = useState(new Date().getFullYear());
+  
+  const { data: dashboard, isLoading: dashLoading } = useSWRFetch<any>("/analytics/dashboard");
+  const { data: heatmapData, isLoading: heatLoading } = useSWRFetch<any>(`/analytics/heatmap?year=${year}`);
+  
+  const heatmap = heatmapData?.data || [];
+  const loading = dashLoading || heatLoading;
 
-  useEffect(() => {
-    apiFetch("/analytics/dashboard").then(setDashboard).catch(console.error);
-    apiFetch(`/analytics/heatmap?year=${year}`).then((d) => setHeatmap(d.data)).catch(console.error);
-  }, [year]);
-
-  if (!dashboard) {
+  if (loading || !dashboard) {
     return (
       <div className="space-y-6 animate-fade-in">
         <h1 className="text-2xl font-bold text-gradient">Analytics</h1>
@@ -70,7 +69,9 @@ export default function AnalyticsPage() {
   ].filter((d) => d.value > 0);
 
   // Build heatmap grid (GitHub-style)
-  const heatmapMap = new Map(heatmap.map((d) => [d.date, d]));
+  const heatmapMap = new Map<string, { date: string, intensity: number }>(
+    heatmap.map((d: any) => [d.date, d])
+  );
   const startDate = new Date(year, 0, 1);
   const startDay = startDate.getDay();
   const weeks: { date: string; intensity: number }[][] = [];

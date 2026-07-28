@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { useSession } from "next-auth/react";
 import {
   ArrowLeft, Bell, Send, Volume2, Mail, Moon, Loader2, Save, CheckCircle2, ExternalLink, RefreshCw
@@ -34,6 +35,14 @@ export default function NotificationSettingsPage() {
   });
   const [checkingTelegram, setCheckingTelegram] = useState(false);
 
+  const { data: settingsData, isLoading } = useSWRFetch<any>("/notifications/settings");
+
+  useEffect(() => {
+    if (settingsData && !settings) {
+      setSettings(settingsData.settings);
+    }
+  }, [settingsData, settings]);
+
   const checkTelegramConnection = useCallback(async () => {
     setCheckingTelegram(true);
     try {
@@ -47,10 +56,6 @@ export default function NotificationSettingsPage() {
   }, []);
 
   useEffect(() => {
-    apiFetch("/notifications/settings").then((d) => {
-      setSettings(d.settings);
-    }).catch(console.error);
-
     checkTelegramConnection();
   }, [checkTelegramConnection]);
 

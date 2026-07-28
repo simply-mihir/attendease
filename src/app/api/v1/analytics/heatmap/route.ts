@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { cachedJson } from "@/lib/api-cache";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -55,5 +56,5 @@ export async function GET(req: NextRequest) {
         : 1,
   }));
 
-  return Response.json({ year, data });
+  return cachedJson({ year, data }, 120);
 }
