@@ -9,6 +9,10 @@ const nextConfig = {
   // Optimize images
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" },
+    ],
   },
   // Security + caching headers
   async headers() {

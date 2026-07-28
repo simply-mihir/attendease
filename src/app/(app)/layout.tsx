@@ -16,6 +16,8 @@ import clsx from "clsx";
 import { preload } from "swr";
 import { apiFetch } from "@/hooks/useApi";
 
+import { SWRPrefetcher } from "@/components/SWRPrefetcher";
+
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
   { href: "/subjects", label: "Subjects", icon: BookOpen, gradient: "from-cyan-500 to-blue-500", prefetchKey: "/subjects" },
@@ -64,6 +66,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProfileProvider>
     <NavigationProgress />
+    <SWRPrefetcher />
     <div className="min-h-screen flex bg-mesh">
       <OnboardingModal />
 
