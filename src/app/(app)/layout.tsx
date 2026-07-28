@@ -13,17 +13,19 @@ import {
   Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users
 } from "lucide-react";
 import clsx from "clsx";
+import { preload } from "swr";
+import { apiFetch } from "@/hooks/useApi";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500" },
-  { href: "/subjects", label: "Subjects", icon: BookOpen, gradient: "from-cyan-500 to-blue-500" },
-  { href: "/calendar", label: "Calendar", icon: Calendar, gradient: "from-orange-500 to-red-500" },
-  { href: "/analytics", label: "Analytics", icon: BarChart3, gradient: "from-green-500 to-emerald-500" },
-  { href: "/simulator", label: "Simulator", icon: Sliders, gradient: "from-yellow-500 to-orange-500" },
-  { href: "/optimizer", label: "Skip Optimizer", icon: Zap, gradient: "from-emerald-500 to-cyan-500" },
-  { href: "/forecast", label: "Forecast", icon: TrendingUp, gradient: "from-violet-500 to-purple-500" },
-  { href: "/groups", label: "Friends", icon: Users, gradient: "from-pink-500 to-rose-500" },
-  { href: "/settings", label: "Settings", icon: Settings, gradient: "from-pink-500 to-purple-500" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
+  { href: "/subjects", label: "Subjects", icon: BookOpen, gradient: "from-cyan-500 to-blue-500", prefetchKey: "/subjects" },
+  { href: "/calendar", label: "Calendar", icon: Calendar, gradient: "from-orange-500 to-red-500", prefetchKey: null },
+  { href: "/analytics", label: "Analytics", icon: BarChart3, gradient: "from-green-500 to-emerald-500", prefetchKey: "/analytics/dashboard" },
+  { href: "/simulator", label: "Simulator", icon: Sliders, gradient: "from-yellow-500 to-orange-500", prefetchKey: null },
+  { href: "/optimizer", label: "Skip Optimizer", icon: Zap, gradient: "from-emerald-500 to-cyan-500", prefetchKey: "/analytics/skip-optimizer" },
+  { href: "/forecast", label: "Forecast", icon: TrendingUp, gradient: "from-violet-500 to-purple-500", prefetchKey: "/analytics/forecast" },
+  { href: "/groups", label: "Friends", icon: Users, gradient: "from-pink-500 to-rose-500", prefetchKey: "/groups" },
+  { href: "/settings", label: "Settings", icon: Settings, gradient: "from-pink-500 to-purple-500", prefetchKey: null },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,6 +33,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const fetcher = (url: string) => apiFetch(url);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -85,6 +89,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             const active = pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
+                onMouseEnter={() => item.prefetchKey && preload(item.prefetchKey, fetcher)}
+                onTouchStart={() => item.prefetchKey && preload(item.prefetchKey, fetcher)}
                 className={clsx(
                   "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                   active

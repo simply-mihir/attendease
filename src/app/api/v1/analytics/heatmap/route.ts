@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { cachedJson } from "@/lib/api-cache";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();

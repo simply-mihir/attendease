@@ -3,7 +3,8 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { TrendingUp, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import {
-  LineChart,
+  LazyComposedChart as ComposedChart,
+  LazyLineChart as LineChart,
   Line,
   XAxis,
   YAxis,
@@ -12,8 +13,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Area,
-  ComposedChart,
-} from "recharts";
+} from "@/components/charts/LazyCharts";
 
 interface WeakDay {
   day: string;
