@@ -17,6 +17,7 @@ import { preload } from "swr";
 import { apiFetch } from "@/hooks/useApi";
 
 import { SWRPrefetcher } from "@/components/SWRPrefetcher";
+import { ReminderNotifier } from "@/components/ReminderNotifier";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
@@ -151,6 +152,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+          <ReminderNotifier />
           <div key={pathname} className="animate-fade-in">
             {children}
           </div>

@@ -29,6 +29,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         ...(body.priority !== undefined && { priority: body.priority }),
         ...(body.isCompleted !== undefined && { isCompleted: Boolean(body.isCompleted) }),
         ...(body.subjectId !== undefined && { subjectId: body.subjectId || null }),
+        ...(body.notifyPush !== undefined && { notifyPush: Boolean(body.notifyPush) }),
+        ...(body.notifyAlarm !== undefined && { notifyAlarm: Boolean(body.notifyAlarm) }),
+        ...(body.notifyEmail !== undefined && { notifyEmail: Boolean(body.notifyEmail) }),
+        ...(body.notifyTelegram !== undefined && { notifyTelegram: Boolean(body.notifyTelegram) }),
       },
       include: {
         subject: {

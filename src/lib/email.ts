@@ -157,3 +157,36 @@ export function formatWeeklyReportEmail(
 
   return { subject, html };
 }
+
+export function formatReminderEmail(
+  reminderTitle: string,
+  dueDate: string,
+  dueTime?: string,
+  subjectName?: string,
+  description?: string
+) {
+  const subject = `🔔 Reminder: ${reminderTitle}${subjectName ? ` (${subjectName})` : ''}`;
+
+  const html = emailWrapper(`
+    <div style="text-align: center; margin-bottom: 16px;">
+      <span class="badge badge-yellow" style="font-size: 14px; padding: 6px 14px;">TASK REMINDER</span>
+    </div>
+    <h2 style="margin-top: 0; color: #FFFFFF; font-size: 22px; text-align: center;">${reminderTitle}</h2>
+    ${subjectName ? `<p style="text-align: center; color: #A78BFA; font-weight: 600; margin-top: -10px;">Subject: ${subjectName}</p>` : ''}
+    
+    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 18px; margin: 20px 0;">
+      <p style="margin: 0 0 8px 0; font-size: 14px; color: #D1D5DB;">
+        📅 <strong>Due Date:</strong> ${dueDate} ${dueTime ? `at ${dueTime}` : ''}
+      </p>
+      ${description ? `<p style="margin: 8px 0 0 0; font-size: 13px; color: #9CA3AF;">📝 ${description}</p>` : ''}
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="https://attendease-c7wl.vercel.app/reminders" style="display: inline-block; background: linear-gradient(135deg, #7C3AED, #EC4899); color: #FFFFFF; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-size: 14px;">
+        Open Reminders
+      </a>
+    </div>
+  `);
+
+  return { subject, html };
+}

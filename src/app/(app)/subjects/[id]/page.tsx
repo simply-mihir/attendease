@@ -7,7 +7,8 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
-  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle
+  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
+  Mail, MessageSquare, Volume2
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -75,6 +76,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     dueTime: "12:00",
     priority: "medium",
     description: "",
+    notifyPush: true,
+    notifyAlarm: true,
+    notifyEmail: false,
+    notifyTelegram: false,
   });
   const [savingSubjectReminder, setSavingSubjectReminder] = useState(false);
 
@@ -335,6 +340,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           dueTime: subjectReminderForm.dueTime,
           priority: subjectReminderForm.priority,
           description: subjectReminderForm.description,
+          notifyPush: subjectReminderForm.notifyPush,
+          notifyAlarm: subjectReminderForm.notifyAlarm,
+          notifyEmail: subjectReminderForm.notifyEmail,
+          notifyTelegram: subjectReminderForm.notifyTelegram,
         }),
       });
       setShowSubjectReminderModal(false);
@@ -345,6 +354,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         dueTime: "12:00",
         priority: "medium",
         description: "",
+        notifyPush: true,
+        notifyAlarm: true,
+        notifyEmail: false,
+        notifyTelegram: false,
       });
       await invalidate(`/reminders?subjectId=${id}`);
       await invalidate("/reminders");
@@ -901,6 +914,58 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <div>
                   <label className="block text-xs font-bold text-text-secondary mb-1">Due Time</label>
                   <input type="time" value={subjectReminderForm.dueTime} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, dueTime: e.target.value })} className="input-glass w-full py-2.5 font-mono" />
+                </div>
+              </div>
+
+              {/* Notification Channels Opt-In */}
+              <div className="p-3 bg-white/5 border border-amber-500/20 rounded-2xl space-y-2">
+                <label className="block text-xs font-bold text-amber-300">
+                  Notify Me Via (Choose Channels):
+                </label>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={subjectReminderForm.notifyPush}
+                      onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyPush: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Bell className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Browser Push</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={subjectReminderForm.notifyAlarm}
+                      onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyAlarm: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Volume2 className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>Alarm Sound</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={subjectReminderForm.notifyEmail}
+                      onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyEmail: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Mail className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Email Alert</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={subjectReminderForm.notifyTelegram}
+                      onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyTelegram: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Telegram</span>
+                  </label>
                 </div>
               </div>
 

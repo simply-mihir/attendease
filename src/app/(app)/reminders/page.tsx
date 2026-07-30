@@ -5,7 +5,8 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { apiFetch } from "@/hooks/useApi";
 import {
   Bell, Plus, CheckCircle2, Circle, Trash2, Calendar, Clock,
-  BookOpen, Filter, AlertCircle, Sparkles, Tag, Check, Zap, FileText, Bookmark
+  BookOpen, Filter, AlertCircle, Sparkles, Tag, Check, Zap, FileText, Bookmark,
+  Mail, MessageSquare, Volume2
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -18,6 +19,10 @@ interface Reminder {
   dueTime: string | null;
   priority: "low" | "medium" | "high";
   isCompleted: boolean;
+  notifyPush: boolean;
+  notifyAlarm: boolean;
+  notifyEmail: boolean;
+  notifyTelegram: boolean;
   subjectId: string | null;
   subject?: {
     id: string;
@@ -65,6 +70,10 @@ export default function RemindersPage() {
     dueTime: "12:00",
     priority: "medium",
     subjectId: "",
+    notifyPush: true,
+    notifyAlarm: true,
+    notifyEmail: false,
+    notifyTelegram: false,
   });
 
   const reminders = remindersData?.reminders || [];
@@ -114,6 +123,10 @@ export default function RemindersPage() {
           dueTime: form.dueTime,
           priority: form.priority,
           subjectId: form.subjectId || null,
+          notifyPush: form.notifyPush,
+          notifyAlarm: form.notifyAlarm,
+          notifyEmail: form.notifyEmail,
+          notifyTelegram: form.notifyTelegram,
         }),
       });
 
@@ -126,6 +139,10 @@ export default function RemindersPage() {
         dueTime: "12:00",
         priority: "medium",
         subjectId: "",
+        notifyPush: true,
+        notifyAlarm: true,
+        notifyEmail: false,
+        notifyTelegram: false,
       });
       await invalidate("/reminders");
     } catch (err) {
@@ -141,11 +158,11 @@ export default function RemindersPage() {
       <div className="flex items-center justify-between flex-wrap gap-4 glass-strong p-6 rounded-3xl border-2 border-border-heavy">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <Bell className="w-6 h-6 text-white" />
+            <Bell className="w-6 h-6 text-black" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gradient">Reminders & Tasks</h1>
-            <p className="text-sm text-text-secondary">Keep track of extra classes, assignments, exams & deadlines</p>
+            <p className="text-sm text-text-secondary">Keep track of extra classes, assignments, exams & deadlines with multi-channel alerts</p>
           </div>
         </div>
         <button
@@ -274,7 +291,7 @@ export default function RemindersPage() {
                     <p className="text-xs text-text-muted line-clamp-2">{reminder.description}</p>
                   )}
 
-                  <div className="flex items-center gap-4 text-[11px] text-text-muted flex-wrap pt-1">
+                  <div className="flex items-center gap-3 text-[11px] text-text-muted flex-wrap pt-1">
                     <span className="flex items-center gap-1 font-mono">
                       <Calendar className="w-3 h-3 text-amber-400" />
                       {new Date(reminder.dueDate).toLocaleDateString("en-IN", {
@@ -292,6 +309,15 @@ export default function RemindersPage() {
                     <span className="capitalize px-2 py-0.5 rounded-md bg-white/5 text-text-secondary text-[10px]">
                       {reminder.category.replace("_", " ")}
                     </span>
+
+                    {/* Active Channels Icons */}
+                    <div className="flex items-center gap-1.5 ml-auto text-amber-300/80 bg-amber-500/10 px-2.5 py-0.5 rounded-lg border border-amber-500/20">
+                      <span className="text-[10px] text-text-muted">Channels:</span>
+                      {reminder.notifyPush && <span title="Browser Push Notification"><Bell className="w-3 h-3 text-amber-400" /></span>}
+                      {reminder.notifyAlarm && <span title="Alarm Sound"><Volume2 className="w-3 h-3 text-yellow-400" /></span>}
+                      {reminder.notifyEmail && <span title="Email Alert"><Mail className="w-3 h-3 text-blue-400" /></span>}
+                      {reminder.notifyTelegram && <span title="Telegram Message"><MessageSquare className="w-3 h-3 text-cyan-400" /></span>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -313,7 +339,7 @@ export default function RemindersPage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleCreateReminder}
-            className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 border border-amber-500/30"
+            className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 border border-amber-500/30 max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center gap-3 mb-1">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
@@ -411,6 +437,58 @@ export default function RemindersPage() {
                       {p}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Notification Channel Opt-In */}
+              <div className="p-3 bg-white/5 border border-amber-500/20 rounded-2xl space-y-2">
+                <label className="block text-xs font-bold text-amber-300">
+                  Notify Me Via (Choose Channels):
+                </label>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={form.notifyPush}
+                      onChange={(e) => setForm({ ...form, notifyPush: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Bell className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Browser Push</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={form.notifyAlarm}
+                      onChange={(e) => setForm({ ...form, notifyAlarm: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Volume2 className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>Alarm Sound</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={form.notifyEmail}
+                      onChange={(e) => setForm({ ...form, notifyEmail: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <Mail className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Email Alert</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-surface-2 hover:bg-surface-3 transition">
+                    <input
+                      type="checkbox"
+                      checked={form.notifyTelegram}
+                      onChange={(e) => setForm({ ...form, notifyTelegram: e.target.checked })}
+                      className="rounded accent-amber-500"
+                    />
+                    <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Telegram</span>
+                  </label>
                 </div>
               </div>
 

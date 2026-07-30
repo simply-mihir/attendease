@@ -77,3 +77,16 @@ export function formatWeeklyReport(
 
   return `📊 *Weekly Attendance Report*\n\n${lines}\n\n*Overall: ${overallPct}%*\n\nKeep it up! 🚀`;
 }
+
+export function formatReminderTelegram(
+  title: string,
+  dueDate: string,
+  dueTime?: string,
+  subjectName?: string,
+  description?: string
+) {
+  const subStr = subjectName ? `\n📚 Subject: ${subjectName}` : "";
+  const timeStr = dueTime ? ` at ${dueTime}` : "";
+  const descStr = description ? `\n📝 ${description}` : "";
+  return `🔔 *AttendEase Reminder Alert*\n\n📌 *${title}*${subStr}\n📅 Due Date: ${dueDate}${timeStr}${descStr}\n\nStay on top of your schedule! 💪`;
+}

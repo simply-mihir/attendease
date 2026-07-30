@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { cachedJson } from "@/lib/api-cache";
+import { sendTelegram, formatReminderTelegram } from "@/lib/telegram";
+import { sendEmail, formatReminderEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, category, dueDate, dueTime, priority, subjectId } = body;
+    const {
+      title,
+      description,
+      category,
+      dueDate,
+      dueTime,
+      priority,
+      subjectId,
+      notifyPush = true,
+      notifyAlarm = true,
+      notifyEmail = false,
+      notifyTelegram = false,
+    } = body;
 
     if (!title || !dueDate) {
       return NextResponse.json({ error: "Title and dueDate are required" }, { status: 400 });
@@ -60,6 +73,10 @@ export async function POST(req: NextRequest) {
         dueDate: new Date(dueDate),
         dueTime: dueTime || null,
         priority: priority || "medium",
+        notifyPush: Boolean(notifyPush),
+        notifyAlarm: Boolean(notifyAlarm),
+        notifyEmail: Boolean(notifyEmail),
+        notifyTelegram: Boolean(notifyTelegram),
       },
       include: {
         subject: {
@@ -67,6 +84,43 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Send immediate Telegram alert if opt-in and user has Telegram chatId
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { email: true, telegramChatId: true },
+    });
+
+    if (notifyTelegram && dbUser?.telegramChatId) {
+      try {
+        const msg = formatReminderTelegram(
+          reminder.title,
+          reminder.dueDate.toISOString().slice(0, 10),
+          reminder.dueTime || undefined,
+          reminder.subject?.name,
+          reminder.description || undefined
+        );
+        await sendTelegram(dbUser.telegramChatId, msg);
+      } catch (err) {
+        console.error("Telegram reminder dispatch failed:", err);
+      }
+    }
+
+    // Send immediate Email alert if opt-in and user has email
+    if (notifyEmail && dbUser?.email) {
+      try {
+        const emailContent = formatReminderEmail(
+          reminder.title,
+          reminder.dueDate.toISOString().slice(0, 10),
+          reminder.dueTime || undefined,
+          reminder.subject?.name,
+          reminder.description || undefined
+        );
+        await sendEmail(dbUser.email, emailContent.subject, emailContent.html);
+      } catch (err) {
+        console.error("Email reminder dispatch failed:", err);
+      }
+    }
 
     return NextResponse.json({ reminder }, { status: 201 });
   } catch (err: any) {
