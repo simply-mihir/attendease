@@ -10,7 +10,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users
+  Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users, Bell
 } from "lucide-react";
 import clsx from "clsx";
 import { preload } from "swr";
@@ -21,6 +21,7 @@ import { SWRPrefetcher } from "@/components/SWRPrefetcher";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
   { href: "/subjects", label: "Subjects", icon: BookOpen, gradient: "from-cyan-500 to-blue-500", prefetchKey: "/subjects" },
+  { href: "/reminders", label: "Reminders", icon: Bell, gradient: "from-amber-500 to-yellow-500", prefetchKey: "/reminders" },
   { href: "/calendar", label: "Calendar", icon: Calendar, gradient: "from-orange-500 to-red-500", prefetchKey: null },
   { href: "/analytics", label: "Analytics", icon: BarChart3, gradient: "from-green-500 to-emerald-500", prefetchKey: "/analytics/dashboard" },
   { href: "/simulator", label: "Simulator", icon: Sliders, gradient: "from-yellow-500 to-orange-500", prefetchKey: null },

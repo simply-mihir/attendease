@@ -1,0 +1,450 @@
+"use client";
+
+import { useState } from "react";
+import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
+import { apiFetch } from "@/hooks/useApi";
+import {
+  Bell, Plus, CheckCircle2, Circle, Trash2, Calendar, Clock,
+  BookOpen, Filter, AlertCircle, Sparkles, Tag, Check, Zap, FileText, Bookmark
+} from "lucide-react";
+import clsx from "clsx";
+
+interface Reminder {
+  id: string;
+  title: string;
+  description: string | null;
+  category: "assignment" | "extra_class" | "exam" | "other";
+  dueDate: string;
+  dueTime: string | null;
+  priority: "low" | "medium" | "high";
+  isCompleted: boolean;
+  subjectId: string | null;
+  subject?: {
+    id: string;
+    name: string;
+    colorHex: string;
+    code: string | null;
+  };
+}
+
+interface Subject {
+  id: string;
+  name: string;
+  code: string | null;
+  colorHex: string;
+}
+
+const CATEGORIES = [
+  { id: "all", label: "All Reminders", icon: Bell },
+  { id: "assignment", label: "Assignments", icon: FileText },
+  { id: "extra_class", label: "Extra Classes", icon: Zap },
+  { id: "exam", label: "Exams & Tests", icon: Bookmark },
+  { id: "other", label: "Other", icon: Tag },
+];
+
+const PRIORITY_BADGES = {
+  high: "bg-red-500/20 text-red-300 border-red-500/30",
+  medium: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  low: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+};
+
+export default function RemindersPage() {
+  const { data: remindersData, isLoading } = useSWRFetch<{ reminders: Reminder[] }>("/reminders");
+  const { data: subjectsData } = useSWRFetch<{ subjects: Subject[] }>("/subjects");
+
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    category: "assignment",
+    dueDate: new Date().toISOString().slice(0, 10),
+    dueTime: "12:00",
+    priority: "medium",
+    subjectId: "",
+  });
+
+  const reminders = remindersData?.reminders || [];
+  const subjects = subjectsData?.subjects || [];
+
+  const filteredReminders = reminders.filter((r) => {
+    if (!showCompleted && r.isCompleted) return false;
+    if (activeCategory !== "all" && r.category !== activeCategory) return false;
+    return true;
+  });
+
+  async function handleToggleComplete(reminder: Reminder) {
+    try {
+      await apiFetch(`/reminders/${reminder.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ isCompleted: !reminder.isCompleted }),
+      });
+      await invalidate("/reminders");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleDelete(reminderId: string) {
+    if (!confirm("Are you sure you want to delete this reminder?")) return;
+    try {
+      await apiFetch(`/reminders/${reminderId}`, { method: "DELETE" });
+      await invalidate("/reminders");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleCreateReminder(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await apiFetch("/reminders", {
+        method: "POST",
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          category: form.category,
+          dueDate: form.dueDate,
+          dueTime: form.dueTime,
+          priority: form.priority,
+          subjectId: form.subjectId || null,
+        }),
+      });
+
+      setShowModal(false);
+      setForm({
+        title: "",
+        description: "",
+        category: "assignment",
+        dueDate: new Date().toISOString().slice(0, 10),
+        dueTime: "12:00",
+        priority: "medium",
+        subjectId: "",
+      });
+      await invalidate("/reminders");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4 glass-strong p-6 rounded-3xl border-2 border-border-heavy">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <Bell className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gradient">Reminders & Tasks</h1>
+            <p className="text-sm text-text-secondary">Keep track of extra classes, assignments, exams & deadlines</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn-gradient px-5 py-3 rounded-2xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-primary/20"
+        >
+          <Plus className="w-4 h-4" /> New Reminder
+        </button>
+      </div>
+
+      {/* Filter Tabs & Toggle */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            const active = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={clsx(
+                  "px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 shrink-0 border-2",
+                  active
+                    ? "bg-amber-500 text-black border-amber-400 shadow-md shadow-amber-500/20"
+                    : "bg-surface-2 text-text-secondary border-border-heavy hover:bg-surface-3 hover:text-text"
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className={clsx(
+            "px-4 py-2.5 rounded-2xl text-xs font-semibold transition border-2 flex items-center gap-2 ml-auto",
+            showCompleted
+              ? "bg-surface-3 text-text border-border-heavy"
+              : "bg-surface-2 text-text-muted border-border-heavy hover:text-text"
+          )}
+        >
+          <Check className="w-3.5 h-3.5 text-green-400" />
+          {showCompleted ? "Hide Completed" : "Show Completed"}
+        </button>
+      </div>
+
+      {/* Reminders List */}
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 glass rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      ) : filteredReminders.length === 0 ? (
+        <div className="glass p-12 text-center rounded-3xl border-2 border-border-heavy space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">
+            <Bell className="w-6 h-6" />
+          </div>
+          <h3 className="text-lg font-bold text-text">No Reminders Found</h3>
+          <p className="text-sm text-text-muted max-w-sm mx-auto">
+            {activeCategory !== "all"
+              ? `No reminders listed under ${activeCategory.replace("_", " ")}.`
+              : "You don't have any pending reminders. Click below to add one!"}
+          </p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-gradient-cyan px-4 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 mt-2"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Reminder
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredReminders.map((reminder) => (
+            <div
+              key={reminder.id}
+              className={clsx(
+                "p-4 rounded-2xl border-2 transition flex items-center justify-between gap-4 group",
+                reminder.isCompleted
+                  ? "bg-surface-2/50 border-border-heavy opacity-60 line-through"
+                  : "bg-surface-2 border-border-heavy hover:border-amber-500/50 hover:bg-surface-3 shadow-md"
+              )}
+            >
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <button
+                  onClick={() => handleToggleComplete(reminder)}
+                  className="mt-0.5 text-text-muted hover:text-green-400 transition shrink-0"
+                >
+                  {reminder.isCompleted ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-400 fill-green-400/20" />
+                  ) : (
+                    <Circle className="w-5 h-5" />
+                  )}
+                </button>
+
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-text text-base leading-snug">
+                      {reminder.title}
+                    </span>
+                    {reminder.subject && (
+                      <span
+                        className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                        style={{
+                          backgroundColor: `${reminder.subject.colorHex}15`,
+                          borderColor: `${reminder.subject.colorHex}40`,
+                          color: reminder.subject.colorHex,
+                        }}
+                      >
+                        {reminder.subject.name}
+                      </span>
+                    )}
+                    <span
+                      className={clsx(
+                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
+                        PRIORITY_BADGES[reminder.priority]
+                      )}
+                    >
+                      {reminder.priority}
+                    </span>
+                  </div>
+
+                  {reminder.description && (
+                    <p className="text-xs text-text-muted line-clamp-2">{reminder.description}</p>
+                  )}
+
+                  <div className="flex items-center gap-4 text-[11px] text-text-muted flex-wrap pt-1">
+                    <span className="flex items-center gap-1 font-mono">
+                      <Calendar className="w-3 h-3 text-amber-400" />
+                      {new Date(reminder.dueDate).toLocaleDateString("en-IN", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    {reminder.dueTime && (
+                      <span className="flex items-center gap-1 font-mono">
+                        <Clock className="w-3 h-3 text-cyan-400" />
+                        {reminder.dueTime}
+                      </span>
+                    )}
+                    <span className="capitalize px-2 py-0.5 rounded-md bg-white/5 text-text-secondary text-[10px]">
+                      {reminder.category.replace("_", " ")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleDelete(reminder.id)}
+                className="p-2 text-text-muted hover:text-red-400 hover:bg-red-500/10 rounded-xl transition shrink-0 opacity-80 group-hover:opacity-100"
+                title="Delete Reminder"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* New Reminder Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <form
+            onSubmit={handleCreateReminder}
+            className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 border border-amber-500/30"
+          >
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+                <Bell className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-text">Create Reminder</h3>
+                <p className="text-xs text-text-muted">Set task, assignment or extra class deadline</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="e.g. Mathematics Assignment Submission"
+                  required
+                  className="input-glass w-full py-2.5"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Category</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="input-glass w-full py-2.5 appearance-none"
+                  >
+                    <option value="assignment">Assignment</option>
+                    <option value="extra_class">Extra Class</option>
+                    <option value="exam">Exam / Test</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Subject (Optional)</label>
+                  <select
+                    value={form.subjectId}
+                    onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
+                    className="input-glass w-full py-2.5 appearance-none"
+                  >
+                    <option value="">-- General / None --</option>
+                    {subjects.map((sub) => (
+                      <option key={sub.id} value={sub.id}>
+                        {sub.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Due Date *</label>
+                  <input
+                    type="date"
+                    value={form.dueDate}
+                    onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+                    required
+                    className="input-glass w-full py-2.5"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Due Time</label>
+                  <input
+                    type="time"
+                    value={form.dueTime}
+                    onChange={(e) => setForm({ ...form, dueTime: e.target.value })}
+                    className="input-glass w-full py-2.5 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Priority</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["low", "medium", "high"] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setForm({ ...form, priority: p })}
+                      className={clsx(
+                        "py-2 rounded-xl text-xs font-bold capitalize transition border",
+                        form.priority === p
+                          ? PRIORITY_BADGES[p]
+                          : "bg-surface-2 text-text-muted border-border-heavy hover:text-text"
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Description (Optional)</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder="Additional details, room location, or requirements..."
+                  rows={2}
+                  className="input-glass w-full py-2.5 text-xs rounded-2xl"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-3">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="btn-ghost flex-1 py-3"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-gradient flex-1 py-3 font-semibold flex items-center justify-center gap-2"
+              >
+                {submitting ? "Saving..." : "Save Reminder"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}

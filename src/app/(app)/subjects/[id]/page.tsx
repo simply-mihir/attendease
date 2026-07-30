@@ -7,7 +7,7 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
-  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2
+  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -61,6 +61,22 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     status: "present",
   });
   const [savingExtraClass, setSavingExtraClass] = useState(false);
+  const [addReminderForExtraClass, setAddReminderForExtraClass] = useState(true);
+
+  // Subject Reminders State
+  const { data: subjectRemindersData } = useSWRFetch<any>(`/reminders?subjectId=${id}`);
+  const subjectReminders = subjectRemindersData?.reminders || [];
+
+  const [showSubjectReminderModal, setShowSubjectReminderModal] = useState(false);
+  const [subjectReminderForm, setSubjectReminderForm] = useState({
+    title: "",
+    category: "assignment",
+    dueDate: new Date().toISOString().slice(0, 10),
+    dueTime: "12:00",
+    priority: "medium",
+    description: "",
+  });
+  const [savingSubjectReminder, setSavingSubjectReminder] = useState(false);
 
   const { data, isLoading: loading } = useSWRFetch<any>(`/subjects/${id}`);
   const subject = data?.subject;
@@ -277,6 +293,23 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         }),
       });
 
+      if (addReminderForExtraClass) {
+        await apiFetch("/reminders", {
+          method: "POST",
+          body: JSON.stringify({
+            subjectId: id,
+            title: `Extra Class: ${subject.name}${extraClassForm.topic ? ` - ${extraClassForm.topic}` : ""}`,
+            category: "extra_class",
+            dueDate: extraClassForm.date,
+            dueTime: extraClassForm.startTime,
+            priority: "high",
+            description: extraClassForm.room ? `Room: ${extraClassForm.room}` : undefined,
+          }),
+        });
+        await invalidate(`/reminders?subjectId=${id}`);
+        await invalidate("/reminders");
+      }
+
       setShowExtraClassModal(false);
       await invalidate(`/subjects/${id}`);
       await invalidate("/dashboard");
@@ -285,6 +318,61 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     } finally {
       setSavingExtraClass(false);
     }
+  }
+
+  async function handleSaveSubjectReminder(e: React.FormEvent) {
+    e.preventDefault();
+    if (!subjectReminderForm.title.trim()) return;
+    setSavingSubjectReminder(true);
+    try {
+      await apiFetch("/reminders", {
+        method: "POST",
+        body: JSON.stringify({
+          subjectId: id,
+          title: subjectReminderForm.title,
+          category: subjectReminderForm.category,
+          dueDate: subjectReminderForm.dueDate,
+          dueTime: subjectReminderForm.dueTime,
+          priority: subjectReminderForm.priority,
+          description: subjectReminderForm.description,
+        }),
+      });
+      setShowSubjectReminderModal(false);
+      setSubjectReminderForm({
+        title: "",
+        category: "assignment",
+        dueDate: new Date().toISOString().slice(0, 10),
+        dueTime: "12:00",
+        priority: "medium",
+        description: "",
+      });
+      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate("/reminders");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingSubjectReminder(false);
+    }
+  }
+
+  async function toggleSubjectReminder(reminderId: string, currentStatus: boolean) {
+    try {
+      await apiFetch(`/reminders/${reminderId}`, {
+        method: "PUT",
+        body: JSON.stringify({ isCompleted: !currentStatus }),
+      });
+      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate("/reminders");
+    } catch (err) { console.error(err); }
+  }
+
+  async function deleteSubjectReminder(reminderId: string) {
+    if (!confirm("Delete reminder?")) return;
+    try {
+      await apiFetch(`/reminders/${reminderId}`, { method: "DELETE" });
+      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate("/reminders");
+    } catch (err) { console.error(err); }
   }
 
   // Progress ring SVG
@@ -458,7 +546,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             <h3 className="font-semibold text-text">Schedule</h3>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={openAddExtraClassModal} className="btn-gradient-cyan px-3 py-1.5 rounded-full text-xs text-white flex items-center gap-1.5 transition">
+            <button onClick={openAddExtraClassModal} className="btn-gradient-cyan px-3 py-1.5 rounded-full text-xs text-white flex items-center gap-1.5 transition font-semibold">
               <Zap className="w-3.5 h-3.5" /> Extra Class
             </button>
             <button onClick={openAddScheduleModal} className="btn-ghost px-3 py-1.5 rounded-full text-xs text-text hover:bg-white/10 flex items-center gap-1.5 transition">
@@ -486,6 +574,59 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Subject Reminders & Tasks */}
+      <div className="glass p-5">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center border-2 border-amber-500/30">
+              <Bell className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-text">Subject Reminders & Tasks</h3>
+              <p className="text-xs text-text-muted">Assignments, tests & deadlines for {subject.name}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowSubjectReminderModal(true)}
+            className="btn-ghost px-3.5 py-1.5 rounded-full text-xs text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5 transition font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Reminder
+          </button>
+        </div>
+
+        {subjectReminders.length === 0 ? (
+          <p className="text-text-muted text-sm py-4 text-center font-semibold">No reminders for this subject yet</p>
+        ) : (
+          <div className="space-y-2">
+            {subjectReminders.map((rem: any) => (
+              <div
+                key={rem.id}
+                className={clsx(
+                  "flex items-center justify-between p-3 bg-white/5 border-2 border-border-heavy rounded-2xl transition hover:bg-white/10",
+                  rem.isCompleted && "opacity-50 line-through"
+                )}
+              >
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button onClick={() => toggleSubjectReminder(rem.id, rem.isCompleted)} className="text-text-muted hover:text-green-400 transition">
+                    {rem.isCompleted ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : <Circle className="w-4 h-4" />}
+                  </button>
+                  <span className="text-sm font-bold text-text">{rem.title}</span>
+                  <span className="text-xs font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                    {new Date(rem.dueDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-white/5 text-text-secondary">
+                    {rem.category.replace("_", " ")}
+                  </span>
+                </div>
+                <button onClick={() => deleteSubjectReminder(rem.id)} className="p-1 text-text-muted hover:text-red-400 transition">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             ))}
           </div>
@@ -690,12 +831,89 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                   <option value="cancelled">Cancelled / Class Off</option>
                 </select>
               </div>
+
+              <label className="flex items-center gap-2 text-xs font-semibold text-text cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={addReminderForExtraClass}
+                  onChange={e => setAddReminderForExtraClass(e.target.checked)}
+                  className="rounded accent-amber-500 w-4 h-4"
+                />
+                Also create a reminder for this extra class
+              </label>
             </div>
 
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => setShowExtraClassModal(false)} className="btn-ghost flex-1 py-3">Cancel</button>
               <button type="submit" disabled={savingExtraClass} className="btn-gradient-cyan flex-1 py-3 font-semibold flex items-center justify-center gap-2">
                 {savingExtraClass ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} Save Extra Class
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Create Subject Reminder Modal */}
+      {showSubjectReminderModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <form onSubmit={handleSaveSubjectReminder} className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 border border-amber-500/30">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+                <Bell className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-text">New Subject Reminder</h3>
+                <p className="text-xs text-text-muted">Set assignment, exam or task deadline for {subject.name}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Title *</label>
+                <input type="text" value={subjectReminderForm.title} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, title: e.target.value })} placeholder="e.g. Lab Report Submission" required className="input-glass w-full py-2.5" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Category</label>
+                  <select value={subjectReminderForm.category} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, category: e.target.value })} className="input-glass w-full py-2.5 appearance-none">
+                    <option value="assignment">Assignment</option>
+                    <option value="extra_class">Extra Class</option>
+                    <option value="exam">Exam / Test</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Priority</label>
+                  <select value={subjectReminderForm.priority} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, priority: e.target.value })} className="input-glass w-full py-2.5 appearance-none">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Due Date *</label>
+                  <input type="date" value={subjectReminderForm.dueDate} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, dueDate: e.target.value })} required className="input-glass w-full py-2.5" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Due Time</label>
+                  <input type="time" value={subjectReminderForm.dueTime} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, dueTime: e.target.value })} className="input-glass w-full py-2.5 font-mono" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Description (Optional)</label>
+                <textarea value={subjectReminderForm.description} onChange={e => setSubjectReminderForm({ ...subjectReminderForm, description: e.target.value })} placeholder="Details, questions to solve, submission portal..." rows={2} className="input-glass w-full py-2 text-xs rounded-2xl" />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-3">
+              <button type="button" onClick={() => setShowSubjectReminderModal(false)} className="btn-ghost flex-1 py-3">Cancel</button>
+              <button type="submit" disabled={savingSubjectReminder} className="btn-gradient flex-1 py-3 font-semibold flex items-center justify-center gap-2">
+                {savingSubjectReminder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />} Save Reminder
               </button>
             </div>
           </form>
