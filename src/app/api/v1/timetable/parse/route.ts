@@ -110,16 +110,42 @@ Rules:
       );
     }
 
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return NextResponse.json(
-        { error: "Could not parse AI response. Try a clearer image." },
-        { status: 422 }
-      );
+    // Strip thinking tags, code fences, and other wrappers
+    let cleaned = text
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/gi, "")
+      .trim();
+
+    // Find the outermost JSON object
+    let depth = 0;
+    let start = -1;
+    let end = -1;
+    for (let i = 0; i < cleaned.length; i++) {
+      if (cleaned[i] === "{") {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (cleaned[i] === "}") {
+        depth--;
+        if (depth === 0 && start !== -1) {
+          end = i + 1;
+          break;
+        }
+      }
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    if (start === -1 || end === -1) {
+      console.error("[Timetable] No JSON found in response:", text.substring(0, 500));
+      return NextResponse.json({ error: "Could not parse AI response. Try a clearer image." }, { status: 422 });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned.substring(start, end));
+    } catch (e) {
+      console.error("[Timetable] JSON parse failed:", e, cleaned.substring(start, end).substring(0, 500));
+      return NextResponse.json({ error: "Could not parse AI response. Try a clearer image." }, { status: 422 });
+    }
 
     if (!parsed.subjects || !Array.isArray(parsed.subjects)) {
       return NextResponse.json(
