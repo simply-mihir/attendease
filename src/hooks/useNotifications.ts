@@ -60,7 +60,7 @@ export function useNotifications() {
     }
   }
 
-  function scheduleAlarm(title: string, body: string, delayMs: number, sound: string = "default") {
+  function scheduleAlarm(title: string, body: string, delayMs: number, sound: string = "default", data: any = {}) {
     if (!swRegistration) return;
 
     swRegistration.active?.postMessage({
@@ -69,6 +69,7 @@ export function useNotifications() {
       body,
       delay: delayMs,
       sound,
+      data,
     });
   }
 
