@@ -71,7 +71,7 @@ Rules:
         "X-Title": "AttendEase",
       },
       body: JSON.stringify({
-        model: "google/gemma-4-31b-it:free",
+        model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
         messages: [
           {
             role: "user",
