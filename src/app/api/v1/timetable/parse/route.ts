@@ -102,6 +102,7 @@ Rules:
 
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content;
+    console.log("[Timetable] Raw AI response:", text?.substring(0, 1000));
 
     if (!text) {
       return NextResponse.json(
