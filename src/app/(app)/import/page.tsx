@@ -560,7 +560,7 @@ export default function ImportPage() {
                 {sub.schedules.map((sch, sci) => (
                   <div
                     key={sci}
-                    className="flex items-center gap-2 p-2.5 bg-surface-3 rounded-xl border-2 border-border-heavy"
+                    className="flex flex-wrap md:flex-nowrap items-center gap-2.5 p-3 bg-surface-3 rounded-xl border-2 border-border-heavy"
                   >
                     <select
                       value={sch.dayOfWeek}
@@ -574,7 +574,7 @@ export default function ImportPage() {
                           day: dayLabel,
                         });
                       }}
-                      className="input-glass py-1.5 px-2 rounded-lg text-xs flex-1"
+                      className="input-glass py-2 px-3 rounded-xl text-xs font-semibold w-full md:w-auto min-w-[115px]"
                     >
                       {DAY_OPTIONS.map((d) => (
                         <option key={d.value} value={d.value}>
@@ -582,8 +582,8 @@ export default function ImportPage() {
                         </option>
                       ))}
                     </select>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-text-muted" />
+                    <div className="flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-xl border border-white/5 shrink-0">
+                      <Clock className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       <input
                         type="time"
                         value={sch.startTime}
@@ -592,9 +592,9 @@ export default function ImportPage() {
                             startTime: e.target.value,
                           })
                         }
-                        className="input-glass py-1 px-1.5 rounded-lg text-xs w-[90px]"
+                        className="input-glass py-1 px-2.5 rounded-lg text-xs font-mono font-medium w-[125px] sm:w-[135px]"
                       />
-                      <span className="text-text-muted text-xs">–</span>
+                      <span className="text-text-muted text-xs font-bold">–</span>
                       <input
                         type="time"
                         value={sch.endTime}
@@ -603,11 +603,11 @@ export default function ImportPage() {
                             endTime: e.target.value,
                           })
                         }
-                        className="input-glass py-1 px-1.5 rounded-lg text-xs w-[90px]"
+                        className="input-glass py-1 px-2.5 rounded-lg text-xs font-mono font-medium w-[125px] sm:w-[135px]"
                       />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-text-muted" />
+                    <div className="flex items-center gap-1.5 flex-1 min-w-[160px] w-full md:w-auto">
+                      <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0 ml-1" />
                       <input
                         type="text"
                         value={sch.room || ""}
@@ -616,16 +616,16 @@ export default function ImportPage() {
                             room: e.target.value || null,
                           })
                         }
-                        placeholder="Room"
-                        className="input-glass py-1 px-1.5 rounded-lg text-xs w-20"
+                        placeholder="Room / Venue"
+                        className="input-glass py-1.5 px-3 rounded-xl text-xs w-full"
                       />
                     </div>
                     <button
                       onClick={() => removeSchedule(si, sci)}
-                      className="p-1 text-text-muted hover:text-red-400 transition"
+                      className="p-1.5 text-text-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition shrink-0 ml-auto md:ml-0"
                       title="Remove slot"
                     >
-                      <XCircle className="w-3.5 h-3.5" />
+                      <XCircle className="w-4 h-4" />
                     </button>
                   </div>
                 ))}

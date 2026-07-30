@@ -158,30 +158,30 @@ export default function NewSubjectPage() {
           <p className="text-sm text-gray-400">When does this class meet?</p>
 
           {schedules.map((sched, i) => (
-            <div key={i} className="grid grid-cols-12 gap-3 items-end p-4 bg-white/5 rounded-xl">
-              <div className="col-span-3">
+            <div key={i} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 bg-white/5 rounded-xl">
+              <div className="sm:col-span-3">
                 <label className="block text-xs font-medium text-gray-400 mb-1">Day</label>
                 <select value={sched.dayOfWeek} onChange={(e) => updateSchedule(i, "dayOfWeek", parseInt(e.target.value))}
                   className="input-glass w-full px-3 py-2 rounded-xl text-sm">
                   {DAYS.map((d, di) => <option key={di} value={di}>{d}</option>)}
                 </select>
               </div>
-              <div className="col-span-3">
-                <label className="block text-xs font-medium text-gray-400 mb-1">Start</label>
+              <div className="sm:col-span-3">
+                <label className="block text-xs font-medium text-gray-400 mb-1">Start Time</label>
                 <input type="time" value={sched.startTime} onChange={(e) => updateSchedule(i, "startTime", e.target.value)}
-                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm font-mono" />
               </div>
-              <div className="col-span-3">
-                <label className="block text-xs font-medium text-gray-400 mb-1">End</label>
+              <div className="sm:col-span-3">
+                <label className="block text-xs font-medium text-gray-400 mb-1">End Time</label>
                 <input type="time" value={sched.endTime} onChange={(e) => updateSchedule(i, "endTime", e.target.value)}
-                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm font-mono" />
               </div>
-              <div className="col-span-2">
-                <label className="block text-xs font-medium text-gray-400 mb-1">Room</label>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-gray-400 mb-1">Room / Venue</label>
                 <input type="text" value={sched.room} onChange={(e) => updateSchedule(i, "room", e.target.value)}
-                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" placeholder="301" />
+                  className="input-glass w-full px-3 py-2 rounded-xl text-sm" placeholder="e.g. Hall 301" />
               </div>
-              <div className="col-span-1">
+              <div className="sm:col-span-1 flex justify-end">
                 {schedules.length > 1 && (
                   <button onClick={() => removeScheduleSlot(i)} className="p-2 text-red-400 hover:bg-red-500/10 rounded-xl transition">
                     <Trash2 className="w-4 h-4" />
