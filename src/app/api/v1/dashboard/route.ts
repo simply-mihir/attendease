@@ -14,8 +14,12 @@ export async function GET() {
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-  // 3 parallel queries
-  const [subjects, todayRecords, schedules] = await Promise.all([
+  // 4 parallel queries including DB user for name
+  const [dbUser, subjects, todayRecords, schedules] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: { name: true },
+    }),
     prisma.subject.findMany({
       where: { userId: user.id, isArchived: false },
       select: {
@@ -66,6 +70,8 @@ export async function GET() {
     }),
   ]);
 
+  const userName = dbUser?.name || user.name || "Student";
+
   // Build subjects with computed stats
   const subjectsWithStats = subjects.map((s) => {
     const pct = s.totalClassesHeld > 0 ? s.currentPercentage : 100;
@@ -114,6 +120,7 @@ export async function GET() {
   const dangerSubjects = subjectsWithStats.filter((s) => s.currentPercentage < (s.minAttendancePct || 75));
 
   return cachedJson({
+    userName,
     todaySchedule,
     subjects: subjectsWithStats,
     stats: {

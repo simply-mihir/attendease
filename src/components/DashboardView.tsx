@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { DashboardSkeleton } from "@/components/Skeleton";
@@ -89,6 +90,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     date: d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
   };
 
+  const { data: session } = useSession();
+  const displayName = dashboard?.userName || session?.user?.name || "Student";
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -99,7 +103,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
         <div>
           <h1 className="text-2xl font-bold text-gradient">
-            {dashboard?.semesterName ? dashboard.semesterName : `Hello ${dashboard?.userName || "User"}`}
+            {dashboard?.semesterName ? dashboard.semesterName : `Hello ${displayName}`}
           </h1>
           <p className="text-text-secondary text-sm">
             {today?.dayName}, {today?.date}
