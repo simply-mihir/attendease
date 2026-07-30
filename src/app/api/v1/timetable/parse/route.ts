@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
-  if (!GROQ_API_KEY) {
+  if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
       { error: "Timetable import is not configured" },
       { status: 503 }
@@ -62,14 +62,16 @@ Rules:
 - If the image is not a timetable, return: {"subjects": [], "error": "This doesn't appear to be a timetable"}`;
 
   try {
-    const res = await fetch(GROQ_URL, {
+    const res = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${GROQ_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://attendease-c7wl.vercel.app",
+        "X-Title": "AttendEase",
       },
       body: JSON.stringify({
-        model: "qwen/qwen3.6-27b",
+        model: "google/gemma-4-31b-it:free",
         messages: [
           {
             role: "user",
@@ -91,7 +93,7 @@ Rules:
 
     if (!res.ok) {
       const err = await res.json();
-      console.error("[Groq] API error:", err);
+      console.error("[OpenRouter] API error:", err);
       return NextResponse.json(
         { error: "Failed to analyze image. Try again." },
         { status: 502 }
