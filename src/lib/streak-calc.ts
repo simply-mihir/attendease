@@ -4,27 +4,35 @@ export async function calcOverallStreak(userId: string): Promise<number> {
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  // Fetch all attendance records for user except cancelled/holiday
-  const allRecords = await prisma.attendanceRecord.findMany({
-    where: {
-      userId,
-      status: { notIn: ["cancelled", "holiday"] },
-    },
-    select: { date: true, status: true },
-    orderBy: { date: "desc" },
-  });
+  // 1. Fetch all attendance records and exceptions for user
+  const [allRecords, exceptions] = await Promise.all([
+    prisma.attendanceRecord.findMany({
+      where: { userId },
+      select: { date: true, status: true },
+      orderBy: { date: "desc" },
+    }),
+    prisma.classException.findMany({
+      where: { userId },
+      select: { date: true },
+    }),
+  ]);
 
-  if (allRecords.length === 0) return 0;
+  const exceptionDates = new Set(exceptions.map((e) => e.date.toISOString().slice(0, 10)));
 
   // Group records by YYYY-MM-DD
-  const recordsByDate = new Map<string, { hasAbsent: boolean; hasPresent: boolean }>();
+  const recordsByDate = new Map<string, { hasAbsent: boolean; hasPresent: boolean; allCancelledOrHoliday: boolean }>();
   for (const r of allRecords) {
     const dStr = r.date.toISOString().slice(0, 10);
-    const curr = recordsByDate.get(dStr) || { hasAbsent: false, hasPresent: false };
+    const curr = recordsByDate.get(dStr) || { hasAbsent: false, hasPresent: false, allCancelledOrHoliday: true };
+
     if (r.status === "absent") {
       curr.hasAbsent = true;
+      curr.allCancelledOrHoliday = false;
     } else if (r.status === "present" || r.status === "late" || r.status === "excused") {
       curr.hasPresent = true;
+      curr.allCancelledOrHoliday = false;
+    } else if (r.status !== "cancelled" && r.status !== "holiday") {
+      curr.allCancelledOrHoliday = false;
     }
     recordsByDate.set(dStr, curr);
   }
@@ -50,6 +58,12 @@ export async function calcOverallStreak(userId: string): Promise<number> {
       continue;
     }
 
+    // College / class exception date (holiday / cancelled)
+    if (exceptionDates.has(dStr)) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      continue;
+    }
+
     const dayData = recordsByDate.get(dStr);
 
     if (dayData) {
@@ -57,6 +71,10 @@ export async function calcOverallStreak(userId: string): Promise<number> {
         break; // Absence breaks overall streak!
       } else if (dayData.hasPresent) {
         overallStreak++;
+      } else if (dayData.allCancelledOrHoliday) {
+        // Class was cancelled / holiday -> DO NOT break streak! Continue to previous days.
+        checkDate.setDate(checkDate.getDate() - 1);
+        continue;
       }
     } else {
       // No attendance record for this working day
