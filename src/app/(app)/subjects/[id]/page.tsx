@@ -7,7 +7,7 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
-  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus
+  Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -49,6 +49,18 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [scheduleMode, setScheduleMode] = useState<"add" | "edit">("add");
   const [scheduleForm, setScheduleForm] = useState({ id: "", dayOfWeek: 1, startTime: "09:00", endTime: "10:00", room: "", building: "" });
   const [savingSchedule, setSavingSchedule] = useState(false);
+
+  // Extra Class State
+  const [showExtraClassModal, setShowExtraClassModal] = useState(false);
+  const [extraClassForm, setExtraClassForm] = useState({
+    date: new Date().toISOString().slice(0, 10),
+    startTime: "10:00",
+    endTime: "11:00",
+    room: "",
+    topic: "",
+    status: "present",
+  });
+  const [savingExtraClass, setSavingExtraClass] = useState(false);
 
   const { data, isLoading: loading } = useSWRFetch<any>(`/subjects/${id}`);
   const subject = data?.subject;
@@ -218,6 +230,63 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     } catch (err) { console.error(err); }
   }
 
+  function openAddExtraClassModal() {
+    setExtraClassForm({
+      date: new Date().toISOString().slice(0, 10),
+      startTime: "10:00",
+      endTime: "11:00",
+      room: "",
+      topic: "",
+      status: "present",
+    });
+    setShowExtraClassModal(true);
+  }
+
+  async function handleSaveExtraClass(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingExtraClass(true);
+    try {
+      const selectedDate = new Date(extraClassForm.date);
+      const dayOfWeek = selectedDate.getDay();
+
+      const roomStr = extraClassForm.room
+        ? `${extraClassForm.room} (Extra Class)`
+        : "Extra Class";
+
+      const scheduleRes = await apiFetch("/schedules", {
+        method: "POST",
+        body: JSON.stringify({
+          subjectId: id,
+          dayOfWeek,
+          startTime: extraClassForm.startTime,
+          endTime: extraClassForm.endTime,
+          room: roomStr,
+          building: extraClassForm.topic || "Extra Class",
+        }),
+      });
+
+      await apiFetch("/attendance", {
+        method: "POST",
+        body: JSON.stringify({
+          subjectId: id,
+          date: extraClassForm.date,
+          status: extraClassForm.status,
+          scheduleId: scheduleRes?.schedule?.id || null,
+          source: "extra_class",
+          notes: `Extra Class${extraClassForm.topic ? `: ${extraClassForm.topic}` : ""}${extraClassForm.room ? ` (${extraClassForm.room})` : ""}`,
+        }),
+      });
+
+      setShowExtraClassModal(false);
+      await invalidate(`/subjects/${id}`);
+      await invalidate("/dashboard");
+    } catch (err) {
+      console.error("Extra class save error:", err);
+    } finally {
+      setSavingExtraClass(false);
+    }
+  }
+
   // Progress ring SVG
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
@@ -381,16 +450,21 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Schedule */}
       <div className="glass p-5">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center border-2 border-border-heavy">
               <Clock className="w-5 h-5 text-border-heavy" />
             </div>
             <h3 className="font-semibold text-text">Schedule</h3>
           </div>
-          <button onClick={openAddScheduleModal} className="btn-ghost px-3 py-1.5 rounded-full text-xs text-text hover:bg-white/10 flex items-center gap-1.5 transition">
-            <Plus className="w-3.5 h-3.5" /> Add
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={openAddExtraClassModal} className="btn-gradient-cyan px-3 py-1.5 rounded-full text-xs text-white flex items-center gap-1.5 transition">
+              <Zap className="w-3.5 h-3.5" /> Extra Class
+            </button>
+            <button onClick={openAddScheduleModal} className="btn-ghost px-3 py-1.5 rounded-full text-xs text-text hover:bg-white/10 flex items-center gap-1.5 transition">
+              <Plus className="w-3.5 h-3.5" /> Add Slot
+            </button>
+          </div>
         </div>
         {subject.schedules?.length === 0 ? (
           <p className="text-text-muted text-sm py-4 text-center font-semibold">No schedule set</p>
@@ -398,7 +472,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <div className="space-y-2">
             {subject.schedules?.map((s: any) => (
               <div key={s.id} className="flex items-center justify-between p-3 bg-white/5 border-2 border-border-heavy rounded-2xl hover:bg-white/10 transition">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-sm font-black w-12 text-primary">{DAYS[s.dayOfWeek]}</span>
                   <Clock className="w-4 h-4 text-text-muted" />
                   <span className="text-sm font-semibold text-text-secondary">{s.startTime} - {s.endTime}</span>
@@ -430,25 +504,36 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <p className="text-text-muted text-sm py-4 text-center font-semibold">No records yet</p>
         ) : (
           <div className="space-y-2">
-            {subject.attendanceRecords?.map((r: any) => (
-              <div key={r.id} className="flex items-center justify-between p-3 bg-white/5 border-2 border-border-heavy rounded-2xl hover:bg-white/10 transition">
-                <div className="flex items-center gap-3">
-                  <CalIcon className="w-4 h-4 text-text-muted" />
-                  <span className="text-sm font-bold text-text-secondary">{new Date(r.date).toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" })}</span>
-                  <span className={clsx("px-3 py-1 rounded-full text-xs font-black capitalize", STATUS_COLORS[r.status])}>
-                    {r.status}
-                  </span>
+            {subject.attendanceRecords?.map((r: any) => {
+              const isExtraClass = r.source === "extra_class" || r.notes?.includes("Extra Class");
+              return (
+                <div key={r.id} className="flex items-center justify-between p-3 bg-white/5 border-2 border-border-heavy rounded-2xl hover:bg-white/10 transition">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <CalIcon className="w-4 h-4 text-text-muted" />
+                    <span className="text-sm font-bold text-text-secondary">{new Date(r.date).toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" })}</span>
+                    <span className={clsx("px-3 py-1 rounded-full text-xs font-black capitalize", STATUS_COLORS[r.status])}>
+                      {r.status}
+                    </span>
+                    {isExtraClass && (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                        <Zap className="w-3 h-3" /> Extra Class
+                      </span>
+                    )}
+                    {r.notes && !isExtraClass && (
+                      <span className="text-xs text-text-muted italic">({r.notes})</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => openEditAttendanceModal(r)} className="btn-ghost p-2 text-text-muted hover:text-primary transition">
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => deleteRecord(r.id)} className="btn-ghost p-2 text-text-muted hover:text-red-400 transition">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => openEditAttendanceModal(r)} className="btn-ghost p-2 text-text-muted hover:text-primary transition">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => deleteRecord(r.id)} className="btn-ghost p-2 text-text-muted hover:text-red-400 transition">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -549,6 +634,69 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             <div className="flex gap-3 pt-4">
               <button type="button" onClick={() => setShowScheduleModal(false)} className="btn-ghost flex-1 py-3">Cancel</button>
               <button type="submit" disabled={savingSchedule} className="btn-gradient flex-1 py-3">{savingSchedule ? "Saving..." : "Save"}</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Schedule Extra Class Modal */}
+      {showExtraClassModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <form onSubmit={handleSaveExtraClass} className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 border border-cyan-500/30">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-text">Schedule Extra Class</h3>
+                <p className="text-xs text-text-muted">Add a one-off or makeup lecture for {subject.name}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Date</label>
+                <input type="date" value={extraClassForm.date} onChange={e => setExtraClassForm({ ...extraClassForm, date: e.target.value })} required className="input-glass w-full py-2.5" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">Start Time</label>
+                  <input type="time" value={extraClassForm.startTime} onChange={e => setExtraClassForm({ ...extraClassForm, startTime: e.target.value })} required className="input-glass w-full py-2.5 font-mono" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-1">End Time</label>
+                  <input type="time" value={extraClassForm.endTime} onChange={e => setExtraClassForm({ ...extraClassForm, endTime: e.target.value })} required className="input-glass w-full py-2.5 font-mono" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Room / Venue (Optional)</label>
+                <input type="text" value={extraClassForm.room} onChange={e => setExtraClassForm({ ...extraClassForm, room: e.target.value })} placeholder="e.g. Hall 301 / Lab B" className="input-glass w-full py-2.5" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Topic / Notes (Optional)</label>
+                <input type="text" value={extraClassForm.topic} onChange={e => setExtraClassForm({ ...extraClassForm, topic: e.target.value })} placeholder="e.g. Revision / Special Lecture" className="input-glass w-full py-2.5" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-1">Attendance Status</label>
+                <select value={extraClassForm.status} onChange={e => setExtraClassForm({ ...extraClassForm, status: e.target.value })} className="input-glass w-full py-2.5 appearance-none">
+                  <option value="present">Present</option>
+                  <option value="absent">Absent</option>
+                  <option value="late">Late</option>
+                  <option value="excused">Excused</option>
+                  <option value="cancelled">Cancelled / Class Off</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-3">
+              <button type="button" onClick={() => setShowExtraClassModal(false)} className="btn-ghost flex-1 py-3">Cancel</button>
+              <button type="submit" disabled={savingExtraClass} className="btn-gradient-cyan flex-1 py-3 font-semibold flex items-center justify-center gap-2">
+                {savingExtraClass ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} Save Extra Class
+              </button>
             </div>
           </form>
         </div>

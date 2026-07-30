@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cachedJson } from "@/lib/api-cache";
+import { calcOverallStreak } from "@/lib/streak-calc";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,8 @@ export async function GET() {
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-  // 4 parallel queries including DB user for name
-  const [dbUser, subjects, todayRecords, schedules] = await Promise.all([
+  // 5 parallel queries including overall streak
+  const [dbUser, subjects, todayRecords, schedules, currentStreak] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
       select: { name: true },
@@ -68,6 +69,7 @@ export async function GET() {
       },
       orderBy: { startTime: "asc" },
     }),
+    calcOverallStreak(user.id),
   ]);
 
   const userName = dbUser?.name || user.name || "Student";
@@ -121,6 +123,7 @@ export async function GET() {
 
   return cachedJson({
     userName,
+    currentStreak,
     todaySchedule,
     subjects: subjectsWithStats,
     stats: {

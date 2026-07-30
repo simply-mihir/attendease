@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import { cachedJson } from "@/lib/api-cache";
+import { calcOverallStreak } from "@/lib/streak-calc";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -24,17 +25,19 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const subjects = await prisma.subject.findMany({
-    where: whereClause,
-    include: {
-      schedules: { where: { isActive: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+  const [subjects, currentStreak] = await Promise.all([
+    prisma.subject.findMany({
+      where: whereClause,
+      include: {
+        schedules: { where: { isActive: true } },
+      },
+      orderBy: { name: "asc" },
+    }),
+    calcOverallStreak(user.id),
+  ]);
 
   let overallPresent = 0;
   let overallTotal = 0;
-  let currentStreak = 0;
   let longestStreak = 0;
   let safeSubjects = 0;
   let warningSubjects = 0;
@@ -52,7 +55,6 @@ export async function GET(req: NextRequest) {
 
     overallPresent += s.totalPresent + s.totalLate;
     overallTotal += s.totalClassesHeld;
-    if (s.streakCount > currentStreak) currentStreak = s.streakCount;
     if (s.longestStreak > longestStreak) longestStreak = s.longestStreak;
     if (stats.statusColor === "green") safeSubjects++;
     else if (stats.statusColor === "yellow") warningSubjects++;
