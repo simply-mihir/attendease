@@ -13,6 +13,14 @@ interface ScheduleCardProps {
 }
 
 function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
+  const currentPct = cls.currentPct ?? cls.subject?.currentPercentage ?? (
+    (cls.subject?.totalClassesHeld && cls.subject.totalClassesHeld > 0)
+      ? Math.round(((cls.subject.totalPresent + cls.subject.totalLate) / cls.subject.totalClassesHeld) * 100)
+      : 100
+  );
+  const minPct = cls.minPct ?? cls.subject?.minAttendancePct ?? 75;
+  const statusColor = cls.statusColor ?? (currentPct >= minPct ? "green" : (currentPct >= minPct - 10 ? "yellow" : "red"));
+
   return (
     <div className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
       <div className="flex items-center justify-between mb-3">
@@ -46,17 +54,17 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
           <span
             className={clsx(
               "text-xl font-bold",
-              (cls.currentPct >= cls.minPct || cls.statusColor === "green")
+              statusColor === "green" || currentPct >= minPct
                 ? "text-green-400"
-                : cls.statusColor === "yellow"
+                : statusColor === "yellow"
                 ? "text-yellow-400"
                 : "text-red-400"
             )}
           >
-            {cls.currentPct ?? cls.subject?.currentPercentage ?? 0}%
+            {currentPct}%
           </span>
           <p className="text-xs text-text-muted">
-            min {cls.minPct ?? cls.subject?.minAttendancePct ?? 75}%
+            min {minPct}%
           </p>
         </div>
       </div>

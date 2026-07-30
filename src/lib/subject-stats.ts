@@ -17,7 +17,7 @@ export async function recalcSubjectStats(subjectId: string) {
   const totalClassesHeld = present + late + absent + excused;
   const effective = present + late;
   const currentPercentage =
-    totalClassesHeld === 0 ? 0 : Math.round((effective / totalClassesHeld) * 10000) / 100;
+    totalClassesHeld === 0 ? 100 : Math.round((effective / totalClassesHeld) * 10000) / 100;
 
   // Calculate streak by fetching only minimal required data
   const recentRecords = await prisma.attendanceRecord.findMany({

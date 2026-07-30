@@ -256,7 +256,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <div className="grid gap-3 md:grid-cols-2">
             {subjectsList.map((s: any, i: number) => {
               // Handle both new and old properties
-              const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0);
+              const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
               const min = s.minAttendancePct ?? 75;
               const color = s.statusColor || (pct >= min ? "green" : (pct >= min - 5 ? "yellow" : "red"));
               
