@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
-
+import { MarkingProgressBar } from "@/components/MarkingProgressBar";
+import { ParticleBurst } from "@/components/ParticleBurst";
+import { StreakFlame } from "@/components/StreakFlame";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
 interface TodayClass {
   scheduleId: string; subjectId: string; subjectName: string; colorHex: string;
   startTime: string; endTime: string; room: string | null; currentPct: number;
@@ -57,12 +60,31 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   const { data: goalPlan, isLoading: goalLoading } = useSWRFetch<GoalPlanData>("/analytics/goal-plan");
 
   const [goalExpanded, setGoalExpanded] = useState(true);
-  const [marking, setMarking] = useState<string | null>(null);
+  const [markingId, setMarkingId] = useState<string | null>(null);
+  const [markingStatus, setMarkingStatus] = useState<{ active: boolean; status: "PRESENT" | "ABSENT" | null }>({ active: false, status: null });
+  const [particleBurst, setParticleBurst] = useState<{ trigger: boolean; x: number; y: number; type: "present" | "absent" }>({ trigger: false, x: 0, y: 0, type: "present" });
 
   const loading = dashLoading || goalLoading;
 
   const quickMark = useCallback(async (subjectId: string, scheduleId: string, status: string) => {
-    setMarking(`${subjectId}-${status}`);
+    setMarkingId(`${subjectId}-${status}`);
+    
+    if (status === "present" || status === "absent") {
+      setMarkingStatus({ active: true, status: status === "present" ? "PRESENT" : "ABSENT" });
+      
+      const btn = document.querySelector(`[data-schedule="${scheduleId}"]`);
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        setParticleBurst({
+          trigger: true,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+          type: status === "present" ? "present" : "absent",
+        });
+        setTimeout(() => setParticleBurst(p => ({ ...p, trigger: false })), 100);
+      }
+    }
+
     try {
       await apiFetch("/attendance", {
         method: "POST",
@@ -71,7 +93,10 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       await invalidate(`/dashboard${qs}`);
       await invalidate("/analytics/goal-plan");
     } catch (err) { console.error(err); }
-    finally { setMarking(null); }
+    finally { 
+      setMarkingId(null); 
+      setTimeout(() => setMarkingStatus({ active: false, status: null }), 1200);
+    }
   }, [qs]);
 
   // Normalize data depending on backend response (supporting both new combined and legacy shapes)
@@ -99,10 +124,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
   return (
     <div className="space-y-6">
+      <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
+      <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
       {/* Header */}
       <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
         <div>
-          <h1 className="text-2xl font-bold text-gradient">
+          <h1 className="text-2xl font-bold text-gradient text-shimmer">
             {dashboard?.semesterName ? dashboard.semesterName : `Hello ${displayName}`}
           </h1>
           <p className="text-text-secondary text-sm">
@@ -128,7 +155,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Danger Alert */}
       {isCurrent && dangerSubjectsList.length > 0 && (
-        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30 animated-border animate-shake" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
@@ -143,15 +170,15 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Stats Row */}
       {dashboard && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
-          <StatCard label="Overall" value={`${overallPct}%`}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 card-stagger" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
+          <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
             icon={<TrendingUp className="w-5 h-5" />}
             gradient={overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
-          <StatCard label="Subjects" value={totalSubjects.toString()}
+          <StatCard label="Subjects" value={<AnimatedCounter value={totalSubjects} />}
             icon={<BookOpen className="w-5 h-5" />} gradient="from-cyan-500 to-blue-500" />
-          <StatCard label="Streak" value={`${currentStreak}d`}
+          <StatCard label="Streak" value={<span className="flex items-center gap-1"><AnimatedCounter value={currentStreak} /><StreakFlame streak={currentStreak} size="sm" /></span>}
             icon={<Flame className="w-5 h-5" />} gradient="from-orange-500 to-yellow-500" />
-          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={dangerCount.toString()}
+          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
             icon={<Zap className="w-5 h-5" />}
             gradient={dangerCount > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
         </div>
@@ -242,11 +269,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
-          <div className="grid gap-3">
+          <div className="grid gap-3 card-stagger">
             {todayClasses.map((cls, i) => (
               <div key={cls.scheduleId}
                 style={{ animation: `dash-in 0.35s ease-out ${0.18 + i * 0.05}s both` }}>
-                <ScheduleCard cls={cls} marking={marking} onMark={quickMark} />
+                <ScheduleCard cls={cls} marking={markingId} onMark={quickMark} />
               </div>
             ))}
           </div>
@@ -257,7 +284,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {dashboard && subjectsList.length > 0 && (
         <div style={{ animation: "dash-in 0.4s ease-out 0.2s both" }}>
           <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2 card-stagger">
             {subjectsList.map((s: any, i: number) => {
               // Handle both new and old properties
               const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
@@ -337,7 +364,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, gradient }: { label: string; value: string; icon: React.ReactNode; gradient: string }) {
+function StatCard({ label, value, icon, gradient }: { label: string; value: React.ReactNode; icon: React.ReactNode; gradient: string }) {
   return (
     <div className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
       <div className="flex items-center justify-between mb-2">
