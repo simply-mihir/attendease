@@ -1,44 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
-  const { endpoint, keys } = await req.json();
+  try {
+    const { endpoint, p256dh, auth } = await req.json();
+    if (!endpoint || !p256dh || !auth) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
 
-  if (!endpoint || !keys?.p256dh || !keys?.auth) {
-    return NextResponse.json({ error: "Invalid subscription" }, { status: 400 });
+    await prisma.pushSubscription.upsert({
+      where: { endpoint },
+      create: { userId: user.id, endpoint, p256dh, auth },
+      update: { userId: user.id, p256dh, auth },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[Push] Subscribe error:", error);
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
-
-  await prisma.pushSubscription.upsert({
-    where: { endpoint },
-    update: {
-      p256dh: keys.p256dh,
-      auth: keys.auth,
-      userId: user.id,
-    },
-    create: {
-      endpoint,
-      p256dh: keys.p256dh,
-      auth: keys.auth,
-      userId: user.id,
-    },
-  });
-
-  return NextResponse.json({ ok: true });
-}
-
-export async function DELETE(req: NextRequest) {
-  const user = await getAuthUser();
-  if (!user) return unauthorizedResponse();
-
-  const { endpoint } = await req.json();
-
-  await prisma.pushSubscription.deleteMany({
-    where: { endpoint, userId: user.id },
-  });
-
-  return NextResponse.json({ ok: true });
 }

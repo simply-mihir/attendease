@@ -220,34 +220,55 @@ model AuditLog {
 }
 
 model NotificationSetting {
-  id                      String  @id @default(cuid())
-  userId                  String  @unique
-  telegramEnabled       Boolean @default(false)
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ===== Master channel toggles =====
+  pushEnabled      Boolean @default(false)
+  emailEnabled     Boolean @default(false)
+  telegramEnabled  Boolean @default(false)
+
+  // ===== Per-type toggles — Push =====
+  pushDailyBrief     Boolean @default(true)
+  pushPreClass       Boolean @default(true)
+  pushDangerAlert    Boolean @default(true)
+  pushWeeklyReport   Boolean @default(true)
+  pushDailyReport    Boolean @default(true)
+
+  // ===== Per-type toggles — Email =====
+  emailDailyBrief    Boolean @default(true)
+  emailPreClass      Boolean @default(true)
+  emailDangerAlert   Boolean @default(true)
+  emailWeeklyReport  Boolean @default(true)
+  emailDailyReport   Boolean @default(true)
+
+  // ===== Per-type toggles — Telegram =====
+  telegramDailyBrief    Boolean @default(true)
   telegramPreClass      Boolean @default(true)
   telegramDangerAlert   Boolean @default(true)
-  telegramDailyBrief    Boolean @default(true)
-  telegramWeeklyReport  Boolean @default(false)
-  telegramBeforeMinutes Int     @default(15)
-  emailEnabled          Boolean @default(false)
-  emailPreClass         Boolean @default(true)
-  emailDangerAlert      Boolean @default(true)
-  emailDailyBrief       Boolean @default(true)
-  emailWeeklyReport     Boolean @default(false)
-  pushEnabled             Boolean @default(true)
-  quietHoursEnabled       Boolean @default(true)
-  quietHoursStart         String  @default("22:00")
-  quietHoursEnd           String  @default("07:00")
-  dailyBriefTime          String  @default("08:00")
-  dailyBriefHour          Int     @default(7)
-  dailyBriefMinute        Int     @default(0)
-  preClassMinutes         Int     @default(15)
-  weeklyReportDay         Int     @default(0)
-  goalModeEnabled         Boolean @default(false)
-  goalTargetPct           Float   @default(85.0)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  telegramWeeklyReport  Boolean @default(true)
+  telegramDailyReport   Boolean @default(true)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // ===== Timing =====
+  dailyBriefHour    Int @default(7)     // 0-23, user's local timezone
+  dailyBriefMinute  Int @default(0)     // 0-59
+  dailyReportHour   Int @default(20)    // Default 8 PM
+  dailyReportMinute Int @default(0)
+  preClassMinutes   Int @default(15)    // Minutes before class
+
+  // ===== Restored Legacy Fields =====
+  quietHoursEnabled Boolean @default(true)
+  quietHoursStart   String  @default("22:00")
+  quietHoursEnd     String  @default("07:00")
+  goalModeEnabled   Boolean @default(false)
+  goalTargetPct     Float   @default(85.0)
+  weeklyReportDay   Int     @default(0)
+  dailyBriefTime    String  @default("08:00")
+  telegramBeforeMinutes Int @default(15)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PushSubscription {

@@ -92,12 +92,16 @@ export function usePushNotifications() {
         method: "POST",
         body: JSON.stringify({
           endpoint: subJSON.endpoint,
-          keys: {
-            p256dh: subJSON.keys?.p256dh,
-            auth: subJSON.keys?.auth,
-          }
+          p256dh: subJSON.keys?.p256dh,
+          auth: subJSON.keys?.auth,
         }),
       });
+
+      // Also enable pushEnabled in notification settings
+      await apiFetch("/settings/notifications", {
+        method: "PUT",
+        body: JSON.stringify({ pushEnabled: true }),
+      }).catch(() => {});
 
       setStatus("enabled");
       setIsRegistering(false);

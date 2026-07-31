@@ -5,7 +5,6 @@ import { sendEmail } from "@/lib/email";
 import webpush from "web-push";
 import { generateQuickMarkToken } from "@/lib/quick-mark-token";
 
-// Set VAPID details
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
     `mailto:${process.env.VAPID_CONTACT_EMAIL || "noreply@attendease.app"}`,
@@ -15,14 +14,12 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 }
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30; // Vercel Hobby limit
+export const maxDuration = 30;
 
 export async function GET(req: NextRequest) {
-  // Auth: verify cron secret OR keep-alive token
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
   const authHeader = req.headers.get("authorization");
-
   const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
   const isExternalCron = token === process.env.KEEP_ALIVE_TOKEN;
 
@@ -31,575 +28,507 @@ export async function GET(req: NextRequest) {
   }
 
   const now = new Date();
-
   const results = {
     dailyBriefs: 0,
-    dangerAlerts: 0,
     preClassReminders: 0,
+    dangerAlerts: 0,
     weeklyReports: 0,
+    dailyReports: 0,
     skippedDuplicates: 0,
     errors: [] as string[],
   };
 
   try {
-    // Get all users with any notification enabled
-    const usersWithSettings = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       where: {
         OR: [
-          { notificationSetting: { telegramEnabled: true } },
-          { notificationSetting: { emailEnabled: true } },
           { notificationSetting: { pushEnabled: true } },
+          { notificationSetting: { emailEnabled: true } },
+          { notificationSetting: { telegramEnabled: true } },
         ],
       },
       include: {
         notificationSetting: true,
         subjects: {
           where: { isArchived: false },
-          include: { schedules: true, attendanceRecords: true },
+          include: { schedules: true },
         },
         pushSubscriptions: true,
       },
     });
 
-    for (const user of usersWithSettings) {
+    for (const user of users) {
       try {
-        const settings = user.notificationSetting;
-        if (!settings) continue;
+        const s = user.notificationSetting;
+        if (!s) continue;
 
-        const userTz = user.timezone || "Asia/Kolkata";
-        const userNow = getTimeInTimezone(now, userTz);
-        const userHour = userNow.hours;
-        const userMinute = userNow.minutes;
-        const userDayOfWeek = userNow.dayOfWeek;
-        const todayKey = userNow.dateKey; // YYYY-MM-DD in user's timezone
-
-        const briefHour = settings.dailyBriefHour ?? 7;
-        const briefMinute = settings.dailyBriefMinute ?? 0;
-
-        // Check if it's time for this user's daily brief (within 5-min window)
-        const isBriefTime =
-          userHour === briefHour &&
-          userMinute >= briefMinute &&
-          userMinute < briefMinute + 5;
+        const tz = user.timezone || "Asia/Kolkata";
+        const uNow = getTimeInTimezone(now, tz);
+        const todayKey = uNow.dateKey;
 
         // ==========================================
-        // 1. DAILY BRIEF
+        // 1. DAILY MORNING BRIEF
         // ==========================================
+        const briefHour = s.dailyBriefHour ?? 7;
+        const briefMin = s.dailyBriefMinute ?? 0;
+        const isBriefTime = uNow.hours === briefHour && uNow.minutes >= briefMin && uNow.minutes < briefMin + 5;
+
         if (isBriefTime) {
-          const briefKey = `daily-brief:${todayKey}`;
-
-          if (await wasAlreadySent(user.id, briefKey)) {
+          const bKey = `daily-brief:${todayKey}`;
+          if (await wasSent(user.id, bKey)) {
             results.skippedDuplicates++;
           } else {
-            const todaySchedules = user.subjects.flatMap((sub) =>
+            const todaySch = user.subjects.flatMap((sub) =>
               sub.schedules
-                .filter((sch) => sch.dayOfWeek === userDayOfWeek)
-                .map((sch) => ({
-                  subject: sub.name,
-                  code: sub.code,
-                  startTime: sch.startTime,
-                  endTime: sch.endTime,
-                  room: sch.room,
-                }))
-            );
+                .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
+                .map((sc) => ({ subject: sub.name, code: sub.code, startTime: sc.startTime, endTime: sc.endTime, room: sc.room }))
+            ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            todaySchedules.sort((a, b) => a.startTime.localeCompare(b.startTime));
+            if (todaySch.length > 0) {
+              const txt = formatDailyBrief(todaySch, uNow.dateString);
+              const html = formatDailyBriefHTML(todaySch, uNow.dateString);
 
-            if (todaySchedules.length > 0) {
-              const briefText = formatDailyBrief(todaySchedules, userNow.dateString);
-
-              // --- Telegram ---
-              if (settings.telegramEnabled && settings.telegramDailyBrief && user.telegramChatId) {
-                await sendWithRetry(
-                  () => sendTelegram(user.telegramChatId!, briefText),
-                  `Telegram brief ${user.id}`,
-                  results
-                );
-              }
-
-              // --- Email ---
-              if (settings.emailEnabled && settings.emailDailyBrief && user.email) {
-                await sendWithRetry(
-                  () => sendEmail(
-                    user.email!,
-                    `📚 Today's Classes — ${userNow.dateString}`,
-                    formatDailyBriefHTML(todaySchedules, userNow.dateString)
-                  ),
-                  `Email brief ${user.id}`,
-                  results
-                );
-              }
-
-              // --- Push ---
-              if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
-                const pushPayload = JSON.stringify({
-                  title: `📚 Today: ${todaySchedules.length} classes`,
-                  body: todaySchedules.map((s) => `${s.startTime} ${s.subject}`).join(", "),
+              if (s.telegramEnabled && s.telegramDailyBrief && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-brief-${user.id}`, results);
+              if (s.emailEnabled && s.emailDailyBrief && user.email)
+                await retry(() => sendEmail(user.email!, `📚 Today's Classes — ${uNow.dateString}`, html), `em-brief-${user.id}`, results);
+              if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title: `📚 Today: ${todaySch.length} classes`,
+                  body: todaySch.map((c) => `${c.startTime} ${c.subject}`).join(", "),
                   tag: "daily-brief",
                   vibrate: [200, 100, 200, 100, 200],
                   data: { url: "/dashboard" },
                 });
 
-                await sendPushToAll(user.pushSubscriptions, pushPayload);
-              }
-
-              await markAsSent(user.id, briefKey);
+              await markSent(user.id, bKey, "daily-brief");
               results.dailyBriefs++;
+            }
+          }
+
+          // ---- DANGER ZONE ALERTS (sent with daily brief) ----
+          const dKey = `danger:${todayKey}`;
+          if (!(await wasSent(user.id, dKey))) {
+            const danger = user.subjects.filter((sub) => {
+              if (sub.totalClassesHeld === 0) return false;
+              return ((sub.totalPresent / sub.totalClassesHeld) * 100) < (sub.minAttendancePct || 75);
+            });
+
+            if (danger.length > 0) {
+              const txt = formatDangerAlert(danger);
+              const html = formatDangerAlertHTML(danger);
+
+              if (s.telegramEnabled && s.telegramDangerAlert && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-danger-${user.id}`, results);
+              if (s.emailEnabled && s.emailDangerAlert && user.email)
+                await retry(() => sendEmail(user.email!, `⚠️ ${danger.length} subjects below minimum`, html), `em-danger-${user.id}`, results);
+              if (s.pushEnabled && s.pushDangerAlert && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title: `⚠️ ${danger.length} subjects in danger zone`,
+                  body: danger.map((d) => d.name).join(", "),
+                  tag: "danger-alert",
+                  requireInteraction: true,
+                  vibrate: [300, 100, 300, 100, 300],
+                  data: { url: "/subjects" },
+                });
+
+              await markSent(user.id, dKey, "danger");
+              results.dangerAlerts++;
+            }
+          }
+
+          // ---- WEEKLY REPORT (Sunday at brief time) ----
+          if (uNow.dayOfWeek === 0) {
+            const wKey = `weekly:${todayKey}`;
+            if (!(await wasSent(user.id, wKey))) {
+              const txt = formatWeeklyReport(user.subjects);
+              const html = formatWeeklyReportHTML(user.subjects);
+              let tA = 0, tC = 0;
+              user.subjects.forEach((sub) => { tA += sub.totalPresent; tC += sub.totalClassesHeld; });
+              const overall = tC > 0 ? Math.round((tA / tC) * 100) : 0;
+
+              if (s.telegramEnabled && s.telegramWeeklyReport && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-weekly-${user.id}`, results);
+              if (s.emailEnabled && s.emailWeeklyReport && user.email)
+                await retry(() => sendEmail(user.email!, `📊 Weekly Attendance Report`, html), `em-weekly-${user.id}`, results);
+              if (s.pushEnabled && s.pushWeeklyReport && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title: `📊 Weekly Report: ${overall}% overall`,
+                  body: `${tA}/${tC} classes attended this week`,
+                  tag: "weekly-report",
+                  data: { url: "/analytics" },
+                });
+
+              await markSent(user.id, wKey, "weekly");
+              results.weeklyReports++;
             }
           }
         }
 
         // ==========================================
-        // 2. PRE-CLASS REMINDERS (server-side)
+        // 2. PRE-CLASS REMINDERS
         // ==========================================
-        const preClassMinutes = settings.preClassMinutes ?? 15;
+        const preMin = s.preClassMinutes ?? 15;
 
         for (const subject of user.subjects) {
           for (const schedule of subject.schedules) {
-            if (schedule.dayOfWeek !== userDayOfWeek) continue;
+            if (schedule.dayOfWeek !== uNow.dayOfWeek) continue;
 
-            const [schedHour, schedMin] = schedule.startTime.split(":").map(Number);
-            if (isNaN(schedHour) || isNaN(schedMin)) continue;
+            const [sH, sM] = schedule.startTime.split(":").map(Number);
+            if (isNaN(sH) || isNaN(sM)) continue;
+            const minsUntil = (sH - uNow.hours) * 60 + (sM - uNow.minutes);
 
-            const minutesUntilClass = (schedHour - userHour) * 60 + (schedMin - userMinute);
+            if (minsUntil > 0 && minsUntil <= preMin && minsUntil > preMin - 5) {
+              const rKey = `pre-class:${schedule.id}:${todayKey}`;
+              if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
 
-            // Send if class is within the reminder window
-            // Window: 0 < minutesUntilClass <= preClassMinutes
-            // Only trigger if within 5 min of the ideal reminder time to avoid dupes
-            if (
-              minutesUntilClass > 0 &&
-              minutesUntilClass <= preClassMinutes &&
-              minutesUntilClass > preClassMinutes - 5
-            ) {
-              const reminderKey = `pre-class:${schedule.id}:${todayKey}`;
+              const txt = `⏰ *${subject.name}* starts in ${minsUntil} min\n📍 ${schedule.room || "No room"} | ${schedule.startTime} - ${schedule.endTime}`;
+              const html = formatPreClassHTML(subject.name, minsUntil, schedule);
 
-              if (await wasAlreadySent(user.id, reminderKey)) {
-                results.skippedDuplicates++;
-                continue;
-              }
-
-              const reminderText = `⏰ *${subject.name}* starts in ${minutesUntilClass} min\n📍 ${schedule.room || "No room"} | ${schedule.startTime} - ${schedule.endTime}`;
-
-              // --- Telegram ---
-              if (settings.telegramEnabled && settings.telegramPreClass && user.telegramChatId) {
-                await sendWithRetry(
-                  () => sendTelegram(user.telegramChatId!, reminderText),
-                  `Telegram reminder ${user.id}`,
-                  results
-                );
-              }
-
-              // --- Email ---
-              if (settings.emailEnabled && settings.emailPreClass && user.email) {
-                await sendWithRetry(
-                  () => sendEmail(
-                    user.email!,
-                    `⏰ ${subject.name} in ${minutesUntilClass} min`,
-                    formatPreClassHTML(subject.name, minutesUntilClass, schedule)
-                  ),
-                  `Email reminder ${user.id}`,
-                  results
-                );
-              }
-
-              // --- Push with action buttons ---
-              if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
-                const quickMarkToken = generateQuickMarkToken(user.id, schedule.id);
-                const pushPayload = JSON.stringify({
-                  title: `⏰ ${subject.name} in ${minutesUntilClass} min`,
+              if (s.telegramEnabled && s.telegramPreClass && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-pre-${user.id}`, results);
+              if (s.emailEnabled && s.emailPreClass && user.email)
+                await retry(() => sendEmail(user.email!, `⏰ ${subject.name} in ${minsUntil} min`, html), `em-pre-${user.id}`, results);
+              if (s.pushEnabled && s.pushPreClass && user.pushSubscriptions.length > 0) {
+                const qToken = await generateQuickMarkToken(user.id, schedule.id);
+                await pushAll(user.pushSubscriptions, {
+                  title: `⏰ ${subject.name} in ${minsUntil} min`,
                   body: `${schedule.startTime} - ${schedule.endTime}${schedule.room ? ` • ${schedule.room}` : ""}`,
                   tag: `pre-class-${schedule.id}`,
-                  requireInteraction: true, // Keep notification visible until user acts
-                  vibrate: [200, 100, 200, 100, 200, 100, 200], // Strong vibration
-                  data: {
-                    scheduleId: schedule.id,
-                    subjectId: subject.id,
-                    subjectName: subject.name,
-                    userId: user.id,
-                    quickMarkToken,
-                    url: "/dashboard",
-                  },
+                  requireInteraction: true,
+                  vibrate: [200, 100, 200, 100, 200, 100, 200],
+                  data: { scheduleId: schedule.id, subjectId: subject.id, subjectName: subject.name, userId: user.id, quickMarkToken: qToken, url: "/dashboard" },
                 });
-
-                await sendPushToAll(user.pushSubscriptions, pushPayload);
               }
 
-              await markAsSent(user.id, reminderKey);
+              await markSent(user.id, rKey, "pre-class");
               results.preClassReminders++;
             }
           }
         }
 
         // ==========================================
-        // 3. DANGER ALERTS (once daily at brief time)
+        // 3. DAILY ATTENDANCE REPORT (end of day)
         // ==========================================
-        if (isBriefTime) {
-          const dangerKey = `danger-alert:${todayKey}`;
+        const reportHour = s.dailyReportHour ?? 20;
+        const reportMin = s.dailyReportMinute ?? 0;
+        const isReportTime = uNow.hours === reportHour && uNow.minutes >= reportMin && uNow.minutes < reportMin + 5;
 
-          if (!(await wasAlreadySent(user.id, dangerKey))) {
-            const dangerSubjects = user.subjects.filter((sub) => {
-              if (sub.totalClassesHeld === 0) return false;
-              const pct = ((sub.totalPresent + sub.totalLate) / sub.totalClassesHeld) * 100;
-              return pct < (sub.minAttendancePct || 75);
+        if (isReportTime) {
+          const rpKey = `daily-report:${todayKey}`;
+          if (await wasSent(user.id, rpKey)) {
+            results.skippedDuplicates++;
+          } else {
+            // Fetch today's attendance records for this user
+            const todayStart = getTodayStartInTimezone(now, tz);
+            const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+
+            const todayRecords = await prisma.attendanceRecord.findMany({
+              where: {
+                subject: { userId: user.id, isArchived: false },
+                date: { gte: todayStart, lt: todayEnd },
+              },
+              include: { subject: true },
             });
 
-            if (dangerSubjects.length > 0) {
-              const dangerText = formatDangerAlert(dangerSubjects);
+            // Get today's scheduled classes
+            const todayClasses = user.subjects.flatMap((sub) =>
+              sub.schedules
+                .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
+                .map((sc) => ({
+                  subjectId: sub.id,
+                  subjectName: sub.name,
+                  code: sub.code,
+                  startTime: sc.startTime,
+                  endTime: sc.endTime,
+                  room: sc.room,
+                  status: todayRecords.find((r) => r.subjectId === sub.id && r.scheduleId === sc.id)?.status || "UNMARKED",
+                }))
+            ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-              if (settings.telegramEnabled && settings.telegramDangerAlert && user.telegramChatId) {
-                await sendWithRetry(
-                  () => sendTelegram(user.telegramChatId!, dangerText),
-                  `Telegram danger ${user.id}`,
-                  results
-                );
-              }
+            if (todayClasses.length > 0) {
+              const present = todayClasses.filter((c) => c.status === "PRESENT" || c.status === "LATE").length;
+              const absent = todayClasses.filter((c) => c.status === "ABSENT").length;
+              const unmarked = todayClasses.filter((c) => c.status === "UNMARKED").length;
 
-              if (settings.emailEnabled && settings.emailDangerAlert && user.email) {
-                await sendWithRetry(
-                  () => sendEmail(
-                    user.email!,
-                    `⚠️ Attendance Alert — ${dangerSubjects.length} subjects in danger`,
-                    formatDangerAlertHTML(dangerSubjects)
-                  ),
-                  `Email danger ${user.id}`,
-                  results
-                );
-              }
+              const txt = formatDailyReport(todayClasses, present, absent, unmarked, uNow.dateString);
+              const html = formatDailyReportHTML(todayClasses, present, absent, unmarked, uNow.dateString);
 
-              if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
-                const pushPayload = JSON.stringify({
-                  title: `⚠️ ${dangerSubjects.length} subjects below ${dangerSubjects[0].minAttendancePct || 75}%`,
-                  body: dangerSubjects.map((s) => s.name).join(", "),
-                  tag: "danger-alert",
-                  requireInteraction: true,
-                  vibrate: [300, 100, 300, 100, 300],
-                  data: { url: "/subjects" },
+              if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-report-${user.id}`, results);
+              if (s.emailEnabled && s.emailDailyReport && user.email)
+                await retry(() => sendEmail(user.email!, `📋 Daily Report — ${uNow.dateString}`, html), `em-report-${user.id}`, results);
+              if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title: `📋 Today: ${present}/${todayClasses.length} attended`,
+                  body: `${absent > 0 ? `${absent} missed` : "All attended!"}${unmarked > 0 ? ` • ${unmarked} unmarked` : ""}`,
+                  tag: "daily-report",
+                  data: { url: "/dashboard" },
                 });
-                await sendPushToAll(user.pushSubscriptions, pushPayload);
-              }
 
-              await markAsSent(user.id, dangerKey);
-              results.dangerAlerts++;
+              await markSent(user.id, rpKey, "daily-report");
+              results.dailyReports++;
             }
           }
         }
 
-        // ==========================================
-        // 4. WEEKLY REPORT (Sunday at brief time)
-        // ==========================================
-        if (isBriefTime && userDayOfWeek === 0) {
-          const weeklyKey = `weekly-report:${todayKey}`;
-
-          if (!(await wasAlreadySent(user.id, weeklyKey))) {
-            if (settings.telegramEnabled && settings.telegramWeeklyReport && user.telegramChatId) {
-              const reportText = formatWeeklyReport(user.subjects);
-              await sendWithRetry(
-                () => sendTelegram(user.telegramChatId!, reportText),
-                `Telegram weekly ${user.id}`,
-                results
-              );
-            }
-
-            if (settings.emailEnabled && settings.emailWeeklyReport && user.email) {
-              const reportHTML = formatWeeklyReportHTML(user.subjects);
-              await sendWithRetry(
-                () => sendEmail(user.email!, "📊 Weekly Attendance Report", reportHTML),
-                `Email weekly ${user.id}`,
-                results
-              );
-            }
-
-            if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
-              let totalAttended = 0, totalClasses = 0;
-              for (const s of user.subjects) {
-                totalAttended += (s.totalPresent + s.totalLate);
-                totalClasses += s.totalClassesHeld;
-              }
-              const pct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
-              const pushPayload = JSON.stringify({
-                title: `📊 Weekly Report: ${pct}% overall`,
-                body: `${totalAttended}/${totalClasses} classes attended`,
-                tag: "weekly-report",
-                data: { url: "/analytics" },
-              });
-              await sendPushToAll(user.pushSubscriptions, pushPayload);
-            }
-
-            await markAsSent(user.id, weeklyKey);
-            results.weeklyReports++;
-          }
-        }
-      } catch (userError: any) {
-        results.errors.push(`User ${user.id}: ${userError.message}`);
+      } catch (userErr: any) {
+        results.errors.push(`User ${user.id}: ${userErr.message}`);
       }
     }
 
-    // Cleanup old sent-notification records (older than 7 days)
+    // Cleanup old records (7 days)
     await prisma.sentNotification.deleteMany({
       where: { sentAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
     });
-  } catch (error: any) {
-    console.error("[Cron] Fatal error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+
+  } catch (err: any) {
+    console.error("[Cron] Fatal:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 
   console.log("[Cron] Results:", results);
   return NextResponse.json({ ok: true, ...results });
 }
 
-// ===== DUPLICATE PREVENTION =====
+// ===== HELPERS =====
 
-async function wasAlreadySent(userId: string, key: string): Promise<boolean> {
-  const existing = await prisma.sentNotification.findUnique({
-    where: { userId_key: { userId, key } },
-  });
-  return !!existing;
+async function wasSent(userId: string, key: string): Promise<boolean> {
+  const r = await prisma.sentNotification.findUnique({ where: { userId_key: { userId, key } } });
+  return !!r;
 }
 
-async function markAsSent(userId: string, key: string): Promise<void> {
+async function markSent(userId: string, key: string, type: string) {
   await prisma.sentNotification.upsert({
     where: { userId_key: { userId, key } },
-    create: { userId, key, type: key.split(":")[0] },
+    create: { userId, key, type },
     update: { sentAt: new Date() },
   });
 }
 
-// ===== RETRY LOGIC =====
-
-async function sendWithRetry(
-  fn: () => Promise<any>,
-  label: string,
-  results: { errors: string[] },
-  maxRetries = 2
-): Promise<boolean> {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      await fn();
-      return true;
-    } catch (e: any) {
-      if (attempt === maxRetries) {
-        results.errors.push(`${label}: ${e.message} (after ${maxRetries} attempts)`);
-        return false;
-      }
-      // Wait 1s before retry
+async function retry(fn: () => Promise<any>, label: string, results: { errors: string[] }, max = 2): Promise<boolean> {
+  for (let i = 1; i <= max; i++) {
+    try { await fn(); return true; }
+    catch (e: any) {
+      if (i === max) { results.errors.push(`${label}: ${e.message}`); return false; }
       await new Promise((r) => setTimeout(r, 1000));
     }
   }
   return false;
 }
 
-// ===== PUSH HELPER =====
-
-async function sendPushToAll(subscriptions: any[], payload: string) {
-  const results = await Promise.allSettled(
-    subscriptions.map((sub) =>
-      webpush
-        .sendNotification(
-          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-          payload
-        )
-        .catch((err) => {
-          // 410 Gone or 404 = subscription expired, clean up
-          if (err.statusCode === 410 || err.statusCode === 404) {
-            prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
-          }
-          throw err;
-        })
+async function pushAll(subs: any[], payload: Record<string, any>) {
+  const json = JSON.stringify(payload);
+  await Promise.allSettled(
+    subs.map((sub) =>
+      webpush.sendNotification(
+        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+        json
+      ).catch((err) => {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
+        }
+      })
     )
   );
-  return results;
 }
 
-// ===== TIMEZONE HELPER =====
-
-function getTimeInTimezone(date: Date, timezone: string) {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    hour: "numeric",
-    minute: "numeric",
-    weekday: "short",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour12: false,
+function getTimeInTimezone(date: Date, tz: string) {
+  const f = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour: "numeric", minute: "numeric", weekday: "short",
+    year: "numeric", month: "2-digit", day: "2-digit", hour12: false,
   });
-
-  const parts = formatter.formatToParts(date);
-  const get = (type: string) => parts.find((p) => p.type === type)?.value || "";
-
-  const hours = parseInt(get("hour"));
-  const minutes = parseInt(get("minute"));
-
-  const dayMap: Record<string, number> = {
-    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+  const p = f.formatToParts(date);
+  const g = (t: string) => p.find((x) => x.type === t)?.value || "";
+  const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  const dateKey = `${g("year")}-${g("month")}-${g("day")}`;
+  const rf = new Intl.DateTimeFormat("en-US", { timeZone: tz, month: "short", day: "numeric", year: "numeric" });
+  return {
+    hours: parseInt(g("hour")),
+    minutes: parseInt(g("minute")),
+    dayOfWeek: dayMap[g("weekday")] ?? date.getDay(),
+    dateKey,
+    dateString: rf.format(date),
   };
-  const dayOfWeek = dayMap[get("weekday")] ?? date.getDay();
+}
 
-  // dateKey for dedup: YYYY-MM-DD in user's timezone
-  const dateKey = `${get("year")}-${get("month")}-${get("day")}`;
-
-  // Human-readable date
-  const readableFormatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-  const dateString = readableFormatter.format(date);
-
-  return { hours, minutes, dayOfWeek, dateKey, dateString };
+function getTodayStartInTimezone(date: Date, tz: string): Date {
+  const f = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" });
+  const dateStr = f.format(date); // YYYY-MM-DD
+  return new Date(dateStr + "T00:00:00Z");
 }
 
 // ===== FORMATTERS =====
 
 function formatDailyBrief(schedules: any[], dateString: string): string {
-  let text = `📚 *Today's Classes — ${dateString}*\n\n`;
+  let t = `📚 *Today's Classes — ${dateString}*\n\n`;
   for (const s of schedules) {
-    text += `🕐 *${s.startTime} - ${s.endTime}*\n`;
-    text += `   ${s.subject}${s.code ? ` (${s.code})` : ""}`;
-    if (s.room) text += `\n   📍 ${s.room}`;
-    text += "\n\n";
+    t += `🕐 *${s.startTime} - ${s.endTime}*\n   ${s.subject}${s.code ? ` (${s.code})` : ""}`;
+    if (s.room) t += `\n   📍 ${s.room}`;
+    t += "\n\n";
   }
-  text += `Total: ${schedules.length} class${schedules.length !== 1 ? "es" : ""} today`;
-  return text;
+  t += `Total: ${schedules.length} class${schedules.length !== 1 ? "es" : ""} today`;
+  return t;
 }
 
 function formatDailyBriefHTML(schedules: any[], dateString: string): string {
-  const rows = schedules
-    .map(
-      (s) => `
+  const rows = schedules.map((s) => `
     <tr>
       <td style="padding:8px 12px;color:#06B6D4;font-weight:600;">${s.startTime}-${s.endTime}</td>
       <td style="padding:8px 12px;color:#fff;">${s.subject}${s.code ? ` (${s.code})` : ""}</td>
       <td style="padding:8px 12px;color:#9CA3AF;">${s.room || "-"}</td>
-    </tr>`
-    )
-    .join("");
+    </tr>`).join("");
 
-  return `
-    <div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-      <h2 style="color:#7C3AED;margin:0 0 16px;">📚 Today's Classes</h2>
-      <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead>
-          <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">TIME</th>
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ROOM</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">
-        ${schedules.length} class${schedules.length !== 1 ? "es" : ""} today — AttendEase
-      </p>
-    </div>
-  `;
+  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+    <h2 style="color:#7C3AED;margin:0 0 16px;">📚 Today's Classes</h2>
+    <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">TIME</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ROOM</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">${schedules.length} class${schedules.length !== 1 ? "es" : ""} today — AttendEase</p>
+  </div>`;
 }
 
-function formatPreClassHTML(subjectName: string, minutesUntil: number, schedule: any): string {
-  return `
-    <div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-      <h2 style="color:#7C3AED;margin:0 0 8px;">⏰ ${subjectName}</h2>
-      <p style="font-size:20px;margin:0 0 16px;color:#06B6D4;">Starts in <strong>${minutesUntil} minutes</strong></p>
-      <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;">
-        <p style="margin:0;color:#fff;">🕐 ${schedule.startTime} - ${schedule.endTime}</p>
-        <p style="margin:4px 0 0;color:#9CA3AF;">📍 ${schedule.room || "No room assigned"}</p>
-      </div>
-      <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to mark attendance.</p>
+function formatPreClassHTML(name: string, mins: number, sch: any): string {
+  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+    <h2 style="color:#7C3AED;margin:0 0 8px;">⏰ ${name}</h2>
+    <p style="font-size:20px;margin:0 0 16px;color:#06B6D4;">Starts in <strong>${mins} minutes</strong></p>
+    <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;">
+      <p style="margin:0;color:#fff;">🕐 ${sch.startTime} - ${sch.endTime}</p>
+      <p style="margin:4px 0 0;color:#9CA3AF;">📍 ${sch.room || "No room"}</p>
     </div>
-  `;
+    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to mark attendance.</p>
+  </div>`;
 }
 
 function formatDangerAlert(subjects: any[]): string {
-  let text = `⚠️ *Attendance Alert*\n\n`;
+  let t = `⚠️ *Attendance Alert*\n\n`;
   for (const s of subjects) {
-    const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
-    const min = s.minAttendancePct || 75;
-    text += `🔴 *${s.name}*: ${pct}% (need ${min}%)\n`;
-    text += `   ${s.totalPresent + s.totalLate}/${s.totalClassesHeld} classes attended\n\n`;
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    t += `🔴 *${s.name}*: ${pct}% (need ${s.minAttendancePct || 75}%)\n   ${s.totalPresent}/${s.totalClassesHeld} attended\n\n`;
   }
-  return text;
+  return t;
 }
 
 function formatDangerAlertHTML(subjects: any[]): string {
-  const rows = subjects
-    .map((s) => {
-      const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
-      return `
-        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:12px;margin-bottom:8px;">
-          <strong style="color:#EF4444;">${s.name}</strong>
-          <span style="color:#9CA3AF;margin-left:8px;">${pct}% (need ${s.minAttendancePct || 75}%)</span>
-          <div style="color:#9CA3AF;font-size:13px;">${s.totalPresent + s.totalLate}/${s.totalClassesHeld} attended</div>
-        </div>`;
-    })
-    .join("");
+  const rows = subjects.map((s) => {
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    return `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:12px;margin-bottom:8px;">
+      <strong style="color:#EF4444;">${s.name}</strong>
+      <span style="color:#9CA3AF;margin-left:8px;">${pct}% (need ${s.minAttendancePct || 75}%)</span>
+      <div style="color:#9CA3AF;font-size:13px;">${s.totalPresent}/${s.totalClassesHeld} attended</div>
+    </div>`;
+  }).join("");
 
-  return `
-    <div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-      <h2 style="color:#EF4444;margin:0 0 16px;">⚠️ Attendance Alert</h2>
-      ${rows}
-      <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to see recovery plan.</p>
-    </div>
-  `;
+  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+    <h2 style="color:#EF4444;margin:0 0 16px;">⚠️ Attendance Alert</h2>
+    ${rows}
+    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to see recovery plan.</p>
+  </div>`;
 }
 
 function formatWeeklyReport(subjects: any[]): string {
-  let text = `📊 *Weekly Attendance Report*\n\n`;
-  let totalAttended = 0;
-  let totalClasses = 0;
-
+  let t = `📊 *Weekly Attendance Report*\n\n`;
+  let tA = 0, tC = 0;
   for (const s of subjects) {
-    const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
-    const emoji = pct >= 75 ? "🟢" : pct >= 50 ? "🟡" : "🔴";
-    text += `${emoji} *${s.name}*: ${pct}% (${s.totalPresent + s.totalLate}/${s.totalClassesHeld})\n`;
-    totalAttended += (s.totalPresent + s.totalLate);
-    totalClasses += s.totalClassesHeld;
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    const e = pct >= 75 ? "🟢" : pct >= 50 ? "🟡" : "🔴";
+    t += `${e} *${s.name}*: ${pct}% (${s.totalPresent}/${s.totalClassesHeld})\n`;
+    tA += s.totalPresent; tC += s.totalClassesHeld;
   }
-
-  const overallPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
-  text += `\n📈 *Overall: ${overallPct}%* (${totalAttended}/${totalClasses})`;
-  return text;
+  t += `\n📈 *Overall: ${tC > 0 ? Math.round((tA / tC) * 100) : 0}%* (${tA}/${tC})`;
+  return t;
 }
 
 function formatWeeklyReportHTML(subjects: any[]): string {
-  let totalAttended = 0;
-  let totalClasses = 0;
+  let tA = 0, tC = 0;
+  const rows = subjects.map((s) => {
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    tA += s.totalPresent; tC += s.totalClassesHeld;
+    const color = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
+    return `<tr>
+      <td style="padding:8px 12px;color:#fff;">${s.name}</td>
+      <td style="padding:8px 12px;color:${color};font-weight:600;">${pct}%</td>
+      <td style="padding:8px 12px;color:#9CA3AF;">${s.totalPresent}/${s.totalClassesHeld}</td>
+    </tr>`;
+  }).join("");
+  const overall = tC > 0 ? Math.round((tA / tC) * 100) : 0;
 
-  const rows = subjects
-    .map((s) => {
-      const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
-      totalAttended += (s.totalPresent + s.totalLate);
-      totalClasses += s.totalClassesHeld;
-      const color = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
-      return `
-        <tr>
-          <td style="padding:8px 12px;color:#fff;">${s.name}</td>
-          <td style="padding:8px 12px;color:${color};font-weight:600;">${pct}%</td>
-          <td style="padding:8px 12px;color:#9CA3AF;">${s.totalPresent + s.totalLate}/${s.totalClassesHeld}</td>
-        </tr>`;
-    })
-    .join("");
+  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+    <h2 style="color:#7C3AED;margin:0 0 16px;">📊 Weekly Report</h2>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">%</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ATTENDED</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:16px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
+      <span style="color:#7C3AED;font-size:24px;font-weight:700;">${overall}%</span>
+      <div style="color:#9CA3AF;font-size:13px;">Overall Attendance</div>
+    </div>
+  </div>`;
+}
 
-  const overallPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
+function formatDailyReport(classes: any[], present: number, absent: number, unmarked: number, dateString: string): string {
+  let t = `📋 *Daily Attendance Report — ${dateString}*\n\n`;
+  for (const c of classes) {
+    const icon = c.status === "PRESENT" ? "✅" : c.status === "LATE" ? "⏰" : c.status === "ABSENT" ? "❌" : "⬜";
+    t += `${icon} *${c.subjectName}* (${c.startTime})\n   Status: ${c.status}\n\n`;
+  }
+  t += `\n📊 *Summary:* ${present} present, ${absent} absent, ${unmarked} unmarked out of ${classes.length}`;
+  return t;
+}
 
-  return `
-    <div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-      <h2 style="color:#7C3AED;margin:0 0 16px;">📊 Weekly Report</h2>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead>
-          <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">%</th>
-            <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ATTENDED</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div style="margin-top:16px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
-        <span style="color:#7C3AED;font-size:24px;font-weight:700;">${overallPct}%</span>
-        <div style="color:#9CA3AF;font-size:13px;">Overall Attendance</div>
+function formatDailyReportHTML(classes: any[], present: number, absent: number, unmarked: number, dateString: string): string {
+  const rows = classes.map((c) => {
+    const statusColor = c.status === "PRESENT" ? "#22C55E" : c.status === "LATE" ? "#EAB308" : c.status === "ABSENT" ? "#EF4444" : "#6B7280";
+    const statusIcon = c.status === "PRESENT" ? "✅" : c.status === "LATE" ? "⏰" : c.status === "ABSENT" ? "❌" : "⬜";
+    return `<tr>
+      <td style="padding:8px 12px;color:#06B6D4;font-weight:600;">${c.startTime}</td>
+      <td style="padding:8px 12px;color:#fff;">${c.subjectName}${c.code ? ` (${c.code})` : ""}</td>
+      <td style="padding:8px 12px;color:${statusColor};font-weight:600;">${statusIcon} ${c.status}</td>
+    </tr>`;
+  }).join("");
+
+  const total = classes.length;
+  const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+  const pctColor = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
+
+  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+    <h2 style="color:#7C3AED;margin:0 0 16px;">📋 Daily Report</h2>
+    <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">TIME</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
+        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">STATUS</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:16px;display:flex;gap:8px;">
+      <div style="flex:1;padding:12px;background:rgba(34,197,94,0.1);border-radius:12px;text-align:center;">
+        <div style="color:#22C55E;font-size:20px;font-weight:700;">${present}</div>
+        <div style="color:#9CA3AF;font-size:11px;">Present</div>
+      </div>
+      <div style="flex:1;padding:12px;background:rgba(239,68,68,0.1);border-radius:12px;text-align:center;">
+        <div style="color:#EF4444;font-size:20px;font-weight:700;">${absent}</div>
+        <div style="color:#9CA3AF;font-size:11px;">Absent</div>
+      </div>
+      <div style="flex:1;padding:12px;background:rgba(107,114,128,0.1);border-radius:12px;text-align:center;">
+        <div style="color:#6B7280;font-size:20px;font-weight:700;">${unmarked}</div>
+        <div style="color:#9CA3AF;font-size:11px;">Unmarked</div>
       </div>
     </div>
-  `;
+    <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
+      <span style="color:${pctColor};font-size:24px;font-weight:700;">${pct}%</span>
+      <div style="color:#9CA3AF;font-size:13px;">Today's Attendance</div>
+    </div>
+  </div>`;
 }
