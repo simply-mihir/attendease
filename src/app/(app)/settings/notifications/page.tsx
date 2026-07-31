@@ -208,7 +208,7 @@ export default function NotificationSettingsPage() {
 
         {/* Daily Brief Time */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white/70">📚 Daily Brief Time</label>
+          <label className="text-sm font-medium text-white/70">Daily Brief Time</label>
           <p className="text-xs text-white/40">Morning class schedule summary</p>
           <div className="flex items-center gap-2">
             <select
@@ -235,7 +235,7 @@ export default function NotificationSettingsPage() {
 
         {/* Daily Report Time */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white/70">📋 Daily Report Time</label>
+          <label className="text-sm font-medium text-white/70">Daily Report Time</label>
           <p className="text-xs text-white/40">End-of-day attendance summary</p>
           <div className="flex items-center gap-2">
             <select
@@ -262,7 +262,7 @@ export default function NotificationSettingsPage() {
 
         {/* Pre-Class Reminder */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white/70">⏰ Pre-Class Reminder</label>
+          <label className="text-sm font-medium text-white/70">Pre-Class Reminder</label>
           <p className="text-xs text-white/40">Minutes before class starts</p>
           <select
             value={settings.preClassMinutes}
