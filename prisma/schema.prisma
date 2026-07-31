@@ -77,6 +77,7 @@ model User {
   pushSubscriptions   PushSubscription[]
   friendGroupMemberships FriendGroupMember[]
   reminders           Reminder[]
+  sentNotifications   SentNotification[]
 }
 
 model DegreeProfile {
@@ -232,12 +233,6 @@ model NotificationSetting {
   emailDangerAlert      Boolean @default(true)
   emailDailyBrief       Boolean @default(true)
   emailWeeklyReport     Boolean @default(false)
-  alarmEnabled            Boolean @default(true)
-  alarmPreClass           Boolean @default(true)
-  alarmDangerThreshold    Float   @default(5.0)
-  alarmSound              String  @default("default")
-  alarmVibrate            Boolean @default(true)
-  alarmBeforeMinutes      Int     @default(10)
   pushEnabled             Boolean @default(true)
   quietHoursEnabled       Boolean @default(true)
   quietHoursStart         String  @default("22:00")
@@ -245,6 +240,7 @@ model NotificationSetting {
   dailyBriefTime          String  @default("08:00")
   dailyBriefHour          Int     @default(7)
   dailyBriefMinute        Int     @default(0)
+  preClassMinutes         Int     @default(15)
   weeklyReportDay         Int     @default(0)
   goalModeEnabled         Boolean @default(false)
   goalTargetPct           Float   @default(85.0)
@@ -347,4 +343,18 @@ model Reminder {
   @@index([subjectId])
   @@index([userId, isCompleted])
   @@index([userId, dueDate])
+}
+
+model SentNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "daily-brief", "pre-class", "danger-alert", "weekly-report"
+  key       String   // unique key like "daily-brief:2026-07-31"
+  sentAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
+  @@index([sentAt])
 }

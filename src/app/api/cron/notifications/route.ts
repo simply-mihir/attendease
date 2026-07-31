@@ -15,7 +15,7 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 }
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30; // seconds
+export const maxDuration = 30; // Vercel Hobby limit
 
 export async function GET(req: NextRequest) {
   // Auth: verify cron secret OR keep-alive token
@@ -31,28 +31,23 @@ export async function GET(req: NextRequest) {
   }
 
   const now = new Date();
-  const currentUTCHour = now.getUTCHours();
-  const currentUTCMinute = now.getUTCMinutes();
-  const currentDayOfWeek = now.getDay(); // 0=Sunday
-  const isRunningAsHourly = currentUTCMinute < 35; // Allow 35-min window for cron drift
 
   const results = {
     dailyBriefs: 0,
     dangerAlerts: 0,
     preClassReminders: 0,
     weeklyReports: 0,
+    skippedDuplicates: 0,
     errors: [] as string[],
   };
 
   try {
-    // ===== 1. DAILY BRIEFS — Send to users whose preferred time matches current UTC hour =====
-    
-    // Get all users with notification settings
+    // Get all users with any notification enabled
     const usersWithSettings = await prisma.user.findMany({
       where: {
         OR: [
-          { notificationSetting: { telegramDailyBrief: true, telegramEnabled: true } },
-          { notificationSetting: { emailDailyBrief: true, emailEnabled: true } },
+          { notificationSetting: { telegramEnabled: true } },
+          { notificationSetting: { emailEnabled: true } },
           { notificationSetting: { pushEnabled: true } },
         ],
       },
@@ -60,9 +55,7 @@ export async function GET(req: NextRequest) {
         notificationSetting: true,
         subjects: {
           where: { isArchived: false },
-          include: {
-            schedules: true,
-          },
+          include: { schedules: true, attendanceRecords: true },
         },
         pushSubscriptions: true,
       },
@@ -78,125 +71,146 @@ export async function GET(req: NextRequest) {
         const userHour = userNow.hours;
         const userMinute = userNow.minutes;
         const userDayOfWeek = userNow.dayOfWeek;
+        const todayKey = userNow.dateKey; // YYYY-MM-DD in user's timezone
 
         const briefHour = settings.dailyBriefHour ?? 7;
         const briefMinute = settings.dailyBriefMinute ?? 0;
 
-        // Check if it's time for this user's daily brief (within 30-min window)
+        // Check if it's time for this user's daily brief (within 5-min window)
         const isBriefTime =
           userHour === briefHour &&
           userMinute >= briefMinute &&
-          userMinute < briefMinute + 30;
+          userMinute < briefMinute + 5;
 
-        // ---- Daily Brief ----
+        // ==========================================
+        // 1. DAILY BRIEF
+        // ==========================================
         if (isBriefTime) {
-          const todaySchedules = user.subjects.flatMap((sub) =>
-            sub.schedules
-              .filter((sch) => sch.dayOfWeek === userDayOfWeek)
-              .map((sch) => ({
-                subject: sub.name,
-                code: sub.code,
-                startTime: sch.startTime,
-                endTime: sch.endTime,
-                room: sch.room,
-              }))
-          );
+          const briefKey = `daily-brief:${todayKey}`;
 
-          todaySchedules.sort((a, b) => a.startTime.localeCompare(b.startTime));
+          if (await wasAlreadySent(user.id, briefKey)) {
+            results.skippedDuplicates++;
+          } else {
+            const todaySchedules = user.subjects.flatMap((sub) =>
+              sub.schedules
+                .filter((sch) => sch.dayOfWeek === userDayOfWeek)
+                .map((sch) => ({
+                  subject: sub.name,
+                  code: sub.code,
+                  startTime: sch.startTime,
+                  endTime: sch.endTime,
+                  room: sch.room,
+                }))
+            );
 
-          if (todaySchedules.length > 0) {
-            const briefText = formatDailyBrief(todaySchedules, userNow.dateString);
+            todaySchedules.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            // Telegram
-            if (settings.telegramEnabled && settings.telegramDailyBrief && user.telegramChatId) {
-              await sendTelegram(user.telegramChatId, briefText).catch((e) =>
-                results.errors.push(`Telegram brief ${user.id}: ${e.message}`)
-              );
-            }
+            if (todaySchedules.length > 0) {
+              const briefText = formatDailyBrief(todaySchedules, userNow.dateString);
 
-            // Email
-            if (settings.emailEnabled && settings.emailDailyBrief && user.email) {
-              await sendEmail(
-                user.email,
-                `📚 Today's Classes — ${userNow.dateString}`,
-                formatDailyBriefHTML(todaySchedules, userNow.dateString)
-              ).catch((e) =>
-                results.errors.push(`Email brief ${user.id}: ${e.message}`)
-              );
-            }
-
-            // Push
-            if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
-              const pushPayload = JSON.stringify({
-                title: `📚 Today: ${todaySchedules.length} classes`,
-                body: todaySchedules.map((s) => `${s.startTime} ${s.subject}`).join(", "),
-                tag: "daily-brief",
-                data: { url: "/dashboard" },
-              });
-
-              for (const sub of user.pushSubscriptions) {
-                await webpush
-                  .sendNotification(
-                    { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                    pushPayload
-                  )
-                  .catch(() => {
-                    // Remove invalid subscription
-                    prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
-                  });
+              // --- Telegram ---
+              if (settings.telegramEnabled && settings.telegramDailyBrief && user.telegramChatId) {
+                await sendWithRetry(
+                  () => sendTelegram(user.telegramChatId!, briefText),
+                  `Telegram brief ${user.id}`,
+                  results
+                );
               }
-            }
 
-            results.dailyBriefs++;
+              // --- Email ---
+              if (settings.emailEnabled && settings.emailDailyBrief && user.email) {
+                await sendWithRetry(
+                  () => sendEmail(
+                    user.email!,
+                    `📚 Today's Classes — ${userNow.dateString}`,
+                    formatDailyBriefHTML(todaySchedules, userNow.dateString)
+                  ),
+                  `Email brief ${user.id}`,
+                  results
+                );
+              }
+
+              // --- Push ---
+              if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
+                const pushPayload = JSON.stringify({
+                  title: `📚 Today: ${todaySchedules.length} classes`,
+                  body: todaySchedules.map((s) => `${s.startTime} ${s.subject}`).join(", "),
+                  tag: "daily-brief",
+                  vibrate: [200, 100, 200, 100, 200],
+                  data: { url: "/dashboard" },
+                });
+
+                await sendPushToAll(user.pushSubscriptions, pushPayload);
+              }
+
+              await markAsSent(user.id, briefKey);
+              results.dailyBriefs++;
+            }
           }
         }
 
-        // ---- Pre-Class Reminders (server-side push) ----
-        // Check if any class starts within the next 15-30 minutes for this user
-        const reminderBefore = settings.telegramBeforeMinutes ?? 15;
+        // ==========================================
+        // 2. PRE-CLASS REMINDERS (server-side)
+        // ==========================================
+        const preClassMinutes = settings.preClassMinutes ?? 15;
 
         for (const subject of user.subjects) {
           for (const schedule of subject.schedules) {
             if (schedule.dayOfWeek !== userDayOfWeek) continue;
 
             const [schedHour, schedMin] = schedule.startTime.split(":").map(Number);
+            if (isNaN(schedHour) || isNaN(schedMin)) continue;
+
             const minutesUntilClass = (schedHour - userHour) * 60 + (schedMin - userMinute);
 
-            // Send reminder if class is within the reminder window (e.g., 15 min)
-            // Only send if we're within a 30-min check window to avoid duplicates
-            if (minutesUntilClass > 0 && minutesUntilClass <= reminderBefore && minutesUntilClass > reminderBefore - 30) {
+            // Send if class is within the reminder window
+            // Window: 0 < minutesUntilClass <= preClassMinutes
+            // Only trigger if within 5 min of the ideal reminder time to avoid dupes
+            if (
+              minutesUntilClass > 0 &&
+              minutesUntilClass <= preClassMinutes &&
+              minutesUntilClass > preClassMinutes - 5
+            ) {
+              const reminderKey = `pre-class:${schedule.id}:${todayKey}`;
+
+              if (await wasAlreadySent(user.id, reminderKey)) {
+                results.skippedDuplicates++;
+                continue;
+              }
+
               const reminderText = `⏰ *${subject.name}* starts in ${minutesUntilClass} min\n📍 ${schedule.room || "No room"} | ${schedule.startTime} - ${schedule.endTime}`;
 
-              // Telegram pre-class reminder
+              // --- Telegram ---
               if (settings.telegramEnabled && settings.telegramPreClass && user.telegramChatId) {
-                await sendTelegram(user.telegramChatId, reminderText).catch((e) =>
-                  results.errors.push(`Telegram reminder ${user.id}: ${e.message}`)
+                await sendWithRetry(
+                  () => sendTelegram(user.telegramChatId!, reminderText),
+                  `Telegram reminder ${user.id}`,
+                  results
                 );
               }
 
-              // Email pre-class reminder
+              // --- Email ---
               if (settings.emailEnabled && settings.emailPreClass && user.email) {
-                await sendEmail(
-                  user.email,
-                  `⏰ ${subject.name} in ${minutesUntilClass} min`,
-                  `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;">
-                    <h2 style="color:#7C3AED;">${subject.name}</h2>
-                    <p>Starts in <strong>${minutesUntilClass} minutes</strong></p>
-                    <p>📍 ${schedule.room || "No room assigned"}</p>
-                    <p>🕐 ${schedule.startTime} - ${schedule.endTime}</p>
-                  </div>`
-                ).catch((e) =>
-                  results.errors.push(`Email reminder ${user.id}: ${e.message}`)
+                await sendWithRetry(
+                  () => sendEmail(
+                    user.email!,
+                    `⏰ ${subject.name} in ${minutesUntilClass} min`,
+                    formatPreClassHTML(subject.name, minutesUntilClass, schedule)
+                  ),
+                  `Email reminder ${user.id}`,
+                  results
                 );
               }
 
-              // Push pre-class reminder with action buttons
+              // --- Push with action buttons ---
               if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
                 const quickMarkToken = generateQuickMarkToken(user.id, schedule.id);
                 const pushPayload = JSON.stringify({
-                  title: `${subject.name} in ${minutesUntilClass} min`,
+                  title: `⏰ ${subject.name} in ${minutesUntilClass} min`,
                   body: `${schedule.startTime} - ${schedule.endTime}${schedule.room ? ` • ${schedule.room}` : ""}`,
                   tag: `pre-class-${schedule.id}`,
+                  requireInteraction: true, // Keep notification visible until user acts
+                  vibrate: [200, 100, 200, 100, 200, 100, 200], // Strong vibration
                   data: {
                     scheduleId: schedule.id,
                     subjectId: subject.id,
@@ -207,77 +221,123 @@ export async function GET(req: NextRequest) {
                   },
                 });
 
-                for (const sub of user.pushSubscriptions) {
-                  await webpush
-                    .sendNotification(
-                      { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                      pushPayload
-                    )
-                    .catch(() => {
-                      prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
-                    });
-                }
+                await sendPushToAll(user.pushSubscriptions, pushPayload);
               }
 
+              await markAsSent(user.id, reminderKey);
               results.preClassReminders++;
             }
           }
         }
 
-        // ---- Danger Alerts ----
-        // Send once daily at brief time for subjects below minimum attendance
+        // ==========================================
+        // 3. DANGER ALERTS (once daily at brief time)
+        // ==========================================
         if (isBriefTime) {
-          const dangerSubjects = user.subjects.filter((sub) => {
-            if (sub.totalClassesHeld === 0) return false;
-            const pct = (sub.totalPresent + sub.totalLate) / sub.totalClassesHeld * 100;
-            return pct < (sub.minAttendancePct || 75);
-          });
+          const dangerKey = `danger-alert:${todayKey}`;
 
-          if (dangerSubjects.length > 0) {
-            const dangerText = formatDangerAlert(dangerSubjects);
+          if (!(await wasAlreadySent(user.id, dangerKey))) {
+            const dangerSubjects = user.subjects.filter((sub) => {
+              if (sub.totalClassesHeld === 0) return false;
+              const pct = ((sub.totalPresent + sub.totalLate) / sub.totalClassesHeld) * 100;
+              return pct < (sub.minAttendancePct || 75);
+            });
 
-            if (settings.telegramEnabled && settings.telegramDangerAlert && user.telegramChatId) {
-              await sendTelegram(user.telegramChatId, dangerText).catch((e) =>
-                results.errors.push(`Telegram danger ${user.id}: ${e.message}`)
-              );
+            if (dangerSubjects.length > 0) {
+              const dangerText = formatDangerAlert(dangerSubjects);
+
+              if (settings.telegramEnabled && settings.telegramDangerAlert && user.telegramChatId) {
+                await sendWithRetry(
+                  () => sendTelegram(user.telegramChatId!, dangerText),
+                  `Telegram danger ${user.id}`,
+                  results
+                );
+              }
+
+              if (settings.emailEnabled && settings.emailDangerAlert && user.email) {
+                await sendWithRetry(
+                  () => sendEmail(
+                    user.email!,
+                    `⚠️ Attendance Alert — ${dangerSubjects.length} subjects in danger`,
+                    formatDangerAlertHTML(dangerSubjects)
+                  ),
+                  `Email danger ${user.id}`,
+                  results
+                );
+              }
+
+              if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
+                const pushPayload = JSON.stringify({
+                  title: `⚠️ ${dangerSubjects.length} subjects below ${dangerSubjects[0].minAttendancePct || 75}%`,
+                  body: dangerSubjects.map((s) => s.name).join(", "),
+                  tag: "danger-alert",
+                  requireInteraction: true,
+                  vibrate: [300, 100, 300, 100, 300],
+                  data: { url: "/subjects" },
+                });
+                await sendPushToAll(user.pushSubscriptions, pushPayload);
+              }
+
+              await markAsSent(user.id, dangerKey);
+              results.dangerAlerts++;
             }
-
-            if (settings.emailEnabled && settings.emailDangerAlert && user.email) {
-              await sendEmail(
-                user.email,
-                `⚠️ Attendance Alert — ${dangerSubjects.length} subjects in danger`,
-                formatDangerAlertHTML(dangerSubjects)
-              ).catch((e) =>
-                results.errors.push(`Email danger ${user.id}: ${e.message}`)
-              );
-            }
-
-            results.dangerAlerts++;
           }
         }
 
-        // ---- Weekly Report (Sunday at brief time) ----
+        // ==========================================
+        // 4. WEEKLY REPORT (Sunday at brief time)
+        // ==========================================
         if (isBriefTime && userDayOfWeek === 0) {
-          if (settings.telegramEnabled && settings.telegramWeeklyReport && user.telegramChatId) {
-            const reportText = formatWeeklyReport(user.subjects);
-            await sendTelegram(user.telegramChatId, reportText).catch((e) =>
-              results.errors.push(`Telegram weekly ${user.id}: ${e.message}`)
-            );
-          }
+          const weeklyKey = `weekly-report:${todayKey}`;
 
-          if (settings.emailEnabled && settings.emailWeeklyReport && user.email) {
-            const reportHTML = formatWeeklyReportHTML(user.subjects);
-            await sendEmail(user.email, "📊 Weekly Attendance Report", reportHTML).catch((e) =>
-              results.errors.push(`Email weekly ${user.id}: ${e.message}`)
-            );
-          }
+          if (!(await wasAlreadySent(user.id, weeklyKey))) {
+            if (settings.telegramEnabled && settings.telegramWeeklyReport && user.telegramChatId) {
+              const reportText = formatWeeklyReport(user.subjects);
+              await sendWithRetry(
+                () => sendTelegram(user.telegramChatId!, reportText),
+                `Telegram weekly ${user.id}`,
+                results
+              );
+            }
 
-          results.weeklyReports++;
+            if (settings.emailEnabled && settings.emailWeeklyReport && user.email) {
+              const reportHTML = formatWeeklyReportHTML(user.subjects);
+              await sendWithRetry(
+                () => sendEmail(user.email!, "📊 Weekly Attendance Report", reportHTML),
+                `Email weekly ${user.id}`,
+                results
+              );
+            }
+
+            if (settings.pushEnabled && user.pushSubscriptions?.length > 0) {
+              let totalAttended = 0, totalClasses = 0;
+              for (const s of user.subjects) {
+                totalAttended += (s.totalPresent + s.totalLate);
+                totalClasses += s.totalClassesHeld;
+              }
+              const pct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
+              const pushPayload = JSON.stringify({
+                title: `📊 Weekly Report: ${pct}% overall`,
+                body: `${totalAttended}/${totalClasses} classes attended`,
+                tag: "weekly-report",
+                data: { url: "/analytics" },
+              });
+              await sendPushToAll(user.pushSubscriptions, pushPayload);
+            }
+
+            await markAsSent(user.id, weeklyKey);
+            results.weeklyReports++;
+          }
         }
       } catch (userError: any) {
         results.errors.push(`User ${user.id}: ${userError.message}`);
       }
     }
+
+    // Cleanup old sent-notification records (older than 7 days)
+    await prisma.sentNotification.deleteMany({
+      where: { sentAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+    });
   } catch (error: any) {
     console.error("[Cron] Fatal error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -287,7 +347,70 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ ok: true, ...results });
 }
 
-// ===== HELPER FUNCTIONS =====
+// ===== DUPLICATE PREVENTION =====
+
+async function wasAlreadySent(userId: string, key: string): Promise<boolean> {
+  const existing = await prisma.sentNotification.findUnique({
+    where: { userId_key: { userId, key } },
+  });
+  return !!existing;
+}
+
+async function markAsSent(userId: string, key: string): Promise<void> {
+  await prisma.sentNotification.upsert({
+    where: { userId_key: { userId, key } },
+    create: { userId, key, type: key.split(":")[0] },
+    update: { sentAt: new Date() },
+  });
+}
+
+// ===== RETRY LOGIC =====
+
+async function sendWithRetry(
+  fn: () => Promise<any>,
+  label: string,
+  results: { errors: string[] },
+  maxRetries = 2
+): Promise<boolean> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await fn();
+      return true;
+    } catch (e: any) {
+      if (attempt === maxRetries) {
+        results.errors.push(`${label}: ${e.message} (after ${maxRetries} attempts)`);
+        return false;
+      }
+      // Wait 1s before retry
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
+  return false;
+}
+
+// ===== PUSH HELPER =====
+
+async function sendPushToAll(subscriptions: any[], payload: string) {
+  const results = await Promise.allSettled(
+    subscriptions.map((sub) =>
+      webpush
+        .sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        )
+        .catch((err) => {
+          // 410 Gone or 404 = subscription expired, clean up
+          if (err.statusCode === 410 || err.statusCode === 404) {
+            prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
+          }
+          throw err;
+        })
+    )
+  );
+  return results;
+}
+
+// ===== TIMEZONE HELPER =====
 
 function getTimeInTimezone(date: Date, timezone: string) {
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -296,8 +419,8 @@ function getTimeInTimezone(date: Date, timezone: string) {
     minute: "numeric",
     weekday: "short",
     year: "numeric",
-    month: "short",
-    day: "numeric",
+    month: "2-digit",
+    day: "2-digit",
     hour12: false,
   });
 
@@ -312,10 +435,22 @@ function getTimeInTimezone(date: Date, timezone: string) {
   };
   const dayOfWeek = dayMap[get("weekday")] ?? date.getDay();
 
-  const dateString = `${get("month")} ${get("day")}, ${get("year")}`;
+  // dateKey for dedup: YYYY-MM-DD in user's timezone
+  const dateKey = `${get("year")}-${get("month")}-${get("day")}`;
 
-  return { hours, minutes, dayOfWeek, dateString };
+  // Human-readable date
+  const readableFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const dateString = readableFormatter.format(date);
+
+  return { hours, minutes, dayOfWeek, dateKey, dateString };
 }
+
+// ===== FORMATTERS =====
 
 function formatDailyBrief(schedules: any[], dateString: string): string {
   let text = `📚 *Today's Classes — ${dateString}*\n\n`;
@@ -362,6 +497,20 @@ function formatDailyBriefHTML(schedules: any[], dateString: string): string {
   `;
 }
 
+function formatPreClassHTML(subjectName: string, minutesUntil: number, schedule: any): string {
+  return `
+    <div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
+      <h2 style="color:#7C3AED;margin:0 0 8px;">⏰ ${subjectName}</h2>
+      <p style="font-size:20px;margin:0 0 16px;color:#06B6D4;">Starts in <strong>${minutesUntil} minutes</strong></p>
+      <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;">
+        <p style="margin:0;color:#fff;">🕐 ${schedule.startTime} - ${schedule.endTime}</p>
+        <p style="margin:4px 0 0;color:#9CA3AF;">📍 ${schedule.room || "No room assigned"}</p>
+      </div>
+      <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to mark attendance.</p>
+    </div>
+  `;
+}
+
 function formatDangerAlert(subjects: any[]): string {
   let text = `⚠️ *Attendance Alert*\n\n`;
   for (const s of subjects) {
@@ -401,11 +550,10 @@ function formatWeeklyReport(subjects: any[]): string {
   let totalClasses = 0;
 
   for (const s of subjects) {
-    const attended = s.totalPresent + s.totalLate;
-    const pct = s.totalClassesHeld > 0 ? Math.round((attended / s.totalClassesHeld) * 100) : 0;
+    const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
     const emoji = pct >= 75 ? "🟢" : pct >= 50 ? "🟡" : "🔴";
-    text += `${emoji} *${s.name}*: ${pct}% (${attended}/${s.totalClassesHeld})\n`;
-    totalAttended += attended;
+    text += `${emoji} *${s.name}*: ${pct}% (${s.totalPresent + s.totalLate}/${s.totalClassesHeld})\n`;
+    totalAttended += (s.totalPresent + s.totalLate);
     totalClasses += s.totalClassesHeld;
   }
 
@@ -420,16 +568,15 @@ function formatWeeklyReportHTML(subjects: any[]): string {
 
   const rows = subjects
     .map((s) => {
-      const attended = s.totalPresent + s.totalLate;
-      const pct = s.totalClassesHeld > 0 ? Math.round((attended / s.totalClassesHeld) * 100) : 0;
-      totalAttended += attended;
+      const pct = s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 0;
+      totalAttended += (s.totalPresent + s.totalLate);
       totalClasses += s.totalClassesHeld;
       const color = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
       return `
         <tr>
           <td style="padding:8px 12px;color:#fff;">${s.name}</td>
           <td style="padding:8px 12px;color:${color};font-weight:600;">${pct}%</td>
-          <td style="padding:8px 12px;color:#9CA3AF;">${attended}/${s.totalClassesHeld}</td>
+          <td style="padding:8px 12px;color:#9CA3AF;">${s.totalPresent + s.totalLate}/${s.totalClassesHeld}</td>
         </tr>`;
     })
     .join("");

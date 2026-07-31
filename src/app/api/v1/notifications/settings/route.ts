@@ -21,7 +21,11 @@ export async function PUT(req: NextRequest) {
   if (!user) return unauthorizedResponse();
   const body = await req.json();
 
-  const { timezone, ...settingsBody } = body;
+  const { 
+    timezone, 
+    alarmEnabled, alarmPreClass, alarmDangerThreshold, alarmSound, alarmVibrate, alarmBeforeMinutes,
+    ...settingsBody 
+  } = body;
 
   if (timezone) {
     await prisma.user.update({

@@ -248,44 +248,23 @@ export default function NotificationSettingsPage() {
         )}
       </div>
 
-      {/* Alarm Section */}
-      <div className="glass rounded-2xl p-6 space-y-4">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <Volume2 className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="text-lg font-semibold text-white">Alarm & Push</h2>
-        </div>
-        <Row label="Enable alarms">
-          <Toggle enabled={settings.alarmEnabled} onChange={() => update("alarmEnabled", !settings.alarmEnabled)} />
+      {/* Pre-class reminder time */}
+      <div className="glass rounded-2xl p-6">
+        <Row label="Remind Before Class" desc="When to send the pre-class push/email">
+          <select
+            value={settings.preClassMinutes ?? 15}
+            onChange={(e) => update("preClassMinutes", parseInt(e.target.value))}
+            className="input-glass w-full max-w-[200px]"
+          >
+            <option value={5}>5 minutes</option>
+            <option value={10}>10 minutes</option>
+            <option value={15}>15 minutes</option>
+            <option value={20}>20 minutes</option>
+            <option value={30}>30 minutes</option>
+            <option value={45}>45 minutes</option>
+            <option value={60}>1 hour</option>
+          </select>
         </Row>
-        {settings.alarmEnabled && (
-          <>
-            <Row label="Pre-class alarm">
-              <Toggle enabled={settings.alarmPreClass} onChange={() => update("alarmPreClass", !settings.alarmPreClass)} />
-            </Row>
-            <Row label="Alarm timing">
-              <select value={settings.alarmBeforeMinutes} onChange={(e) => update("alarmBeforeMinutes", parseInt(e.target.value))}
-                className="input-glass px-3 py-1.5 rounded-xl text-sm">
-                {[5, 10, 15, 30].map((m) => <option key={m} value={m}>{m} min before</option>)}
-              </select>
-            </Row>
-            <Row label="Danger threshold" desc="Alert when within X% of minimum">
-              <select value={settings.alarmDangerThreshold} onChange={(e) => update("alarmDangerThreshold", parseFloat(e.target.value))}
-                className="input-glass px-3 py-1.5 rounded-xl text-sm">
-                {[3, 5, 10].map((m) => <option key={m} value={m}>{m}%</option>)}
-              </select>
-            </Row>
-            <Row label="Sound">
-              <select value={settings.alarmSound} onChange={(e) => update("alarmSound", e.target.value)}
-                className="input-glass px-3 py-1.5 rounded-xl text-sm">
-                {["default", "loud", "chime", "vibrate", "silent"].map((s) => (
-                  <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
-                ))}
-              </select>
-            </Row>
-          </>
-        )}
       </div>
 
       {/* Quiet Hours */}
