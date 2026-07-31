@@ -29,11 +29,14 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
       <body className="min-h-full bg-surface text-text">
         <Providers>{children}</Providers>
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

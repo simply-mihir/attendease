@@ -61,8 +61,10 @@ async function savePushSubscription(subscription: PushSubscription) {
       method: "POST",
       body: JSON.stringify({
         endpoint: subJSON.endpoint,
-        p256dh: subJSON.keys?.p256dh,
-        auth: subJSON.keys?.auth,
+        keys: {
+          p256dh: subJSON.keys?.p256dh,
+          auth: subJSON.keys?.auth,
+        }
       }),
     });
   } catch (error) {
