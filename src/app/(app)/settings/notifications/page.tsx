@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { NotificationSettingsSkeleton } from "@/components/Skeleton";
 
 interface NotificationSettings {
   pushEnabled: boolean;
@@ -34,51 +36,39 @@ interface NotificationSettings {
 
 export default function NotificationSettingsPage() {
   const { data: session } = useSession();
-  const [settings, setSettings] = useState<NotificationSettings | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const { status: pushStatus, isRegistering, enablePush, disablePush } = usePushNotifications();
 
-  useEffect(() => {
-    if (session?.user) {
-      apiFetch("/settings/notifications")
-        .then((data) => {
-          setSettings(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
-  }, [session]);
+  const { data: settings, error, mutate } = useSWRFetch<NotificationSettings>(
+    session?.user ? "/settings/notifications" : null
+  );
+  const loading = !settings && !error;
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   async function handleUpdate(updates: Partial<NotificationSettings>) {
     if (!settings) return;
+
+    // Optimistic update via SWR
     const newSettings = { ...settings, ...updates };
-    setSettings(newSettings);
-    setSaving(true);
+    mutate(newSettings, false); // Update cache immediately, don't revalidate
+    setSaveStatus("saving");
+
     try {
       await apiFetch("/settings/notifications", {
         method: "PUT",
         body: JSON.stringify(updates),
       });
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
     } catch (error) {
       console.error("Failed to save:", error);
-      // Revert on error
-      setSettings(settings);
+      mutate(settings, false); // Revert on error
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
     }
-    setSaving(false);
   }
 
   if (loading) {
-    return (
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
-        <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card-glass h-32 rounded-2xl" />
-          ))}
-        </div>
-      </div>
-    );
+    return <NotificationSettingsSkeleton />;
   }
 
   if (!settings) {
@@ -94,8 +84,19 @@ export default function NotificationSettingsPage() {
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
-        <p className="text-white/50 text-sm mt-1">
-          {saving ? "Saving..." : "Configure when and how you get notified"}
+        <p className="text-sm text-white/50 mt-1 flex items-center gap-2">
+          {saveStatus === "saving" && (
+            <span className="text-amber-400 animate-pulse">Saving...</span>
+          )}
+          {saveStatus === "saved" && (
+            <span className="text-emerald-400 transition-opacity">Saved ✓</span>
+          )}
+          {saveStatus === "error" && (
+            <span className="text-red-400">Failed to save</span>
+          )}
+          {saveStatus === "idle" && (
+            <span>Changes save automatically</span>
+          )}
         </p>
       </div>
 

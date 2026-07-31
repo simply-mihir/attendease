@@ -7,23 +7,32 @@ export async function GET() {
   if (!user) return unauthorizedResponse();
 
   try {
-    // Upsert: create default settings if they don't exist
-    const settings = await prisma.notificationSetting.upsert({
-      where: { userId: user.id },
-      create: { userId: user.id },
-      update: {},
-    });
-
-    // Get timezone from User model
+    // Single query with include
     const userData = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { timezone: true },
+      select: {
+        timezone: true,
+        notificationSetting: true,
+      },
     });
 
-    return NextResponse.json({
-      ...settings,
-      timezone: userData?.timezone || "Asia/Kolkata",
-    });
+    let settings = userData?.notificationSetting;
+
+    // Create default settings if they don't exist
+    if (!settings) {
+      settings = await prisma.notificationSetting.create({
+        data: { userId: user.id },
+      });
+    }
+
+    return NextResponse.json(
+      { ...settings, timezone: userData?.timezone || "Asia/Kolkata" },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=0, stale-while-revalidate=60",
+        },
+      }
+    );
   } catch (error) {
     console.error("[Settings] GET error:", error);
     return NextResponse.json({ error: "Failed to load settings" }, { status: 500 });
