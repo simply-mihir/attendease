@@ -43,6 +43,24 @@ export default function NotificationSettingsPage() {
     }
   }, [settingsData, settings]);
 
+  useEffect(() => {
+    if (settingsData?.settings && !settingsData.settings.timezone) {
+      const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      handleSaveAuto(detected);
+    }
+  }, [settingsData]);
+
+  async function handleSaveAuto(timezone: string) {
+    if (!settingsData?.settings) return;
+    try {
+      await apiFetch("/notifications/settings", {
+        method: "PUT",
+        body: JSON.stringify({ ...settingsData.settings, timezone }),
+      });
+      setSettings((prev: any) => ({ ...prev, timezone }));
+    } catch (err) {}
+  }
+
   const checkTelegramConnection = useCallback(async () => {
     setCheckingTelegram(true);
     try {
@@ -88,6 +106,29 @@ export default function NotificationSettingsPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
       <h1 className="text-2xl font-bold text-gradient">Notification Settings</h1>
+
+      {/* Timezone Section */}
+      <div className="glass rounded-2xl p-6 space-y-4">
+        <Row label="Timezone" desc="Your local timezone for all notifications">
+          <select
+            value={settings.timezone || "Asia/Kolkata"}
+            onChange={(e) => update("timezone", e.target.value)}
+            className="input-glass w-full max-w-[250px]"
+          >
+            <option value="Asia/Kolkata">India (IST)</option>
+            <option value="America/New_York">US Eastern</option>
+            <option value="America/Chicago">US Central</option>
+            <option value="America/Denver">US Mountain</option>
+            <option value="America/Los_Angeles">US Pacific</option>
+            <option value="Europe/London">UK (GMT/BST)</option>
+            <option value="Europe/Berlin">Central Europe</option>
+            <option value="Asia/Dubai">Dubai (GST)</option>
+            <option value="Asia/Singapore">Singapore (SGT)</option>
+            <option value="Australia/Sydney">Sydney (AEST)</option>
+            <option value="Pacific/Auckland">New Zealand</option>
+          </select>
+        </Row>
+      </div>
 
       {/* Telegram Section */}
       <div className="glass rounded-2xl p-6 space-y-4">
@@ -277,8 +318,28 @@ export default function NotificationSettingsPage() {
       {/* Daily brief time */}
       <div className="glass rounded-2xl p-6">
         <Row label="Daily brief time" desc="When to receive your morning brief">
-          <input type="time" value={settings.dailyBriefTime} onChange={(e) => update("dailyBriefTime", e.target.value)}
-            className="input-glass px-3 py-2 rounded-xl text-sm" />
+          <div className="flex items-center gap-2">
+            <select
+              value={settings.dailyBriefHour ?? 7}
+              onChange={(e) => update("dailyBriefHour", parseInt(e.target.value))}
+              className="input-glass w-20 text-sm"
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
+              ))}
+            </select>
+            <span className="text-white/50">:</span>
+            <select
+              value={settings.dailyBriefMinute ?? 0}
+              onChange={(e) => update("dailyBriefMinute", parseInt(e.target.value))}
+              className="input-glass w-20 text-sm"
+            >
+              <option value={0}>00</option>
+              <option value={15}>15</option>
+              <option value={30}>30</option>
+              <option value={45}>45</option>
+            </select>
+          </div>
         </Row>
       </div>
 

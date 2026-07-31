@@ -243,6 +243,8 @@ model NotificationSetting {
   quietHoursStart         String  @default("22:00")
   quietHoursEnd           String  @default("07:00")
   dailyBriefTime          String  @default("08:00")
+  dailyBriefHour          Int     @default(7)
+  dailyBriefMinute        Int     @default(0)
   weeklyReportDay         Int     @default(0)
   goalModeEnabled         Boolean @default(false)
   goalTargetPct           Float   @default(85.0)

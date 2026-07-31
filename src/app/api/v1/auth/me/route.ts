@@ -19,7 +19,8 @@ export async function PUT(req: NextRequest) {
       where: { id: user.id },
       data: {
         name: body.name,
-        email: body.email
+        email: body.email,
+        ...(body.timezone ? { timezone: body.timezone } : {}),
       }
     });
     
