@@ -9,7 +9,17 @@ export async function POST(req: NextRequest) {
   try {
     const { endpoint, p256dh, auth } = await req.json();
     if (!endpoint || !p256dh || !auth) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Missing subscription fields",
+          received: {
+            hasEndpoint: !!endpoint,
+            hasP256dh: !!p256dh,
+            hasAuth: !!auth,
+          },
+        },
+        { status: 400 }
+      );
     }
 
     await prisma.pushSubscription.upsert({
