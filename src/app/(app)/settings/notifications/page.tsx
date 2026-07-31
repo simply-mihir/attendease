@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
   return (
@@ -26,6 +27,8 @@ export default function NotificationSettingsPage() {
   const [settings, setSettings] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const { status: pushStatus, isRegistering, enablePush, disablePush } = usePushNotifications();
 
   // Telegram status
   const [telegramStatus, setTelegramStatus] = useState<{ connected: boolean; username: string | null; connectUrl: string }>({
@@ -128,6 +131,101 @@ export default function NotificationSettingsPage() {
             <option value="Pacific/Auckland">New Zealand</option>
           </select>
         </Row>
+      </div>
+
+      {/* ===== Push Notifications — This Device ===== */}
+      <div className="card-glass p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-white">Push Notifications</h3>
+            <p className="text-sm text-white/50">For this device</p>
+          </div>
+
+          {/* Status Badge */}
+          <div className="flex items-center gap-2">
+            {pushStatus === "loading" && (
+              <span className="text-xs text-white/40 animate-pulse">Checking...</span>
+            )}
+            {pushStatus === "enabled" && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                Active
+              </span>
+            )}
+            {pushStatus === "disabled" && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 px-3 py-1.5 rounded-full">
+                <span className="w-2 h-2 bg-amber-400 rounded-full" />
+                Off
+              </span>
+            )}
+            {pushStatus === "denied" && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-red-400 bg-red-400/10 px-3 py-1.5 rounded-full">
+                <span className="w-2 h-2 bg-red-400 rounded-full" />
+                Blocked
+              </span>
+            )}
+            {pushStatus === "unsupported" && (
+              <span className="text-xs text-white/30">Not supported</span>
+            )}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        {pushStatus === "disabled" && (
+          <button
+            onClick={enablePush}
+            disabled={isRegistering}
+            className="w-full py-3 px-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isRegistering ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Enabling...
+              </>
+            ) : (
+              <>🔔 Enable Push Notifications</>
+            )}
+          </button>
+        )}
+
+        {pushStatus === "enabled" && (
+          <button
+            onClick={disablePush}
+            className="w-full py-2.5 px-4 rounded-xl border border-white/10 hover:border-red-400/30 hover:bg-red-400/5 text-white/60 hover:text-red-400 text-sm font-medium transition-all duration-200"
+          >
+            Disable on this device
+          </button>
+        )}
+
+        {pushStatus === "denied" && (
+          <div className="bg-red-400/5 border border-red-400/20 rounded-xl p-4">
+            <p className="text-sm text-red-300">
+              Push notifications are blocked by your browser. To enable:
+            </p>
+            <ol className="text-sm text-white/50 mt-2 space-y-1 list-decimal list-inside">
+              <li>Open your browser settings</li>
+              <li>Find AttendEase in site permissions</li>
+              <li>Change notifications to "Allow"</li>
+              <li>Refresh this page</li>
+            </ol>
+          </div>
+        )}
+
+        {pushStatus === "unsupported" && (
+          <p className="text-sm text-white/40">
+            This browser doesn't support push notifications. Try Chrome or Edge.
+          </p>
+        )}
+
+        {/* Info text */}
+        {pushStatus !== "unsupported" && (
+          <p className="text-xs text-white/30">
+            Push notifications work even when the app is closed. Each device needs to be enabled separately.
+          </p>
+        )}
       </div>
 
       {/* Telegram Section */}
