@@ -5,7 +5,11 @@ import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { NotificationSettingsSkeleton } from "@/components/Skeleton";
+import {
+  Bell, Mail, Send, Clock, Globe, AlarmClock, BookOpen, AlertTriangle,
+  BarChart3, CalendarCheck, ChevronLeft, Loader2, Check
+} from "lucide-react";
+import Link from "next/link";
 
 interface NotificationSettings {
   pushEnabled: boolean;
@@ -34,6 +38,21 @@ interface NotificationSettings {
   timezone?: string;
 }
 
+// Notification type definitions for DRY rendering
+const NOTIFICATION_TYPES = [
+  { key: "DailyBrief", label: "Daily Brief", desc: "Morning summary of today's schedule", icon: BookOpen, gradient: "from-purple-500 to-violet-500" },
+  { key: "PreClass", label: "Pre-Class Reminder", desc: "Alert before each class starts", icon: AlarmClock, gradient: "from-cyan-500 to-blue-500" },
+  { key: "DangerAlert", label: "Danger Zone Alert", desc: "When attendance drops below minimum", icon: AlertTriangle, gradient: "from-red-500 to-orange-500" },
+  { key: "WeeklyReport", label: "Weekly Report", desc: "Sunday performance recap", icon: BarChart3, gradient: "from-green-500 to-emerald-500" },
+  { key: "DailyReport", label: "Daily Report", desc: "End-of-day attendance summary", icon: CalendarCheck, gradient: "from-amber-500 to-orange-500" },
+] as const;
+
+const CHANNELS = [
+  { key: "push" as const, label: "Push Notifications", desc: "Browser & mobile alerts", icon: Bell, gradient: "from-purple-500 to-pink-500", enabledKey: "pushEnabled" as const },
+  { key: "email" as const, label: "Email", desc: "Receive email digests", icon: Mail, gradient: "from-cyan-500 to-blue-500", enabledKey: "emailEnabled" as const },
+  { key: "telegram" as const, label: "Telegram", desc: "Instant Telegram messages", icon: Send, gradient: "from-green-500 to-emerald-500", enabledKey: "telegramEnabled" as const },
+] as const;
+
 export default function NotificationSettingsPage() {
   const { data: session } = useSession();
   const { status: pushStatus, isRegistering, enablePush, disablePush } = usePushNotifications();
@@ -55,9 +74,10 @@ export default function NotificationSettingsPage() {
         setCurrentSettings(structuredClone(fetchedData));
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedData]);
 
-  const isDirty = originalSettings && currentSettings 
+  const isDirty = originalSettings && currentSettings
     ? JSON.stringify(originalSettings) !== JSON.stringify(currentSettings)
     : false;
 
@@ -68,7 +88,6 @@ export default function NotificationSettingsPage() {
         e.returnValue = "";
       }
     };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
@@ -101,449 +120,340 @@ export default function NotificationSettingsPage() {
   }
 
   if (loading) {
-    return <NotificationSettingsSkeleton />;
+    return <NotifSettingsSkeleton />;
   }
 
   if (!currentSettings) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
-        <p className="text-white/50 mt-4">Failed to load settings.</p>
+      <div className="max-w-2xl mx-auto space-y-4 animate-fade-in">
+        <h1 className="text-2xl font-black text-text">Notification Settings</h1>
+        <div className="glass rounded-2xl p-6">
+          <p className="text-text-muted font-semibold">Failed to load settings.</p>
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      <div className="max-w-2xl mx-auto p-6 space-y-6 pb-24">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
-          <p className="text-white/50 text-sm mt-1">
-            Configure when and how you get notified
-          </p>
-        </div>
-
-        {/* ===== PUSH NOTIFICATIONS — THIS DEVICE ===== */}
-        <div className="card-glass p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-white">Push Notifications</h3>
-              <p className="text-sm text-white/50">For this device</p>
-            </div>
-            {pushStatus === "loading" && (
-              <span className="text-xs text-white/40 animate-pulse">Checking...</span>
-            )}
-            {pushStatus === "enabled" && (
-              <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                Active
-              </span>
-            )}
-            {pushStatus === "disabled" && (
-              <span className="flex items-center gap-1.5 text-xs font-medium text-amber-400 bg-amber-400/10 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 bg-amber-400 rounded-full" />
-                Off
-              </span>
-            )}
-            {pushStatus === "denied" && (
-              <span className="flex items-center gap-1.5 text-xs font-medium text-red-400 bg-red-400/10 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 bg-red-400 rounded-full" />
-                Blocked
-              </span>
-            )}
-            {pushStatus === "unsupported" && (
-              <span className="text-xs text-white/30">Not supported</span>
-            )}
+      <div className="max-w-2xl mx-auto space-y-6 pb-28 animate-fade-in">
+        {/* Header */}
+        <div className="flex items-center gap-3" style={{ animation: "dash-in 0.4s ease-out both" }}>
+          <Link href="/settings" className="btn-ghost p-2.5 rounded-xl">
+            <ChevronLeft className="w-5 h-5 text-text" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-black text-text">Notifications</h1>
+            <p className="text-sm font-semibold text-text-secondary">Choose how AttendEase keeps you updated</p>
           </div>
-
-          {pushStatus === "disabled" && (
-            <button
-              onClick={enablePush}
-              disabled={isRegistering}
-              className="w-full py-3 px-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isRegistering ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Enabling...
-                </>
-              ) : (
-                "🔔 Enable Push Notifications"
-              )}
-            </button>
-          )}
-
-          {pushStatus === "enabled" && (
-            <button
-              onClick={disablePush}
-              className="w-full py-2.5 px-4 rounded-xl border border-white/10 hover:border-red-400/30 hover:bg-red-400/5 text-white/60 hover:text-red-400 text-sm font-medium transition-all duration-200"
-            >
-              Disable on this device
-            </button>
-          )}
-
-          {pushStatus === "denied" && (
-            <div className="bg-red-400/5 border border-red-400/20 rounded-xl p-4">
-              <p className="text-sm text-red-300">Notifications are blocked by your browser.</p>
-              <ol className="text-sm text-white/50 mt-2 space-y-1 list-decimal list-inside">
-                <li>Open browser settings</li>
-                <li>Find AttendEase in site permissions</li>
-                <li>Change notifications to "Allow"</li>
-                <li>Refresh this page</li>
-              </ol>
-            </div>
-          )}
-
-          <p className="text-xs text-white/30">
-            Works even when app is closed. Each device needs separate setup.
-          </p>
         </div>
 
-        {/* ===== TIMING SETTINGS ===== */}
-        <div className="card-glass p-5 space-y-5">
-          <h3 className="text-lg font-semibold text-white">Timing</h3>
+        <style>{`
+          @keyframes dash-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
 
+        {/* ===== GENERAL TIMING SETTINGS ===== */}
+        <div className="card-stagger space-y-3" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
           {/* Timezone */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70">Timezone</label>
-            <select
-              value={currentSettings.timezone || "Asia/Kolkata"}
-              onChange={(e) => updateSetting({ timezone: e.target.value })}
-              className="input-glass w-full"
-            >
-              <option value="Asia/Kolkata">India (IST)</option>
-              <option value="America/New_York">US Eastern</option>
-              <option value="America/Chicago">US Central</option>
-              <option value="America/Denver">US Mountain</option>
-              <option value="America/Los_Angeles">US Pacific</option>
-              <option value="Europe/London">UK (GMT/BST)</option>
-              <option value="Europe/Berlin">Central Europe</option>
-              <option value="Asia/Dubai">Dubai (GST)</option>
-              <option value="Asia/Singapore">Singapore (SGT)</option>
-              <option value="Asia/Tokyo">Japan (JST)</option>
-              <option value="Australia/Sydney">Sydney (AEST)</option>
-              <option value="Pacific/Auckland">New Zealand</option>
-            </select>
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-cyan-500/20">
+                  <Globe className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">Timezone</p>
+                  <p className="text-xs font-semibold text-text-muted">Set your local timezone</p>
+                </div>
+              </div>
+              <select
+                value={currentSettings.timezone || "Asia/Kolkata"}
+                onChange={(e) => updateSetting({ timezone: e.target.value })}
+                className="input-glass py-2 text-sm max-w-[160px]"
+              >
+                <option value="Asia/Kolkata">India (IST)</option>
+                <option value="America/New_York">US Eastern</option>
+                <option value="America/Chicago">US Central</option>
+                <option value="America/Denver">US Mountain</option>
+                <option value="America/Los_Angeles">US Pacific</option>
+                <option value="Europe/London">UK (GMT/BST)</option>
+                <option value="Europe/Berlin">Central Europe</option>
+                <option value="Asia/Dubai">Dubai (GST)</option>
+                <option value="Asia/Singapore">Singapore (SGT)</option>
+                <option value="Asia/Tokyo">Japan (JST)</option>
+                <option value="Australia/Sydney">Sydney (AEST)</option>
+                <option value="Pacific/Auckland">New Zealand</option>
+              </select>
+            </div>
           </div>
 
           {/* Daily Brief Time */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70">Daily Brief Time</label>
-            <p className="text-xs text-white/40">Morning class schedule summary</p>
-            <div className="flex items-center gap-2">
-              <select
-                value={currentSettings.dailyBriefHour}
-                onChange={(e) => updateSetting({ dailyBriefHour: parseInt(e.target.value) })}
-                className="input-glass w-20"
-              >
-                {Array.from({ length: 24 }, (_, i) => (
-                  <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
-                ))}
-              </select>
-              <span className="text-white/50">:</span>
-              <select
-                value={currentSettings.dailyBriefMinute}
-                onChange={(e) => updateSetting({ dailyBriefMinute: parseInt(e.target.value) })}
-                className="input-glass w-20"
-              >
-                {[0, 15, 30, 45].map((m) => (
-                  <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
-                ))}
-              </select>
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-purple-500/20">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">Daily Brief Time</p>
+                  <p className="text-xs font-semibold text-text-muted">Morning class schedule summary</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={currentSettings.dailyBriefHour}
+                  onChange={(e) => updateSetting({ dailyBriefHour: parseInt(e.target.value) })}
+                  className="input-glass py-2 text-sm w-16 text-center"
+                >
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
+                  ))}
+                </select>
+                <span className="text-text-muted font-black">:</span>
+                <select
+                  value={currentSettings.dailyBriefMinute}
+                  onChange={(e) => updateSetting({ dailyBriefMinute: parseInt(e.target.value) })}
+                  className="input-glass py-2 text-sm w-16 text-center"
+                >
+                  {[0, 15, 30, 45].map((m) => (
+                    <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Daily Report Time */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70">Daily Report Time</label>
-            <p className="text-xs text-white/40">End-of-day attendance summary</p>
-            <div className="flex items-center gap-2">
-              <select
-                value={currentSettings.dailyReportHour}
-                onChange={(e) => updateSetting({ dailyReportHour: parseInt(e.target.value) })}
-                className="input-glass w-20"
-              >
-                {Array.from({ length: 24 }, (_, i) => (
-                  <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
-                ))}
-              </select>
-              <span className="text-white/50">:</span>
-              <select
-                value={currentSettings.dailyReportMinute}
-                onChange={(e) => updateSetting({ dailyReportMinute: parseInt(e.target.value) })}
-                className="input-glass w-20"
-              >
-                {[0, 15, 30, 45].map((m) => (
-                  <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
-                ))}
-              </select>
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-amber-500/20">
+                  <CalendarCheck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">Daily Report Time</p>
+                  <p className="text-xs font-semibold text-text-muted">End-of-day attendance summary</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={currentSettings.dailyReportHour}
+                  onChange={(e) => updateSetting({ dailyReportHour: parseInt(e.target.value) })}
+                  className="input-glass py-2 text-sm w-16 text-center"
+                >
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
+                  ))}
+                </select>
+                <span className="text-text-muted font-black">:</span>
+                <select
+                  value={currentSettings.dailyReportMinute}
+                  onChange={(e) => updateSetting({ dailyReportMinute: parseInt(e.target.value) })}
+                  className="input-glass py-2 text-sm w-16 text-center"
+                >
+                  {[0, 15, 30, 45].map((m) => (
+                    <option key={m} value={m}>{m.toString().padStart(2, "0")}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Pre-Class Reminder */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70">Pre-Class Reminder</label>
-            <p className="text-xs text-white/40">Minutes before class starts</p>
-            <select
-              value={currentSettings.preClassMinutes}
-              onChange={(e) => updateSetting({ preClassMinutes: parseInt(e.target.value) })}
-              className="input-glass w-full max-w-[200px]"
-            >
-              <option value={5}>5 minutes</option>
-              <option value={10}>10 minutes</option>
-              <option value={15}>15 minutes</option>
-              <option value={30}>30 minutes</option>
-              <option value={60}>1 hour</option>
-            </select>
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-pink-500/20">
+                  <AlarmClock className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-text text-sm">Pre-Class Alert</p>
+                  <p className="text-xs font-semibold text-text-muted">How early to notify before class</p>
+                </div>
+              </div>
+              <select
+                value={currentSettings.preClassMinutes}
+                onChange={(e) => updateSetting({ preClassMinutes: parseInt(e.target.value) })}
+                className="input-glass py-2 text-sm max-w-[140px]"
+              >
+                <option value={5}>5 min before</option>
+                <option value={10}>10 min before</option>
+                <option value={15}>15 min before</option>
+                <option value={30}>30 min before</option>
+                <option value={60}>1 hour before</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* ===== NOTIFICATION MATRIX ===== */}
-        <div className="card-glass p-5 space-y-4 overflow-x-auto">
-          <h3 className="text-lg font-semibold text-white">Notification Types</h3>
-          <p className="text-xs text-white/40">Select which types you want to receive on each channel.</p>
+        {/* ===== CHANNEL CARDS ===== */}
+        {CHANNELS.map((channel, channelIdx) => {
+          const isChannelEnabled = currentSettings[channel.enabledKey];
+          const isPush = channel.key === "push";
 
-          <table className="w-full min-w-[500px] mt-4">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left py-2 font-medium text-white/50 text-sm">Type</th>
-                <th className="text-center py-2 font-medium text-white/50 text-sm w-24">
-                  <div className="flex flex-col items-center gap-1">
-                    Push
-                    <Toggle
-                      enabled={currentSettings.pushEnabled}
-                      onChange={() => updateSetting({ pushEnabled: !currentSettings.pushEnabled })}
-                    />
+          return (
+            <div
+              key={channel.key}
+              className="glass rounded-3xl overflow-hidden"
+              style={{ animation: `dash-in 0.4s ease-out ${0.1 + channelIdx * 0.05}s both` }}
+            >
+              {/* Channel Header */}
+              <div className="flex items-center justify-between p-5">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${channel.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-${channel.gradient.split(" ")[0].replace("from-", "")}/20`}>
+                    <channel.icon className="w-5 h-5 text-white" />
                   </div>
-                </th>
-                <th className="text-center py-2 font-medium text-white/50 text-sm w-24">
-                  <div className="flex flex-col items-center gap-1">
-                    Email
-                    <Toggle
-                      enabled={currentSettings.emailEnabled}
-                      onChange={() => updateSetting({ emailEnabled: !currentSettings.emailEnabled })}
-                    />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-black text-text">{channel.label}</p>
+                      {isPush && (
+                        <StatusBadge status={pushStatus} />
+                      )}
+                    </div>
+                    <p className="text-xs font-semibold text-text-secondary">{channel.desc}</p>
                   </div>
-                </th>
-                <th className="text-center py-2 font-medium text-white/50 text-sm w-24">
-                  <div className="flex flex-col items-center gap-1">
-                    Telegram
-                    <Toggle
-                      enabled={currentSettings.telegramEnabled}
-                      onChange={() => updateSetting({ telegramEnabled: !currentSettings.telegramEnabled })}
-                    />
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-sm">
-              {/* Daily Brief */}
-              <tr>
-                <td className="py-4 text-white">
-                  <div className="font-medium">Daily Brief</div>
-                  <div className="text-xs text-white/40">Morning schedule</div>
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.pushDailyBrief}
-                    disabled={!currentSettings.pushEnabled}
-                    onChange={(c) => updateSetting({ pushDailyBrief: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.emailDailyBrief}
-                    disabled={!currentSettings.emailEnabled}
-                    onChange={(c) => updateSetting({ emailDailyBrief: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.telegramDailyBrief}
-                    disabled={!currentSettings.telegramEnabled}
-                    onChange={(c) => updateSetting({ telegramDailyBrief: c })}
-                  />
-                </td>
-              </tr>
+                </div>
+                <Toggle3D
+                  enabled={isChannelEnabled}
+                  onChange={() => updateSetting({ [channel.enabledKey]: !isChannelEnabled } as any)}
+                />
+              </div>
 
-              {/* Pre-Class */}
-              <tr>
-                <td className="py-4 text-white">
-                  <div className="font-medium">Pre-Class Reminders</div>
-                  <div className="text-xs text-white/40">Before class starts</div>
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.pushPreClass}
-                    disabled={!currentSettings.pushEnabled}
-                    onChange={(c) => updateSetting({ pushPreClass: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.emailPreClass}
-                    disabled={!currentSettings.emailEnabled}
-                    onChange={(c) => updateSetting({ emailPreClass: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.telegramPreClass}
-                    disabled={!currentSettings.telegramEnabled}
-                    onChange={(c) => updateSetting({ telegramPreClass: c })}
-                  />
-                </td>
-              </tr>
+              {/* Push-specific actions */}
+              {isPush && (
+                <div className="px-5 pb-2">
+                  {pushStatus === "disabled" && (
+                    <button
+                      onClick={enablePush}
+                      disabled={isRegistering}
+                      className="btn-gradient w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm"
+                    >
+                      {isRegistering ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Enabling...
+                        </>
+                      ) : (
+                        <>
+                          <Bell className="w-4 h-4" />
+                          Enable Push on This Device
+                        </>
+                      )}
+                    </button>
+                  )}
+                  {pushStatus === "enabled" && (
+                    <button
+                      onClick={disablePush}
+                      className="btn-ghost w-full py-2.5 rounded-xl text-sm text-text-muted hover:text-danger transition"
+                    >
+                      Disable on this device
+                    </button>
+                  )}
+                  {pushStatus === "denied" && (
+                    <div className="glass-strong rounded-xl p-4 space-y-2">
+                      <p className="text-sm font-bold text-danger">Notifications blocked by browser</p>
+                      <ol className="text-xs font-semibold text-text-muted space-y-1 list-decimal list-inside">
+                        <li>Open browser settings</li>
+                        <li>Find AttendEase in site permissions</li>
+                        <li>Change notifications to &quot;Allow&quot;</li>
+                        <li>Refresh this page</li>
+                      </ol>
+                    </div>
+                  )}
+                </div>
+              )}
 
-              {/* Daily Report */}
-              <tr>
-                <td className="py-4 text-white">
-                  <div className="font-medium">Daily Report</div>
-                  <div className="text-xs text-white/40">End-of-day summary</div>
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.pushDailyReport}
-                    disabled={!currentSettings.pushEnabled}
-                    onChange={(c) => updateSetting({ pushDailyReport: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.emailDailyReport}
-                    disabled={!currentSettings.emailEnabled}
-                    onChange={(c) => updateSetting({ emailDailyReport: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.telegramDailyReport}
-                    disabled={!currentSettings.telegramEnabled}
-                    onChange={(c) => updateSetting({ telegramDailyReport: c })}
-                  />
-                </td>
-              </tr>
+              {/* Notification Type Cards */}
+              <div className={`divide-y-2 divide-border-heavy border-t-2 border-border-heavy transition-all duration-300 ${!isChannelEnabled ? "opacity-40 pointer-events-none" : ""}`}>
+                {NOTIFICATION_TYPES.map((type) => {
+                  const settingKey = `${channel.key}${type.key}` as keyof NotificationSettings;
+                  const isEnabled = currentSettings[settingKey] as boolean;
 
-              {/* Danger Zone */}
-              <tr>
-                <td className="py-4 text-white">
-                  <div className="font-medium text-red-400">Danger Zone Alerts</div>
-                  <div className="text-xs text-white/40">Low attendance warnings</div>
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.pushDangerAlert}
-                    disabled={!currentSettings.pushEnabled}
-                    onChange={(c) => updateSetting({ pushDangerAlert: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.emailDangerAlert}
-                    disabled={!currentSettings.emailEnabled}
-                    onChange={(c) => updateSetting({ emailDangerAlert: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.telegramDangerAlert}
-                    disabled={!currentSettings.telegramEnabled}
-                    onChange={(c) => updateSetting({ telegramDangerAlert: c })}
-                  />
-                </td>
-              </tr>
+                  return (
+                    <div
+                      key={type.key}
+                      className="flex items-center justify-between p-4 hover:bg-surface-3 transition"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${type.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
+                          <type.icon className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-text">{type.label}</p>
+                          <p className="text-xs font-semibold text-text-muted">{type.desc}</p>
+                        </div>
+                      </div>
+                      <Toggle3D
+                        enabled={isEnabled}
+                        onChange={() => updateSetting({ [settingKey]: !isEnabled } as any)}
+                        small
+                      />
+                    </div>
+                  );
+                })}
+              </div>
 
-              {/* Weekly Report */}
-              <tr>
-                <td className="py-4 text-white">
-                  <div className="font-medium text-emerald-400">Weekly Report</div>
-                  <div className="text-xs text-white/40">Sunday performance recap</div>
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.pushWeeklyReport}
-                    disabled={!currentSettings.pushEnabled}
-                    onChange={(c) => updateSetting({ pushWeeklyReport: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.emailWeeklyReport}
-                    disabled={!currentSettings.emailEnabled}
-                    onChange={(c) => updateSetting({ emailWeeklyReport: c })}
-                  />
-                </td>
-                <td className="text-center">
-                  <Checkbox
-                    checked={currentSettings.telegramWeeklyReport}
-                    disabled={!currentSettings.telegramEnabled}
-                    onChange={(c) => updateSetting({ telegramWeeklyReport: c })}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              {/* Footer hint for push */}
+              {isPush && (
+                <div className="px-5 py-3 border-t-2 border-border-heavy">
+                  <p className="text-xs font-semibold text-text-muted">
+                    Works even when app is closed. Each device needs separate setup.
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Sticky Save Footer */}
+      {/* ===== STICKY SAVE FOOTER ===== */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
           isDirty
             ? "translate-y-0 opacity-100"
             : "translate-y-full opacity-0 pointer-events-none"
         }`}
       >
         <div className="mx-auto max-w-2xl px-4 pb-6 pt-3">
-          <div className="rounded-2xl border border-white/10 bg-gray-900/80 backdrop-blur-xl p-4 shadow-2xl shadow-purple-500/10">
+          <div className="glass-strong rounded-2xl p-4 shadow-2xl">
             <div className="flex items-center justify-between gap-4">
-              {/* Unsaved changes indicator */}
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-purple-400 opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+              {/* Pulsing dot + label */}
+              <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
                 </span>
                 Unsaved changes
               </div>
 
-              {/* Save Button */}
               <button
                 onClick={handleSave}
                 disabled={saveStatus === "saving"}
-                className={`relative overflow-hidden rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-300 ${
+                className={`relative overflow-hidden rounded-full px-6 py-2.5 text-sm font-black text-white uppercase tracking-wide transition-all duration-300 border-2 border-border-heavy ${
                   saveStatus === "saving"
-                    ? "bg-purple-600/50 cursor-wait"
+                    ? "bg-primary/50 cursor-wait"
                     : saveStatus === "saved"
-                    ? "bg-emerald-600 scale-95"
+                    ? "bg-success shadow-lg shadow-success/30 scale-95"
                     : saveStatus === "error"
-                    ? "bg-red-500 hover:bg-red-400"
-                    : "bg-purple-600 hover:bg-purple-500 hover:shadow-lg hover:shadow-purple-500/25 active:scale-95"
+                    ? "bg-danger shadow-lg shadow-danger/30"
+                    : "bg-primary hover:bg-primary-dark shadow-[0px_6px_0px] shadow-border-heavy hover:translate-y-[2px] hover:shadow-[0px_4px_0px] active:translate-y-[6px] active:shadow-[0px_0px_0px]"
                 }`}
               >
-                {/* Shimmer effect while saving */}
+                {/* Shimmer effect */}
                 {saveStatus === "saving" && (
                   <span className="absolute inset-0 -translate-x-full animate-[shimmer-slide_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 )}
 
                 <span className="relative flex items-center gap-2">
-                  {saveStatus === "saving" && (
-                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                  )}
-                  {saveStatus === "saved" && (
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" className="animate-[draw_0.3s_ease-out_forwards]" strokeDasharray="20" strokeDashoffset="20" style={{ animation: "draw 0.3s ease-out forwards" }} />
-                    </svg>
-                  )}
+                  {saveStatus === "saving" && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {saveStatus === "saved" && <Check className="w-4 h-4" />}
                   {saveStatus === "idle" && "Save Settings"}
                   {saveStatus === "saving" && "Saving..."}
                   {saveStatus === "saved" && "Saved!"}
-                  {saveStatus === "error" && "Error - Retry"}
+                  {saveStatus === "error" && "Retry"}
                 </span>
               </button>
             </div>
@@ -554,49 +464,123 @@ export default function NotificationSettingsPage() {
   );
 }
 
-function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
+/* ===== SUB-COMPONENTS ===== */
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === "enabled") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-black text-success uppercase tracking-wide border border-success/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+        Active
+      </span>
+    );
+  }
+  if (status === "denied") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-danger/15 px-2 py-0.5 text-[10px] font-black text-danger uppercase tracking-wide border border-danger/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-danger" />
+        Blocked
+      </span>
+    );
+  }
+  if (status === "loading") {
+    return (
+      <span className="text-[10px] font-black text-text-muted uppercase tracking-wide animate-pulse">
+        Checking...
+      </span>
+    );
+  }
+  return null;
+}
+
+function Toggle3D({ enabled, onChange, small }: { enabled: boolean; onChange: () => void; small?: boolean }) {
+  const h = small ? "h-6 w-11" : "h-7 w-13";
+  const knob = small ? "h-4 w-4" : "h-5 w-5";
+  const translate = small ? "translate-x-5" : "translate-x-6";
+
   return (
     <button
+      role="switch"
+      aria-checked={enabled}
       onClick={onChange}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? "bg-violet-600" : "bg-white/20"
+      className={`relative inline-flex ${h} items-center rounded-full border-2 border-border-heavy transition-all duration-300 shrink-0 ${
+        enabled
+          ? "bg-primary shadow-[0px_4px_0px] shadow-border-heavy"
+          : "bg-surface-3 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          enabled ? "translate-x-6" : "translate-x-1"
+        className={`inline-block ${knob} transform rounded-full bg-white border border-border-heavy shadow-md transition-all duration-300 ${
+          enabled ? translate : "translate-x-0.5"
         }`}
       />
     </button>
   );
 }
 
-function Checkbox({
-  checked,
-  disabled,
-  onChange,
-}: {
-  checked: boolean;
-  disabled: boolean;
-  onChange: (c: boolean) => void;
-}) {
+/* ===== SKELETON ===== */
+
+function NotifSettingsSkeleton() {
   return (
-    <button
-      onClick={() => onChange(!checked)}
-      disabled={disabled}
-      className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${
-        disabled
-          ? "bg-white/5 cursor-not-allowed opacity-50 border border-white/5"
-          : checked
-          ? "bg-violet-600 text-white"
-          : "bg-white/10 border border-white/20 hover:border-violet-500"
-      }`}
-    >
-      {checked && (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-        </svg>
-      )}
-    </button>
+    <div className="max-w-2xl mx-auto space-y-6 animate-pulse">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl bg-surface-3 border-2 border-border-heavy" />
+        <div className="space-y-1.5">
+          <div className="h-6 w-40 rounded-lg bg-surface-3" />
+          <div className="h-4 w-56 rounded-lg bg-surface-3" />
+        </div>
+      </div>
+
+      {/* Timing cards */}
+      <div className="space-y-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-surface-3 border-2 border-border-heavy" />
+                <div className="space-y-1.5">
+                  <div className="h-4 w-28 rounded bg-surface-3" />
+                  <div className="h-3 w-40 rounded bg-surface-3" />
+                </div>
+              </div>
+              <div className="h-9 w-24 rounded-xl bg-surface-3 border-2 border-border-heavy" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Channel cards */}
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="glass rounded-3xl overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-5">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-surface-3 border-2 border-border-heavy" />
+              <div className="space-y-1.5">
+                <div className="h-5 w-36 rounded bg-surface-3" />
+                <div className="h-3 w-28 rounded bg-surface-3" />
+              </div>
+            </div>
+            <div className="h-7 w-13 rounded-full bg-surface-3 border-2 border-border-heavy" />
+          </div>
+          {/* Type rows */}
+          <div className="divide-y-2 divide-border-heavy border-t-2 border-border-heavy">
+            {[1, 2, 3, 4, 5].map((j) => (
+              <div key={j} className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-surface-3 border-2 border-border-heavy" />
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-28 rounded bg-surface-3" />
+                    <div className="h-3 w-44 rounded bg-surface-3" />
+                  </div>
+                </div>
+                <div className="h-6 w-11 rounded-full bg-surface-3 border-2 border-border-heavy" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
