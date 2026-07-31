@@ -411,20 +411,20 @@ export default function NotificationSettingsPage() {
 
       {/* ===== STICKY SAVE FOOTER ===== */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+        className={`fixed bottom-0 left-0 lg:left-[280px] right-0 z-50 transition-all duration-500 ease-out ${
           isDirty
             ? "translate-y-0 opacity-100"
             : "translate-y-full opacity-0 pointer-events-none"
         }`}
       >
         <div className="mx-auto max-w-2xl px-4 pb-6 pt-3">
-          <div className="glass-strong rounded-2xl p-4 shadow-2xl">
+          <div className="glass-strong rounded-2xl p-4 shadow-2xl border-2 border-border-heavy">
             <div className="flex items-center justify-between gap-4">
               {/* Pulsing dot + label */}
-              <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
+              <div className="flex items-center gap-2 text-sm font-bold text-pink">
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-pink opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-pink" />
                 </span>
                 Unsaved changes
               </div>
@@ -434,12 +434,12 @@ export default function NotificationSettingsPage() {
                 disabled={saveStatus === "saving"}
                 className={`relative overflow-hidden rounded-full px-6 py-2.5 text-sm font-black text-white uppercase tracking-wide transition-all duration-300 border-2 border-border-heavy ${
                   saveStatus === "saving"
-                    ? "bg-primary/50 cursor-wait"
+                    ? "bg-pink/50 cursor-wait"
                     : saveStatus === "saved"
                     ? "bg-success shadow-lg shadow-success/30 scale-95"
                     : saveStatus === "error"
                     ? "bg-danger shadow-lg shadow-danger/30"
-                    : "bg-primary hover:bg-primary-dark shadow-[0px_6px_0px] shadow-border-heavy hover:translate-y-[2px] hover:shadow-[0px_4px_0px] active:translate-y-[6px] active:shadow-[0px_0px_0px]"
+                    : "bg-pink hover:bg-pink-dark shadow-[0px_6px_0px] shadow-border-heavy hover:translate-y-[2px] hover:shadow-[0px_4px_0px] active:translate-y-[6px] active:shadow-[0px_0px_0px]"
                 }`}
               >
                 {/* Shimmer effect */}
