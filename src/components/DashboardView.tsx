@@ -202,22 +202,34 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   }
 
   return (
-    <PageTransition direction="up" staggerChildren={false} className="space-y-6">
+    <PageTransition direction="up" staggerChildren={false} className="space-y-6 pb-8">
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        <div>
-          <h1 className="text-2xl font-bold text-white">
-            Hello, <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">{displayName}</span> 👋
-          </h1>
-          <p className="mt-1 text-sm text-gray-400">
-            {dashboard?.semesterName 
-              ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
-              : "Here is your attendance overview. Let's make every class count!"} 
-            <span className="mx-2 opacity-50">•</span>
-            {today?.dayName}, {today?.date}
-          </p>
+            {/* Greeting — FIRST element */}
+      <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+        <h1 className="text-2xl font-bold text-white">
+          Hello, <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">{displayName}</span> 👋
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          {dashboard?.semesterName 
+            ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
+            : "Here is your attendance overview. Let's make every class count!"} 
+          <span className="mx-2 opacity-50">·</span>
+          {today?.date}
+        </p>
+      </div>
+
+      {/* Semester Banner */}
+      <div className="relative mb-6 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 overflow-hidden" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10">
+            <span className="text-lg">📚</span>
+          </div>
+          <div>
+            <h2 className="font-semibold text-white">{dashboard?.semesterName || "All Semesters"}</h2>
+            <p className="text-sm text-gray-400">{today?.dayName}, {today?.date}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {isCurrent && activeSemId && (
@@ -347,30 +359,28 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         </div>
       )}
 
-      {/* Stats Row */}
+            {/* Stats Row */}
       {dashboard && (
         <StaggerGrid
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
           delay={100}
           staggerDelay={80}
           animation="card3DEnter"
         >
           <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
-            icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
-            bgClass="bg-emerald-500/10 text-emerald-400" />
+            icon="📈" bgClass="bg-emerald-500/10 text-emerald-400 text-lg" glowClass="via-emerald-500/30" />
           <StatCard label="Subjects" value={<AnimatedCounter value={totalSubjects} />}
-            icon={<BookOpen className="w-5 h-5 text-blue-400" />} bgClass="bg-blue-500/10 text-blue-400" />
-          <StatCard label="Streak" value={<span className="flex items-center gap-1"><AnimatedCounter value={currentStreak} /><StreakFlame streak={currentStreak} size="sm" /></span>}
-            icon={<Flame className="w-5 h-5 text-amber-400" />} bgClass="bg-amber-500/10 text-amber-400" />
-          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
-            icon={<Zap className={clsx("w-5 h-5", dangerCount > 0 ? "text-red-400" : "text-emerald-400")} />}
-            bgClass={dangerCount > 0 ? "bg-red-500/10 text-red-400" : "bg-emerald-500/10 text-emerald-400"} />
+            icon="📖" bgClass="bg-blue-500/10 text-blue-400 text-lg" glowClass="via-blue-500/30" />
+          <StatCard label="Streak" value={<span className="flex items-center gap-1"><AnimatedCounter value={currentStreak} /> <span className="text-lg">🔥</span></span>}
+            icon="🔥" bgClass="bg-amber-500/10 text-amber-400 text-lg" glowClass="via-amber-500/30" />
+          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<span className={dangerCount > 0 ? "text-red-400" : "text-white"}><AnimatedCounter value={dangerCount} /></span>}
+            icon={dangerCount > 0 ? "⚠️" : "✅"} bgClass={dangerCount > 0 ? "bg-red-500/10 text-red-400 text-lg" : "bg-emerald-500/10 text-emerald-400 text-lg"} glowClass={dangerCount > 0 ? "via-red-500/30" : "via-emerald-500/30"} />
         </StaggerGrid>
       )}
 
       {/* Goal Mode Card */}
       {isCurrent && goalPlan && (
-        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
+        <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all">
               <button
@@ -468,89 +478,85 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Subject Cards */}
       {dashboard && subjectsList.length > 0 && (
-        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
+        <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white">All Subjects</h2>
             <span className="text-sm text-gray-500">{subjectsList.length} courses</span>
           </div>
           <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
-              // Handle both new and old properties
               const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
               const min = s.minAttendancePct ?? 75;
-              const color = s.statusColor || (pct >= min ? "green" : (pct >= min - 5 ? "yellow" : "red"));
-              
-              const fillClass = pct >= min ? "from-emerald-600 via-emerald-500 to-green-500" :
-                                pct >= min - 5 ? "from-amber-600 via-amber-500 to-yellow-500" :
-                                "from-red-600 via-red-500 to-rose-500";
               const statusLabel = isCurrent ? (pct >= min ? "On track" : pct >= min - 5 ? "At risk" : "Action needed") :
                                             (pct >= min ? "Met requirement" : "Failed requirement");
+              
+              const accentColors = [
+                "from-purple-500 to-violet-600",
+                "from-blue-500 to-indigo-600",
+                "from-emerald-500 to-green-600",
+                "from-amber-500 to-orange-600",
+                "from-pink-500 to-rose-600",
+                "from-cyan-500 to-teal-600",
+              ];
+              const accentClass = s.colorHex ? `from-[${s.colorHex}] to-[${s.colorHex}]` : accentColors[i % accentColors.length];
 
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden block">
+                className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer overflow-hidden block">
                 {/* Top gradient line */}
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
                 
                 {/* Subject color indicator — left border accent */}
-                <div className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full" style={{ backgroundColor: s.colorHex }} />
+                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-gradient-to-b ${accentClass}`} style={s.colorHex ? { backgroundColor: s.colorHex, backgroundImage: 'none' } : {}} />
                 
                 {/* Content */}
                 <div className="pl-4">
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate pr-4">
-                      {s.name}
-                    </h3>
-                    <span className="shrink-0 text-xs text-gray-500">{s.code}</span>
+                    <div className="min-w-0 pr-4">
+                      <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
+                        {s.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{s.code}</p>
+                    </div>
+                    <span className="shrink-0 text-gray-600 group-hover:text-purple-400 transition-colors">→</span>
                   </div>
                   
-                  {/* Attendance percentage */}
-                  <div className="flex items-center gap-3 mt-3">
-                    <div className="flex-1">
-                      {/* Glass progress bar track */}
-                      <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                        {/* Gradient fill */}
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${fillClass} transition-all duration-500`}
-                          style={{ width: `${Math.min(100, pct)}%` }}
-                        />
-                      </div>
+                  {/* Progress bar */}
+                  <div className="mt-3 mb-2">
+                    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          pct >= 75
+                            ? "bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-400"
+                            : pct >= 60
+                            ? "bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-400"
+                            : "bg-gradient-to-r from-red-600 via-red-500 to-rose-400"
+                        }`}
+                        style={{ width: `${Math.min(100, pct)}%` }}
+                      />
                     </div>
-                    <span className="text-sm font-semibold text-white min-w-[3rem] text-right">
-                      {pct}%
-                    </span>
                   </div>
 
                   {/* Status + stats row */}
                   <div className="flex items-center justify-between mt-2">
-                    <span className={`text-xs font-medium ${
-                      pct >= min ? "text-emerald-400" :
-                      pct >= min - 5 ? "text-amber-400" :
+                    <span className={`text-sm font-semibold ${
+                      pct >= 75 ? "text-emerald-400" :
+                      pct >= 60 ? "text-amber-400" :
                       "text-red-400"
+                    }`}>
+                      {pct}%
+                    </span>
+                    <span className={`text-xs font-medium ${
+                      statusLabel === "On track" || statusLabel === "Met requirement" ? "text-emerald-400/70" :
+                      statusLabel === "At risk" ? "text-amber-400/70" :
+                      "text-red-400/70"
                     }`}>
                       {statusLabel}
                     </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">
-                        {s.totalPresent ?? 0}/{s.totalClassesHeld ?? 0} classes
-                      </span>
-                      {(s.totalCancelled ?? 0) > 0 && (
-                        <span className="flex items-center gap-1 text-xs text-slate-400 font-bold bg-slate-500/10 px-2 py-0.5 rounded-md">
-                          <Ban className="w-3 h-3" /> {s.totalCancelled}
-                        </span>
-                      )}
-                      {(s.streakCount ?? 0) > 0 && (
-                        <span className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
-                          <Flame className="w-3 h-3" />{s.streakCount}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      🔥 {s.totalPresent ?? 0}
+                    </span>
                   </div>
-                </div>
-                
-                {/* Arrow icon on hover */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 group-hover:text-purple-400 transition-colors">
-                  <ArrowRight className="w-4 h-4" />
                 </div>
               </Link>
             )})}
@@ -677,21 +683,16 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, bgClass }: { label: string; value: React.ReactNode; icon: React.ReactNode; bgClass: string }) {
+function StatCard({ label, value, icon, bgClass, glowClass }: { label: string; value: React.ReactNode; icon: React.ReactNode; bgClass: string; glowClass?: string }) {
   return (
     <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden">
-      {/* Subtle gradient glow at top */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-      
-      {/* Icon — top right with glow background */}
-      <div className={`absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-xl ${bgClass}`}>
-        {icon}
+      <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${glowClass || "via-purple-500/30"} to-transparent`} />
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm text-gray-400">{label}</p>
+        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${bgClass}`}>
+          {icon}
+        </div>
       </div>
-      
-      {/* Label */}
-      <p className="text-sm text-gray-400 mb-1">{label}</p>
-      
-      {/* Value — large and prominent */}
       <p className="text-3xl font-bold text-white">{value}</p>
     </div>
   );
