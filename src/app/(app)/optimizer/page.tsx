@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -31,20 +32,7 @@ export default function OptimizerPage() {
   const initialLoad = loading && !result;
 
   if (initialLoad) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          <div className="w-48 h-8 rounded-lg bg-white/10 animate-pulse" />
-        </div>
-        <div className="glass rounded-2xl p-6 space-y-4">
-          <div className="w-full h-10 bg-white/5 rounded-xl animate-pulse" />
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading optimizer" icon="⚡" />;
   }
 
   return (
@@ -236,9 +224,7 @@ export default function OptimizerPage() {
       )}
 
       {loading && !initialLoad && (
-        <div className="text-center py-8 text-text-muted animate-pulse">
-          Calculating optimal skip plan...
-        </div>
+        <FuturisticLoader variant="inline" title="Calculating optimal skip plan..." icon="⚡" />
       )}
     </PageTransition>
   );

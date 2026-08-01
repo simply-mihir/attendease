@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Sliders, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 
@@ -38,19 +39,7 @@ export default function SimulatorPage() {
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          <div className="w-48 h-8 rounded-lg bg-white/10 animate-pulse" />
-        </div>
-        <div className="glass rounded-2xl p-6 space-y-6 animate-pulse">
-          <div className="w-full h-10 bg-white/10 rounded-xl" />
-          <div className="w-full h-10 bg-white/5 rounded-xl" />
-          <div className="w-full h-32 bg-white/10 rounded-2xl" />
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading simulator" icon="🧪" />;
   }
 
   return (
@@ -163,7 +152,7 @@ export default function SimulatorPage() {
       )}
 
       {loading && (
-        <div className="text-center py-8 text-gray-500">Calculating...</div>
+        <FuturisticLoader variant="inline" title="Calculating..." icon="🧪" />
       )}
     </PageTransition>
   );

@@ -1,5 +1,5 @@
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
-export default function Loading() {
-  return <FuturisticLoader title="Optimizing schedule" icon="⚡" variant="full" />;
+export default function appOptimizerLoadingtsxLoading() {
+  return <FuturisticLoader title="Loading optimizer" icon="⚡" variant="full" />;
 }

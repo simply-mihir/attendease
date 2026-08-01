@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
-import { SubjectsSkeleton } from "@/components/Skeleton";
 import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
@@ -76,7 +76,7 @@ export default function SubjectsPage() {
       )}
 
       {loading ? (
-        <SubjectsSkeleton />
+        <FuturisticLoader variant="section" title="Loading subjects" icon="📚" />
       ) : subjects.length === 0 ? (
         <div className="text-center py-16 glass rounded-2xl" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 150ms forwards" }}>
           <BookOpen className="w-12 h-12 text-text-muted mx-auto mb-3" />

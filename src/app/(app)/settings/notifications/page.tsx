@@ -1,4 +1,5 @@
 "use client";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -122,7 +123,7 @@ export default function NotificationSettingsPage() {
   }
 
   if (loading) {
-    return <NotifSettingsSkeleton />;
+    return <FuturisticLoader variant="section" title="Loading notifications" icon="🔔" />;
   }
 
   if (!currentSettings) {
@@ -514,69 +515,3 @@ function Toggle3D({ enabled, onChange, small }: { enabled: boolean; onChange: ()
   );
 }
 
-/* ===== SKELETON ===== */
-
-function NotifSettingsSkeleton() {
-  return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-pulse">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-surface-3 border-2 border-border-heavy" />
-        <div className="space-y-1.5">
-          <div className="h-6 w-40 rounded-lg bg-surface-3" />
-          <div className="h-4 w-56 rounded-lg bg-surface-3" />
-        </div>
-      </div>
-
-      {/* Timing cards */}
-      <div className="space-y-3">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="glass rounded-2xl p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-surface-3 border-2 border-border-heavy" />
-                <div className="space-y-1.5">
-                  <div className="h-4 w-28 rounded bg-surface-3" />
-                  <div className="h-3 w-40 rounded bg-surface-3" />
-                </div>
-              </div>
-              <div className="h-9 w-24 rounded-xl bg-surface-3 border-2 border-border-heavy" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Channel cards */}
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="glass rounded-3xl overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between p-5">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-surface-3 border-2 border-border-heavy" />
-              <div className="space-y-1.5">
-                <div className="h-5 w-36 rounded bg-surface-3" />
-                <div className="h-3 w-28 rounded bg-surface-3" />
-              </div>
-            </div>
-            <div className="h-7 w-13 rounded-full bg-surface-3 border-2 border-border-heavy" />
-          </div>
-          {/* Type rows */}
-          <div className="divide-y-2 divide-border-heavy border-t-2 border-border-heavy">
-            {[1, 2, 3, 4, 5].map((j) => (
-              <div key={j} className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-surface-3 border-2 border-border-heavy" />
-                  <div className="space-y-1.5">
-                    <div className="h-4 w-28 rounded bg-surface-3" />
-                    <div className="h-3 w-44 rounded bg-surface-3" />
-                  </div>
-                </div>
-                <div className="h-6 w-11 rounded-full bg-surface-3 border-2 border-border-heavy" />
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}

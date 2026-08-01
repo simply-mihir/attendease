@@ -1,5 +1,6 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { GraduationCap, Calendar, BookOpen, ArrowRight } from "lucide-react";
 import clsx from "clsx";
@@ -19,17 +20,7 @@ export default function SemestersPage() {
   const { data: semesters, isLoading } = useSWRFetch<SemesterSummary[]>("/semesters");
 
   if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          <div className="w-48 h-8 rounded-lg bg-white/10 animate-pulse" />
-        </div>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="glass rounded-2xl p-6 h-32 animate-pulse" />
-        ))}
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading semesters" icon="🎓" />;
   }
 
   return (

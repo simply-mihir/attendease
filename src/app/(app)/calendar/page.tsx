@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer } from "lucide-react";
 import clsx from "clsx";
@@ -47,22 +48,7 @@ export default function CalendarPage() {
   const pageLoading = schedLoading || recLoading;
 
   if (pageLoading) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-8 w-40 bg-white/10 rounded-lg animate-pulse mb-2" />
-            <div className="h-4 w-32 bg-white/5 rounded-md animate-pulse" />
-          </div>
-          <div className="h-10 w-24 bg-white/10 rounded-xl animate-pulse" />
-        </div>
-        <div className="glass p-2 rounded-2xl flex max-w-xs animate-pulse">
-          <div className="flex-1 h-10 bg-white/10 rounded-xl" />
-          <div className="flex-1 h-10 bg-transparent rounded-xl" />
-        </div>
-        <div className="h-[400px] w-full bg-white/5 rounded-3xl animate-pulse" />
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading calendar" icon="🗓️" />;
   }
 
   function navigate(dir: number) {

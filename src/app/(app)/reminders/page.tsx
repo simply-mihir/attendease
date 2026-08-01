@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { apiFetch } from "@/hooks/useApi";
 import {
@@ -215,11 +216,7 @@ export default function RemindersPage() {
 
       {/* Reminders List */}
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 glass rounded-2xl animate-pulse" />
-          ))}
-        </div>
+        <FuturisticLoader variant="section" title="Loading reminders" icon="⏰" />
       ) : filteredReminders.length === 0 ? (
         <div className="glass p-12 text-center rounded-3xl border-2 border-border-heavy space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">

@@ -1,5 +1,6 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { TrendingUp, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import {
@@ -48,18 +49,7 @@ export default function ForecastPage() {
   const { data, isLoading: loading } = useSWRFetch<ForecastResponse>("/analytics/forecast");
 
   if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          <div className="w-56 h-8 rounded-lg bg-white/10 animate-pulse" />
-        </div>
-        <div className="glass rounded-2xl p-6 h-24 animate-pulse" />
-        {[1, 2].map((i) => (
-          <div key={i} className="glass rounded-2xl p-6 h-80 animate-pulse" />
-        ))}
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading forecast" icon="🔮" />;
   }
 
   if (!data) return null;

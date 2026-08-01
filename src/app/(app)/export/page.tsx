@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -14,18 +15,7 @@ export default function ExportPage() {
   const subjects = data?.subjects || [];
 
   if (pageLoading) {
-    return (
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-        <div className="w-32 h-4 rounded bg-white/10 animate-pulse mb-6" />
-        <div className="h-8 w-48 rounded-lg bg-white/10 animate-pulse mb-6" />
-        <div className="glass rounded-3xl p-6 space-y-6 animate-pulse">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 mx-auto" />
-          <div className="w-3/4 h-4 rounded bg-white/5 mx-auto" />
-          <div className="w-full h-12 rounded-xl bg-white/10" />
-          <div className="w-full h-12 rounded-xl bg-white/10" />
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading export" icon="📥" />;
   }
 
   async function handleExport() {

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useCallback } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
@@ -442,15 +443,7 @@ export default function ImportPage() {
           </button>
 
           {analyzing && (
-            <div className="glass rounded-2xl p-6 text-center animate-pulse">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mx-auto mb-3 animate-pulse-glow">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-text font-bold">AI is reading your timetable...</p>
-              <p className="text-xs text-text-muted mt-1">
-                This usually takes 5–10 seconds
-              </p>
-            </div>
+            <FuturisticLoader variant="section" title="AI is reading your timetable..." icon="✨" />
           )}
         </div>
       )}

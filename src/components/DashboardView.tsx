@@ -1,10 +1,10 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
-import { DashboardSkeleton } from "@/components/Skeleton";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
   Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download
@@ -198,7 +198,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   });
 
   if (loading) {
-    return <DashboardSkeleton />;
+    return <FuturisticLoader variant="section" title="Loading your dashboard" icon="📊" />;
   }
 
   return (
@@ -599,11 +599,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             {/* Body — scrollable */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {loadingImportable ? (
-                <div className="space-y-3 animate-pulse">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 rounded-xl bg-white/5" />
-                  ))}
-                </div>
+                <FuturisticLoader variant="inline" title="Loading subjects" icon="📚" />
               ) : (
                 <>
                   {/* Orphan subjects */}

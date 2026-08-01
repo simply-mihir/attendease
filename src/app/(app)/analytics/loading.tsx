@@ -1,5 +1,5 @@
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
-export default function Loading() {
+export default function appAnalyticsLoadingtsxLoading() {
   return <FuturisticLoader title="Crunching numbers" icon="📈" variant="full" />;
 }

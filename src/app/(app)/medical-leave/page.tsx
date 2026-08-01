@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
@@ -78,16 +79,7 @@ export default function MedicalLeavePage() {
   const isValid = startDate && endDate && reason.trim().length > 0 && (allSubjects || selectedSubjects.size > 0);
 
   if (loading) {
-    return (
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-        <div className="h-8 w-48 rounded-xl bg-white/10 animate-pulse" />
-        <div className="glass rounded-2xl p-6 space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading medical leave" icon="🏥" />;
   }
 
   return (

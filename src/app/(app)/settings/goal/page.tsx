@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
@@ -43,12 +44,7 @@ export default function GoalSettingsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-        <div className="h-8 w-48 rounded-xl bg-white/10 animate-pulse" />
-        <div className="glass rounded-2xl p-6 h-48 animate-pulse" />
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading goal" icon="🎯" />;
   }
 
   return (

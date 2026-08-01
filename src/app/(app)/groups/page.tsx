@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import {
@@ -127,17 +128,7 @@ export default function GroupsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          <div className="w-40 h-8 rounded-lg bg-white/10 animate-pulse" />
-        </div>
-        {[1, 2].map((i) => (
-          <div key={i} className="glass rounded-2xl p-6 h-48 animate-pulse" />
-        ))}
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading groups" icon="👥" />;
   }
 
   return (

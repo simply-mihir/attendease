@@ -1,5 +1,5 @@
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
-export default function Loading() {
+export default function appSettingsLoadingtsxLoading() {
   return <FuturisticLoader title="Loading settings" icon="⚙️" variant="full" />;
 }

@@ -1,5 +1,5 @@
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
-export default function Loading() {
-  return <FuturisticLoader title="Running simulation" icon="🎮" variant="full" />;
+export default function appSimulatorLoadingtsxLoading() {
+  return <FuturisticLoader title="Loading simulator" icon="🧪" variant="full" />;
 }

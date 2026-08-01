@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import dynamic from "next/dynamic";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert } from "lucide-react";
@@ -11,18 +12,7 @@ const AnalyticsCharts = dynamic(
   () => import("@/components/AnalyticsCharts"),
   {
     ssr: false,
-    loading: () => (
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass rounded-2xl p-5 h-[380px] animate-pulse">
-          <div className="h-6 w-48 bg-white/10 rounded-lg mb-6" />
-          <div className="h-64 w-full bg-white/5 rounded-xl" />
-        </div>
-        <div className="glass rounded-2xl p-5 h-[380px] animate-pulse">
-          <div className="h-6 w-40 bg-white/10 rounded-lg mb-6" />
-          <div className="h-48 w-48 mx-auto rounded-full bg-white/5 mt-4" />
-        </div>
-      </div>
-    ),
+    loading: () => <FuturisticLoader variant="section" title="Loading charts..." icon="📊" />,
   }
 );
 
@@ -38,40 +28,7 @@ export default function AnalyticsPage() {
   const loading = dashLoading || heatLoading;
 
   if (loading || !dashboard) {
-    return (
-      <div className="space-y-6 animate-fade-in">
-        <h1 className="text-2xl font-bold text-gradient">Analytics</h1>
-
-        {/* Overview cards skeleton */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="glass rounded-2xl p-4 text-center">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mx-auto mb-2 animate-pulse" />
-              <div className="h-8 w-16 mx-auto bg-white/10 rounded-lg animate-pulse mb-1" />
-              <div className="h-3 w-12 mx-auto bg-white/5 rounded-lg animate-pulse" />
-            </div>
-          ))}
-        </div>
-
-        {/* Charts row skeleton */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 glass rounded-2xl p-5 h-[380px] animate-pulse">
-            <div className="h-6 w-48 bg-white/10 rounded-lg mb-6" />
-            <div className="h-64 w-full bg-white/5 rounded-xl" />
-          </div>
-          <div className="glass rounded-2xl p-5 h-[380px] animate-pulse">
-            <div className="h-6 w-40 bg-white/10 rounded-lg mb-6" />
-            <div className="h-48 w-48 mx-auto rounded-full bg-white/5 mt-4" />
-          </div>
-        </div>
-
-        {/* Heatmap skeleton */}
-        <div className="glass rounded-2xl p-5 h-[200px] animate-pulse">
-          <div className="h-6 w-48 bg-white/10 rounded-lg mb-6" />
-          <div className="h-32 w-full bg-white/5 rounded-xl" />
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Crunching numbers" icon="📈" />;
   }
 
   const barData = dashboard.subjectsSummary.map((s: any) => ({

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/hooks/useApi";
@@ -87,48 +88,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const subject = data?.subject;
 
   if (loading || !subject) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-4 h-4 rounded bg-white/10 animate-pulse" />
-          <div className="w-24 h-4 rounded bg-white/10 animate-pulse" />
-        </div>
-        <div className="flex items-center justify-between bg-glass p-6 rounded-3xl">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 animate-pulse" />
-            <div className="space-y-2">
-              <div className="h-8 w-48 rounded bg-white/10 animate-pulse" />
-              <div className="h-4 w-24 rounded bg-white/5 animate-pulse" />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-            <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="glass p-5 rounded-2xl h-24 animate-pulse">
-              <div className="h-4 w-16 bg-white/10 rounded mb-3" />
-              <div className="h-8 w-12 bg-white/5 rounded" />
-            </div>
-          ))}
-        </div>
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 glass p-6 rounded-3xl h-64 animate-pulse">
-            <div className="h-6 w-32 bg-white/10 rounded mb-4" />
-            <div className="h-4 w-full bg-white/5 rounded mb-2" />
-            <div className="h-4 w-3/4 bg-white/5 rounded mb-2" />
-            <div className="h-4 w-1/2 bg-white/5 rounded" />
-          </div>
-          <div className="glass p-6 rounded-3xl h-64 animate-pulse">
-            <div className="h-6 w-32 bg-white/10 rounded mb-4" />
-            <div className="h-10 w-full bg-white/5 rounded mb-3" />
-            <div className="h-10 w-full bg-white/5 rounded" />
-          </div>
-        </div>
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading subject" icon="📚" />;
   }
 
   const stats = calculateAttendance({

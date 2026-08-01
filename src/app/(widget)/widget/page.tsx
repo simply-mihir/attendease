@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
@@ -117,13 +118,7 @@ export default function WidgetPage() {
   }
 
   if (loading) {
-    return (
-      <div className="space-y-3 animate-fade-in">
-        <div className="glass rounded-2xl p-4 h-20 animate-pulse" />
-        <div className="glass rounded-2xl p-4 h-32 animate-pulse" />
-        <div className="glass rounded-2xl p-3 h-24 animate-pulse" />
-      </div>
-    );
+    return <FuturisticLoader variant="section" title="Loading widget..." icon="📱" />;
   }
 
   const nextClass = getNextClass();
