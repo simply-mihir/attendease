@@ -1,5 +1,5 @@
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
 export default function Loading() {
-  return <FuturisticLoader title="Running simulation" icon="🎮" variant="full" />;
+  return <FuturisticLoader title="Loading semesters" icon="🎓" variant="full" />;
 }

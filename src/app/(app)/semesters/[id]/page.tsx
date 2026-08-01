@@ -4,6 +4,7 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { apiFetch } from "@/hooks/useApi";
 import { DashboardView } from "@/components/DashboardView";
 import { ArrowLeft, Calendar, FileText, Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import clsx from "clsx";
@@ -70,8 +71,8 @@ export default function SemesterDetailPage() {
     invalidate(`/semesters/${id}`);
   };
 
-  if (isLoading) {
-    return <div className="text-center py-20"><Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-500" /></div>;
+  if (!semester && isLoading) {
+    return <FuturisticLoader variant="section" title="Loading semester details" icon="🎓" />;
   }
 
   if (!semester) {

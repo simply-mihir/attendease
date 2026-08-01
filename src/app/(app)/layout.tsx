@@ -18,7 +18,7 @@ import { apiFetch } from "@/hooks/useApi";
 
 import { SWRPrefetcher } from "@/components/SWRPrefetcher";
 import { ReminderNotifier } from "@/components/ReminderNotifier";
-import FuturisticLoading from "@/components/FuturisticLoading";
+import { FuturisticLoader } from "@/components/FuturisticLoader";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
@@ -53,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (status === "loading" || !session?.user) {
-    return <FuturisticLoading />;
+    return <FuturisticLoader title="Loading..." icon="🎓" variant="full" />;
   }
 
   const user = session.user;
