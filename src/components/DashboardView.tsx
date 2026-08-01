@@ -202,46 +202,41 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   }
 
   return (
-    <PageTransition direction="up" staggerChildren={false} className="space-y-6 pb-8">
+    <PageTransition direction="up" staggerChildren={false} className="space-y-6">
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
-            {/* Greeting — FIRST element */}
-      <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl font-bold text-white">
-          Hello, <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">{displayName}</span> 👋
-        </h1>
-        <p className="mt-1 text-sm text-gray-400">
-          {dashboard?.semesterName 
-            ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
-            : "Here is your attendance overview. Let's make every class count!"} 
-          <span className="mx-2 opacity-50">·</span>
-          {today?.date}
-        </p>
+            {/* Main Degree Program Badge */}
+      <div className="flex mb-4">
+        <button className="flex items-center gap-2 rounded-full border border-white/10 bg-surface-2 px-3 py-1.5 text-xs text-gray-300 hover:bg-surface-3 transition">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 text-purple-400">
+            🎓
+          </div>
+          Main Degree Program
+          <ChevronDown className="h-3 w-3 text-gray-500" />
+        </button>
       </div>
 
-      {/* Semester Banner */}
-      <div className="relative mb-6 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 overflow-hidden" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10">
-            <span className="text-lg">📚</span>
-          </div>
-          <div>
-            <h2 className="font-semibold text-white">{dashboard?.semesterName || "All Semesters"}</h2>
-            <p className="text-sm text-gray-400">{today?.dayName}, {today?.date}</p>
-          </div>
+      {/* Header Row */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-indigo-400">
+            {dashboard?.semesterName || "Sem 5"}
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">
+            {today?.dayName}, {today?.date}
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-all"
+              className="flex items-center gap-2 rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300 transition-all"
             >
-              <Download className="w-4 h-4" /> Import
+              <Download className="w-4 h-4" /> IMPORT
             </button>
           )}
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all active:scale-95">
-            <Plus className="w-4 h-4" /> Add Subject
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-full bg-pink-500 px-4 py-2 text-sm font-semibold text-white hover:bg-pink-400 transition-all active:scale-95">
+            <Plus className="w-4 h-4" /> ADD SUBJECT
           </Link>
         </div>
       </div>
@@ -361,40 +356,35 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
             {/* Stats Row */}
       {dashboard && (
-        <StaggerGrid
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
-          delay={100}
-          staggerDelay={80}
-          animation="card3DEnter"
-        >
+        <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
           <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
-            icon="📈" bgClass="bg-emerald-500/10 text-emerald-400 text-lg" glowClass="via-emerald-500/30" />
+            icon={<TrendingUp className="w-4 h-4" />} iconBg="bg-emerald-500" iconColor="text-white" />
           <StatCard label="Subjects" value={<AnimatedCounter value={totalSubjects} />}
-            icon="📖" bgClass="bg-blue-500/10 text-blue-400 text-lg" glowClass="via-blue-500/30" />
-          <StatCard label="Streak" value={<span className="flex items-center gap-1"><AnimatedCounter value={currentStreak} /> <span className="text-lg">🔥</span></span>}
-            icon="🔥" bgClass="bg-amber-500/10 text-amber-400 text-lg" glowClass="via-amber-500/30" />
-          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<span className={dangerCount > 0 ? "text-red-400" : "text-white"}><AnimatedCounter value={dangerCount} /></span>}
-            icon={dangerCount > 0 ? "⚠️" : "✅"} bgClass={dangerCount > 0 ? "bg-red-500/10 text-red-400 text-lg" : "bg-emerald-500/10 text-emerald-400 text-lg"} glowClass={dangerCount > 0 ? "via-red-500/30" : "via-emerald-500/30"} />
+            icon={<BookOpen className="w-4 h-4" />} iconBg="bg-blue-500" iconColor="text-white" />
+          <StatCard label="Streak" value={<span className="flex items-center gap-2"><AnimatedCounter value={currentStreak} /> <span className="text-sm font-normal text-orange-500 flex items-center gap-1">🔥 <AnimatedCounter value={currentStreak} /></span></span>}
+            icon={<Flame className="w-4 h-4" />} iconBg="bg-orange-500" iconColor="text-white" />
+          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
+            icon={dangerCount > 0 ? <AlertTriangle className="w-4 h-4" /> : <Zap className="w-4 h-4" />} iconBg="bg-teal-400" iconColor="text-white" />
         </StaggerGrid>
       )}
 
-      {/* Goal Mode Card */}
+            {/* Goal Mode Card */}
       {isCurrent && goalPlan && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all">
+            <div className="rounded-xl border border-white/10 bg-[#1e1e2d] overflow-hidden transition-all">
               <button
                 onClick={() => setGoalExpanded(!goalExpanded)}
-                className="w-full flex items-center justify-between p-4 hover:bg-white/[0.04] transition"
+                className="w-full flex items-center justify-between p-4 hover:bg-[#252536] transition"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <Target className="w-4 h-4 text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+                    <Target className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-bold text-white text-sm">Today&apos;s Goal Plan</h3>
-                    <p className="text-xs text-gray-400">
-                      Attend {goalPlan.summary.mustAttend} of {goalPlan.summary.total} to stay on track for {goalPlan.goalPct}%
+                    <h3 className="font-semibold text-white">Today's Goal Plan</h3>
+                    <p className="text-sm text-gray-400">
+                      Attend {goalPlan.summary.mustAttend} of {goalPlan.summary.total} to stay on track
                     </p>
                   </div>
                 </div>
@@ -443,20 +433,17 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               )}
             </div>
           ) : !goalPlan.goalEnabled ? (
-            <Link href="/settings/goal" className="group relative rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/5 to-violet-500/5 backdrop-blur-xl p-5 transition-all duration-300 hover:from-purple-500/10 hover:to-violet-500/10 hover:border-purple-500/20 block overflow-hidden">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10">
-                    <Target className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">Set Your Attendance Goal</h3>
-                    <p className="text-sm text-gray-400">Get a daily action plan showing which classes to attend</p>
-                  </div>
+            <Link href="/settings/goal" className="flex items-center justify-between rounded-xl border border-white/10 bg-[#1e1e2d] p-4 hover:bg-[#252536] transition cursor-pointer">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500">
+                  <Target className="w-5 h-5 text-white" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-purple-400 transition-colors" />
+                <div>
+                  <h3 className="font-semibold text-white">Set Your Attendance Goal</h3>
+                  <p className="text-sm text-gray-400">Get a daily action plan showing which classes to attend</p>
+                </div>
               </div>
+              <ArrowRight className="w-5 h-5 text-gray-500" />
             </Link>
           ) : null}
         </div>
@@ -476,13 +463,10 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         </div>
       )}
 
-      {/* Subject Cards */}
+            {/* Subject Cards */}
       {dashboard && subjectsList.length > 0 && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">All Subjects</h2>
-            <span className="text-sm text-gray-500">{subjectsList.length} courses</span>
-          </div>
+          <h2 className="text-lg font-semibold text-white mb-4">All Subjects</h2>
           <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
               const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
@@ -491,69 +475,44 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                                             (pct >= min ? "Met requirement" : "Failed requirement");
               
               const accentColors = [
-                "from-purple-500 to-violet-600",
-                "from-blue-500 to-indigo-600",
-                "from-emerald-500 to-green-600",
-                "from-amber-500 to-orange-600",
-                "from-pink-500 to-rose-600",
-                "from-cyan-500 to-teal-600",
+                "bg-blue-500",
+                "bg-cyan-500",
+                "bg-pink-500",
+                "bg-purple-500",
               ];
-              const accentClass = s.colorHex ? `from-[${s.colorHex}] to-[${s.colorHex}]` : accentColors[i % accentColors.length];
+              const barColor = s.colorHex ? `bg-[${s.colorHex}]` : accentColors[i % accentColors.length];
 
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer overflow-hidden block">
-                {/* Top gradient line */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+                className="relative rounded-xl border border-white/10 bg-[#1e1e2d] p-5 block hover:bg-[#252536] transition overflow-hidden">
                 
-                {/* Subject color indicator — left border accent */}
-                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-gradient-to-b ${accentClass}`} style={s.colorHex ? { backgroundColor: s.colorHex, backgroundImage: 'none' } : {}} />
+                {/* Left thick accent bar */}
+                <div className={`absolute left-0 top-4 bottom-4 w-1.5 rounded-r-md ${barColor}`} style={s.colorHex ? { backgroundColor: s.colorHex } : {}} />
                 
-                {/* Content */}
                 <div className="pl-4">
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="min-w-0 pr-4">
-                      <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
-                        {s.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{s.code}</p>
+                      <h3 className="font-semibold text-white truncate">{s.name}</h3>
+                      <p className="text-xs text-gray-400">{s.code}</p>
                     </div>
-                    <span className="shrink-0 text-gray-600 group-hover:text-purple-400 transition-colors">→</span>
+                    <ArrowRight className="w-4 h-4 text-gray-500" />
                   </div>
                   
-                  {/* Progress bar */}
-                  <div className="mt-3 mb-2">
-                    <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-700 ${
-                          pct >= 75
-                            ? "bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-400"
-                            : pct >= 60
-                            ? "bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-400"
-                            : "bg-gradient-to-r from-red-600 via-red-500 to-rose-400"
-                        }`}
-                        style={{ width: `${Math.min(100, pct)}%` }}
-                      />
-                    </div>
+                  {/* Solid thick progress bar */}
+                  <div className="h-1.5 w-full bg-white/10 rounded-full mb-3">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${pct >= min ? "bg-emerald-500" : pct >= min - 5 ? "bg-amber-500" : "bg-red-500"}`}
+                      style={{ width: `${Math.min(100, pct)}%` }}
+                    />
                   </div>
 
-                  {/* Status + stats row */}
-                  <div className="flex items-center justify-between mt-2">
-                    <span className={`text-sm font-semibold ${
-                      pct >= 75 ? "text-emerald-400" :
-                      pct >= 60 ? "text-amber-400" :
-                      "text-red-400"
-                    }`}>
+                  {/* Stats Row */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`${pct >= min ? "text-emerald-500" : pct >= min - 5 ? "text-amber-500" : "text-red-500"} font-semibold`}>
                       {pct}%
                     </span>
-                    <span className={`text-xs font-medium ${
-                      statusLabel === "On track" || statusLabel === "Met requirement" ? "text-emerald-400/70" :
-                      statusLabel === "At risk" ? "text-amber-400/70" :
-                      "text-red-400/70"
-                    }`}>
-                      {statusLabel}
-                    </span>
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <span className="text-gray-400">{statusLabel}</span>
+                    <span className="text-orange-500 flex items-center gap-1">
                       🔥 {s.totalPresent ?? 0}
                     </span>
                   </div>
@@ -683,17 +642,16 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, bgClass, glowClass }: { label: string; value: React.ReactNode; icon: React.ReactNode; bgClass: string; glowClass?: string }) {
+function StatCard({ label, value, icon, iconBg, iconColor }: { label: string; value: React.ReactNode; icon: React.ReactNode; iconBg: string; iconColor: string }) {
   return (
-    <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden">
-      <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${glowClass || "via-purple-500/30"} to-transparent`} />
-      <div className="flex items-center justify-between mb-3">
+    <div className="rounded-xl border border-white/10 bg-[#1e1e2d] p-5 flex flex-col justify-between h-32">
+      <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">{label}</p>
-        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${bgClass}`}>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}>
           {icon}
         </div>
       </div>
-      <p className="text-3xl font-bold text-white">{value}</p>
+      <p className="text-3xl font-bold text-white mt-auto">{value}</p>
     </div>
   );
 }
