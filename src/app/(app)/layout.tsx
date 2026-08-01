@@ -18,6 +18,7 @@ import { apiFetch } from "@/hooks/useApi";
 
 import { SWRPrefetcher } from "@/components/SWRPrefetcher";
 import { ReminderNotifier } from "@/components/ReminderNotifier";
+import FuturisticLoading from "@/components/FuturisticLoading";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
@@ -52,16 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (status === "loading" || !session?.user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-mesh">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 animate-pulse-glow">
-            <GraduationCap className="w-9 h-9 text-white" />
-          </div>
-          <p className="text-text-muted text-sm">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
+    return <FuturisticLoading />;
   }
 
   const user = session.user;
