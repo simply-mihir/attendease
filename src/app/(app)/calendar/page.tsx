@@ -14,10 +14,28 @@ export default function CalendarPage() {
   const [view, setView] = useState<"week" | "month">("week");
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const from = new Date(year, month, 1).toISOString().slice(0, 10);
-  const to = new Date(year, month + 1, 0).toISOString().slice(0, 10);
+  // Calculate week dates
+  const weekStart = new Date(currentDate);
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  const weekDates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
+  // Calculate month dates
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+  // Dynamic fetch bounds based on view
+  // Add timezone buffer to from/to by grabbing the local YYYY-MM-DD
+  const formatDateLocal = (d: Date) => {
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 10);
+  };
+
+  const from = view === "week" ? formatDateLocal(weekDates[0]) : formatDateLocal(monthStart);
+  const to = view === "week" ? formatDateLocal(weekDates[6]) : formatDateLocal(monthEnd);
   
   const { data: schedData, isLoading: schedLoading } = useSWRFetch<{ schedules: any[] }>("/schedules");
   const { data: recData, isLoading: recLoading } = useSWRFetch<{ records: any[] }>(`/attendance?from=${from}&to=${to}`);
@@ -52,18 +70,6 @@ export default function CalendarPage() {
     setCurrentDate(d);
   }
 
-  // Get week dates
-  const weekStart = new Date(currentDate);
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-  const weekDates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
-
-  // Get month dates
-  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
   const monthStartDay = monthStart.getDay();
   const monthDays: (Date | null)[] = [];
   for (let i = 0; i < monthStartDay; i++) monthDays.push(null);
