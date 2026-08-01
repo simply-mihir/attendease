@@ -84,7 +84,34 @@ export async function GET(req: NextRequest) {
                 .map((sc) => ({ subject: sub.name, code: sub.code, startTime: sc.startTime, endTime: sc.endTime, room: sc.room }))
             ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            if (todaySch.length > 0) {
+            if (todaySch.length === 0) {
+              const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
+              const title = "☀️ No Classes Today!";
+              const body = `It's ${dayName} — no classes scheduled. Enjoy your day off!`;
+              const html = `
+                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
+                  <h2 style="color: #7C3AED; margin: 0 0 16px;">☀️ No Classes Today!</h2>
+                  <p>Hey ${user.name || "there"}! It's <strong>${dayName}</strong> — you have no classes scheduled today.</p>
+                  <p style="color: #9CA3AF;">Enjoy your day off! Regular classes resume on your next scheduled day.</p>
+                </div>
+              `;
+              const text = `☀️ *No Classes Today!*\n\nHey ${user.name || "there"}! It's ${dayName} — no classes scheduled.\n\nEnjoy your day off! 🎉`;
+
+              if (s.telegramEnabled && s.telegramDailyBrief && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, text), `tg-brief-${user.id}`, results);
+              if (s.emailEnabled && s.emailDailyBrief && user.email)
+                await retry(() => sendEmail(user.email!, "☀️ No Classes Today — AttendEase", html), `em-brief-${user.id}`, results);
+              if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title,
+                  body,
+                  tag: "daily-brief",
+                  data: { url: "/dashboard" },
+                });
+
+              await markSent(user.id, bKey, "daily-brief");
+              results.dailyBriefs++;
+            } else {
               const txt = formatDailyBrief(todaySch, uNow.dateString);
               const html = formatDailyBriefHTML(todaySch, uNow.dateString);
 
@@ -246,7 +273,34 @@ export async function GET(req: NextRequest) {
                 }))
             ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            if (todayClasses.length > 0) {
+            if (todayClasses.length === 0) {
+              const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
+              const title = "📊 Daily Report — Day Off";
+              const body = `No classes were scheduled today (${dayName}). No attendance to report!`;
+              const html = `
+                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
+                  <h2 style="color: #7C3AED; margin: 0 0 16px;">📊 Daily Report</h2>
+                  <p>No classes were scheduled today (<strong>${dayName}</strong>).</p>
+                  <p style="color: #9CA3AF;">No attendance to report — see you on the next class day! 📚</p>
+                </div>
+              `;
+              const text = `📊 *Daily Report — Day Off*\n\nNo classes were scheduled today (${dayName}).\nNo attendance to report — see you on the next class day! 📚`;
+
+              if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
+                await retry(() => sendTelegram(user.telegramChatId!, text), `tg-report-${user.id}`, results);
+              if (s.emailEnabled && s.emailDailyReport && user.email)
+                await retry(() => sendEmail(user.email!, "📊 Daily Report — Day Off — AttendEase", html), `em-report-${user.id}`, results);
+              if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
+                await pushAll(user.pushSubscriptions, {
+                  title,
+                  body,
+                  tag: "daily-report",
+                  data: { url: "/dashboard" },
+                });
+
+              await markSent(user.id, rpKey, "daily-report");
+              results.dailyReports++;
+            } else {
               const present = todayClasses.filter((c) => c.status === "PRESENT" || c.status === "LATE").length;
               const absent = todayClasses.filter((c) => c.status === "ABSENT").length;
               const unmarked = todayClasses.filter((c) => c.status === "UNMARKED").length;
