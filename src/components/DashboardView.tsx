@@ -41,6 +41,11 @@ interface DashboardData {
   userName?: string;
   // Fallbacks for older data structure compatibility (optional)
   overallPct?: number; safeSubjects?: number; warningSubjects?: number; currentStreak?: number; longestStreak?: number; subjectsSummary?: SubjectSummary[]; totalSubjects?: number;
+  activeSemester?: {
+    id: string; name: string; startDate: string; endDate: string; isCurrent: boolean;
+    holidays: { id: string; name: string; date: string }[];
+    examPeriods: { id: string; name: string; startDate: string; endDate: string }[];
+  } | null;
 }
 
 interface GoalPlanData {
@@ -118,6 +123,19 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   const { data: session } = useSession();
   const displayName = dashboard?.userName || session?.user?.name || "Student";
 
+  // Check semester status
+  const activeSemester = dashboard?.activeSemester;
+  const todayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  
+  const semesterEnded = activeSemester && new Date(activeSemester.endDate) < todayStart;
+  const todayHoliday = activeSemester?.holidays?.find(h => {
+    const hDate = new Date(h.date);
+    return hDate.getFullYear() === todayStart.getFullYear() && hDate.getMonth() === todayStart.getMonth() && hDate.getDate() === todayStart.getDate();
+  });
+  const currentExam = activeSemester?.examPeriods?.find(ep => {
+    return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
+  });
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -152,6 +170,80 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      {/* Semester Banners */}
+      {!activeSemester && !dashLoading && (
+        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+              🎓
+            </div>
+            <div>
+              <h3 className="font-semibold text-purple-300">Welcome to AttendEase</h3>
+              <p className="text-sm text-gray-400">Set up your current semester to start tracking classes.</p>
+            </div>
+            <Link
+              href="/semesters/new"
+              className="ml-auto rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            >
+              Start Semester
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {semesterEnded && (
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+              📅
+            </div>
+            <div>
+              <h3 className="font-semibold text-amber-300">Semester Ended</h3>
+              <p className="text-sm text-gray-400">
+                {activeSemester.name} ended on {new Date(activeSemester.endDate).toLocaleDateString()}. 
+                Start a new semester to track attendance for new courses.
+              </p>
+            </div>
+            <Link
+              href="/semesters/new"
+              className="ml-auto rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            >
+              New Semester
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {currentExam && (
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+              📝
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-300">Exam Period</h3>
+              <p className="text-sm text-gray-400">
+                {currentExam.name} — classes cancelled until {new Date(currentExam.endDate).toLocaleDateString()}. Good luck!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {todayHoliday && (
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+              🎉
+            </div>
+            <div>
+              <h3 className="font-semibold text-emerald-300">{todayHoliday.name}</h3>
+              <p className="text-sm text-gray-400">Holiday today — no classes scheduled. Enjoy!</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Danger Alert */}
       {isCurrent && dangerSubjectsList.length > 0 && (

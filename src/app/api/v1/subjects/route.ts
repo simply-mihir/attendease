@@ -41,8 +41,16 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
 
+    const activeSemester = await prisma.semester.findFirst({
+      where: { userId: user.id, isCurrent: true },
+    });
+
     const subject = await prisma.subject.create({
-      data: { ...parsed.data, userId: user.id },
+      data: { 
+        ...parsed.data, 
+        userId: user.id,
+        semesterId: parsed.data.semesterId || activeSemester?.id || null
+      },
       include: { schedules: true },
     });
 

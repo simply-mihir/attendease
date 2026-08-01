@@ -54,6 +54,10 @@ export async function GET(req: NextRequest) {
           include: { schedules: true },
         },
         pushSubscriptions: true,
+        semesters: {
+          where: { isCurrent: true },
+          include: { holidays: true, examPeriods: true },
+        },
       },
     });
 
@@ -65,6 +69,26 @@ export async function GET(req: NextRequest) {
         const tz = user.timezone || "Asia/Kolkata";
         const uNow = getTimeInTimezone(now, tz);
         const todayKey = uNow.dateKey;
+
+        // ---- SEMESTER / HOLIDAY / EXAM PERIOD LOGIC ----
+        const activeSemester = user.semesters?.[0];
+        const todayStart = getTodayStartInTimezone(now, tz);
+        
+        // If no active semester or semester ended, skip ALL notifications
+        if (!activeSemester || new Date(activeSemester.endDate) < todayStart) {
+          continue;
+        }
+
+        const todayHoliday = activeSemester.holidays.find(h => {
+          const hDate = new Date(h.date);
+          return hDate.getTime() === todayStart.getTime();
+        });
+
+        const currentExam = activeSemester.examPeriods.find(ep => {
+          return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
+        });
+
+        const isSpecialDay = !!todayHoliday || !!currentExam;
 
         // ==========================================
         // 1. DAILY MORNING BRIEF
@@ -78,29 +102,44 @@ export async function GET(req: NextRequest) {
           if (await wasSent(user.id, bKey)) {
             results.skippedDuplicates++;
           } else {
-            const todaySch = user.subjects.flatMap((sub) =>
+            const todaySch = isSpecialDay ? [] : user.subjects.flatMap((sub) =>
               sub.schedules
                 .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
                 .map((sc) => ({ subject: sub.name, code: sub.code, startTime: sc.startTime, endTime: sc.endTime, room: sc.room }))
             ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            if (todaySch.length === 0) {
+            if (isSpecialDay || todaySch.length === 0) {
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
-              const title = "☀️ No Classes Today!";
-              const body = `It's ${dayName} — no classes scheduled. Enjoy your day off!`;
+              
+              let title = "☀️ No Classes Today!";
+              let body = `It's ${dayName} — no classes scheduled. Enjoy your day off!`;
+              let emoji = "☀️";
+              let msg = `Hey ${user.name || "there"}! It's <strong>${dayName}</strong> — you have no classes scheduled today. Enjoy your day off!`;
+
+              if (todayHoliday) {
+                title = `🎉 Holiday: ${todayHoliday.name}`;
+                body = `It's ${todayHoliday.name} today. No classes scheduled. Enjoy!`;
+                emoji = "🎉";
+                msg = `Happy <strong>${todayHoliday.name}</strong>! No classes today. Enjoy your holiday!`;
+              } else if (currentExam) {
+                title = `📝 Exam Period: ${currentExam.name}`;
+                body = `Good luck with your exams! Regular classes are cancelled.`;
+                emoji = "📝";
+                msg = `It's the <strong>${currentExam.name}</strong>. Regular classes are cancelled. Good luck with your exams!`;
+              }
+
               const html = `
                 <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-                  <h2 style="color: #7C3AED; margin: 0 0 16px;">☀️ No Classes Today!</h2>
-                  <p>Hey ${user.name || "there"}! It's <strong>${dayName}</strong> — you have no classes scheduled today.</p>
-                  <p style="color: #9CA3AF;">Enjoy your day off! Regular classes resume on your next scheduled day.</p>
+                  <h2 style="color: #7C3AED; margin: 0 0 16px;">${emoji} ${title.replace(`${emoji} `, "")}</h2>
+                  <p>${msg}</p>
                 </div>
               `;
-              const text = `☀️ *No Classes Today!*\n\nHey ${user.name || "there"}! It's ${dayName} — no classes scheduled.\n\nEnjoy your day off! 🎉`;
+              const text = `${emoji} *${title.replace(`${emoji} `, "")}*\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}`;
 
               if (s.telegramEnabled && s.telegramDailyBrief && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, text), `tg-brief-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyBrief && user.email)
-                await retry(() => sendEmail(user.email!, "☀️ No Classes Today — AttendEase", html), `em-brief-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, `${title} — AttendEase`, html), `em-brief-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title,
@@ -135,7 +174,7 @@ export async function GET(req: NextRequest) {
 
           // ---- DANGER ZONE ALERTS (sent with daily brief) ----
           const dKey = `danger:${todayKey}`;
-          if (!(await wasSent(user.id, dKey))) {
+          if (!isSpecialDay && !(await wasSent(user.id, dKey))) {
             const danger = user.subjects.filter((sub) => {
               if (sub.totalClassesHeld === 0) return false;
               return ((sub.totalPresent / sub.totalClassesHeld) * 100) < (sub.minAttendancePct || 75);
@@ -165,7 +204,7 @@ export async function GET(req: NextRequest) {
           }
 
           // ---- WEEKLY REPORT (Sunday at brief time) ----
-          if (uNow.dayOfWeek === 0) {
+          if (!isSpecialDay && uNow.dayOfWeek === 0) {
             const wKey = `weekly:${todayKey}`;
             if (!(await wasSent(user.id, wKey))) {
               const txt = formatWeeklyReport(user.subjects);
@@ -197,7 +236,8 @@ export async function GET(req: NextRequest) {
         // ==========================================
         const preMin = s.preClassMinutes ?? 15;
 
-        for (const subject of user.subjects) {
+        if (!isSpecialDay) {
+          for (const subject of user.subjects) {
           for (const schedule of subject.schedules) {
             if (schedule.dayOfWeek !== uNow.dayOfWeek) continue;
 
@@ -233,6 +273,7 @@ export async function GET(req: NextRequest) {
             }
           }
         }
+        }
 
         // ==========================================
         // 3. DAILY ATTENDANCE REPORT (end of day)
@@ -259,7 +300,7 @@ export async function GET(req: NextRequest) {
             });
 
             // Get today's scheduled classes
-            const todayClasses = user.subjects.flatMap((sub) =>
+            const todayClasses = isSpecialDay ? [] : user.subjects.flatMap((sub) =>
               sub.schedules
                 .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
                 .map((sc) => ({
@@ -273,18 +314,30 @@ export async function GET(req: NextRequest) {
                 }))
             ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            if (todayClasses.length === 0) {
+            if (isSpecialDay || todayClasses.length === 0) {
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
-              const title = "📊 Daily Report — Day Off";
-              const body = `No classes were scheduled today (${dayName}). No attendance to report!`;
+              let title = "📊 Daily Report — Day Off";
+              let body = `No classes were scheduled today (${dayName}). No attendance to report!`;
+              let msg = `No classes were scheduled today (<strong>${dayName}</strong>).`;
+              
+              if (todayHoliday) {
+                title = `🎉 Daily Report — ${todayHoliday.name}`;
+                body = `It was ${todayHoliday.name} today. No attendance to report!`;
+                msg = `It was <strong>${todayHoliday.name}</strong> today.`;
+              } else if (currentExam) {
+                title = `📝 Daily Report — Exam Period`;
+                body = `Exam period ongoing. No regular attendance to report!`;
+                msg = `It is currently the <strong>${currentExam.name}</strong>.`;
+              }
+
               const html = `
                 <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-                  <h2 style="color: #7C3AED; margin: 0 0 16px;">📊 Daily Report</h2>
-                  <p>No classes were scheduled today (<strong>${dayName}</strong>).</p>
+                  <h2 style="color: #7C3AED; margin: 0 0 16px;">${title}</h2>
+                  <p>${msg}</p>
                   <p style="color: #9CA3AF;">No attendance to report — see you on the next class day! 📚</p>
                 </div>
               `;
-              const text = `📊 *Daily Report — Day Off*\n\nNo classes were scheduled today (${dayName}).\nNo attendance to report — see you on the next class day! 📚`;
+              const text = `*${title}*\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}\nNo attendance to report — see you on the next class day! 📚`;
 
               if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, text), `tg-report-${user.id}`, results);

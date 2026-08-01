@@ -110,6 +110,8 @@ model Semester {
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   degreeProfile DegreeProfile? @relation(fields: [degreeProfileId], references: [id], onDelete: SetNull)
   subjects      Subject[]
+  holidays      Holiday[]
+  examPeriods   ExamPeriod[]
 
   @@index([userId])
   @@index([degreeProfileId])
@@ -378,4 +380,30 @@ model SentNotification {
   @@unique([userId, key])
   @@index([userId])
   @@index([sentAt])
+}
+
+model Holiday {
+  id         String   @id @default(cuid())
+  semesterId String
+  name       String
+  date       DateTime
+  createdAt  DateTime @default(now())
+
+  semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+
+  @@unique([semesterId, date])
+  @@index([semesterId])
+}
+
+model ExamPeriod {
+  id         String   @id @default(cuid())
+  semesterId String
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime @default(now())
+
+  semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+
+  @@index([semesterId])
 }

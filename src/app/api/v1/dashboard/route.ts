@@ -15,6 +15,11 @@ export async function GET() {
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
+  const activeSemester = await prisma.semester.findFirst({
+    where: { userId: user.id, isCurrent: true },
+    include: { holidays: true, examPeriods: true },
+  });
+
   // 5 parallel queries including overall streak
   const [dbUser, subjects, todayRecords, schedules, currentStreak] = await Promise.all([
     prisma.user.findUnique({
@@ -22,7 +27,11 @@ export async function GET() {
       select: { name: true },
     }),
     prisma.subject.findMany({
-      where: { userId: user.id, isArchived: false },
+      where: { 
+        userId: user.id, 
+        isArchived: false,
+        ...(activeSemester ? { semesterId: activeSemester.id } : {})
+      },
       select: {
         id: true,
         name: true,
@@ -133,5 +142,8 @@ export async function GET() {
       dangerCount: dangerSubjects.length,
     },
     dangerSubjects,
+    isCurrentSemester: activeSemester ? true : false,
+    semesterName: activeSemester?.name || null,
+    activeSemester,
   }, 15);
 }
