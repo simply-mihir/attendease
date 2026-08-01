@@ -20,7 +20,7 @@ export default function SemestersPage() {
   const { data: semesters, isLoading } = useSWRFetch<SemesterSummary[]>("/semesters");
 
   if (isLoading) {
-    return <FuturisticLoader variant="section" title="Loading semesters" icon="🎓" />;
+    return <FuturisticLoader variant="section" title="Loading semesters" Icon={GraduationCap} />;
   }
 
   return (

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { apiFetch } from "@/hooks/useApi";
 import { DashboardView } from "@/components/DashboardView";
-import { ArrowLeft, Calendar, FileText, Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Plus, Trash2, Loader2, AlertCircle , GraduationCap } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -73,7 +73,7 @@ export default function SemesterDetailPage() {
   };
 
   if (!semester && isLoading) {
-    return <FuturisticLoader variant="section" title="Loading semester details" icon="🎓" />;
+    return <FuturisticLoader variant="section" title="Loading semester details" Icon={GraduationCap} />;
   }
 
   if (!semester) {

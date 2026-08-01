@@ -15,7 +15,7 @@ export default function ExportPage() {
   const subjects = data?.subjects || [];
 
   if (pageLoading) {
-    return <FuturisticLoader variant="section" title="Loading export" icon="📥" />;
+    return <FuturisticLoader variant="section" title="Loading export" Icon={Download} />;
   }
 
   async function handleExport() {

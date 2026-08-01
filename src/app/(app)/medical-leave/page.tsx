@@ -6,7 +6,7 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
 import {
   ArrowLeft, HeartPulse, Calendar, CheckCircle2, AlertTriangle, Loader2,
-} from "lucide-react";
+  Hospital } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 
@@ -79,7 +79,7 @@ export default function MedicalLeavePage() {
   const isValid = startDate && endDate && reason.trim().length > 0 && (allSubjects || selectedSubjects.size > 0);
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading medical leave" icon="🏥" />;
+    return <FuturisticLoader variant="section" title="Loading medical leave" Icon={Hospital} />;
   }
 
   return (

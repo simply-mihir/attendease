@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
-import { Sliders, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { Sliders, ArrowRight, CheckCircle2, XCircle , TestTube } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
@@ -39,7 +39,7 @@ export default function SimulatorPage() {
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return <FuturisticLoader variant="section" title="Loading simulator" icon="🧪" />;
+    return <FuturisticLoader variant="section" title="Loading simulator" Icon={TestTube} />;
   }
 
   return (
@@ -152,7 +152,7 @@ export default function SimulatorPage() {
       )}
 
       {loading && (
-        <FuturisticLoader variant="inline" title="Calculating..." icon="🧪" />
+        <FuturisticLoader variant="inline" title="Calculating..." Icon={TestTube} />
       )}
     </PageTransition>
   );

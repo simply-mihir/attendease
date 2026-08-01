@@ -44,7 +44,7 @@ export default function GoalSettingsPage() {
   }
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading goal" icon="🎯" />;
+    return <FuturisticLoader variant="section" title="Loading goal" Icon={Target} />;
   }
 
   return (

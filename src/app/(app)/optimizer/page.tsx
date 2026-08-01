@@ -32,7 +32,7 @@ export default function OptimizerPage() {
   const initialLoad = loading && !result;
 
   if (initialLoad) {
-    return <FuturisticLoader variant="section" title="Loading optimizer" icon="⚡" />;
+    return <FuturisticLoader variant="section" title="Loading optimizer" Icon={Zap} />;
   }
 
   return (
@@ -224,7 +224,7 @@ export default function OptimizerPage() {
       )}
 
       {loading && !initialLoad && (
-        <FuturisticLoader variant="inline" title="Calculating optimal skip plan..." icon="⚡" />
+        <FuturisticLoader variant="inline" title="Calculating optimal skip plan..." Icon={Zap} />
       )}
     </PageTransition>
   );

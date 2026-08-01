@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Github, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, Github, Mail , GraduationCap } from "lucide-react";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
@@ -120,7 +120,7 @@ export default function LoginPage() {
             </div>
             <div className="absolute inset-2 rounded-full border border-violet-500/15" style={{ animation: "spinSlow 5s linear infinite reverse" }} />
             <div className="absolute inset-5 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-violet-600 shadow-xl shadow-purple-500/30" style={{ animation: "breathe 2.5s ease-in-out infinite" }}>
-              <span className="text-2xl">🎓</span>
+              <GraduationCap className="h-7 w-7 text-white" />
             </div>
           </div>
 

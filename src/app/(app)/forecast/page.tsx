@@ -1,7 +1,7 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
-import { TrendingUp, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { TrendingUp, CheckCircle2, XCircle, AlertTriangle , Sparkles } from "lucide-react";
 import clsx from "clsx";
 import {
   LazyComposedChart as ComposedChart,
@@ -49,7 +49,7 @@ export default function ForecastPage() {
   const { data, isLoading: loading } = useSWRFetch<ForecastResponse>("/analytics/forecast");
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading forecast" icon="🔮" />;
+    return <FuturisticLoader variant="section" title="Loading forecast" Icon={Sparkles} />;
   }
 
   if (!data) return null;

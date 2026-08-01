@@ -76,7 +76,7 @@ export default function SubjectsPage() {
       )}
 
       {loading ? (
-        <FuturisticLoader variant="section" title="Loading subjects" icon="📚" />
+        <FuturisticLoader variant="section" title="Loading subjects" Icon={BookOpen} />
       ) : subjects.length === 0 ? (
         <div className="text-center py-16 glass rounded-2xl" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 150ms forwards" }}>
           <BookOpen className="w-12 h-12 text-text-muted mx-auto mb-3" />

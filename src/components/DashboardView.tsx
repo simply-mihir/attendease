@@ -7,8 +7,8 @@ import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download
-} from "lucide-react";
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap
+, BarChart3 } from "lucide-react";
 import clsx from "clsx";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
 import { MarkingProgressBar } from "@/components/MarkingProgressBar";
@@ -198,132 +198,53 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   });
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading your dashboard" icon="📊" />;
+    return <FuturisticLoader variant="section" title="Loading your dashboard" Icon={BarChart3} />;
   }
 
   return (
     <PageTransition direction="up" staggerChildren={false} className="space-y-6">
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
-            {/* Main Degree Program Badge */}
-      <div className="flex mb-4">
-        <button className="flex items-center gap-2 rounded-full border border-white/10 bg-surface-2 px-3 py-1.5 text-xs text-gray-300 hover:bg-surface-3 transition">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 text-purple-400">
-            🎓
-          </div>
-          Main Degree Program
-          <ChevronDown className="h-3 w-3 text-gray-500" />
-        </button>
+                  {/* Greeting */}
+      <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+        <h1 className="text-2xl font-bold text-white">
+          Hello, <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">{displayName}</span>
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          {dashboard?.semesterName 
+            ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
+            : "Here is your attendance overview. Let's make every class count!"} 
+          <span className="mx-2 opacity-50">·</span>
+          {today?.date}
+        </p>
       </div>
 
-      {/* Header Row */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-indigo-400">
-            {dashboard?.semesterName || "Sem 5"}
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            {today?.dayName}, {today?.date}
-          </p>
-        </div>
+      {/* Semester Banner */}
+      <div className="relative mb-6 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 overflow-hidden" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
         <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+            <GraduationCap className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-white">{dashboard?.semesterName || "All Semesters"}</h2>
+            <p className="text-sm text-gray-400">{today?.dayName}, {today?.date}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="flex items-center gap-2 rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-black hover:bg-cyan-300 transition-all"
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-all"
             >
-              <Download className="w-4 h-4" /> IMPORT
+              <ArrowDown className="h-4 w-4" /> Import
             </button>
           )}
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-full bg-pink-500 px-4 py-2 text-sm font-semibold text-white hover:bg-pink-400 transition-all active:scale-95">
-            <Plus className="w-4 h-4" /> ADD SUBJECT
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all active:scale-95">
+            <Plus className="h-4 w-4" /> Add Subject
           </Link>
         </div>
       </div>
-
-
-
-      {/* Orphan Subjects Banner */}
-      {((dashboard?.orphanCount ?? 0) > 0) && isCurrent && (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-4 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 text-sm">
-                ⚠️
-              </div>
-              <p className="text-sm text-gray-300">
-                You have <strong className="text-amber-300">{dashboard!.orphanCount} subject{dashboard!.orphanCount! > 1 ? "s" : ""}</strong> not assigned to any semester.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowImportSubjects(true)}
-              className="rounded-lg bg-white/5 px-3 py-1.5 text-sm text-gray-300 hover:bg-white/10 transition-colors"
-            >
-              Assign
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Semester Banners */}
-      {!activeSemester && !dashLoading && (
-        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
-              🎓
-            </div>
-            <div>
-              <h3 className="font-semibold text-purple-300">Welcome to AttendEase</h3>
-              <p className="text-sm text-gray-400">Set up your current semester to start tracking classes.</p>
-            </div>
-            <Link
-              href="/semesters/new"
-              className="ml-auto rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-            >
-              Start Semester
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {semesterEnded && (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
-              📅
-            </div>
-            <div>
-              <h3 className="font-semibold text-amber-300">Semester Ended</h3>
-              <p className="text-sm text-gray-400">
-                {activeSemester.name} ended on {new Date(activeSemester.endDate).toLocaleDateString()}. 
-                Start a new semester to track attendance for new courses.
-              </p>
-            </div>
-            <Link
-              href="/semesters/new"
-              className="ml-auto rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-            >
-              New Semester
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {currentExam && (
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
-              📝
-            </div>
-            <div>
-              <h3 className="font-semibold text-blue-300">Exam Period</h3>
-              <p className="text-sm text-gray-400">
-                {currentExam.name} — classes cancelled until {new Date(currentExam.endDate).toLocaleDateString()}. Good luck!
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {todayHoliday && (
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
@@ -354,32 +275,94 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         </div>
       )}
 
-            {/* Stats Row */}
+                  {/* Stats Row */}
       {dashboard && (
         <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
-          <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
-            icon={<TrendingUp className="w-4 h-4" />} iconBg="bg-emerald-500" iconColor="text-white" />
-          <StatCard label="Subjects" value={<AnimatedCounter value={totalSubjects} />}
-            icon={<BookOpen className="w-4 h-4" />} iconBg="bg-blue-500" iconColor="text-white" />
-          <StatCard label="Streak" value={<span className="flex items-center gap-2"><AnimatedCounter value={currentStreak} /> <span className="text-sm font-normal text-orange-500 flex items-center gap-1">🔥 <AnimatedCounter value={currentStreak} /></span></span>}
-            icon={<Flame className="w-4 h-4" />} iconBg="bg-orange-500" iconColor="text-white" />
-          <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
-            icon={dangerCount > 0 ? <AlertTriangle className="w-4 h-4" /> : <Zap className="w-4 h-4" />} iconBg="bg-teal-400" iconColor="text-white" />
+          {/* Overall */}
+          <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-400">Overall</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-white"><AnimatedCounter value={overallPct} suffix="%" /></p>
+            </div>
+          </div>
+
+          {/* Subjects */}
+          <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-blue-500/20 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-400">Subjects</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition-colors">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-white"><AnimatedCounter value={totalSubjects} /></p>
+            </div>
+          </div>
+
+          {/* Streak */}
+          <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-amber-500/20 hover:shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {currentStreak > 0 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-amber-500/10 blur-2xl" style={{ animation: "streakGlow 2s ease-in-out infinite" }} />
+            )}
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-400">Streak</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+                  <Flame className="h-5 w-5" style={currentStreak > 0 ? { animation: "streakFlicker 1.5s ease-in-out infinite" } : undefined} />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-3xl font-bold text-white"><AnimatedCounter value={currentStreak} /></p>
+                {currentStreak > 0 && (
+                  <div className="relative h-8 w-6">
+                    <Flame className="h-5 w-5 text-amber-400 absolute bottom-0 left-0" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+                    <Flame className="h-3 w-3 text-orange-400/60 absolute bottom-1 left-2" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* In Danger */}
+          <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-red-500/20 hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1 overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-red-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-gray-400">{isCurrent ? "In Danger" : "Failed"}</p>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${dangerCount > 0 ? "bg-red-500/10 text-red-400 group-hover:bg-red-500/20" : "bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20"}`}>
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+              </div>
+              <p className={`text-3xl font-bold ${dangerCount > 0 ? "text-red-400" : "text-white"}`}><AnimatedCounter value={dangerCount} /></p>
+            </div>
+          </div>
         </StaggerGrid>
       )}
 
-            {/* Goal Mode Card */}
+                  {/* Goal Mode Card */}
       {isCurrent && goalPlan && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
-            <div className="rounded-xl border border-white/10 bg-[#1e1e2d] overflow-hidden transition-all">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden transition-all backdrop-blur-xl hover:bg-white/[0.05] hover:border-white/20">
               <button
                 onClick={() => setGoalExpanded(!goalExpanded)}
-                className="w-full flex items-center justify-between p-4 hover:bg-[#252536] transition"
+                className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
-                    <Target className="w-5 h-5 text-white" />
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400">
+                    <Target className="w-5 h-5" />
                   </div>
                   <div className="text-left">
                     <h3 className="font-semibold text-white">Today's Goal Plan</h3>
@@ -401,7 +384,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     <div
                       key={cls.scheduleId}
                       className={clsx(
-                        "flex items-center gap-3 p-3 rounded-xl border-2 transition",
+                        "flex items-center gap-3 p-3 rounded-xl border transition",
                         cls.priority === "mandatory" ? "border-red-500/30 bg-red-500/5" :
                         cls.priority === "recommended" ? "border-yellow-500/30 bg-yellow-500/5" :
                         "border-green-500/30 bg-green-500/5"
@@ -433,17 +416,18 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               )}
             </div>
           ) : !goalPlan.goalEnabled ? (
-            <Link href="/settings/goal" className="flex items-center justify-between rounded-xl border border-white/10 bg-[#1e1e2d] p-4 hover:bg-[#252536] transition cursor-pointer">
+            <Link href="/settings/goal" className="group relative flex items-center justify-between rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/[0.04] to-violet-500/[0.04] backdrop-blur-xl p-5 transition-all duration-300 hover:from-purple-500/[0.08] hover:to-violet-500/[0.08] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-0.5 cursor-pointer overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
               <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500">
-                  <Target className="w-5 h-5 text-white" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+                  <Target className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white">Set Your Attendance Goal</h3>
                   <p className="text-sm text-gray-400">Get a daily action plan showing which classes to attend</p>
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-500" />
+              <ChevronRight className="h-5 w-5 text-gray-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
             </Link>
           ) : null}
         </div>
@@ -463,57 +447,85 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         </div>
       )}
 
-            {/* Subject Cards */}
+                  {/* Subject Cards */}
       {dashboard && subjectsList.length > 0 && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
-          <h2 className="text-lg font-semibold text-white mb-4">All Subjects</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">All Subjects</h2>
+            <span className="text-sm text-gray-500">{subjectsList.length} courses</span>
+          </div>
           <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
-              const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
+              const percentage = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
               const min = s.minAttendancePct ?? 75;
-              const statusLabel = isCurrent ? (pct >= min ? "On track" : pct >= min - 5 ? "At risk" : "Action needed") :
-                                            (pct >= min ? "Met requirement" : "Failed requirement");
+              const statusLabel = isCurrent ? (percentage >= min ? "On track" : percentage >= min - 5 ? "At risk" : "Action needed") :
+                                            (percentage >= min ? "Met requirement" : "Failed requirement");
               
               const accentColors = [
-                "bg-blue-500",
-                "bg-cyan-500",
-                "bg-pink-500",
-                "bg-purple-500",
+                { from: "from-purple-500", to: "to-violet-600", hover: "hover:border-purple-500/20", shadow: "hover:shadow-purple-500/10", track: "bg-purple-500/20" },
+                { from: "from-blue-500", to: "to-indigo-600", hover: "hover:border-blue-500/20", shadow: "hover:shadow-blue-500/10", track: "bg-blue-500/20" },
+                { from: "from-emerald-500", to: "to-green-600", hover: "hover:border-emerald-500/20", shadow: "hover:shadow-emerald-500/10", track: "bg-emerald-500/20" },
+                { from: "from-amber-500", to: "to-orange-600", hover: "hover:border-amber-500/20", shadow: "hover:shadow-amber-500/10", track: "bg-amber-500/20" },
+                { from: "from-pink-500", to: "to-rose-600", hover: "hover:border-pink-500/20", shadow: "hover:shadow-pink-500/10", track: "bg-pink-500/20" },
+                { from: "from-cyan-500", to: "to-teal-600", hover: "hover:border-cyan-500/20", shadow: "hover:shadow-cyan-500/10", track: "bg-cyan-500/20" },
+                { from: "from-red-500", to: "to-rose-600", hover: "hover:border-red-500/20", shadow: "hover:shadow-red-500/10", track: "bg-red-500/20" },
               ];
-              const barColor = s.colorHex ? `bg-[${s.colorHex}]` : accentColors[i % accentColors.length];
+              const accent = accentColors[i % accentColors.length];
+              const barColorStyle = s.colorHex ? { backgroundColor: s.colorHex, backgroundImage: 'none' } : {};
 
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="relative rounded-xl border border-white/10 bg-[#1e1e2d] p-5 block hover:bg-[#252536] transition overflow-hidden">
+                className={`group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] ${accent.hover} hover:shadow-lg ${accent.shadow} hover:-translate-y-1 cursor-pointer overflow-hidden block`}
+              >
+                {/* Top gradient line */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
                 
-                {/* Left thick accent bar */}
-                <div className={`absolute left-0 top-4 bottom-4 w-1.5 rounded-r-md ${barColor}`} style={s.colorHex ? { backgroundColor: s.colorHex } : {}} />
+                {/* Left accent bar — gradient */}
+                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-gradient-to-b ${accent.from} ${accent.to}`} style={barColorStyle} />
                 
                 <div className="pl-4">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-1">
                     <div className="min-w-0 pr-4">
-                      <h3 className="font-semibold text-white truncate">{s.name}</h3>
-                      <p className="text-xs text-gray-400">{s.code}</p>
+                      <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate">{s.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{s.code}</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-500" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
                   </div>
                   
-                  {/* Solid thick progress bar */}
-                  <div className="h-1.5 w-full bg-white/10 rounded-full mb-3">
-                    <div
-                      className={`h-full rounded-full transition-all duration-700 ${pct >= min ? "bg-emerald-500" : pct >= min - 5 ? "bg-amber-500" : "bg-red-500"}`}
-                      style={{ width: `${Math.min(100, pct)}%` }}
-                    />
+                  {/* Progress bar — glass track + gradient fill */}
+                  <div className="mt-3 mb-2">
+                    <div className="h-2 w-full rounded-full bg-white/[0.06] overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ease-out ${
+                          percentage >= 75
+                            ? "bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-400"
+                            : percentage >= 60
+                            ? "bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-400"
+                            : "bg-gradient-to-r from-red-600 via-red-500 to-rose-400"
+                        }`}
+                        style={{ width: `${Math.min(100, percentage)}%` }}
+                      />
+                    </div>
                   </div>
 
                   {/* Stats Row */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className={`${pct >= min ? "text-emerald-500" : pct >= min - 5 ? "text-amber-500" : "text-red-500"} font-semibold`}>
-                      {pct}%
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm font-semibold ${
+                      percentage >= 75 ? "text-emerald-400" :
+                      percentage >= 60 ? "text-amber-400" :
+                      "text-red-400"
+                    }`}>
+                      {percentage}%
                     </span>
-                    <span className="text-gray-400">{statusLabel}</span>
-                    <span className="text-orange-500 flex items-center gap-1">
-                      🔥 {s.totalPresent ?? 0}
+                    <span className={`text-xs font-medium ${
+                      percentage >= 75 ? "text-emerald-400/60" :
+                      percentage >= 60 ? "text-amber-400/60" :
+                      "text-red-400/60"
+                    }`}>
+                      {statusLabel}
+                    </span>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <Flame className="h-3 w-3 text-amber-400/70" /> {s.totalPresent ?? 0}
                     </span>
                   </div>
                 </div>
@@ -564,7 +576,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             {/* Body — scrollable */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {loadingImportable ? (
-                <FuturisticLoader variant="inline" title="Loading subjects" icon="📚" />
+                <FuturisticLoader variant="inline" title="Loading subjects" Icon={BookOpen} />
               ) : (
                 <>
                   {/* Orphan subjects */}
@@ -642,19 +654,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, iconBg, iconColor }: { label: string; value: React.ReactNode; icon: React.ReactNode; iconBg: string; iconColor: string }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-[#1e1e2d] p-5 flex flex-col justify-between h-32">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">{label}</p>
-        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}>
-          {icon}
-        </div>
-      </div>
-      <p className="text-3xl font-bold text-white mt-auto">{value}</p>
-    </div>
-  );
-}
+
 
 function ImportSubjectCard({
   subject, semesterName, isSelected, mode, onToggle, onSwitchMode, isOrphan

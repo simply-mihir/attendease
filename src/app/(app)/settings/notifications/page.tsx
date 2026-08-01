@@ -123,7 +123,7 @@ export default function NotificationSettingsPage() {
   }
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading notifications" icon="🔔" />;
+    return <FuturisticLoader variant="section" title="Loading notifications" Icon={Bell} />;
   }
 
   if (!currentSettings) {

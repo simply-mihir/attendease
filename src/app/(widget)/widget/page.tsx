@@ -6,7 +6,7 @@ import { apiFetch } from "@/hooks/useApi";
 import {
   Clock, MapPin, CheckCircle2, XCircle, Timer, Ban,
   AlertTriangle, ArrowRight, TrendingUp
-} from "lucide-react";
+, Smartphone } from "lucide-react";
 import clsx from "clsx";
 
 interface TodayClass {
@@ -118,7 +118,7 @@ export default function WidgetPage() {
   }
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading widget..." icon="📱" />;
+    return <FuturisticLoader variant="section" title="Loading widget..." Icon={Smartphone} />;
   }
 
   const nextClass = getNextClass();

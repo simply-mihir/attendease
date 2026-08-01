@@ -10,7 +10,7 @@ import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
   Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
   Mail, MessageSquare, Volume2
-} from "lucide-react";
+, BookOpen } from "lucide-react";
 import clsx from "clsx";
 
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -88,7 +88,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const subject = data?.subject;
 
   if (loading || !subject) {
-    return <FuturisticLoader variant="section" title="Loading subject" icon="📚" />;
+    return <FuturisticLoader variant="section" title="Loading subject" Icon={BookOpen} />;
   }
 
   const stats = calculateAttendance({

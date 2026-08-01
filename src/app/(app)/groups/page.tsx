@@ -128,7 +128,7 @@ export default function GroupsPage() {
   }
 
   if (loading) {
-    return <FuturisticLoader variant="section" title="Loading groups" icon="👥" />;
+    return <FuturisticLoader variant="section" title="Loading groups" Icon={Users} />;
   }
 
   return (

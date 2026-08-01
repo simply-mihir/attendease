@@ -12,7 +12,7 @@ const AnalyticsCharts = dynamic(
   () => import("@/components/AnalyticsCharts"),
   {
     ssr: false,
-    loading: () => <FuturisticLoader variant="section" title="Loading charts..." icon="📊" />,
+    loading: () => <FuturisticLoader variant="section" title="Loading charts..." Icon={BarChart3} />,
   }
 );
 
@@ -28,7 +28,7 @@ export default function AnalyticsPage() {
   const loading = dashLoading || heatLoading;
 
   if (loading || !dashboard) {
-    return <FuturisticLoader variant="section" title="Crunching numbers" icon="📈" />;
+    return <FuturisticLoader variant="section" title="Crunching numbers" Icon={TrendingUp} />;
   }
 
   const barData = dashboard.subjectsSummary.map((s: any) => ({

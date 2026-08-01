@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LucideIcon, GraduationCap } from "lucide-react";
 
 interface FuturisticLoaderProps {
   title?: string;           // e.g., "Loading your dashboard..."
-  icon?: string;            // emoji icon for center, default 🎓
+  Icon?: LucideIcon; // Changed from emoji string to Lucide component
   variant?: "full" | "section" | "inline"; // size variants
   showProgress?: boolean;   // show progress bar
   showParticles?: boolean;  // show floating particles (skip on lightweight variants)
@@ -12,7 +13,7 @@ interface FuturisticLoaderProps {
 
 export function FuturisticLoader({
   title = "Loading...",
-  icon = "🎓",
+  Icon = GraduationCap,
   variant = "full",
   showProgress = true,
   showParticles = true,
@@ -44,7 +45,7 @@ export function FuturisticLoader({
             <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50" />
           </div>
           <div className="absolute inset-2 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600/80 to-violet-600/80" style={{ animation: "breathe 2s ease-in-out infinite" }}>
-            <span className="text-xs">{icon}</span>
+            <Icon className="h-3 w-3 text-white" />
           </div>
         </div>
         <span className="text-sm text-gray-400">{title}</span>
@@ -65,7 +66,7 @@ export function FuturisticLoader({
             <div className="absolute -right-0.5 top-1/2 -translate-y-1/2 h-1 w-1 rounded-full bg-violet-400" />
           </div>
           <div className="absolute inset-5 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-violet-600 shadow-lg shadow-purple-500/25" style={{ animation: "breathe 2s ease-in-out infinite" }}>
-            <span className="text-lg">{icon}</span>
+            <Icon className="h-5 w-5 text-white" />
           </div>
         </div>
 
@@ -152,7 +153,7 @@ export function FuturisticLoader({
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-lg shadow-indigo-500/50" />
           </div>
           <div className="absolute inset-9 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-violet-600 shadow-xl shadow-purple-500/30" style={{ animation: "breathe 2s ease-in-out infinite" }}>
-            <span className="text-2xl">{icon}</span>
+            <Icon className="h-6 w-6 text-white" />
           </div>
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 128 128" style={{ animation: "spinSlow 10s linear infinite" }}>
             <circle cx="64" cy="64" r="62" fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="1" strokeDasharray="20 40" strokeLinecap="round" />

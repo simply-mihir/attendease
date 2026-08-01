@@ -443,7 +443,7 @@ export default function ImportPage() {
           </button>
 
           {analyzing && (
-            <FuturisticLoader variant="section" title="AI is reading your timetable..." icon="✨" />
+            <FuturisticLoader variant="section" title="AI is reading your timetable..." Icon={Sparkles} />
           )}
         </div>
       )}

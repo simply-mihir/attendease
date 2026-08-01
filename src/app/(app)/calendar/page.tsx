@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
-import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer , Calendar } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -48,7 +48,7 @@ export default function CalendarPage() {
   const pageLoading = schedLoading || recLoading;
 
   if (pageLoading) {
-    return <FuturisticLoader variant="section" title="Loading calendar" icon="🗓️" />;
+    return <FuturisticLoader variant="section" title="Loading calendar" Icon={Calendar} />;
   }
 
   function navigate(dir: number) {

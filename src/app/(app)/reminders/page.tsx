@@ -8,7 +8,7 @@ import {
   Bell, Plus, CheckCircle2, Circle, Trash2, Calendar, Clock,
   BookOpen, Filter, AlertCircle, Sparkles, Tag, Check, Zap, FileText, Bookmark,
   Mail, MessageSquare, Volume2
-} from "lucide-react";
+, AlarmClock } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -216,7 +216,7 @@ export default function RemindersPage() {
 
       {/* Reminders List */}
       {isLoading ? (
-        <FuturisticLoader variant="section" title="Loading reminders" icon="⏰" />
+        <FuturisticLoader variant="section" title="Loading reminders" Icon={AlarmClock} />
       ) : filteredReminders.length === 0 ? (
         <div className="glass p-12 text-center rounded-3xl border-2 border-border-heavy space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">
