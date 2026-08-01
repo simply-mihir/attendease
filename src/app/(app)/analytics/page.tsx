@@ -73,15 +73,15 @@ export default function AnalyticsPage() {
   }
 
   const barData = dashboard.subjectsSummary.map((s: any) => ({
-    name: s.name.length > 12 ? s.name.slice(0, 12) + "..." : s.name,
+    name: s.name,
     percentage: s.currentPercentage,
     fill: s.statusColor === "green" ? "#22c55e" : s.statusColor === "yellow" ? "#f59e0b" : "#ef4444",
   }));
 
   const pieData = [
-    { name: "Safe", value: dashboard.safeSubjects, color: "#22c55e" },
-    { name: "Warning", value: dashboard.warningSubjects, color: "#f59e0b" },
-    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef4444" },
+    { name: "Safe", value: dashboard.safeSubjects, color: "#22c55e", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "green").map((s: any) => s.name) },
+    { name: "Warning", value: dashboard.warningSubjects, color: "#f59e0b", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "yellow").map((s: any) => s.name) },
+    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef4444", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "red").map((s: any) => s.name) },
   ].filter((d) => d.value > 0);
 
   // Build heatmap grid (GitHub-style)

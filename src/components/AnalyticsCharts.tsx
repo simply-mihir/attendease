@@ -16,7 +16,7 @@ import { BarChart3 } from "lucide-react";
 
 interface AnalyticsChartsProps {
   barData: { name: string; percentage: number; fill: string }[];
-  pieData: { name: string; value: number; color: string }[];
+  pieData: { name: string; value: number; color: string; subjects?: string[] }[];
 }
 
 export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsProps) {
@@ -31,8 +31,8 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
           Subject Comparison
         </h3>
         {barData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 40, left: 0 }}>
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 80, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} angle={-35} textAnchor="end" />
               <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} />
@@ -59,18 +59,30 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
       <div className="glass rounded-2xl p-5">
         <h3 className="font-semibold mb-4 text-white">Status Distribution</h3>
         {pieData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-              </Pie>
-              <Tooltip
-                contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
-                itemStyle={{ color: "#fff" }}
-                labelStyle={{ color: "#9ca3af" }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                  {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ backgroundColor: "rgba(15,15,30,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
+                  itemStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#9ca3af" }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-3 px-2 max-h-40 overflow-y-auto custom-scrollbar">
+              {pieData.map((group, i) => (
+                <div key={i} className="text-sm">
+                  <span className="font-semibold" style={{ color: group.color }}>{group.name}:</span>
+                  <p className="text-gray-400 mt-0.5 text-xs leading-relaxed">
+                    {group.subjects && group.subjects.length > 0 ? group.subjects.join(", ") : "None"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <p className="text-gray-500 text-sm text-center py-12">No data</p>
         )}
