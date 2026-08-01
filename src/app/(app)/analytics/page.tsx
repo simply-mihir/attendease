@@ -115,33 +115,37 @@ export default function AnalyticsPage() {
 
       {/* Overview cards */}
       <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4" delay={100} staggerDelay={80} animation="flipIn">
-        <div className="glass rounded-2xl p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-2">
-            <TrendingUp className="w-5 h-5 text-white" />
+        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center mx-auto mb-2">
+            <TrendingUp className="w-5 h-5 text-purple-400" />
           </div>
           <p className="text-3xl font-bold text-white">{dashboard.overallPct}%</p>
-          <p className="text-xs text-gray-500">Overall</p>
+          <p className="text-xs text-gray-400">Overall</p>
         </div>
-        <div className="glass rounded-2xl p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-2">
-            <ShieldCheck className="w-5 h-5 text-white" />
+        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-2">
+            <ShieldCheck className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-3xl font-bold text-green-400">{dashboard.safeSubjects}</p>
-          <p className="text-xs text-gray-500">Safe</p>
+          <p className="text-3xl font-bold text-white">{dashboard.safeSubjects}</p>
+          <p className="text-xs text-gray-400">Safe</p>
         </div>
-        <div className="glass rounded-2xl p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center mx-auto mb-2">
-            <ShieldAlert className="w-5 h-5 text-white" />
+        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+          <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center mx-auto mb-2">
+            <ShieldAlert className="w-5 h-5 text-red-400" />
           </div>
-          <p className="text-3xl font-bold text-red-400">{dashboard.dangerSubjects}</p>
-          <p className="text-xs text-gray-500">In Danger</p>
+          <p className="text-3xl font-bold text-white">{dashboard.dangerSubjects}</p>
+          <p className="text-xs text-gray-400">In Danger</p>
         </div>
-        <div className="glass rounded-2xl p-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center mx-auto mb-2">
-            <Flame className="w-5 h-5 text-white" />
+        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-2">
+            <Flame className="w-5 h-5 text-amber-400" />
           </div>
-          <p className="text-3xl font-bold text-yellow-400">{dashboard.currentStreak}</p>
-          <p className="text-xs text-gray-500">Streak</p>
+          <p className="text-3xl font-bold text-white">{dashboard.currentStreak}</p>
+          <p className="text-xs text-gray-400">Streak</p>
         </div>
       </StaggerGrid>
 

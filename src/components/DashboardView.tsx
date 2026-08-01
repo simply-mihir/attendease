@@ -206,12 +206,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
       {/* Header */}
-      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+      <div className="flex items-center justify-between mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <div>
-          <h1 className="text-2xl font-bold text-gradient text-shimmer">
-            Hello {displayName} 👋
+          <h1 className="text-2xl font-bold text-white">
+            Hello, <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">{displayName}</span> 👋
           </h1>
-          <p className="text-text-secondary text-sm mt-1">
+          <p className="mt-1 text-sm text-gray-400">
             {dashboard?.semesterName 
               ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
               : "Here is your attendance overview. Let's make every class count!"} 
@@ -223,12 +223,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="btn-gradient-cyan px-4 py-2.5 rounded-xl text-sm flex items-center gap-2"
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-all"
             >
               <Download className="w-4 h-4" /> Import
             </button>
           )}
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all active:scale-95">
             <Plus className="w-4 h-4" /> Add Subject
           </Link>
         </div>
@@ -356,15 +356,15 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           animation="card3DEnter"
         >
           <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
-            icon={<TrendingUp className="w-5 h-5" />}
-            gradient={overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
+            icon={<TrendingUp className="w-5 h-5 text-emerald-400" />}
+            bgClass="bg-emerald-500/10 text-emerald-400" />
           <StatCard label="Subjects" value={<AnimatedCounter value={totalSubjects} />}
-            icon={<BookOpen className="w-5 h-5" />} gradient="from-cyan-500 to-blue-500" />
+            icon={<BookOpen className="w-5 h-5 text-blue-400" />} bgClass="bg-blue-500/10 text-blue-400" />
           <StatCard label="Streak" value={<span className="flex items-center gap-1"><AnimatedCounter value={currentStreak} /><StreakFlame streak={currentStreak} size="sm" /></span>}
-            icon={<Flame className="w-5 h-5" />} gradient="from-orange-500 to-yellow-500" />
+            icon={<Flame className="w-5 h-5 text-amber-400" />} bgClass="bg-amber-500/10 text-amber-400" />
           <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
-            icon={<Zap className="w-5 h-5" />}
-            gradient={dangerCount > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
+            icon={<Zap className={clsx("w-5 h-5", dangerCount > 0 ? "text-red-400" : "text-emerald-400")} />}
+            bgClass={dangerCount > 0 ? "bg-red-500/10 text-red-400" : "bg-emerald-500/10 text-emerald-400"} />
         </StaggerGrid>
       )}
 
@@ -372,18 +372,18 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {isCurrent && goalPlan && (
         <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
-            <div className="glass rounded-2xl overflow-hidden">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all">
               <button
                 onClick={() => setGoalExpanded(!goalExpanded)}
-                className="w-full flex items-center justify-between p-4 hover:bg-surface-3 transition"
+                className="w-full flex items-center justify-between p-4 hover:bg-white/[0.04] transition"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-bold text-text text-sm">Today&apos;s Goal Plan</h3>
-                    <p className="text-xs text-text-muted">
+                    <h3 className="font-bold text-white text-sm">Today&apos;s Goal Plan</h3>
+                    <p className="text-xs text-gray-400">
                       Attend {goalPlan.summary.mustAttend} of {goalPlan.summary.total} to stay on track for {goalPlan.goalPct}%
                     </p>
                   </div>
@@ -392,7 +392,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-500/10 text-amber-400 border border-amber-500/20">
                     {goalPlan.goalPct}% goal
                   </span>
-                  <ChevronDown className={clsx("w-4 h-4 text-text-muted transition-transform", goalExpanded && "rotate-180")} />
+                  <ChevronDown className={clsx("w-4 h-4 text-gray-500 transition-transform", goalExpanded && "rotate-180")} />
                 </div>
               </button>
               {goalExpanded && (
@@ -409,8 +409,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     >
                       <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: cls.colorHex }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-text truncate">{cls.subjectName}</p>
-                        <p className="text-xs text-text-muted flex items-center gap-2">
+                        <p className="font-bold text-sm text-gray-200 truncate">{cls.subjectName}</p>
+                        <p className="text-xs text-gray-500 flex items-center gap-2">
                           <Clock className="w-3 h-3" /> {cls.startTime} - {cls.endTime}
                           {cls.room && <><MapPin className="w-3 h-3 ml-1" /> {cls.room}</>}
                         </p>
@@ -433,15 +433,20 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               )}
             </div>
           ) : !goalPlan.goalEnabled ? (
-            <Link href="/settings/goal" className="glass rounded-2xl p-4 flex items-center gap-3 hover:bg-surface-3 transition group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Target className="w-4 h-4 text-white" />
+            <Link href="/settings/goal" className="group relative rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/5 to-violet-500/5 backdrop-blur-xl p-5 transition-all duration-300 hover:from-purple-500/10 hover:to-violet-500/10 hover:border-purple-500/20 block overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10">
+                    <Target className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Set Your Attendance Goal</h3>
+                    <p className="text-sm text-gray-400">Get a daily action plan showing which classes to attend</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-purple-400 transition-colors" />
               </div>
-              <div className="flex-1">
-                <p className="font-bold text-sm text-text">Set Your Attendance Goal</p>
-                <p className="text-xs text-text-muted">Get a daily action plan showing which classes to attend</p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-text-muted group-hover:translate-x-1 transition-transform" />
             </Link>
           ) : null}
         </div>
@@ -450,7 +455,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Today's Classes */}
       {isCurrent && todayClasses.length > 0 && (
         <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 150ms forwards" }}>
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-white">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
           <StaggerGrid className="grid gap-3" delay={180} staggerDelay={80} animation="fadeSlideUp">
@@ -464,58 +469,88 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Subject Cards */}
       {dashboard && subjectsList.length > 0 && (
         <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
-          <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
-          <StaggerGrid className="grid gap-3 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">All Subjects</h2>
+            <span className="text-sm text-gray-500">{subjectsList.length} courses</span>
+          </div>
+          <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
               // Handle both new and old properties
               const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
               const min = s.minAttendancePct ?? 75;
               const color = s.statusColor || (pct >= min ? "green" : (pct >= min - 5 ? "yellow" : "red"));
               
+              const fillClass = pct >= min ? "from-emerald-600 via-emerald-500 to-green-500" :
+                                pct >= min - 5 ? "from-amber-600 via-amber-500 to-yellow-500" :
+                                "from-red-600 via-red-500 to-rose-500";
+              const statusLabel = isCurrent ? (pct >= min ? "On track" : pct >= min - 5 ? "At risk" : "Action needed") :
+                                            (pct >= min ? "Met requirement" : "Failed requirement");
+
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-10 rounded-full" style={{ backgroundColor: s.colorHex, boxShadow: `0 0 10px ${s.colorHex}30` }} />
-                    <div>
-                      <h3 className="font-semibold group-hover:text-purple-400 transition text-text">{s.name}</h3>
-                      {s.code && <p className="text-xs text-text-muted">{s.code}</p>}
+                className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden block">
+                {/* Top gradient line */}
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+                
+                {/* Subject color indicator — left border accent */}
+                <div className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full" style={{ backgroundColor: s.colorHex }} />
+                
+                {/* Content */}
+                <div className="pl-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate pr-4">
+                      {s.name}
+                    </h3>
+                    <span className="shrink-0 text-xs text-gray-500">{s.code}</span>
+                  </div>
+                  
+                  {/* Attendance percentage */}
+                  <div className="flex items-center gap-3 mt-3">
+                    <div className="flex-1">
+                      {/* Glass progress bar track */}
+                      <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                        {/* Gradient fill */}
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${fillClass} transition-all duration-500`}
+                          style={{ width: `${Math.min(100, pct)}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold text-white min-w-[3rem] text-right">
+                      {pct}%
+                    </span>
+                  </div>
+
+                  {/* Status + stats row */}
+                  <div className="flex items-center justify-between mt-2">
+                    <span className={`text-xs font-medium ${
+                      pct >= min ? "text-emerald-400" :
+                      pct >= min - 5 ? "text-amber-400" :
+                      "text-red-400"
+                    }`}>
+                      {statusLabel}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        {s.totalPresent ?? 0}/{s.totalClassesHeld ?? 0} classes
+                      </span>
+                      {(s.totalCancelled ?? 0) > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-slate-400 font-bold bg-slate-500/10 px-2 py-0.5 rounded-md">
+                          <Ban className="w-3 h-3" /> {s.totalCancelled}
+                        </span>
+                      )}
+                      {(s.streakCount ?? 0) > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
+                          <Flame className="w-3 h-3" />{s.streakCount}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
                 </div>
-                {/* Progress bar */}
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-2">
-                  <div className={clsx("h-full rounded-full transition-all",
-                    color === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" :
-                    color === "yellow" ? "bg-gradient-to-r from-yellow-500 to-orange-400" :
-                    "bg-gradient-to-r from-red-500 to-pink-400"
-                  )} style={{ width: `${Math.min(100, pct)}%` }} />
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className={clsx("font-semibold",
-                    color === "green" ? "text-green-400" : color === "yellow" ? "text-yellow-400" : "text-red-400"
-                  )}>{pct}%</span>
-                  <span className="text-text-muted text-xs">
-                    {isCurrent ? (
-                      color === "red" ? `Action needed` : `On track`
-                    ) : (
-                       color === "red" ? `Failed requirement` : `Met requirement`
-                    )}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {(s.totalCancelled ?? 0) > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-slate-400 font-bold bg-slate-500/10 px-2 py-0.5 rounded-md">
-                        <Ban className="w-3 h-3" /> {s.totalCancelled}
-                      </span>
-                    )}
-                    {(s.streakCount ?? 0) > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded-md">
-                        <Flame className="w-3 h-3" />{s.streakCount}
-                      </span>
-                    )}
-                  </div>
+                
+                {/* Arrow icon on hover */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 group-hover:text-purple-400 transition-colors">
+                  <ArrowRight className="w-4 h-4" />
                 </div>
               </Link>
             )})}
@@ -646,16 +681,22 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, gradient }: { label: string; value: React.ReactNode; icon: React.ReactNode; gradient: string }) {
+function StatCard({ label, value, icon, bgClass }: { label: string; value: React.ReactNode; icon: React.ReactNode; bgClass: string }) {
   return (
-    <div className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-text-secondary text-sm">{label}</span>
-        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg`}>
-          {icon}
-        </div>
+    <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden">
+      {/* Subtle gradient glow at top */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+      
+      {/* Icon — top right with glow background */}
+      <div className={`absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-xl ${bgClass}`}>
+        {icon}
       </div>
-      <p className="text-2xl font-bold text-text">{value}</p>
+      
+      {/* Label */}
+      <p className="text-sm text-gray-400 mb-1">{label}</p>
+      
+      {/* Value — large and prominent */}
+      <p className="text-3xl font-bold text-white">{value}</p>
     </div>
   );
 }
