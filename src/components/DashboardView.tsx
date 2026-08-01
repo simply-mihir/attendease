@@ -211,8 +211,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           </h1>
           <p className="text-text-secondary text-sm mt-1">
             {dashboard?.semesterName 
-              ? `Ready to crush ${dashboard.semesterName}? Vibe check your attendance! ✨` 
-              : "Let's check your attendance! 🚀"} 
+              ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
+              : "Here is your attendance overview. Let's make every class count!"} 
             <span className="mx-2 opacity-50">•</span>
             {today?.dayName}, {today?.date}
           </p>
