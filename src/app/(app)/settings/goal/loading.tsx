@@ -1,3 +1,4 @@
+"use client";
 import { Target } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 

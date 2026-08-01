@@ -1,3 +1,4 @@
+"use client";
 import { Bell } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 

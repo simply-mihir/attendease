@@ -1,3 +1,4 @@
+"use client";
 import { Stethoscope } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 

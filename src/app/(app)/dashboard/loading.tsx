@@ -1,3 +1,4 @@
+"use client";
 import { BarChart3 } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 
