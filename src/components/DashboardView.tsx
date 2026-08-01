@@ -207,9 +207,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
         <div>
           <h1 className="text-2xl font-bold text-gradient text-shimmer">
-            {dashboard?.semesterName ? dashboard.semesterName : `Hello ${displayName}`}
+            Hello {displayName} 👋
           </h1>
-          <p className="text-text-secondary text-sm">
+          <p className="text-text-secondary text-sm mt-1">
+            {dashboard?.semesterName 
+              ? `Ready to crush ${dashboard.semesterName}? Vibe check your attendance! ✨` 
+              : "Let's check your attendance! 🚀"} 
+            <span className="mx-2 opacity-50">•</span>
             {today?.dayName}, {today?.date}
           </p>
         </div>
@@ -236,7 +240,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       `}</style>
 
       {/* Orphan Subjects Banner */}
-      {dashboard?.orphanCount && dashboard.orphanCount > 0 && isCurrent && (
+      {((dashboard?.orphanCount ?? 0) > 0) && isCurrent && (
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-4 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -244,7 +248,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                 ⚠️
               </div>
               <p className="text-sm text-gray-300">
-                You have <strong className="text-amber-300">{dashboard.orphanCount} subject{dashboard.orphanCount > 1 ? "s" : ""}</strong> not assigned to any semester.
+                You have <strong className="text-amber-300">{dashboard!.orphanCount} subject{dashboard!.orphanCount! > 1 ? "s" : ""}</strong> not assigned to any semester.
               </p>
             </div>
             <button
