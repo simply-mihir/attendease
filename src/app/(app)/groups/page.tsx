@@ -7,6 +7,8 @@ import {
   Loader2, AlertTriangle,
 } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 interface MemberSubject {
   name: string;
@@ -139,9 +141,9 @@ export default function GroupsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+    <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/20">
@@ -171,7 +173,7 @@ export default function GroupsPage() {
 
       {/* Success message */}
       {successMsg && (
-        <div className="glass rounded-2xl p-3 border-green-500/30 flex items-center gap-2 animate-fade-in">
+        <div className="glass rounded-2xl p-3 border-green-500/30 flex items-center gap-2 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
           <CheckCircle2 className="w-4 h-4 text-green-400" />
           <p className="text-sm font-bold text-green-400">{successMsg}</p>
         </div>
@@ -179,7 +181,7 @@ export default function GroupsPage() {
 
       {/* Create modal */}
       {showCreate && (
-        <div className="glass rounded-2xl p-5 space-y-4 animate-fade-in">
+        <div className="glass rounded-2xl p-5 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
           <h3 className="font-black text-text">Create a New Group</h3>
           <input
             type="text"
@@ -210,7 +212,7 @@ export default function GroupsPage() {
 
       {/* Join modal */}
       {showJoin && (
-        <div className="glass rounded-2xl p-5 space-y-4 animate-fade-in">
+        <div className="glass rounded-2xl p-5 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
           <h3 className="font-black text-text">Join a Group</h3>
           <input
             type="text"
@@ -241,7 +243,7 @@ export default function GroupsPage() {
 
       {/* Empty state */}
       {groups.length === 0 && !showCreate && !showJoin && (
-        <div className="glass rounded-2xl p-10 text-center">
+        <div className="glass rounded-2xl p-10 text-center" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink-500/20">
             <Users className="w-8 h-8 text-white" />
           </div>
@@ -267,127 +269,128 @@ export default function GroupsPage() {
       )}
 
       {/* Group cards */}
-      {groups.map((group, i) => (
-        <div
-          key={group.id}
-          className="glass rounded-2xl overflow-hidden"
-          style={{ animation: `fade-in 0.3s ease-out ${0.05 * i}s both` }}
-        >
-          {/* Group header */}
-          <div className="p-5 border-b-2 border-border-heavy">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-black text-text text-lg">{group.name}</h3>
-                <p className="text-xs text-text-muted">
-                  {group.memberCount} {group.memberCount === 1 ? "member" : "members"}
-                </p>
+      <StaggerGrid className="space-y-6" delay={150} staggerDelay={80} animation="fadeSlideUp">
+        {groups.map((group, i) => (
+          <div
+            key={group.id}
+            className="glass rounded-2xl overflow-hidden"
+          >
+            {/* Group header */}
+            <div className="p-5 border-b-2 border-border-heavy">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-black text-text text-lg">{group.name}</h3>
+                  <p className="text-xs text-text-muted">
+                    {group.memberCount} {group.memberCount === 1 ? "member" : "members"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => copyCode(group.code)}
+                  className={clsx(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition border-2 border-border-heavy",
+                    copiedCode === group.code
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-surface-3 text-text-secondary hover:bg-surface-3/80"
+                  )}
+                >
+                  {copiedCode === group.code ? (
+                    <><CheckCircle2 className="w-3 h-3" /> Copied!</>
+                  ) : (
+                    <><Copy className="w-3 h-3" /> {group.code}</>
+                  )}
+                </button>
               </div>
+            </div>
+
+            {/* Members */}
+            <div className="p-4 space-y-3">
+              {group.members.map((member) => (
+                <div
+                  key={member.userId}
+                  className="flex items-center gap-3 p-3 bg-surface-3 rounded-xl border-2 border-border-heavy"
+                >
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-black text-sm shrink-0 border-2 border-border-heavy">
+                    {(member.name || "S").charAt(0).toUpperCase()}
+                  </div>
+
+                  {/* Name + overall */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-text truncate">{member.name}</p>
+                    <p className="text-xs text-text-muted">
+                      Overall:{" "}
+                      <span
+                        className={clsx(
+                          "font-black",
+                          member.overallPct >= 75
+                            ? "text-green-400"
+                            : member.overallPct >= 65
+                            ? "text-yellow-400"
+                            : "text-red-400"
+                        )}
+                      >
+                        {member.overallPct}%
+                      </span>
+                    </p>
+                  </div>
+
+                  {/* Subject health dots */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {member.subjects.slice(0, 6).map((s, j) => (
+                      <div
+                        key={j}
+                        className="w-3 h-3 rounded-full border border-border-heavy"
+                        style={{
+                          backgroundColor:
+                            s.statusColor === "green"
+                              ? "#22c55e"
+                              : s.statusColor === "yellow"
+                              ? "#f59e0b"
+                              : "#ef4444",
+                        }}
+                        title={`${s.name}: ${s.currentPct}% (can skip ${s.canSkipCount})`}
+                      />
+                    ))}
+                    {member.subjects.length > 6 && (
+                      <span className="text-xs text-text-muted font-bold">
+                        +{member.subjects.length - 6}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="px-4 pb-4 flex items-center justify-between">
               <button
-                onClick={() => copyCode(group.code)}
-                className={clsx(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition border-2 border-border-heavy",
-                  copiedCode === group.code
-                    ? "bg-green-500/10 text-green-400"
-                    : "bg-surface-3 text-text-secondary hover:bg-surface-3/80"
-                )}
+                onClick={() => handleNudge(group.id)}
+                disabled={nudging === group.id}
+                className="btn-gradient px-4 py-2 rounded-xl text-xs flex items-center gap-1.5"
               >
-                {copiedCode === group.code ? (
-                  <><CheckCircle2 className="w-3 h-3" /> Copied!</>
+                {nudging === group.id ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <><Copy className="w-3 h-3" /> {group.code}</>
+                  <Bell className="w-3.5 h-3.5" />
                 )}
+                {nudging === group.id ? "Sending..." : "Nudge 😏"}
+              </button>
+              <button
+                onClick={() => handleLeave(group.id)}
+                disabled={leaving === group.id}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-text-muted hover:text-red-400 hover:bg-red-500/10 transition"
+              >
+                {leaving === group.id ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <LogOut className="w-3.5 h-3.5" />
+                )}
+                Leave
               </button>
             </div>
           </div>
-
-          {/* Members */}
-          <div className="p-4 space-y-3">
-            {group.members.map((member) => (
-              <div
-                key={member.userId}
-                className="flex items-center gap-3 p-3 bg-surface-3 rounded-xl border-2 border-border-heavy"
-              >
-                {/* Avatar */}
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-black text-sm shrink-0 border-2 border-border-heavy">
-                  {(member.name || "S").charAt(0).toUpperCase()}
-                </div>
-
-                {/* Name + overall */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-text truncate">{member.name}</p>
-                  <p className="text-xs text-text-muted">
-                    Overall:{" "}
-                    <span
-                      className={clsx(
-                        "font-black",
-                        member.overallPct >= 75
-                          ? "text-green-400"
-                          : member.overallPct >= 65
-                          ? "text-yellow-400"
-                          : "text-red-400"
-                      )}
-                    >
-                      {member.overallPct}%
-                    </span>
-                  </p>
-                </div>
-
-                {/* Subject health dots */}
-                <div className="flex items-center gap-1 shrink-0">
-                  {member.subjects.slice(0, 6).map((s, j) => (
-                    <div
-                      key={j}
-                      className="w-3 h-3 rounded-full border border-border-heavy"
-                      style={{
-                        backgroundColor:
-                          s.statusColor === "green"
-                            ? "#22c55e"
-                            : s.statusColor === "yellow"
-                            ? "#f59e0b"
-                            : "#ef4444",
-                      }}
-                      title={`${s.name}: ${s.currentPct}% (can skip ${s.canSkipCount})`}
-                    />
-                  ))}
-                  {member.subjects.length > 6 && (
-                    <span className="text-xs text-text-muted font-bold">
-                      +{member.subjects.length - 6}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="px-4 pb-4 flex items-center justify-between">
-            <button
-              onClick={() => handleNudge(group.id)}
-              disabled={nudging === group.id}
-              className="btn-gradient px-4 py-2 rounded-xl text-xs flex items-center gap-1.5"
-            >
-              {nudging === group.id ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Bell className="w-3.5 h-3.5" />
-              )}
-              {nudging === group.id ? "Sending..." : "Nudge 😏"}
-            </button>
-            <button
-              onClick={() => handleLeave(group.id)}
-              disabled={leaving === group.id}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-text-muted hover:text-red-400 hover:bg-red-500/10 transition"
-            >
-              {leaving === group.id ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <LogOut className="w-3.5 h-3.5" />
-              )}
-              Leave
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </StaggerGrid>
+    </PageTransition>
   );
 }

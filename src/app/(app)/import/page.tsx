@@ -7,6 +7,7 @@ import {
   ArrowRight, ArrowLeft, Sparkles, BookOpen, Clock, MapPin, FileSpreadsheet,
 } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
 
 // ─── Types ──────────────────────────────────────────────────────
 interface ParsedSchedule {
@@ -293,9 +294,9 @@ export default function ImportPage() {
 
   // ─── Render ───────────────────────────────────────────────────
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div>
+      <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
             <Camera className="w-5 h-5 text-white" />
@@ -308,7 +309,7 @@ export default function ImportPage() {
       </div>
 
       {/* Step indicator */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-3">
             <div
@@ -332,7 +333,7 @@ export default function ImportPage() {
           </div>
         ))}
       </div>
-      <div className="flex justify-center gap-12 text-xs text-text-muted font-bold">
+      <div className="flex justify-center gap-12 text-xs text-text-muted font-bold" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <span className={clsx(step === 1 && "text-cyan-400")}>Upload</span>
         <span className={clsx(step === 2 && "text-cyan-400")}>Review</span>
         <span className={clsx(step === 3 && "text-cyan-400")}>Done</span>
@@ -340,7 +341,7 @@ export default function ImportPage() {
 
       {/* ────── Step 1: Upload ────── */}
       {step === 1 && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           {/* Dropzone */}
           <div
             onClick={() => fileRef.current?.click()}
@@ -456,7 +457,7 @@ export default function ImportPage() {
 
       {/* ────── Step 2: Review & Edit ────── */}
       {step === 2 && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           {/* Summary bar */}
           <div className="glass rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -672,7 +673,7 @@ export default function ImportPage() {
 
       {/* ────── Step 3: Done ────── */}
       {step === 3 && importResult && (
-        <div className="animate-fade-in">
+        <div className="animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           <div className="glass rounded-2xl p-8 text-center">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/20 animate-pulse-glow">
               <CheckCircle2 className="w-10 h-10 text-white" />
@@ -717,6 +718,6 @@ export default function ImportPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

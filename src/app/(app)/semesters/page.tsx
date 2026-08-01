@@ -3,6 +3,8 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
 import { GraduationCap, Calendar, BookOpen, ArrowRight } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 interface SemesterSummary {
   id: string;
@@ -31,9 +33,9 @@ export default function SemestersPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <PageTransition direction="up" staggerChildren={false} className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
@@ -51,14 +53,13 @@ export default function SemestersPage() {
       </div>
 
       {/* List */}
-      <div className="space-y-4">
+      <StaggerGrid className="space-y-4" delay={100} staggerDelay={80} animation="fadeSlideUp">
         {semesters?.map((sem, i) => {
           const isEnded = new Date(sem.endDate) < new Date();
           return (
             <div
               key={sem.id}
               className="glass rounded-2xl p-5 hover:bg-glass-strong transition-all group flex flex-col md:flex-row md:items-center justify-between gap-4"
-              style={{ animation: `fade-in 0.3s ease-out ${0.05 * i}s both` }}
             >
               <div className="flex items-start gap-4">
                 <div className={clsx(
@@ -112,7 +113,7 @@ export default function SemestersPage() {
             <p className="text-text-muted">No semesters found. Create one to get started!</p>
           </div>
         )}
-      </div>
-    </div>
+      </StaggerGrid>
+    </PageTransition>
   );
 }

@@ -10,6 +10,8 @@ import {
   BarChart3, CalendarCheck, ChevronLeft, Loader2, Check
 } from "lucide-react";
 import Link from "next/link";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 interface NotificationSettings {
   pushEnabled: boolean;
@@ -136,9 +138,9 @@ export default function NotificationSettingsPage() {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto space-y-6 pb-28 animate-fade-in">
+      <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6 pb-28">
         {/* Header */}
-        <div className="flex items-center gap-3" style={{ animation: "dash-in 0.4s ease-out both" }}>
+        <div className="flex items-center gap-3" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
           <Link href="/settings" className="btn-ghost p-2.5 rounded-xl">
             <ChevronLeft className="w-5 h-5 text-text" />
           </Link>
@@ -148,15 +150,8 @@ export default function NotificationSettingsPage() {
           </div>
         </div>
 
-        <style>{`
-          @keyframes dash-in {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
-
         {/* ===== GENERAL TIMING SETTINGS ===== */}
-        <div className="card-stagger space-y-3" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <StaggerGrid className="space-y-3" delay={50} staggerDelay={80} animation="fadeSlideUp">
           {/* Timezone */}
           <div className="glass rounded-2xl p-4">
             <div className="flex items-center justify-between gap-4">
@@ -287,127 +282,128 @@ export default function NotificationSettingsPage() {
               </select>
             </div>
           </div>
-        </div>
+        </StaggerGrid>
 
         {/* ===== CHANNEL CARDS ===== */}
-        {CHANNELS.map((channel, channelIdx) => {
-          const isChannelEnabled = currentSettings[channel.enabledKey];
-          const isPush = channel.key === "push";
+        <StaggerGrid className="space-y-6" delay={200} staggerDelay={80} animation="fadeSlideUp">
+          {CHANNELS.map((channel, channelIdx) => {
+            const isChannelEnabled = currentSettings[channel.enabledKey];
+            const isPush = channel.key === "push";
 
-          return (
-            <div
-              key={channel.key}
-              className="glass rounded-3xl overflow-hidden"
-              style={{ animation: `dash-in 0.4s ease-out ${0.1 + channelIdx * 0.05}s both` }}
-            >
-              {/* Channel Header */}
-              <div className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${channel.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-${channel.gradient.split(" ")[0].replace("from-", "")}/20`}>
-                    <channel.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-black text-text">{channel.label}</p>
-                      {isPush && (
-                        <StatusBadge status={pushStatus} />
-                      )}
+            return (
+              <div
+                key={channel.key}
+                className="glass rounded-3xl overflow-hidden"
+              >
+                {/* Channel Header */}
+                <div className="flex items-center justify-between p-5">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${channel.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy shadow-lg shadow-${channel.gradient.split(" ")[0].replace("from-", "")}/20`}>
+                      <channel.icon className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-xs font-semibold text-text-secondary">{channel.desc}</p>
-                  </div>
-                </div>
-                <Toggle3D
-                  enabled={isChannelEnabled}
-                  onChange={() => updateSetting({ [channel.enabledKey]: !isChannelEnabled } as any)}
-                />
-              </div>
-
-              {/* Push-specific actions */}
-              {isPush && (
-                <div className="px-5 pb-2">
-                  {pushStatus === "disabled" && (
-                    <button
-                      onClick={enablePush}
-                      disabled={isRegistering}
-                      className="btn-gradient w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm"
-                    >
-                      {isRegistering ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Enabling...
-                        </>
-                      ) : (
-                        <>
-                          <Bell className="w-4 h-4" />
-                          Enable Push on This Device
-                        </>
-                      )}
-                    </button>
-                  )}
-                  {pushStatus === "enabled" && (
-                    <button
-                      onClick={disablePush}
-                      className="btn-ghost w-full py-2.5 rounded-xl text-sm text-text-muted hover:text-danger transition"
-                    >
-                      Disable on this device
-                    </button>
-                  )}
-                  {pushStatus === "denied" && (
-                    <div className="glass-strong rounded-xl p-4 space-y-2">
-                      <p className="text-sm font-bold text-danger">Notifications blocked by browser</p>
-                      <ol className="text-xs font-semibold text-text-muted space-y-1 list-decimal list-inside">
-                        <li>Open browser settings</li>
-                        <li>Find AttendEase in site permissions</li>
-                        <li>Change notifications to &quot;Allow&quot;</li>
-                        <li>Refresh this page</li>
-                      </ol>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Notification Type Cards */}
-              <div className={`divide-y-2 divide-border-heavy border-t-2 border-border-heavy transition-all duration-300 ${!isChannelEnabled ? "opacity-40 pointer-events-none" : ""}`}>
-                {NOTIFICATION_TYPES.map((type) => {
-                  const settingKey = `${channel.key}${type.key}` as keyof NotificationSettings;
-                  const isEnabled = currentSettings[settingKey] as boolean;
-
-                  return (
-                    <div
-                      key={type.key}
-                      className="flex items-center justify-between p-4 hover:bg-surface-3 transition"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${type.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
-                          <type.icon className="w-4 h-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-text">{type.label}</p>
-                          <p className="text-xs font-semibold text-text-muted">{type.desc}</p>
-                        </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-text">{channel.label}</p>
+                        {isPush && (
+                          <StatusBadge status={pushStatus} />
+                        )}
                       </div>
-                      <Toggle3D
-                        enabled={isEnabled}
-                        onChange={() => updateSetting({ [settingKey]: !isEnabled } as any)}
-                        small
-                      />
+                      <p className="text-xs font-semibold text-text-secondary">{channel.desc}</p>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Footer hint for push */}
-              {isPush && (
-                <div className="px-5 py-3 border-t-2 border-border-heavy">
-                  <p className="text-xs font-semibold text-text-muted">
-                    Works even when app is closed. Each device needs separate setup.
-                  </p>
+                  </div>
+                  <Toggle3D
+                    enabled={isChannelEnabled}
+                    onChange={() => updateSetting({ [channel.enabledKey]: !isChannelEnabled } as any)}
+                  />
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+                {/* Push-specific actions */}
+                {isPush && (
+                  <div className="px-5 pb-2">
+                    {pushStatus === "disabled" && (
+                      <button
+                        onClick={enablePush}
+                        disabled={isRegistering}
+                        className="btn-gradient w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm"
+                      >
+                        {isRegistering ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Enabling...
+                          </>
+                        ) : (
+                          <>
+                            <Bell className="w-4 h-4" />
+                            Enable Push on This Device
+                          </>
+                        )}
+                      </button>
+                    )}
+                    {pushStatus === "enabled" && (
+                      <button
+                        onClick={disablePush}
+                        className="btn-ghost w-full py-2.5 rounded-xl text-sm text-text-muted hover:text-danger transition"
+                      >
+                        Disable on this device
+                      </button>
+                    )}
+                    {pushStatus === "denied" && (
+                      <div className="glass-strong rounded-xl p-4 space-y-2">
+                        <p className="text-sm font-bold text-danger">Notifications blocked by browser</p>
+                        <ol className="text-xs font-semibold text-text-muted space-y-1 list-decimal list-inside">
+                          <li>Open browser settings</li>
+                          <li>Find AttendEase in site permissions</li>
+                          <li>Change notifications to &quot;Allow&quot;</li>
+                          <li>Refresh this page</li>
+                        </ol>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Notification Type Cards */}
+                <div className={`divide-y-2 divide-border-heavy border-t-2 border-border-heavy transition-all duration-300 ${!isChannelEnabled ? "opacity-40 pointer-events-none" : ""}`}>
+                  {NOTIFICATION_TYPES.map((type) => {
+                    const settingKey = `${channel.key}${type.key}` as keyof NotificationSettings;
+                    const isEnabled = currentSettings[settingKey] as boolean;
+
+                    return (
+                      <div
+                        key={type.key}
+                        className="flex items-center justify-between p-4 hover:bg-surface-3 transition"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${type.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
+                            <type.icon className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-text">{type.label}</p>
+                            <p className="text-xs font-semibold text-text-muted">{type.desc}</p>
+                          </div>
+                        </div>
+                        <Toggle3D
+                          enabled={isEnabled}
+                          onChange={() => updateSetting({ [settingKey]: !isEnabled } as any)}
+                          small
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer hint for push */}
+                {isPush && (
+                  <div className="px-5 py-3 border-t-2 border-border-heavy">
+                    <p className="text-xs font-semibold text-text-muted">
+                      Works even when app is closed. Each device needs separate setup.
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </StaggerGrid>
+      </PageTransition>
 
       {/* ===== STICKY SAVE FOOTER ===== */}
       <div

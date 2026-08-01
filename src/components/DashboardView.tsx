@@ -15,6 +15,8 @@ import { MarkingProgressBar } from "@/components/MarkingProgressBar";
 import { ParticleBurst } from "@/components/ParticleBurst";
 import { StreakFlame } from "@/components/StreakFlame";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 interface TodayClass {
   scheduleId: string; subjectId: string; subjectName: string; colorHex: string;
   startTime: string; endTime: string; room: string | null; currentPct: number;
@@ -200,11 +202,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   }
 
   return (
-    <div className="space-y-6">
+    <PageTransition direction="up" staggerChildren={false} className="space-y-6">
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
       {/* Header */}
-      <div className="flex items-center justify-between" style={{ animation: "dash-in 0.4s ease-out both" }}>
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <div>
           <h1 className="text-2xl font-bold text-gradient text-shimmer">
             Hello {displayName} 👋
@@ -232,16 +234,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
         </div>
       </div>
 
-      <style>{`
-        @keyframes dash-in {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+
 
       {/* Orphan Subjects Banner */}
       {((dashboard?.orphanCount ?? 0) > 0) && isCurrent && (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-4 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-4 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 text-sm">
@@ -263,7 +260,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Semester Banners */}
       {!activeSemester && !dashLoading && (
-        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
               🎓
@@ -283,7 +280,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {semesterEnded && (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
               📅
@@ -306,7 +303,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {currentExam && (
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
               📝
@@ -322,7 +319,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {todayHoliday && (
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl p-5 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
               🎉
@@ -337,7 +334,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Danger Alert */}
       {isCurrent && dangerSubjectsList.length > 0 && (
-        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30 animated-border animate-shake" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+        <div className="glass rounded-2xl p-4 flex items-start gap-3 border-red-500/30 animated-border animate-shake" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shrink-0 shadow-lg shadow-red-500/20">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
@@ -352,7 +349,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Stats Row */}
       {dashboard && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 card-stagger" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
+        <StaggerGrid
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          delay={100}
+          staggerDelay={80}
+          animation="card3DEnter"
+        >
           <StatCard label="Overall" value={<AnimatedCounter value={overallPct} suffix="%" />}
             icon={<TrendingUp className="w-5 h-5" />}
             gradient={overallPct >= 75 ? "from-green-500 to-emerald-500" : "from-red-500 to-orange-500"} />
@@ -363,12 +365,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <StatCard label={isCurrent ? "In Danger" : "Failed"} value={<AnimatedCounter value={dangerCount} />}
             icon={<Zap className="w-5 h-5" />}
             gradient={dangerCount > 0 ? "from-red-500 to-pink-500" : "from-green-500 to-cyan-500"} />
-        </div>
+        </StaggerGrid>
       )}
 
       {/* Goal Mode Card */}
       {isCurrent && goalPlan && (
-        <div style={{ animation: "dash-in 0.4s ease-out 0.12s both" }}>
+        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
             <div className="glass rounded-2xl overflow-hidden">
               <button
@@ -447,26 +449,23 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Today's Classes */}
       {isCurrent && todayClasses.length > 0 && (
-        <div style={{ animation: "dash-in 0.4s ease-out 0.15s both" }}>
+        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 150ms forwards" }}>
           <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-text">
             <Sparkles className="w-5 h-5 text-purple-400" /> Today&apos;s Classes
           </h2>
-          <div className="grid gap-3 card-stagger">
+          <StaggerGrid className="grid gap-3" delay={180} staggerDelay={80} animation="fadeSlideUp">
             {todayClasses.map((cls, i) => (
-              <div key={cls.scheduleId}
-                style={{ animation: `dash-in 0.35s ease-out ${0.18 + i * 0.05}s both` }}>
-                <ScheduleCard cls={cls} marking={markingId} onMark={quickMark} />
-              </div>
+              <ScheduleCard key={cls.scheduleId} cls={cls} marking={markingId} onMark={quickMark} />
             ))}
-          </div>
+          </StaggerGrid>
         </div>
       )}
 
       {/* Subject Cards */}
       {dashboard && subjectsList.length > 0 && (
-        <div style={{ animation: "dash-in 0.4s ease-out 0.2s both" }}>
+        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
           <h2 className="text-lg font-semibold mb-3 text-text">All Subjects</h2>
-          <div className="grid gap-3 md:grid-cols-2 card-stagger">
+          <StaggerGrid className="grid gap-3 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
               // Handle both new and old properties
               const pct = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
@@ -475,8 +474,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group"
-                style={{ animation: `dash-in 0.35s ease-out ${0.25 + i * 0.04}s both` }}>
+                className="glass rounded-2xl p-4 hover:bg-glass-strong transition-all group">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-10 rounded-full" style={{ backgroundColor: s.colorHex, boxShadow: `0 0 10px ${s.colorHex}30` }} />
@@ -521,13 +519,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                 </div>
               </Link>
             )})}
-          </div>
+          </StaggerGrid>
         </div>
       )}
 
       {/* Empty state */}
       {dashboard && totalSubjects === 0 && (
-        <div className="text-center py-16 glass rounded-2xl" style={{ animation: "dash-in 0.4s ease-out 0.1s both" }}>
+        <div className="text-center py-16 glass rounded-2xl" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 100ms forwards" }}>
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
@@ -644,7 +642,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }
 

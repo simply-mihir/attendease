@@ -4,6 +4,8 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+import { PageTransition } from "@/components/PageTransition";
+
 export default function ExportPage() {
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [exporting, setExporting] = useState(false);
@@ -45,13 +47,13 @@ export default function ExportPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <Link href="/settings" className="flex items-center gap-2 text-gray-400 text-sm hover:text-white transition">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <Link href="/settings" className="flex items-center gap-2 text-gray-400 text-sm hover:text-white transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
-      <h1 className="text-2xl font-bold text-gradient">Export Data</h1>
+      <h1 className="text-2xl font-bold text-gradient" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>Export Data</h1>
 
-      <div className="glass rounded-2xl p-6 space-y-5">
+      <div className="glass rounded-2xl p-6 space-y-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
           <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
@@ -79,6 +81,6 @@ export default function ExportPage() {
           {exporting ? "Exporting..." : "Download CSV"}
         </button>
       </div>
-    </div>
+    </PageTransition>
   );
 }

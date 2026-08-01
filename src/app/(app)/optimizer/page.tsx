@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 interface Recommendation {
   subjectId: string;
@@ -46,9 +48,9 @@ export default function OptimizerPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+    <PageTransition direction="up" staggerChildren={false} className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div>
+      <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <Zap className="w-5 h-5 text-white" />
@@ -61,7 +63,7 @@ export default function OptimizerPage() {
       </div>
 
       {/* Controls */}
-      <div className="glass rounded-2xl p-6">
+      <div className="glass rounded-2xl p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <label className="block text-sm font-bold text-text mb-3">
           How many classes do you want to skip?{" "}
           <span className="text-emerald-400 text-xl">{maxSkips}</span>
@@ -91,6 +93,7 @@ export default function OptimizerPage() {
               ? "border-l-green-500"
               : "border-l-red-500"
           )}
+          style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
         >
           <div
             className={clsx(
@@ -125,7 +128,7 @@ export default function OptimizerPage() {
 
       {/* Results */}
       {result && !loading && (
-        <div className="space-y-3">
+        <StaggerGrid className="space-y-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {result.recommendations.length === 0 ? (
             <div className="glass rounded-2xl p-8 text-center">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-500/20">
@@ -141,7 +144,6 @@ export default function OptimizerPage() {
               <div
                 key={rec.subjectId}
                 className="glass rounded-2xl p-5 hover:bg-surface-3 transition-all"
-                style={{ animation: `fade-in 0.3s ease-out ${0.05 * i}s both` }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -230,7 +232,7 @@ export default function OptimizerPage() {
               </div>
             ))
           )}
-        </div>
+        </StaggerGrid>
       )}
 
       {loading && !initialLoad && (
@@ -238,6 +240,6 @@ export default function OptimizerPage() {
           Calculating optimal skip plan...
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

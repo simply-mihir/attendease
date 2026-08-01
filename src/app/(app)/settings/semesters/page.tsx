@@ -5,6 +5,8 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { ArrowLeft, Plus, Trash2, Star, Loader2, Edit2, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 export default function SemestersPage() {
   const [showForm, setShowForm] = useState(false);
@@ -149,11 +151,11 @@ export default function SemestersPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
         <h1 className="text-2xl font-black text-text">Semesters</h1>
         <button onClick={() => setShowForm(!showForm)}
           className="btn-gradient flex items-center gap-2 px-6 py-3">
@@ -162,7 +164,7 @@ export default function SemestersPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleCreate} className="glass rounded-3xl p-6 space-y-4">
+        <form onSubmit={handleCreate} className="glass rounded-3xl p-6 space-y-4 animate-fade-in">
           <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="e.g., Semester 5 — Fall 2026" required
             className="input-glass w-full py-3" />
@@ -190,7 +192,7 @@ export default function SemestersPage() {
         </form>
       )}
 
-      <div className="space-y-3">
+      <StaggerGrid className="space-y-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
         {semesters.map((s) => (
           <div key={s.id} className={clsx("glass p-5 flex items-center justify-between",
             s.isCurrent ? "border-primary shadow-lg" : ""
@@ -234,7 +236,7 @@ export default function SemestersPage() {
         {semesters.length === 0 && (
           <p className="text-center py-8 text-text-muted text-sm font-bold">No semesters yet</p>
         )}
-      </div>
+      </StaggerGrid>
 
       {/* Edit Semester Modal */}
       {showEditModal && (
@@ -305,6 +307,6 @@ export default function SemestersPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

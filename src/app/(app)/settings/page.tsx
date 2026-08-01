@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { Bell, Calendar, Download, Moon, ChevronRight, Trophy, Edit2, HeartPulse, Target } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiFetch } from "@/hooks/useApi";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 const settingsItems = [
   { href: "/settings/notifications", label: "Notifications", desc: "Telegram, email, alarms, and push notifications", icon: Bell, gradient: "from-purple-500 to-pink-500" },
@@ -52,69 +54,71 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-black text-text">Settings</h1>
+    <PageTransition direction="up" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <h1 className="text-2xl font-black text-text" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>Settings</h1>
 
-      {/* Profile card */}
-      <div className="glass rounded-3xl p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-black border-2 border-border-heavy">
-              {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+      <StaggerGrid className="space-y-6" delay={100} staggerDelay={100} animation="fadeSlideUp">
+        {/* Profile card */}
+        <div className="glass rounded-3xl p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-black border-2 border-border-heavy">
+                {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-text">{user?.name || "Student"}</h2>
+                <p className="text-sm font-semibold text-text-secondary">{user?.email}</p>
+              </div>
+            </div>
+            <button onClick={openEditModal} className="btn-ghost p-3 text-text hover:text-primary transition">
+              <Edit2 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Settings links */}
+        <div className="glass rounded-3xl divide-y-2 divide-border-heavy overflow-hidden">
+          {settingsItems.map((item) => (
+            <Link key={item.href} href={item.href}
+              className="flex items-center gap-4 p-5 hover:bg-surface-3 transition">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
+                <item.icon className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-black text-text">{item.label}</p>
+                <p className="text-xs font-semibold text-text-secondary">{item.desc}</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-text-muted" />
+            </Link>
+          ))}
+        </div>
+
+        {/* Theme Appearance card */}
+        <div className="glass rounded-3xl p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shrink-0 border-2 border-border-heavy">
+              <Moon className="w-5 h-5 text-border-heavy" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-text">{user?.name || "Student"}</h2>
-              <p className="text-sm font-semibold text-text-secondary">{user?.email}</p>
+              <p className="font-black text-text">Appearance</p>
+              <p className="text-xs font-semibold text-text-secondary">Toggle between Light and Dark mode</p>
             </div>
           </div>
-          <button onClick={openEditModal} className="btn-ghost p-3 text-text hover:text-primary transition">
-            <Edit2 className="w-5 h-5" />
-          </button>
+          <ThemeToggle />
         </div>
-      </div>
 
-      {/* Settings links */}
-      <div className="glass rounded-3xl divide-y-2 divide-border-heavy overflow-hidden">
-        {settingsItems.map((item) => (
-          <Link key={item.href} href={item.href}
-            className="flex items-center gap-4 p-5 hover:bg-surface-3 transition">
-            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
-              <item.icon className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1">
-              <p className="font-black text-text">{item.label}</p>
-              <p className="text-xs font-semibold text-text-secondary">{item.desc}</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-text-muted" />
-          </Link>
-        ))}
-      </div>
-
-      {/* Theme Appearance card */}
-      <div className="glass rounded-3xl p-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shrink-0 border-2 border-border-heavy">
-            <Moon className="w-5 h-5 text-border-heavy" />
+        {/* Achievements link */}
+        <Link href="/analytics" className="flex items-center gap-4 glass rounded-3xl p-5 hover:bg-surface-3 transition block">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center shrink-0 border-2 border-border-heavy">
+            <Trophy className="w-5 h-5 text-border-heavy" />
           </div>
-          <div>
-            <p className="font-black text-text">Appearance</p>
-            <p className="text-xs font-semibold text-text-secondary">Toggle between Light and Dark mode</p>
+          <div className="flex-1">
+            <p className="font-black text-text">Achievements & Badges</p>
+            <p className="text-xs font-semibold text-text-secondary">View your earned badges and progress</p>
           </div>
-        </div>
-        <ThemeToggle />
-      </div>
-
-      {/* Achievements link */}
-      <Link href="/analytics" className="flex items-center gap-4 glass rounded-3xl p-5 hover:bg-surface-3 transition">
-        <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center shrink-0 border-2 border-border-heavy">
-          <Trophy className="w-5 h-5 text-border-heavy" />
-        </div>
-        <div className="flex-1">
-          <p className="font-black text-text">Achievements & Badges</p>
-          <p className="text-xs font-semibold text-text-secondary">View your earned badges and progress</p>
-        </div>
-        <ChevronRight className="w-5 h-5 text-text-muted" />
-      </Link>
+          <ChevronRight className="w-5 h-5 text-text-muted" />
+        </Link>
+      </StaggerGrid>
 
       {/* Edit Profile Modal */}
       {showEditModal && (
@@ -139,6 +143,6 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

@@ -5,6 +5,8 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
 import { ArrowLeft, Target, Save, Loader2 } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 export default function GoalSettingsPage() {
   const [enabled, setEnabled] = useState(false);
@@ -50,13 +52,13 @@ export default function GoalSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
 
       {/* Header */}
-      <div>
+      <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
             <Target className="w-5 h-5 text-white" />
@@ -68,7 +70,7 @@ export default function GoalSettingsPage() {
         </p>
       </div>
 
-      <div className="glass rounded-2xl p-6 space-y-6">
+      <StaggerGrid className="glass rounded-2xl p-6 space-y-6" delay={150} staggerDelay={80} animation="fadeSlideUp">
         {/* Enable toggle */}
         <div className="flex items-center justify-between">
           <div>
@@ -126,17 +128,19 @@ export default function GoalSettingsPage() {
             </div>
           </div>
         )}
-      </div>
+      </StaggerGrid>
 
       {/* Save button */}
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="btn-gradient w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-      >
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-        {saved ? "Saved!" : "Save Goal Settings"}
-      </button>
-    </div>
+      <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="btn-gradient w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {saved ? "Saved!" : "Save Goal Settings"}
+        </button>
+      </div>
+    </PageTransition>
   );
 }

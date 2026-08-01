@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const STATUS_DOT: Record<string, string> = {
@@ -91,8 +93,8 @@ export default function CalendarPage() {
   const isToday = (d: Date) => d.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <PageTransition direction="left" staggerChildren={false} className="space-y-6">
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl font-bold text-gradient">Calendar</h1>
         <div className="flex gap-2">
           <button onClick={() => setView("week")}
@@ -107,7 +109,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between glass rounded-2xl p-3">
+      <div className="flex items-center justify-between glass rounded-2xl p-3" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-xl transition">
           <ChevronLeft className="w-5 h-5 text-gray-400" />
         </button>
@@ -124,7 +126,7 @@ export default function CalendarPage() {
 
       {view === "week" ? (
         /* Week View */
-        <div className="grid grid-cols-7 gap-2">
+        <StaggerGrid className="grid grid-cols-7 gap-2" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {weekDates.map((date, i) => {
             const dayClasses = getClassesForDay(date.getDay());
             const dateStr = date.toISOString().slice(0, 10);
@@ -153,14 +155,14 @@ export default function CalendarPage() {
               </div>
             );
           })}
-        </div>
+        </StaggerGrid>
       ) : (
         /* Month View */
-        <div className="glass rounded-2xl p-4">
+        <div className="glass rounded-2xl p-4" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           <div className="grid grid-cols-7 gap-1 mb-2">
             {DAYS.map((d) => <div key={d} className="text-center text-xs font-medium text-gray-500 py-1">{d}</div>)}
           </div>
-          <div className="grid grid-cols-7 gap-1">
+          <StaggerGrid className="grid grid-cols-7 gap-1" delay={200} staggerDelay={30} animation="scaleIn">
             {monthDays.map((date, i) => {
               if (!date) return <div key={i} />;
               const dateStr = date.toISOString().slice(0, 10);
@@ -179,7 +181,7 @@ export default function CalendarPage() {
                 </div>
               );
             })}
-          </div>
+          </StaggerGrid>
           <div className="flex items-center gap-4 mt-4 text-xs text-gray-500 justify-center">
             {Object.entries(STATUS_DOT).slice(0, 4).map(([k, v]) => (
               <span key={k} className="flex items-center gap-1">
@@ -189,6 +191,6 @@ export default function CalendarPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

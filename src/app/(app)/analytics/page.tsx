@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 const AnalyticsCharts = dynamic(
   () => import("@/components/AnalyticsCharts"),
@@ -108,11 +110,11 @@ export default function AnalyticsPage() {
   if (currentWeek.length > 0) weeks.push(currentWeek);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-gradient">Analytics</h1>
+    <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
+      <h1 className="text-2xl font-bold text-gradient" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>Analytics</h1>
 
       {/* Overview cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4" delay={100} staggerDelay={80} animation="flipIn">
         <div className="glass rounded-2xl p-4 text-center">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-2">
             <TrendingUp className="w-5 h-5 text-white" />
@@ -141,13 +143,15 @@ export default function AnalyticsPage() {
           <p className="text-3xl font-bold text-yellow-400">{dashboard.currentStreak}</p>
           <p className="text-xs text-gray-500">Streak</p>
         </div>
-      </div>
+      </StaggerGrid>
 
       {/* Charts row — lazy loaded */}
-      <AnalyticsCharts barData={barData} pieData={pieData} />
+      <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 200ms forwards" }}>
+        <AnalyticsCharts barData={barData} pieData={pieData} />
+      </div>
 
       {/* Heatmap */}
-      <div className="glass rounded-2xl p-5">
+      <div className="glass rounded-2xl p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="font-semibold mb-4 text-white">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-0.5" style={{ minWidth: "700px" }}>
@@ -174,9 +178,9 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Per-subject details */}
-      <div className="glass rounded-2xl p-5">
+      <div className="glass rounded-2xl p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
         <h3 className="font-semibold mb-4 text-white">Subject Breakdown</h3>
-        <div className="space-y-3">
+        <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
           {dashboard.subjectsSummary.map((s: any) => (
             <div key={s.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition">
               <div className="w-2.5 h-8 rounded-full" style={{ backgroundColor: s.colorHex }} />
@@ -198,8 +202,8 @@ export default function AnalyticsPage() {
               </div>
             </div>
           ))}
-        </div>
+        </StaggerGrid>
       </div>
-    </div>
+    </PageTransition>
   );
 }

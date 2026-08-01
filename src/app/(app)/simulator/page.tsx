@@ -4,6 +4,7 @@ import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Sliders, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
 
 export default function SimulatorPage() {
   const [selectedId, setSelectedId] = useState("");
@@ -53,8 +54,8 @@ export default function SimulatorPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      <div>
+    <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6">
+      <div style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
             <Sliders className="w-5 h-5 text-white" />
@@ -64,7 +65,7 @@ export default function SimulatorPage() {
         <p className="text-gray-400 text-sm mt-1 ml-[52px]">See how skipping or attending classes affects your attendance</p>
       </div>
 
-      <div className="glass rounded-2xl p-6 space-y-6">
+      <div className="glass rounded-2xl p-6 space-y-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Select Subject</label>
@@ -108,7 +109,7 @@ export default function SimulatorPage() {
 
       {/* Result */}
       {result && !loading && (
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
           <h3 className="font-semibold mb-4 text-white">Simulation Result</h3>
 
           <div className="flex items-center gap-4 justify-center mb-6">
@@ -164,6 +165,6 @@ export default function SimulatorPage() {
       {loading && (
         <div className="text-center py-8 text-gray-500">Calculating...</div>
       )}
-    </div>
+    </PageTransition>
   );
 }

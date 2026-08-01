@@ -9,6 +9,8 @@ import {
   Mail, MessageSquare, Volume2
 } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 
 interface Reminder {
   id: string;
@@ -153,9 +155,9 @@ export default function RemindersPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-fade-in">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 glass-strong p-6 rounded-3xl border-2 border-border-heavy">
+      <div className="flex items-center justify-between flex-wrap gap-4 glass-strong p-6 rounded-3xl border-2 border-border-heavy" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
             <Bell className="w-6 h-6 text-black" />
@@ -174,7 +176,7 @@ export default function RemindersPage() {
       </div>
 
       {/* Filter Tabs & Toggle */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
@@ -219,7 +221,7 @@ export default function RemindersPage() {
           ))}
         </div>
       ) : filteredReminders.length === 0 ? (
-        <div className="glass p-12 text-center rounded-3xl border-2 border-border-heavy space-y-3">
+        <div className="glass p-12 text-center rounded-3xl border-2 border-border-heavy space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">
             <Bell className="w-6 h-6" />
           </div>
@@ -237,7 +239,7 @@ export default function RemindersPage() {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <StaggerGrid className="space-y-3" delay={100} staggerDelay={50} animation="fadeSlideUp">
           {filteredReminders.map((reminder) => (
             <div
               key={reminder.id}
@@ -331,7 +333,7 @@ export default function RemindersPage() {
               </button>
             </div>
           ))}
-        </div>
+        </StaggerGrid>
       )}
 
       {/* New Reminder Modal */}
@@ -523,6 +525,6 @@ export default function RemindersPage() {
           </form>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

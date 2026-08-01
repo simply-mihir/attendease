@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/hooks/useApi";
 import { GraduationCap, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { PageTransition } from "@/components/PageTransition";
 
 export default function NewSemesterPage() {
   const router = useRouter();
@@ -86,8 +87,8 @@ export default function NewSemesterPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <div className="flex items-center gap-4 mb-8">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <div className="flex items-center gap-4 mb-8" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <Link href="/semesters" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -113,7 +114,7 @@ export default function NewSemesterPage() {
 
       {step === "form" && (
 
-      <form onSubmit={handleSubmit} className="glass rounded-2xl p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="glass rounded-2xl p-6 space-y-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold mb-2 text-text">Semester Name</label>
@@ -167,7 +168,7 @@ export default function NewSemesterPage() {
       )}
 
       {step === "import" && (
-        <div className="glass rounded-2xl p-6 space-y-6">
+        <div className="glass rounded-2xl p-6 space-y-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
           <div>
             <h2 className="text-xl font-bold text-white">Import Subjects</h2>
             <p className="mt-1 text-sm text-gray-400">
@@ -233,7 +234,7 @@ export default function NewSemesterPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }
 

@@ -6,7 +6,8 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { SubjectsSkeleton } from "@/components/Skeleton";
 import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera } from "lucide-react";
 import clsx from "clsx";
-
+import { PageTransition } from "@/components/PageTransition";
+import { StaggerGrid } from "@/components/StaggerGrid";
 export default function SubjectsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [deletingSubject, setDeletingSubject] = useState<any | null>(null);
@@ -37,8 +38,8 @@ export default function SubjectsPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <PageTransition direction="left" staggerChildren={false} className="space-y-6">
+      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl font-bold text-gradient">Subjects</h1>
         <div className="flex gap-3">
           <button onClick={() => setShowArchived(!showArchived)}
@@ -53,29 +54,31 @@ export default function SubjectsPage() {
 
       {/* Import CTA */}
       {!showArchived && (
-        <Link
-          href="/import"
-          className="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-surface-3 transition group border-2 border-dashed border-border-heavy hover:border-cyan-500/30"
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
-            <Camera className="w-5 h-5 text-white" />
-          </div>
-          <div className="flex-1">
-            <p className="font-bold text-sm text-text">Import from Photo</p>
-            <p className="text-xs text-text-muted">
-              Snap your timetable or upload a PDF/Excel to auto-add all subjects
-            </p>
-          </div>
-          <span className="text-text-muted group-hover:translate-x-1 transition-transform">
-            →
-          </span>
-        </Link>
+        <div style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
+          <Link
+            href="/import"
+            className="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-surface-3 transition group border-2 border-dashed border-border-heavy hover:border-cyan-500/30"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-sm text-text">Import from Photo</p>
+              <p className="text-xs text-text-muted">
+                Snap your timetable or upload a PDF/Excel to auto-add all subjects
+              </p>
+            </div>
+            <span className="text-text-muted group-hover:translate-x-1 transition-transform">
+              →
+            </span>
+          </Link>
+        </div>
       )}
 
       {loading ? (
         <SubjectsSkeleton />
       ) : subjects.length === 0 ? (
-        <div className="text-center py-16 glass rounded-2xl">
+        <div className="text-center py-16 glass rounded-2xl" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 150ms forwards" }}>
           <BookOpen className="w-12 h-12 text-text-muted mx-auto mb-3" />
           <p className="text-text-secondary mb-4">{showArchived ? "No archived subjects" : "No subjects yet. Add one to get started!"}</p>
           {!showArchived && (
@@ -90,7 +93,7 @@ export default function SubjectsPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <StaggerGrid className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" delay={150} staggerDelay={100} animation="scaleIn">
           {subjects.map((s) => {
             const buffer = s.currentPercentage - s.minAttendancePct;
             const color = buffer >= 10 ? "green" : buffer >= 0 ? "yellow" : "red";
@@ -135,7 +138,7 @@ export default function SubjectsPage() {
               </div>
             );
           })}
-        </div>
+        </StaggerGrid>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -165,6 +168,6 @@ export default function SubjectsPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

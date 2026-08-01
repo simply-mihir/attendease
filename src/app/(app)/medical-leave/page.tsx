@@ -7,6 +7,7 @@ import {
   ArrowLeft, HeartPulse, Calendar, CheckCircle2, AlertTriangle, Loader2,
 } from "lucide-react";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
 
 interface SubjectOption {
   id: string;
@@ -90,13 +91,13 @@ export default function MedicalLeavePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+      <Link href="/settings" className="flex items-center gap-2 text-text-secondary text-sm hover:text-text transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
 
       {/* Header */}
-      <div>
+      <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
         <h1 className="text-2xl font-bold flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center shadow-lg shadow-red-500/20">
             <HeartPulse className="w-5 h-5 text-white" />
@@ -110,7 +111,7 @@ export default function MedicalLeavePage() {
 
       {/* Success result */}
       {result && (
-        <div className="glass rounded-2xl p-5 border-green-500/30 animate-fade-in">
+        <div className="glass rounded-2xl p-5 border-green-500/30 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5 text-white" />
@@ -133,7 +134,7 @@ export default function MedicalLeavePage() {
       )}
 
       {/* Form */}
-      <div className="glass rounded-2xl p-6 space-y-5">
+      <div className="glass rounded-2xl p-6 space-y-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
         {/* Date range */}
         <div>
           <label className="block text-sm font-bold text-text mb-2 flex items-center gap-2">
@@ -280,6 +281,6 @@ export default function MedicalLeavePage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

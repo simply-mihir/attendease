@@ -8,6 +8,7 @@ import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import clsx from "clsx";
+import { PageTransition } from "@/components/PageTransition";
 
 export default function SemesterDetailPage() {
   const params = useParams();
@@ -80,9 +81,9 @@ export default function SemesterDetailPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in">
+    <PageTransition direction="right" staggerChildren={false} className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <Link href="/semesters" className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -102,7 +103,7 @@ export default function SemesterDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
+      <div className="flex gap-2 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
         {[
           { id: "dashboard", label: "Dashboard", icon: <FileText className="w-4 h-4" /> },
           { id: "holidays", label: "Holidays", icon: <Calendar className="w-4 h-4" /> },
@@ -122,7 +123,7 @@ export default function SemesterDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="pt-2">
+      <div className="pt-2" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         {activeTab === "dashboard" && (
           <div className="opacity-90">
             {semester.isCurrent ? (
@@ -207,6 +208,6 @@ export default function SemesterDetailPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageTransition>
   );
 }
