@@ -91,26 +91,26 @@ export async function GET() {
     ) {
       const dayOfWeek = d.getDay();
 
-      if (!scheduledDays.has(dayOfWeek)) continue;
+      if (scheduledDays.has(dayOfWeek)) {
+        // Count how many schedules on this day
+        const classCount = subject.schedules.filter(
+          (s) => s.dayOfWeek === dayOfWeek
+        ).length;
 
-      // Count how many schedules on this day
-      const classCount = subject.schedules.filter(
-        (s) => s.dayOfWeek === dayOfWeek
-      ).length;
+        for (let c = 0; c < classCount; c++) {
+          projectedTotal++;
+          // Use historical day-of-week attendance rate as probability
+          const ds = dayStats[dayOfWeek];
+          const attendProb =
+            ds.total > 0 ? ds.present / ds.total : 0.75; // default 75% if no data
 
-      for (let c = 0; c < classCount; c++) {
-        projectedTotal++;
-        // Use historical day-of-week attendance rate as probability
-        const ds = dayStats[dayOfWeek];
-        const attendProb =
-          ds.total > 0 ? ds.present / ds.total : 0.75; // default 75% if no data
-
-        // Deterministic projection using probability
-        projectedPresent += attendProb;
+          // Deterministic projection using probability
+          projectedPresent += attendProb;
+        }
       }
 
       // Sample projection point every 7 days
-      const dayDiff = Math.floor(
+      const dayDiff = Math.round(
         (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
       );
       if (dayDiff % 7 === 0 || d.getTime() >= semesterEnd.getTime() - 86400000) {
@@ -118,10 +118,13 @@ export async function GET() {
           projectedTotal === 0
             ? 0
             : Math.round((projectedPresent / projectedTotal) * 10000) / 100;
-        projectionPoints.push({
-          date: d.toISOString().slice(0, 10),
-          projectedPct: pct,
-        });
+        const dateStr = d.toISOString().slice(0, 10);
+        if (projectionPoints[projectionPoints.length - 1]?.date !== dateStr) {
+          projectionPoints.push({
+            date: dateStr,
+            projectedPct: pct,
+          });
+        }
       }
     }
 
