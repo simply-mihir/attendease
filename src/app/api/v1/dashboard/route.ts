@@ -20,8 +20,8 @@ export async function GET() {
     include: { holidays: true, examPeriods: true },
   });
 
-  // 5 parallel queries including overall streak
-  const [dbUser, subjects, todayRecords, schedules, currentStreak] = await Promise.all([
+  // 6 parallel queries including overall streak and orphan count
+  const [dbUser, subjects, todayRecords, schedules, currentStreak, orphanCount] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
       select: { name: true },
@@ -79,6 +79,9 @@ export async function GET() {
       orderBy: { startTime: "asc" },
     }),
     calcOverallStreak(user.id),
+    prisma.subject.count({
+      where: { userId: user.id, semesterId: null },
+    }),
   ]);
 
   const userName = dbUser?.name || user.name || "Student";
@@ -145,5 +148,6 @@ export async function GET() {
     isCurrentSemester: activeSemester ? true : false,
     semesterName: activeSemester?.name || null,
     activeSemester,
+    orphanCount,
   }, 15);
 }

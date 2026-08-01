@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
@@ -7,7 +7,7 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { DashboardSkeleton } from "@/components/Skeleton";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download
 } from "lucide-react";
 import clsx from "clsx";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
@@ -46,6 +46,7 @@ interface DashboardData {
     holidays: { id: string; name: string; date: string }[];
     examPeriods: { id: string; name: string; startDate: string; endDate: string }[];
   } | null;
+  orphanCount?: number;
 }
 
 interface GoalPlanData {
@@ -68,6 +69,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [markingStatus, setMarkingStatus] = useState<{ active: boolean; status: "PRESENT" | "ABSENT" | null }>({ active: false, status: null });
   const [particleBurst, setParticleBurst] = useState<{ trigger: boolean; x: number; y: number; type: "present" | "absent" }>({ trigger: false, x: 0, y: 0, type: "present" });
+
+  const [showImportSubjects, setShowImportSubjects] = useState(false);
+  const [importableSubjects, setImportableSubjects] = useState<{ orphans: any[]; fromOtherSemesters: any[] } | null>(null);
+  const [loadingImportable, setLoadingImportable] = useState(false);
+  const [selectedImports, setSelectedImports] = useState<Map<string, "move" | "copy">>(new Map());
+  const [importing, setImporting] = useState(false);
 
   const loading = dashLoading || goalLoading;
 
@@ -103,6 +110,58 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       setTimeout(() => setMarkingStatus({ active: false, status: null }), 1200);
     }
   }, [qs]);
+
+  // Import Modal logic
+  const activeSemId = dashboard?.activeSemester?.id || semesterId;
+  
+  useEffect(() => {
+    if (!showImportSubjects || !activeSemId) return;
+    setLoadingImportable(true);
+    apiFetch(`/semesters/${activeSemId}/import`)
+      .then((data: any) => {
+        setImportableSubjects(data);
+        setSelectedImports(new Map());
+      })
+      .catch(console.error)
+      .finally(() => setLoadingImportable(false));
+  }, [showImportSubjects, activeSemId]);
+
+  function toggleImportSelection(subjectId: string, isOrphan: boolean) {
+    setSelectedImports(prev => {
+      const next = new Map(prev);
+      if (next.has(subjectId)) next.delete(subjectId);
+      else next.set(subjectId, isOrphan ? "move" : "copy");
+      return next;
+    });
+  }
+
+  function switchImportMode(subjectId: string) {
+    setSelectedImports(prev => {
+      const next = new Map(prev);
+      const current = next.get(subjectId);
+      if (current) next.set(subjectId, current === "move" ? "copy" : "move");
+      return next;
+    });
+  }
+
+  async function handleImport() {
+    if (selectedImports.size === 0 || importing || !activeSemId) return;
+    setImporting(true);
+    try {
+      const subjects = Array.from(selectedImports.entries()).map(([id, mode]) => ({ id, mode }));
+      await apiFetch(`/semesters/${activeSemId}/import`, {
+        method: "POST",
+        body: JSON.stringify({ subjects }),
+      });
+      await invalidate(`/dashboard${qs}`);
+      setShowImportSubjects(false);
+      setSelectedImports(new Map());
+    } catch (error) {
+      console.error("Import failed:", error);
+    } finally {
+      setImporting(false);
+    }
+  }
 
   // Normalize data depending on backend response (supporting both new combined and legacy shapes)
   const isCurrent = dashboard?.isCurrentSemester ?? true;
@@ -155,9 +214,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/import" className="btn-gradient-cyan px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
-            <Camera className="w-4 h-4" /> Import
-          </Link>
+          {isCurrent && activeSemId && (
+            <button
+              onClick={() => setShowImportSubjects(true)}
+              className="btn-gradient-cyan px-4 py-2.5 rounded-xl text-sm flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Import
+            </button>
+          )}
           <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Subject
           </Link>
@@ -170,6 +234,28 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      {/* Orphan Subjects Banner */}
+      {dashboard?.orphanCount && dashboard.orphanCount > 0 && isCurrent && (
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-xl p-4 mb-6" style={{ animation: "dash-in 0.4s ease-out 0.05s both" }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 text-sm">
+                ⚠️
+              </div>
+              <p className="text-sm text-gray-300">
+                You have <strong className="text-amber-300">{dashboard.orphanCount} subject{dashboard.orphanCount > 1 ? "s" : ""}</strong> not assigned to any semester.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowImportSubjects(true)}
+              className="rounded-lg bg-white/5 px-3 py-1.5 text-sm text-gray-300 hover:bg-white/10 transition-colors"
+            >
+              Assign
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Semester Banners */}
       {!activeSemester && !dashLoading && (
@@ -447,9 +533,111 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             <Plus className="w-5 h-5" /> Add Your First Subject
           </Link>
           <p className="text-text-muted text-sm mt-3">or</p>
-          <Link href="/import" className="btn-gradient-cyan px-6 py-3 rounded-xl inline-flex items-center gap-2 mt-2">
-            <Camera className="w-5 h-5" /> Import from Timetable Photo
-          </Link>
+          <div className="flex flex-col gap-2 mt-2 items-center">
+            {isCurrent && activeSemId && (
+              <button onClick={() => setShowImportSubjects(true)} className="btn-gradient-cyan px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 w-full max-w-xs">
+                <Download className="w-5 h-5" /> Import Existing Subjects
+              </button>
+            )}
+            <Link href="/import" className="glass px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 hover:bg-surface-3 transition w-full max-w-xs">
+              <Camera className="w-5 h-5" /> Import from Timetable Photo
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Import Modal */}
+      {showImportSubjects && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowImportSubjects(false)}>
+          <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border border-white/10 bg-gray-900/95 backdrop-blur-xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Header */}
+            <div className="p-6 border-b border-white/5">
+              <h3 className="text-lg font-semibold text-white">Import Subjects</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Add existing subjects to this semester
+              </p>
+            </div>
+
+            {/* Body — scrollable */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {loadingImportable ? (
+                <div className="space-y-3 animate-pulse">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="h-16 rounded-xl bg-white/5" />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* Orphan subjects */}
+                  {importableSubjects?.orphans && importableSubjects.orphans.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                        Unassigned Subjects
+                      </h4>
+                      <div className="space-y-2">
+                        {importableSubjects.orphans.map(subject => (
+                          <ImportSubjectCard
+                            key={subject.id} subject={subject} semesterName={null}
+                            isSelected={selectedImports.has(subject.id)}
+                            mode={selectedImports.get(subject.id) || "move"}
+                            onToggle={() => toggleImportSelection(subject.id, true)}
+                            onSwitchMode={() => switchImportMode(subject.id)} isOrphan={true}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Subjects from other semesters */}
+                  {importableSubjects?.fromOtherSemesters && importableSubjects.fromOtherSemesters.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                        From Other Semesters
+                      </h4>
+                      <div className="space-y-2">
+                        {importableSubjects.fromOtherSemesters.map(subject => (
+                          <ImportSubjectCard
+                            key={subject.id} subject={subject} semesterName={subject.semester?.name}
+                            isSelected={selectedImports.has(subject.id)}
+                            mode={selectedImports.get(subject.id) || "copy"}
+                            onToggle={() => toggleImportSelection(subject.id, false)}
+                            onSwitchMode={() => switchImportMode(subject.id)} isOrphan={false}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(!importableSubjects?.orphans?.length && !importableSubjects?.fromOtherSemesters?.length) && (
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <p className="text-gray-500 text-sm">No subjects available to import</p>
+                      <p className="text-gray-600 text-xs mt-1">All subjects are already in this semester</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-white/5 flex items-center justify-between">
+              <p className="text-sm text-gray-500">
+                {selectedImports.size > 0 ? `${selectedImports.size} subject${selectedImports.size > 1 ? "s" : ""} selected` : "Select subjects to import"}
+              </p>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setShowImportSubjects(false)} className="rounded-xl px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                  Cancel
+                </button>
+                <button onClick={handleImport} disabled={selectedImports.size === 0 || importing}
+                  className="rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {importing ? "Importing..." : `Import ${selectedImports.size > 0 ? selectedImports.size : ""}`}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -466,6 +654,53 @@ function StatCard({ label, value, icon, gradient }: { label: string; value: Reac
         </div>
       </div>
       <p className="text-2xl font-bold text-text">{value}</p>
+    </div>
+  );
+}
+
+function ImportSubjectCard({
+  subject, semesterName, isSelected, mode, onToggle, onSwitchMode, isOrphan
+}: {
+  subject: any; semesterName: string | null; isSelected: boolean; mode: "move" | "copy";
+  onToggle: () => void; onSwitchMode: () => void; isOrphan: boolean;
+}) {
+  return (
+    <div
+      onClick={onToggle}
+      className={`flex items-center gap-3 rounded-xl border p-4 cursor-pointer transition-all duration-200 ${
+        isSelected ? "border-purple-500/30 bg-purple-500/5" : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10"
+      }`}
+    >
+      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
+        isSelected ? "border-purple-500 bg-purple-600" : "border-white/20 bg-white/5"
+      }`}>
+        {isSelected && (
+          <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-200 truncate">{subject.name}</p>
+        <p className="text-xs text-gray-500">
+          {semesterName ? `From ${semesterName}` : "Not assigned to any semester"}
+          {subject._count?.attendanceRecords > 0 && ` · ${subject._count.attendanceRecords} records`}
+        </p>
+      </div>
+
+      {isSelected && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onSwitchMode(); }}
+          className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+            mode === "move"
+              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+              : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+          }`}
+        >
+          {mode === "move" ? "Move" : "Copy"}
+        </button>
+      )}
     </div>
   );
 }
