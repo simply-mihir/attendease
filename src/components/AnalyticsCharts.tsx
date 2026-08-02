@@ -41,8 +41,8 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
           Subject Comparison
         </h3>
         {barData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 80, left: 0 }}>
+          <ResponsiveContainer width="100%" height={420}>
+            <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 160, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.15)" />
               <XAxis dataKey="name" tick={<CustomXAxisTick />} interval={0} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#6b7280" }} />

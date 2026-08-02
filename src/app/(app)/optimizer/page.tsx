@@ -93,7 +93,7 @@ export default function OptimizerPage() {
             "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150",
             result.safeToSkipAll
               ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
-              : "border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827]"
+              : "border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f]"
           )}
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
         >
@@ -102,13 +102,13 @@ export default function OptimizerPage() {
               "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
               result.safeToSkipAll
                 ? "bg-[#06d6a0]/20 text-[#06d6a0] border-transparent"
-                : "bg-[#ff6b35]/20 text-[#ff6b35] border-transparent"
+                : "bg-[#ef476f]/20 text-[#ef476f] border-transparent"
             )}
           >
             {result.safeToSkipAll ? (
               <CheckCircle2 className="w-6 h-6" />
             ) : (
-              <AlertTriangle className="w-6 h-6" />
+              <XCircle className="w-6 h-6" />
             )}
           </div>
           <div>
@@ -118,11 +118,14 @@ export default function OptimizerPage() {
                 <Sparkles className="w-4 h-4 text-[#06d6a0] shrink-0 inline" />
               </p>
             ) : (
-              <p className="text-sm font-bold text-[#ff6b35]">
-                You can only safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes
+              <p className="text-sm font-bold text-[#ef476f]">
+                {result.totalSkipsUsed === 0 
+                  ? "You cannot safely skip any requested classes"
+                  : `You can only safely skip ${result.totalSkipsUsed} out of ${result.totalRequested} requested classes`
+                }
               </p>
             )}
-            <p className={clsx("text-xs font-bold mt-0.5 opacity-80", result.safeToSkipAll ? "text-[#06d6a0]" : "text-[#ff6b35]")}>
+            <p className={clsx("text-xs font-bold mt-0.5 opacity-80", result.safeToSkipAll ? "text-[#06d6a0]" : "text-[#ef476f]")}>
               Skips are distributed across subjects to maximize safety margin
             </p>
           </div>
