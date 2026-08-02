@@ -547,7 +547,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
           <p className="text-4xl font-black text-[#ff6b35] flex items-center gap-2 mb-1">
-            <Flame className="w-8 h-8 text-[#ff6b35]" /> {subject.streakCount} days
+            <Flame className="w-8 h-8 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} /> {subject.streakCount} days
           </p>
           <p className="text-sm font-bold text-text-secondary">Best record: {subject.longestStreak} days</p>
         </div>

@@ -121,12 +121,6 @@ export function FuturisticLoader({
 
 
 
-        {/* Animated dots after text */}
-        <div className="flex gap-1.5 -mt-4">
-          <div className="h-1.5 w-1.5 rounded-full bg-[#FF2D78]" style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }} />
-          <div className="h-1.5 w-1.5 rounded-full bg-[#9b5de5]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.2s infinite" }} />
-          <div className="h-1.5 w-1.5 rounded-full bg-[#4361ee]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.4s infinite" }} />
-        </div>
       </div>
     </div>
   );

@@ -126,7 +126,7 @@ export default function AnalyticsPage() {
             <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827] dark:border-[#c5471c] dark:shadow-[0_4px_0_0_#c5471c] dark:hover:shadow-[0_2px_0_0_#c5471c]">
               <div className="flex justify-center mb-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6b35]/20">
-                  <Flame className="h-6 w-6 text-[#ff6b35]" />
+                  <Flame className="h-6 w-6 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
                 </div>
               </div>
               <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
