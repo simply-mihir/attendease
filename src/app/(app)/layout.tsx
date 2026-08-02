@@ -56,7 +56,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (status === "loading" || !session?.user) {
     return (
-      <div className="flex min-h-screen relative z-0">
+      <div className="flex h-screen w-full relative z-0 overflow-hidden bg-white dark:bg-[#0a0e1a]">
         <VibrantBackground />
         <FuturisticLoader title="Loading..." Icon={GraduationCap} variant="full" />
       </div>
