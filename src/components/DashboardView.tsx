@@ -7,7 +7,7 @@ import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
-  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap
+  Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap, Minus, TrendingDown
 , BarChart3 } from "lucide-react";
 import clsx from "clsx";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
@@ -18,6 +18,19 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { StreakBadges } from "@/components/StreakBadges";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
+const SUBJECT_COLORS = [
+  { bg: "#FF2D78", shadow: "#cc1a5e", label: "Hot Pink" },
+  { bg: "#4361ee", shadow: "#3451cc", label: "Royal Blue" },
+  { bg: "#06d6a0", shadow: "#05a87e", label: "Teal" },
+  { bg: "#ff6b35", shadow: "#cc5529", label: "Orange" },
+  { bg: "#9b5de5", shadow: "#7c4ab8", label: "Purple" },
+  { bg: "#4cc9f0", shadow: "#3aa3c4", label: "Cyan" },
+  { bg: "#f15bb5", shadow: "#c14890", label: "Magenta" },
+  { bg: "#FFD166", shadow: "#ccaa52", label: "Gold" },
+  { bg: "#ef476f", shadow: "#c43559", label: "Coral" },
+  { bg: "#2ec4b6", shadow: "#249e92", label: "Mint" },
+];
+
 interface TodayClass {
   scheduleId: string; subjectId: string; subjectName: string; colorHex: string;
   startTime: string; endTime: string; room: string | null; currentPct: number;
@@ -318,16 +331,36 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold text-[#ff6b35] uppercase tracking-wider">Streak</p>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/20 text-[#ff6b35] border border-[#ff6b35]/30 shadow-sm">
-                  <Flame className="h-5 w-5" style={currentStreak > 0 ? { animation: "streakFlicker 1.5s ease-in-out infinite" } : undefined} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] group-hover:scale-110 transition-transform">
+                  <Flame 
+                    className="h-5 w-5 drop-shadow-[0_0_6px_rgba(255,107,53,0.5)]" 
+                    fill={currentStreak > 0 ? "#ff6b35" : "none"}
+                    style={currentStreak > 0 ? { animation: "streakFlicker 1.5s ease-in-out infinite" } : undefined} 
+                  />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
+              <div className="flex items-baseline gap-1 mt-1">
+                <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
                 {currentStreak > 0 && (
-                  <div className="relative h-8 w-6">
-                    <Flame className="h-5 w-5 text-[#ff6b35] absolute bottom-0 left-0" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
-                    <Flame className="h-3 w-3 text-amber-400/90 absolute bottom-1 left-2" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
+                  <div className="flex items-end -mb-0.5">
+                    {/* Main flame — large, bright */}
+                    <Flame 
+                      className="h-7 w-7 text-[#ff6b35] drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]" 
+                      fill="#ff6b35"
+                      style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} 
+                    />
+                    {/* Secondary flame — smaller, offset left behind the main one */}
+                    <Flame 
+                      className="h-5 w-5 text-[#FFD166] -ml-3 mb-0.5 drop-shadow-[0_0_6px_rgba(255,209,102,0.5)]" 
+                      fill="#FFD166"
+                      style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} 
+                    />
+                    {/* Tiny spark — topmost */}
+                    <Flame 
+                      className="h-3 w-3 text-[#fff1cc] -ml-2 mb-2 drop-shadow-[0_0_4px_rgba(255,241,204,0.6)]" 
+                      fill="#fff1cc"
+                      style={{ animation: "streakFlicker 1s ease-in-out 0.6s infinite" }} 
+                    />
                   </div>
                 )}
               </div>
@@ -461,76 +494,105 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             <h2 className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">All Subjects</h2>
             <span className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{subjectsList.length} courses</span>
           </div>
-          <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
-            {subjectsList.map((s: any, i: number) => {
+          <StaggerGrid className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" delay={250} staggerDelay={80} animation="fadeSlideUp">
+            {subjectsList.map((s: any, index: number) => {
+              const color = SUBJECT_COLORS[index % SUBJECT_COLORS.length];
               const percentage = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
               const min = s.minAttendancePct ?? 75;
-              const statusLabel = isCurrent ? (percentage >= min ? "On track" : percentage >= min - 5 ? "At risk" : "Action needed") :
-                                            (percentage >= min ? "Met requirement" : "Failed requirement");
+              const attended = s.totalPresent ?? 0;
+              const total = s.totalClassesHeld ?? 0;
               
-              const popColors = [
-                "#FF2D78", // Hot Pink
-                "#4361ee", // Royal Blue
-                "#06d6a0", // Electric Teal
-                "#ff6b35", // Vivid Orange
-                "#9b5de5", // Purple
-                "#4cc9f0", // Cyan
-                "#f15bb5", // Magenta
-              ];
-              const cardColor = s.colorHex || popColors[i % popColors.length];
-
+              // Pick status icon
+              const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? Minus : TrendingDown;
+              
               return (
-              <Link key={s.id} href={`/subjects/${s.id}`}
-                className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150 hover:translate-y-[2px] cursor-pointer block
-                  bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] hover:shadow-[0_4px_0_0_#d1d5db]
-                  dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a] dark:hover:shadow-[0_4px_0_0_#0d0d1a]"
-                style={{ borderLeftWidth: "6px", borderLeftColor: cardColor }}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="min-w-0 pr-4">
-                      <h3 className="font-extrabold text-[#1a1a2e] dark:text-white group-hover:text-[#FF2D78] transition-colors truncate">{s.name}</h3>
-                      <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">{s.code}</p>
+                <Link
+                  key={s.id}
+                  href={`/subjects/${s.id}`}
+                  className="group relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-150 block
+                    hover:translate-y-[2px] overflow-hidden"
+                  style={{
+                    borderColor: `${color.bg}40`,
+                    backgroundColor: `${color.bg}0D`,
+                    boxShadow: `0 6px 0 0 ${color.bg}30`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = `0 4px 0 0 ${color.bg}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = `0 6px 0 0 ${color.bg}30`;
+                    e.currentTarget.style.transform = '';
+                  }}
+                >
+                  {/* Animated gradient shimmer on hover */}
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: `linear-gradient(135deg, ${color.bg}08 0%, ${color.bg}15 50%, ${color.bg}08 100%)`,
+                      backgroundSize: "200% 200%",
+                      animation: "subjectCardShimmer 3s ease-in-out infinite",
+                    }} />
+
+                  {/* Top accent line */}
+                  <div className="absolute inset-x-0 top-0 h-[2px]"
+                    style={{ background: `linear-gradient(to right, transparent, ${color.bg}60, transparent)` }} />
+
+                  <div className="relative">
+                    {/* Row 1: Label + Icon */}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-[11px] font-bold uppercase tracking-wider truncate pr-2"
+                        style={{ color: color.bg }}>
+                        {s.name}
+                      </p>
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-transform duration-300"
+                        style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>
+                        <BookOpen className="h-4 w-4" />
+                      </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#FF2D78] group-hover:translate-x-1 transition-all" />
-                  </div>
-                  
-                  {/* Progress bar — 3D Inset Chunky Bar */}
-                  <div className="mt-3 mb-2">
-                    <div className="h-3 w-full rounded-full bg-gray-100 dark:bg-[#0d0d1a] border border-gray-200/60 dark:border-[#2a2a3d]/60 overflow-hidden p-[1px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
-                      <div
-                        className="h-full rounded-full transition-all duration-700 ease-out shadow-sm"
-                        style={{
-                          width: `${Math.min(100, percentage)}%`,
-                          backgroundColor: percentage >= 75 ? "#06d6a0" : percentage >= 60 ? "#ff6b35" : "#ef476f"
-                        }}
-                      />
+
+                    {/* Row 2: Big percentage number */}
+                    <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white mb-1">
+                      {percentage}%
+                    </p>
+
+                    {/* Row 3: Status + class count */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <StatusIcon className="h-3.5 w-3.5" style={{ color: color.bg }} />
+                        <span className="text-xs font-semibold"
+                          style={{ color: percentage >= min ? "#06d6a0" : percentage >= min - 15 ? "#ff6b35" : "#ef476f" }}>
+                          {percentage >= min ? "On track" : percentage >= min - 15 ? "At risk" : "Danger"}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
+                        {attended}/{total}
+                      </span>
                     </div>
+
+                    {/* Row 4: Mini progress bar */}
+                    <div className="mt-3">
+                      <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-700"
+                          style={{
+                            width: `${Math.min(100, percentage)}%`,
+                            backgroundColor: color.bg,
+                            boxShadow: `0 0 8px ${color.bg}40`,
+                          }} />
+                      </div>
+                    </div>
+
+                    {/* Subject code — small */}
+                    <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] mt-2 font-semibold">
+                      {s.code || "No code"}
+                    </p>
                   </div>
 
-                  {/* Stats Row */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className={`text-sm font-black ${
-                      percentage >= 75 ? "text-[#06d6a0]" :
-                      percentage >= 60 ? "text-[#ff6b35]" :
-                      "text-[#ef476f]"
-                    }`}>
-                      {percentage}%
-                    </span>
-                    <span className={`text-xs font-bold ${
-                      percentage >= 75 ? "text-[#06d6a0]" :
-                      percentage >= 60 ? "text-[#ff6b35]" :
-                      "text-[#ef476f]"
-                    }`}>
-                      {statusLabel}
-                    </span>
-                    <span className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] flex items-center gap-1">
-                      <Flame className="h-3.5 w-3.5 text-[#ff6b35]" /> {s.totalPresent ?? 0}
-                    </span>
+                  {/* Arrow on hover */}
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0 -translate-x-2">
+                    <ChevronRight className="h-4 w-4" style={{ color: color.bg }} />
                   </div>
-                </div>
-              </Link>
-            )})}
+                </Link>
+              );
+            })}
           </StaggerGrid>
         </div>
       )}
