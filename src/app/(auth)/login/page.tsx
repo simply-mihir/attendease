@@ -39,9 +39,22 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#fff5f7] via-white to-[#f0f0ff] dark:bg-[#0a0e1a]">
-      {/* Dark mode gradient overlay */}
-      <div className="pointer-events-none fixed inset-0 -z-10 hidden dark:block bg-[radial-gradient(ellipse_at_center,_rgba(255,45,120,0.12)_0%,_transparent_60%),_radial-gradient(ellipse_at_top,_rgba(67,97,238,0.08)_0%,_transparent_50%),_linear-gradient(to_bottom,_#0a0e1a,_#100e24,_#0a0e1a)]" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4">
+      {/* Dark mode login bg */}
+      <div className="fixed inset-0 -z-10 hidden dark:block">
+        <div className="absolute inset-0 bg-[#0a0e1a]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-[#FF2D78]/25 blur-[150px]" />
+        <div className="absolute -top-20 -left-20 h-[400px] w-[400px] rounded-full bg-[#4361ee]/20 blur-[120px]" />
+        <div className="absolute -bottom-20 -right-20 h-[400px] w-[400px] rounded-full bg-[#9b5de5]/18 blur-[120px]" />
+      </div>
+      
+      {/* Light mode login bg */}
+      <div className="fixed inset-0 -z-10 dark:hidden">
+        <div className="absolute inset-0 bg-[#fafafa]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/15 blur-[150px]" />
+        <div className="absolute -top-20 -left-20 h-[300px] w-[300px] rounded-full bg-[#4361ee]/10 blur-[100px]" />
+        <div className="absolute -bottom-20 -right-20 h-[300px] w-[300px] rounded-full bg-[#9b5de5]/10 blur-[100px]" />
+      </div>
       
       {/* === ANIMATED BACKGROUND === */}
       

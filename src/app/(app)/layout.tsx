@@ -10,7 +10,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users, Bell
+  Sliders, Settings, LogOut, Menu, X, ChevronRight, Zap, TrendingUp, Users, Bell, Award
 } from "lucide-react";
 import clsx from "clsx";
 import { preload } from "swr";
@@ -31,6 +31,7 @@ const navItems = [
   { href: "/optimizer", label: "Skip Optimizer", icon: Zap, gradient: "from-emerald-500 to-cyan-500", prefetchKey: "/analytics/skip-optimizer" },
   { href: "/forecast", label: "Forecast", icon: TrendingUp, gradient: "from-violet-500 to-purple-500", prefetchKey: "/analytics/forecast" },
   { href: "/groups", label: "Friends", icon: Users, gradient: "from-pink-500 to-rose-500", prefetchKey: "/groups" },
+  { href: "/achievements", label: "Achievements", icon: Award, gradient: "from-yellow-400 to-orange-500", prefetchKey: null },
   { href: "/settings", label: "Settings", icon: Settings, gradient: "from-pink-500 to-purple-500", prefetchKey: null },
 ];
 
@@ -63,11 +64,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <NavigationProgress />
     <SWRPrefetcher />
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50/30 dark:bg-[#0a0e1a] dark:bg-none relative z-0">
-      {/* Dark mode: layered gradient via CSS */}
-      <div className="fixed inset-0 -z-10 hidden dark:block bg-[radial-gradient(ellipse_at_top_left,_rgba(255,45,120,0.08)_0%,_transparent_50%),_radial-gradient(ellipse_at_top_right,_rgba(67,97,238,0.08)_0%,_transparent_50%),_radial-gradient(ellipse_at_bottom_left,_rgba(155,93,229,0.06)_0%,_transparent_50%),_radial-gradient(ellipse_at_bottom_right,_rgba(6,214,160,0.06)_0%,_transparent_50%),_linear-gradient(to_bottom_right,_#0a0e1a,_#0f1428,_#0a0e1a)]" />
+      {/* Dark mode vibrant gradient — VISIBLE colored washes */}
+      <div className="fixed inset-0 -z-10 hidden dark:block">
+        {/* Base */}
+        <div className="absolute inset-0 bg-[#0a0e1a]" />
+        
+        {/* Hot pink glow — top left — STRONG */}
+        <div className="absolute -top-20 -left-20 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/20 blur-[120px]" />
+        
+        {/* Blue glow — top right — STRONG */}
+        <div className="absolute -top-10 right-0 h-[400px] w-[400px] rounded-full bg-[#4361ee]/20 blur-[100px]" />
+        
+        {/* Purple glow — center left */}
+        <div className="absolute top-1/2 -left-20 h-[350px] w-[350px] rounded-full bg-[#9b5de5]/15 blur-[100px]" />
+        
+        {/* Teal glow — bottom right */}
+        <div className="absolute bottom-0 right-10 h-[400px] w-[400px] rounded-full bg-[#06d6a0]/15 blur-[100px]" />
+        
+        {/* Orange glow — bottom center */}
+        <div className="absolute -bottom-20 left-1/3 h-[300px] w-[300px] rounded-full bg-[#ff6b35]/12 blur-[100px]" />
+        
+        {/* Slow drifting animation on some orbs */}
+        <div className="absolute top-1/4 left-1/3 h-[250px] w-[250px] rounded-full bg-[#FF2D78]/10 blur-[80px]" 
+          style={{ animation: "bgOrbFloat 20s ease-in-out infinite" }} />
+        <div className="absolute top-2/3 right-1/4 h-[200px] w-[200px] rounded-full bg-[#4361ee]/10 blur-[80px]" 
+          style={{ animation: "bgOrbFloat 25s ease-in-out 5s infinite reverse" }} />
+      </div>
       
-      {/* Light mode: soft warm gradient */}
-      <div className="fixed inset-0 -z-10 dark:hidden bg-[radial-gradient(ellipse_at_top_left,_rgba(255,45,120,0.04)_0%,_transparent_40%),_radial-gradient(ellipse_at_top_right,_rgba(67,97,238,0.04)_0%,_transparent_40%),_radial-gradient(ellipse_at_bottom_center,_rgba(155,93,229,0.03)_0%,_transparent_40%),_linear-gradient(to_bottom_right,_#fafafa,_#fff5f7,_#f0f0ff,_#fafafa)]" />
+      {/* Light mode vibrant gradient — soft but VISIBLE colorful washes */}
+      <div className="fixed inset-0 -z-10 dark:hidden">
+        {/* Base warm white */}
+        <div className="absolute inset-0 bg-[#fafafa]" />
+        
+        {/* Pink wash — top left */}
+        <div className="absolute -top-20 -left-20 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/12 blur-[120px]" />
+        
+        {/* Blue wash — top right */}
+        <div className="absolute -top-10 right-0 h-[400px] w-[400px] rounded-full bg-[#4361ee]/10 blur-[100px]" />
+        
+        {/* Purple wash — center */}
+        <div className="absolute top-1/2 left-1/4 h-[350px] w-[350px] rounded-full bg-[#9b5de5]/8 blur-[100px]" />
+        
+        {/* Teal wash — bottom right */}
+        <div className="absolute bottom-0 right-10 h-[400px] w-[400px] rounded-full bg-[#06d6a0]/8 blur-[100px]" />
+        
+        {/* Orange wash — bottom left */}
+        <div className="absolute -bottom-20 left-10 h-[300px] w-[300px] rounded-full bg-[#ff6b35]/8 blur-[100px]" />
+        
+        {/* Slow drift */}
+        <div className="absolute top-1/3 right-1/3 h-[200px] w-[200px] rounded-full bg-[#FF2D78]/6 blur-[80px]" 
+          style={{ animation: "bgOrbFloat 22s ease-in-out 3s infinite" }} />
+      </div>
       <OnboardingModal />
 
       {/* Sidebar */}

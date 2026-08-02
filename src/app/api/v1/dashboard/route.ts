@@ -141,6 +141,7 @@ export async function GET() {
     stats: {
       totalSubjects: subjects.length,
       totalClasses,
+      totalAttended,
       overallAttendance,
       dangerCount: dangerSubjects.length,
     },

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Lock } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, Lock, ChevronRight } from "lucide-react";
 import { STREAK_BADGES, getEarnedBadges, getNextBadge, getBadgeProgress, type Badge } from "@/lib/badges";
 
 interface StreakBadgesProps {
@@ -22,9 +23,9 @@ export function StreakBadges({ streak }: StreakBadgesProps) {
           <Sparkles className="h-5 w-5 text-[#FF2D78]" style={{ animation: "badgeSparkle 2s ease-in-out infinite" }} />
           <h3 className="font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">Streak Badges</h3>
         </div>
-        <span className="text-sm font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
-          {earned.length}/{STREAK_BADGES.length} earned
-        </span>
+        <Link href="/achievements" className="text-sm font-bold text-[#FF2D78] hover:text-[#cc1a5e] transition-colors flex items-center gap-1">
+          View All <ChevronRight className="h-4 w-4" />
+        </Link>
       </div>
 
       {/* Badge grid */}
