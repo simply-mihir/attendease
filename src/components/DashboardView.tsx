@@ -541,9 +541,10 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                         style={{ color: color.bg }}>
                         {s.name}
                       </p>
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-transform duration-300"
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-all duration-300"
                         style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>
-                        <BookOpen className="h-4 w-4" />
+                        <BookOpen className="h-4 w-4 block group-hover:hidden" />
+                        <ChevronRight className="h-4 w-4 hidden group-hover:block" />
                       </div>
                     </div>
 
@@ -584,10 +585,6 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     </p>
                   </div>
 
-                  {/* Arrow on hover */}
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0 -translate-x-2">
-                    <ChevronRight className="h-4 w-4" style={{ color: color.bg }} />
-                  </div>
                 </Link>
               );
             })}
