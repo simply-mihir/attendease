@@ -173,6 +173,37 @@ html.dark .btn-gradient:active, html.dark .btn-3d-primary:active {
   box-shadow: 0 1px 0 0 #b81e56;
 }
 
+.btn-3d-gray {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  font-weight: 700;
+  border-width: 2px;
+  border-color: #d1d5db;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-gray:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #d1d5db;
+}
+.btn-3d-gray:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #d1d5db;
+}
+html.dark .btn-3d-gray {
+  background-color: #1f1f35;
+  color: #e5e7eb;
+  border-color: #3f3f5a;
+  box-shadow: 0 4px 0 0 #3f3f5a;
+}
+html.dark .btn-3d-gray:hover {
+  box-shadow: 0 2px 0 0 #3f3f5a;
+}
+html.dark .btn-3d-gray:active {
+  box-shadow: 0 1px 0 0 #3f3f5a;
+}
+
 .btn-ghost, .btn-3d-ghost, .btn-3d-secondary {
   background-color: #ffffff;
   color: #4a4a5a;

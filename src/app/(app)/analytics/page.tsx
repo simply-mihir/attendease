@@ -5,7 +5,8 @@ import { FieldLoader } from "@/components/FieldLoader";
 import dynamic from "next/dynamic";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Skeleton } from "@/components/Skeleton";
-import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert } from "lucide-react";
+import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert, AlertTriangle, BookOpen } from "lucide-react";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -92,45 +93,86 @@ export default function AnalyticsPage() {
       ) : (
         <>
           {/* Overview cards */}
-          <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="flipIn">
-            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#8944cd] bg-[#9b5de5]/10 shadow-[0_4px_0_0_#8944cd] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#8944cd] dark:border-[#7d32b5] dark:shadow-[0_4px_0_0_#7d32b5] dark:hover:shadow-[0_2px_0_0_#7d32b5]">
-              <div className="flex justify-center mb-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#9b5de5]/20">
-                  <TrendingUp className="h-6 w-6 text-[#9b5de5]" />
+          <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
+            {/* Overall (Teal) */}
+            <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+              bg-[#06d6a0]/[0.06] border-2 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#06d6a0]
+              dark:bg-[#06d6a0]/[0.08] dark:border-[#06d6a0]/40 dark:shadow-[0_6px_0_0_#049e77] dark:hover:shadow-[0_4px_0_0_#049e77]">
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-[#06d6a0] uppercase tracking-wider">Overall</p>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/20 text-[#06d6a0] border border-[#06d6a0]/30 shadow-sm">
+                    <TrendingUp className="h-5 w-5" />
+                  </div>
                 </div>
+                <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight mt-1">
+                  <AnimatedCounter value={dashboard.overallPct ?? 0} suffix="%" />
+                </p>
               </div>
-              <p className="text-3xl font-black text-[#9b5de5] tracking-tight">{dashboard.overallPct}%</p>
-              <p className="text-sm font-bold text-[#9b5de5] opacity-80 mt-1">Overall</p>
             </div>
 
-            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e] dark:border-[#048261] dark:shadow-[0_4px_0_0_#048261] dark:hover:shadow-[0_2px_0_0_#048261]">
-              <div className="flex justify-center mb-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#06d6a0]/20">
-                  <ShieldCheck className="h-6 w-6 text-[#06d6a0]" />
+            {/* Subjects (Royal Blue) */}
+            <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+              bg-[#4361ee]/[0.06] border-2 border-[#4361ee]/40 shadow-[0_6px_0_0_#4361ee] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#4361ee]
+              dark:bg-[#4361ee]/[0.08] dark:border-[#4361ee]/40 dark:shadow-[0_6px_0_0_#3451cc] dark:hover:shadow-[0_4px_0_0_#3451cc]">
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-[#4361ee] uppercase tracking-wider">Subjects</p>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361ee]/20 text-[#4361ee] border border-[#4361ee]/30 shadow-sm">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
                 </div>
+                <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight mt-1">
+                  <AnimatedCounter value={dashboard.stats?.totalSubjects ?? dashboard.totalSubjects ?? dashboard.subjectsSummary?.length ?? 0} />
+                </p>
               </div>
-              <p className="text-3xl font-black text-[#06d6a0] tracking-tight">{dashboard.safeSubjects}</p>
-              <p className="text-sm font-bold text-[#06d6a0] opacity-80 mt-1">Safe</p>
             </div>
 
-            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f] dark:border-[#b83151] dark:shadow-[0_4px_0_0_#b83151] dark:hover:shadow-[0_2px_0_0_#b83151]">
-              <div className="flex justify-center mb-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ef476f]/20">
-                  <ShieldAlert className="h-6 w-6 text-[#ef476f]" />
+            {/* Streak (Orange) */}
+            <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+              bg-[#ff6b35]/[0.06] border-2 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ff6b35]
+              dark:bg-[#ff6b35]/[0.08] dark:border-[#ff6b35]/40 dark:shadow-[0_6px_0_0_#cc5529] dark:hover:shadow-[0_4px_0_0_#cc5529]">
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-[#ff6b35] uppercase tracking-wider">Streak</p>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] group-hover:scale-110 transition-transform">
+                    <Flame 
+                      className="h-5 w-5 drop-shadow-[0_0_6px_rgba(255,107,53,0.5)]" 
+                      fill={(dashboard.currentStreak ?? 0) > 0 ? "#ff6b35" : "none"}
+                      style={(dashboard.currentStreak ?? 0) > 0 ? { animation: "streakFlicker 1.5s ease-in-out infinite" } : undefined} 
+                    />
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-1 mt-1 h-9">
+                  <>
+                    <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">
+                      <AnimatedCounter value={dashboard.currentStreak ?? 0} />
+                    </p>
+                    {(dashboard.currentStreak ?? 0) > 0 && (
+                      <div className="flex items-end -mb-0.5">
+                        <Flame className="h-7 w-7 text-[#ff6b35] drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]" fill="#ff6b35" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+                      </div>
+                    )}
+                  </>
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#ef476f] tracking-tight">{dashboard.dangerSubjects}</p>
-              <p className="text-sm font-bold text-[#ef476f] opacity-80 mt-1">Danger</p>
             </div>
 
-            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827] dark:border-[#c5471c] dark:shadow-[0_4px_0_0_#c5471c] dark:hover:shadow-[0_2px_0_0_#c5471c]">
-              <div className="flex justify-center mb-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6b35]/20">
-                  <Flame className="h-6 w-6 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+            {/* In Danger (Coral) */}
+            <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+              bg-[#ef476f]/[0.06] border-2 border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ef476f]
+              dark:bg-[#ef476f]/[0.08] dark:border-[#ef476f]/40 dark:shadow-[0_6px_0_0_#c43559] dark:hover:shadow-[0_4px_0_0_#c43559]">
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-bold text-[#ef476f] uppercase tracking-wider">In Danger</p>
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${((dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects) ?? 0) > 0 ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" : "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"}`}>
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
                 </div>
+                <p className={`text-3xl font-black tracking-tight mt-1 ${((dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects) ?? 0) > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}>
+                  <AnimatedCounter value={dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects ?? 0} />
+                </p>
               </div>
-              <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
-              <p className="text-sm font-bold text-[#ff6b35] opacity-80 mt-1">Streak</p>
             </div>
           </StaggerGrid>
 

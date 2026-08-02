@@ -250,7 +250,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="btn-3d-ghost flex items-center gap-2 px-4 py-2 text-sm font-bold cursor-pointer"
+              className="btn-3d-gray flex items-center gap-2 px-4 py-2 text-sm font-bold cursor-pointer"
             >
               <ArrowDown className="h-4 w-4" /> Import
             </button>
@@ -355,8 +355,6 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     {currentStreak > 0 && (
                       <div className="flex items-end -mb-0.5">
                         <Flame className="h-7 w-7 text-[#ff6b35] drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]" fill="#ff6b35" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
-                        <Flame className="h-5 w-5 text-[#FFD166] -ml-3 mb-0.5 drop-shadow-[0_0_6px_rgba(255,209,102,0.5)]" fill="#FFD166" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
-                        <Flame className="h-3 w-3 text-[#fff1cc] -ml-2 mb-2 drop-shadow-[0_0_4px_rgba(255,241,204,0.6)]" fill="#fff1cc" style={{ animation: "streakFlicker 1s ease-in-out 0.6s infinite" }} />
                       </div>
                     )}
                   </>
