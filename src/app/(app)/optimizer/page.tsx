@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
-import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
+import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles, XCircle } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { FieldLoader } from "@/components/FieldLoader";
 import { Skeleton } from "@/components/Skeleton";
@@ -176,10 +176,17 @@ export default function OptimizerPage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <h3 className="font-bold text-[#1a1a2e] dark:text-white">{rec.subjectName}</h3>
-                      <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-[#06d6a0] text-white border-2 border-[#05a87e] shadow-[0_2px_0_0_#05a87e]">
-                        <Sparkles className="w-3 h-3 text-white" />
-                        Skip {rec.skipsAllocated} {rec.skipsAllocated === 1 ? "class" : "classes"}
-                      </span>
+                      {rec.skipsAllocated > 0 ? (
+                        <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-[#06d6a0] text-white border-2 border-[#05a87e] shadow-[0_2px_0_0_#05a87e]">
+                          <CheckCircle2 className="w-3 h-3 text-white" />
+                          Skip {rec.skipsAllocated} {rec.skipsAllocated === 1 ? "class" : "classes"}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-[#ef476f] text-white border-2 border-[#d63b5f] shadow-[0_2px_0_0_#d63b5f]">
+                          <XCircle className="w-3 h-3 text-white" />
+                          Cannot skip
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
