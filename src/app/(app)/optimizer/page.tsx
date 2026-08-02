@@ -78,89 +78,60 @@ export default function OptimizerPage() {
         </div>
       </div>
 
-      {/* Summary banner */}
       {initialLoad ? (
-        <div className="rounded-2xl border-2 p-5 flex items-center gap-4 mb-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-          <Skeleton className="w-12 h-12 rounded-2xl shrink-0" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-64" />
-            <Skeleton className="h-3 w-48" />
-          </div>
+        <div className="flex justify-center py-20">
+          <FuturisticLoader title="Optimizing Schedule..." variant="inner" />
         </div>
       ) : result && (
-        <div
-          className={clsx(
-            "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150",
-            result.totalSkipsUsed > 0
-              ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
-              : "border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f]"
-          )}
-          style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
-        >
+        <>
+          {/* Summary banner */}
           <div
             className={clsx(
-              "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
+              "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150 mb-6",
               result.totalSkipsUsed > 0
-                ? "bg-[#06d6a0]/20 text-[#06d6a0] border-transparent"
-                : "bg-[#ef476f]/20 text-[#ef476f] border-transparent"
+                ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
+                : "border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f]"
             )}
+            style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
           >
-            {result.totalSkipsUsed > 0 ? (
-              <CheckCircle2 className="w-6 h-6" />
-            ) : (
-              <XCircle className="w-6 h-6" />
-            )}
-          </div>
-          <div>
-            {result.totalSkipsUsed > 0 ? (
-              <p className="text-sm font-bold text-[#06d6a0] flex items-center gap-1.5">
-                {result.safeToSkipAll ? (
-                  <>
-                    <span>You can safely skip {result.totalSkipsUsed} classes this week!</span>
-                    <Sparkles className="w-4 h-4 text-[#06d6a0] shrink-0 inline" />
-                  </>
-                ) : (
-                  <span>You can safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes</span>
-                )}
-              </p>
-            ) : (
-              <p className="text-sm font-bold text-[#ef476f]">
-                You cannot safely skip any requested classes
-              </p>
-            )}
-            <p className={clsx("text-xs font-bold mt-0.5 opacity-80", result.totalSkipsUsed > 0 ? "text-[#06d6a0]" : "text-[#ef476f]")}>
-              Skips are distributed across subjects to maximize safety margin
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Results */}
-      {initialLoad ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map(i => (
-            <div key={i} className="rounded-2xl border-2 p-5 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <Skeleton className="h-5 w-32 mb-1" />
-                    <Skeleton className="h-6 w-24 rounded-lg" />
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Skeleton className="h-4 w-12" />
-                    <ArrowRight className="w-4 h-4 text-gray-300 dark:text-[#2a2a3d]" />
-                    <Skeleton className="h-4 w-12" />
-                  </div>
-                  <Skeleton className="h-3 w-16 ml-auto" />
-                </div>
-              </div>
-              <Skeleton className="h-1.5 w-full rounded-full" />
+            <div
+              className={clsx(
+                "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
+                result.totalSkipsUsed > 0
+                  ? "bg-[#06d6a0]/20 text-[#06d6a0] border-transparent"
+                  : "bg-[#ef476f]/20 text-[#ef476f] border-transparent"
+              )}
+            >
+              {result.totalSkipsUsed > 0 ? (
+                <CheckCircle2 className="w-6 h-6" />
+              ) : (
+                <XCircle className="w-6 h-6" />
+              )}
             </div>
-          ))}
-        </div>
-      ) : result && (
+            <div>
+              {result.totalSkipsUsed > 0 ? (
+                <p className="text-sm font-bold text-[#06d6a0] flex items-center gap-1.5">
+                  {result.safeToSkipAll ? (
+                    <>
+                      <span>You can safely skip {result.totalSkipsUsed} classes this week!</span>
+                      <Sparkles className="w-4 h-4 text-[#06d6a0] shrink-0 inline" />
+                    </>
+                  ) : (
+                    <span>You can safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes</span>
+                  )}
+                </p>
+              ) : (
+                <p className="text-sm font-bold text-[#ef476f]">
+                  You cannot safely skip any requested classes
+                </p>
+              )}
+              <p className={clsx("text-xs font-bold mt-0.5 opacity-80", result.totalSkipsUsed > 0 ? "text-[#06d6a0]" : "text-[#ef476f]")}>
+                Skips are distributed across subjects to maximize safety margin
+              </p>
+            </div>
+          </div>
+
+          {/* Results */}
         <StaggerGrid className={clsx("space-y-3", loading && "opacity-50")} delay={150} staggerDelay={80} animation="fadeSlideUp">
           {result.recommendations.length === 0 ? (
             <div className="rounded-2xl border-2 p-8 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
@@ -265,7 +236,8 @@ export default function OptimizerPage() {
               </div>
             ))
           )}
-        </StaggerGrid>
+          </StaggerGrid>
+        </>
       )}
 
       {loading && !initialLoad && (

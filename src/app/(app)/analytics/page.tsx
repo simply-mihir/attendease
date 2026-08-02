@@ -85,84 +85,59 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Overview cards */}
-      {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl border-2 p-5 text-center
-              border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
-              dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-              <Skeleton className="h-12 w-12 mx-auto mb-3 rounded-2xl" />
-              <Skeleton className="h-9 w-16 mx-auto mb-1" />
-              <Skeleton className="h-3 w-12 mx-auto" />
-            </div>
-          ))}
+      {loading || !dashboard ? (
+        <div className="flex justify-center py-20">
+          <FuturisticLoader title="Loading Analytics..." variant="inner" />
         </div>
-      ) : dashboard && (
-        <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="flipIn">
-          <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#8944cd] bg-[#9b5de5]/10 shadow-[0_4px_0_0_#8944cd] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#8944cd] dark:border-[#7d32b5] dark:shadow-[0_4px_0_0_#7d32b5] dark:hover:shadow-[0_2px_0_0_#7d32b5]">
-            <div className="flex justify-center mb-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#9b5de5]/20">
-                <TrendingUp className="h-6 w-6 text-[#9b5de5]" />
+      ) : (
+        <>
+          {/* Overview cards */}
+          <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="flipIn">
+            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#8944cd] bg-[#9b5de5]/10 shadow-[0_4px_0_0_#8944cd] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#8944cd] dark:border-[#7d32b5] dark:shadow-[0_4px_0_0_#7d32b5] dark:hover:shadow-[0_2px_0_0_#7d32b5]">
+              <div className="flex justify-center mb-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#9b5de5]/20">
+                  <TrendingUp className="h-6 w-6 text-[#9b5de5]" />
+                </div>
               </div>
+              <p className="text-3xl font-black text-[#9b5de5] tracking-tight">{dashboard.overallPct}%</p>
+              <p className="text-sm font-bold text-[#9b5de5] opacity-80 mt-1">Overall</p>
             </div>
-            <p className="text-3xl font-black text-[#9b5de5] tracking-tight">{dashboard.overallPct}%</p>
-            <p className="text-sm font-bold text-[#9b5de5] opacity-80 mt-1">Overall</p>
-          </div>
 
-          <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e] dark:border-[#048261] dark:shadow-[0_4px_0_0_#048261] dark:hover:shadow-[0_2px_0_0_#048261]">
-            <div className="flex justify-center mb-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#06d6a0]/20">
-                <ShieldCheck className="h-6 w-6 text-[#06d6a0]" />
+            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e] dark:border-[#048261] dark:shadow-[0_4px_0_0_#048261] dark:hover:shadow-[0_2px_0_0_#048261]">
+              <div className="flex justify-center mb-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#06d6a0]/20">
+                  <ShieldCheck className="h-6 w-6 text-[#06d6a0]" />
+                </div>
               </div>
+              <p className="text-3xl font-black text-[#06d6a0] tracking-tight">{dashboard.safeSubjects}</p>
+              <p className="text-sm font-bold text-[#06d6a0] opacity-80 mt-1">Safe</p>
             </div>
-            <p className="text-3xl font-black text-[#06d6a0] tracking-tight">{dashboard.safeSubjects}</p>
-            <p className="text-sm font-bold text-[#06d6a0] opacity-80 mt-1">Safe</p>
-          </div>
 
-          <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f] dark:border-[#b83151] dark:shadow-[0_4px_0_0_#b83151] dark:hover:shadow-[0_2px_0_0_#b83151]">
-            <div className="flex justify-center mb-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ef476f]/20">
-                <ShieldAlert className="h-6 w-6 text-[#ef476f]" />
+            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f] dark:border-[#b83151] dark:shadow-[0_4px_0_0_#b83151] dark:hover:shadow-[0_2px_0_0_#b83151]">
+              <div className="flex justify-center mb-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ef476f]/20">
+                  <ShieldAlert className="h-6 w-6 text-[#ef476f]" />
+                </div>
               </div>
+              <p className="text-3xl font-black text-[#ef476f] tracking-tight">{dashboard.dangerSubjects}</p>
+              <p className="text-sm font-bold text-[#ef476f] opacity-80 mt-1">Danger</p>
             </div>
-            <p className="text-3xl font-black text-[#ef476f] tracking-tight">{dashboard.dangerSubjects}</p>
-            <p className="text-sm font-bold text-[#ef476f] opacity-80 mt-1">Danger</p>
-          </div>
 
-          <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827] dark:border-[#c5471c] dark:shadow-[0_4px_0_0_#c5471c] dark:hover:shadow-[0_2px_0_0_#c5471c]">
-            <div className="flex justify-center mb-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6b35]/20">
-                <Flame className="h-6 w-6 text-[#ff6b35]" />
+            <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827] dark:border-[#c5471c] dark:shadow-[0_4px_0_0_#c5471c] dark:hover:shadow-[0_2px_0_0_#c5471c]">
+              <div className="flex justify-center mb-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6b35]/20">
+                  <Flame className="h-6 w-6 text-[#ff6b35]" />
+                </div>
               </div>
+              <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
+              <p className="text-sm font-bold text-[#ff6b35] opacity-80 mt-1">Streak</p>
             </div>
-            <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
-            <p className="text-sm font-bold text-[#ff6b35] opacity-80 mt-1">Streak</p>
-          </div>
-        </StaggerGrid>
-      )}
+          </StaggerGrid>
 
-      {/* Charts row — lazy loaded */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="rounded-2xl border-2 p-5 h-[300px]
-            border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
-            dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-            <Skeleton className="h-6 w-32 mb-6" />
-            <Skeleton className="h-full w-full" />
+          {/* Charts row — lazy loaded */}
+          <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 200ms forwards" }}>
+            <AnalyticsCharts barData={barData} pieData={pieData} />
           </div>
-          <div className="rounded-2xl border-2 p-5 h-[300px]
-            border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
-            dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-            <Skeleton className="h-6 w-32 mb-6" />
-            <Skeleton className="h-full w-full" />
-          </div>
-        </div>
-      ) : dashboard && (
-        <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 200ms forwards" }}>
-          <AnalyticsCharts barData={barData} pieData={pieData} />
-        </div>
-      )}
 
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
@@ -200,22 +175,9 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Per-subject details */}
-      {loading ? (
-        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
-          <div className="space-y-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-2xl border-2 p-4 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
-                <Skeleton className="h-4 w-32 mb-2" />
-                <Skeleton className="h-2 w-full rounded-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : dashboard && (
-        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
+          {/* Per-subject details */}
+          <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
+            <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
           <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
             {(dashboard.subjectsSummary || dashboard.subjects || []).map((s: any) => (
               <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
@@ -237,8 +199,9 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ))}
-          </StaggerGrid>
-        </div>
+            </StaggerGrid>
+          </div>
+        </>
       )}
     </PageTransition>
   );
