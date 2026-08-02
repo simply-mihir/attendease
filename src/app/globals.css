@@ -1020,13 +1020,29 @@ html.dark select option {
   z-index: -1;
 }
 
-@keyframes loaderSpin {
+/* === FUTURISTIC LOADER ANIMATIONS === */
+
+/* Orbital ring spin */
+@keyframes futuristicSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes loaderProgress {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
+/* Center icon gentle pulse */
+@keyframes futuristicPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Progress bar sweep */
+@keyframes futuristicProgress {
+  0% { width: 0%; margin-left: 0%; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 0%; margin-left: 100%; }
+}
+
+/* Bouncing dots */
+@keyframes futuristicDot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+  40% { transform: scale(1.2); opacity: 1; }
 }

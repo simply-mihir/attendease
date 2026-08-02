@@ -1,7 +1,6 @@
-"use client";
-import { TrendingUp } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { LineChart } from "lucide-react";
 
-export default function appForecastLoadingtsxLoading() {
-  return <FuturisticLoader title="Loading forecast" Icon={TrendingUp} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={LineChart} variant="full" />;
 }

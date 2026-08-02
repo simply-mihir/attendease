@@ -1,7 +1,6 @@
-"use client";
-import { Settings } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { Settings } from "lucide-react";
 
-export default function appSettingsLoadingtsxLoading() {
-  return <FuturisticLoader title="Loading settings" Icon={Settings} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={Settings} variant="full" />;
 }

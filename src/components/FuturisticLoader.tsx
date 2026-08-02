@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { LucideIcon, GraduationCap } from "lucide-react";
+import { type LucideIcon, GraduationCap } from "lucide-react";
 
 interface FuturisticLoaderProps {
-  title?: string;           // e.g., "Loading your dashboard..."
-  Icon?: LucideIcon; // Changed from emoji string to Lucide component
-  variant?: "full" | "section" | "inline"; // size variants
-  showProgress?: boolean;   // show progress bar
-  showParticles?: boolean;  // show floating particles (skip on lightweight variants)
+  title?: string;
+  Icon?: LucideIcon;
+  variant?: "full" | "section" | "inline";
+  showProgress?: boolean;
 }
 
 export function FuturisticLoader({
@@ -16,53 +14,40 @@ export function FuturisticLoader({
   Icon = GraduationCap,
   variant = "full",
   showProgress = true,
-  showParticles = true,
 }: FuturisticLoaderProps) {
-
-  // Randomize particles only on mount to avoid hydration mismatch
-  const [particles, setParticles] = useState<Array<{ w: number; l: number; t: number; d: number; del: number }>>([]);
-  
-  useEffect(() => {
-    if (showParticles && variant === "full") {
-      setParticles(
-        Array.from({ length: 20 }, () => ({
-          w: Math.random() * 4 + 2,
-          l: Math.random() * 100,
-          t: Math.random() * 100,
-          d: Math.random() * 6 + 4,
-          del: Math.random() * 4,
-        }))
-      );
-    }
-  }, [showParticles, variant]);
-
-  // === INLINE variant — small spinner for buttons/cards ===
   if (variant === "inline") {
     return (
-      <div className="flex items-center justify-center gap-3 py-8">
-        <div className="relative h-10 w-10">
-          <div className="absolute inset-0 rounded-full border border-purple-500/20" style={{ animation: "spinSlow 3s linear infinite" }}>
-            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50" />
-          </div>
-          <div className="absolute inset-2 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600/80 to-violet-600/80" style={{ animation: "breathe 2s ease-in-out infinite" }}>
-            <Icon className="h-3 w-3 text-white" />
-          </div>
-        </div>
-        <span className="text-sm text-gray-400">{title}</span>
-      </div>
+      <span className="inline-flex items-center gap-2">
+        <Icon className="h-4 w-4 text-[#FF2D78] animate-spin" />
+        <span className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">{title}</span>
+      </span>
     );
   }
 
-  // === SECTION variant — for in-page loading (e.g., a card or tab content) ===
   if (variant === "section") {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-4">
-          <div className="relative flex h-16 w-16 items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-[#FF2D78]/20"
-              style={{ animation: "loaderSpin 3s linear infinite" }} />
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2
-              border-[#FF2D78]/30 bg-[#FF2D78]/10 shadow-[0_3px_0_0_rgba(255,45,120,0.2)]">
+          <div className="relative flex h-20 w-20 items-center justify-center">
+            {/* Outer orbital ring — spinning */}
+            <div
+              className="absolute inset-0 rounded-full border-2 border-dashed border-[#FF2D78]/25"
+              style={{ animation: "futuristicSpin 4s linear infinite" }}
+            />
+            {/* Middle ring — counter-spin */}
+            <div
+              className="absolute inset-[6px] rounded-full border border-[#4361ee]/20"
+              style={{ animation: "futuristicSpin 6s linear infinite reverse" }}
+            />
+            {/* Orbiting dot */}
+            <div
+              className="absolute h-full w-full"
+              style={{ animation: "futuristicSpin 3s linear infinite" }}
+            >
+              <div className="absolute -top-1 left-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-[#FF2D78] shadow-[0_0_8px_rgba(255,45,120,0.6)]" />
+            </div>
+            {/* Center icon container */}
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#FF2D78]/30 bg-[#FF2D78]/10 shadow-[0_3px_0_0_rgba(255,45,120,0.2)]">
               <Icon className="h-6 w-6 text-[#FF2D78]" />
             </div>
           </div>
@@ -72,40 +57,84 @@ export function FuturisticLoader({
     );
   }
 
-  // === FULL variant — fullscreen with all effects ===
+  // variant === "full"
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-      <div className="flex flex-col items-center gap-5">
-        
-        {/* Icon container — enlarged */}
-        <div className="relative flex h-24 w-24 items-center justify-center">
-          {/* Orbital ring 1 */}
-          <div className="absolute inset-0 rounded-full border-2 border-[#FF2D78]/20"
-            style={{ animation: "loaderSpin 3s linear infinite" }} />
-          {/* Orbital ring 2 — slightly larger */}
-          <div className="absolute -inset-3 rounded-full border border-[#4361ee]/15"
-            style={{ animation: "loaderSpin 5s linear infinite reverse" }} />
-          {/* Dot on orbit */}
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-[#FF2D78]/60"
-            style={{ animation: "loaderSpin 3s linear infinite" }} />
-          
-          {/* Center icon — larger */}
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2
-            border-[#FF2D78]/30 bg-[#FF2D78]/10 shadow-[0_4px_0_0_rgba(255,45,120,0.2)]">
-            <Icon className="h-8 w-8 text-[#FF2D78]" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-6">
+
+        {/* Animated orbital system — ENLARGED */}
+        <div className="relative flex h-32 w-32 items-center justify-center">
+
+          {/* Ring 1: Outer dashed — spinning clockwise */}
+          <div
+            className="absolute inset-0 rounded-full border-2 border-dashed border-[#FF2D78]/25"
+            style={{ animation: "futuristicSpin 4s linear infinite" }}
+          />
+
+          {/* Ring 2: Middle solid — spinning counter-clockwise */}
+          <div
+            className="absolute inset-[10px] rounded-full border border-[#4361ee]/20"
+            style={{ animation: "futuristicSpin 6s linear infinite reverse" }}
+          />
+
+          {/* Ring 3: Inner dotted — spinning clockwise slower */}
+          <div
+            className="absolute inset-[20px] rounded-full border border-dotted border-[#9b5de5]/20"
+            style={{ animation: "futuristicSpin 8s linear infinite" }}
+          />
+
+          {/* Orbiting dot 1 — fast, on outer ring */}
+          <div
+            className="absolute h-full w-full"
+            style={{ animation: "futuristicSpin 3s linear infinite" }}
+          >
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 h-3 w-3 rounded-full bg-[#FF2D78] shadow-[0_0_10px_rgba(255,45,120,0.7)]" />
+          </div>
+
+          {/* Orbiting dot 2 — slower, opposite side */}
+          <div
+            className="absolute h-full w-full"
+            style={{ animation: "futuristicSpin 5s linear infinite reverse" }}
+          >
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-[#4361ee] shadow-[0_0_8px_rgba(67,97,238,0.6)]" />
+          </div>
+
+          {/* Orbiting dot 3 — medium speed */}
+          <div
+            className="absolute h-full w-full"
+            style={{ animation: "futuristicSpin 4s linear infinite" }}
+          >
+            <div className="absolute top-1/2 -right-1 -translate-y-1/2 h-2 w-2 rounded-full bg-[#06d6a0] shadow-[0_0_8px_rgba(6,214,160,0.6)]" />
+          </div>
+
+          {/* Center icon — large 3D box */}
+          <div
+            className="relative flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-[#FF2D78]/30 bg-[#FF2D78]/10 shadow-[0_4px_0_0_rgba(255,45,120,0.2)]"
+            style={{ animation: "futuristicPulse 2s ease-in-out infinite" }}
+          >
+            <Icon className="h-9 w-9 text-[#FF2D78]" />
           </div>
         </div>
 
-        {/* Loading text — larger */}
-        <p className="text-base font-bold text-[#1a1a2e] dark:text-white">{title}</p>
+        {/* Loading text */}
+        <p className="text-lg font-bold text-[#1a1a2e] dark:text-white">{title}</p>
 
-        {/* Progress bar */}
+        {/* Animated progress bar */}
         {showProgress && (
-          <div className="h-1.5 w-40 rounded-full bg-gray-200/30 dark:bg-white/10 overflow-hidden">
-            <div className="h-full rounded-full bg-[#FF2D78]"
-              style={{ animation: "loaderProgress 2s ease-in-out infinite" }} />
+          <div className="h-1.5 w-48 rounded-full bg-gray-200/20 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#FF2D78] via-[#9b5de5] to-[#4361ee]"
+              style={{ animation: "futuristicProgress 2s ease-in-out infinite" }}
+            />
           </div>
         )}
+
+        {/* Animated dots after text */}
+        <div className="flex gap-1.5 -mt-4">
+          <div className="h-1.5 w-1.5 rounded-full bg-[#FF2D78]" style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }} />
+          <div className="h-1.5 w-1.5 rounded-full bg-[#9b5de5]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.2s infinite" }} />
+          <div className="h-1.5 w-1.5 rounded-full bg-[#4361ee]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.4s infinite" }} />
+        </div>
       </div>
     </div>
   );

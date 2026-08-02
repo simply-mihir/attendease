@@ -1,8 +1,6 @@
-"use client";
-
 import { FuturisticLoader } from "@/components/FuturisticLoader";
-import { Award } from "lucide-react";
+import { Medal } from "lucide-react";
 
-export default function AchievementsLoading() {
-  return <FuturisticLoader title="Loading achievements" Icon={Award} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={Medal} variant="full" />;
 }

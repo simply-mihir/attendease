@@ -1,7 +1,6 @@
-"use client";
-import { TrendingUp } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { TrendingUp } from "lucide-react";
 
-export default function appAnalyticsLoadingtsxLoading() {
-  return <FuturisticLoader title="Crunching numbers" Icon={TrendingUp} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={TrendingUp} variant="full" />;
 }

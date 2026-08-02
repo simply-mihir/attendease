@@ -1,7 +1,6 @@
-"use client";
-import { Lock } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { Shield } from "lucide-react";
 
-export default function authLoadingtsxLoading() {
-  return <FuturisticLoader title="Preparing login" Icon={Lock} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={Shield} variant="full" />;
 }

@@ -1,7 +1,6 @@
-"use client";
-import { CalendarDays } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { CalendarDays } from "lucide-react";
 
-export default function appScheduleLoadingtsxLoading() {
-  return <FuturisticLoader title="Loading schedule" Icon={CalendarDays} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={CalendarDays} variant="full" />;
 }

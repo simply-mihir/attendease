@@ -1,7 +1,6 @@
-"use client";
-import { BookOpen } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { BookOpen } from "lucide-react";
 
-export default function appSubjectsLoadingtsxLoading() {
-  return <FuturisticLoader title="Loading subjects" Icon={BookOpen} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={BookOpen} variant="full" />;
 }

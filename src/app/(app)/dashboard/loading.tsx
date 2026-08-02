@@ -1,7 +1,6 @@
-"use client";
-import { BarChart3 } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { LayoutDashboard } from "lucide-react";
 
-export default function appDashboardLoadingtsxLoading() {
-  return <FuturisticLoader title="Loading your dashboard" Icon={BarChart3} variant="full" />;
+export default function Loading() {
+  return <FuturisticLoader title="Loading..." Icon={LayoutDashboard} variant="full" />;
 }
