@@ -96,16 +96,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* Toggle button - desktop only */}
-          <button
-            onClick={toggleSidebar}
-            className="hidden lg:flex h-9 w-9 items-center justify-center rounded-xl border-2 border-[#FF2D78]/30 bg-[#FF2D78]/10 text-[#FF2D78] shadow-[0_3px_0_0_rgba(255,45,120,0.2)] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_rgba(255,45,120,0.2)] transition-all duration-150 shrink-0"
-            style={{ animation: "sidebarTogglePulse 2s ease-in-out infinite" }}
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
-
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shrink-0 shadow-[0_3px_0_0_#cc1a5e]">
               <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -124,13 +114,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Sidebar */}
         <aside className={clsx(
-          "fixed inset-y-0 top-16 left-0 z-40 flex flex-col transition-all duration-300 ease-in-out lg:static lg:h-full lg:translate-x-0 h-[calc(100vh-4rem)]",
+          "fixed inset-y-0 top-16 left-0 z-40 flex flex-col transition-all duration-300 ease-in-out lg:static lg:h-full lg:translate-x-0 h-[calc(100vh-4rem)] overflow-y-auto",
           "bg-gray-50/95 border-r-2 border-gray-200 dark:bg-[#070b14]/95 dark:border-[#2a2a3d] backdrop-blur-sm shrink-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
           sidebarCollapsed ? "w-[260px] lg:w-[88px]" : "w-[260px]"
         )}>
-          {/* Mobile close button if needed, but tap outside is better. Let's just keep nav clean */}
-          <nav className={clsx("flex-1 py-4 overflow-y-auto space-y-1.5", sidebarCollapsed ? "px-2 lg:px-3" : "px-3")}>
+          {/* ===== TOGGLE BUTTON ===== */}
+          <div className={clsx("p-3 hidden lg:flex", sidebarCollapsed ? "justify-center" : "")}>
+            <button
+              onClick={toggleSidebar}
+              className={clsx(
+                "flex h-9 w-9 items-center justify-center rounded-xl",
+                "border-2 border-[#FF2D78]/30 bg-[#FF2D78]/10 text-[#FF2D78]",
+                "shadow-[0_3px_0_0_rgba(255,45,120,0.2)]",
+                "hover:translate-y-[1px] hover:shadow-[0_2px_0_0_rgba(255,45,120,0.2)]",
+                "transition-all duration-150"
+              )}
+              style={{ animation: "sidebarTogglePulse 2s ease-in-out infinite" }}
+              aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
+          </div>
+
+          <nav className={clsx("flex-1 px-2 space-y-1 overflow-y-auto pt-2 lg:pt-0", sidebarCollapsed ? "px-2 lg:px-3" : "px-3")}>
             {navItems.map((item) => {
               const active = pathname.startsWith(item.href);
               return (
