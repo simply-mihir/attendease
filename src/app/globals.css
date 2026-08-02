@@ -1117,3 +1117,13 @@ html.dark select option {
   background-size: 200% 100%;
   animation: skeletonShimmer 1.8s ease-in-out infinite;
 }
+
+/* === SIDEBAR TOGGLE PULSE === */
+@keyframes sidebarTogglePulse {
+  0%, 100% {
+    box-shadow: 0 3px 0 0 rgba(255, 45, 120, 0.2), 0 0 0 0 rgba(255, 45, 120, 0);
+  }
+  50% {
+    box-shadow: 0 3px 0 0 rgba(255, 45, 120, 0.2), 0 0 12px 3px rgba(255, 45, 120, 0.15);
+  }
+}

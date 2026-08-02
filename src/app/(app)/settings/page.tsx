@@ -76,10 +76,9 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Settings Menu Card */}
-        <div className="rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] overflow-hidden mb-4 bg-white shadow-[0_6px_0_0_#d1d5db] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-          {/* Notifications row — Orange #ff6b35 */}
-          <Link href="/settings/notifications" className="w-full flex items-center gap-4 px-5 py-4 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-[#ff6b35] hover:bg-[#ff6b35]/[0.04] dark:hover:bg-[#ff6b35]/[0.04] border-b-2 border-b-gray-100 dark:border-b-[#2a2a3d]/50 group">
+        {/* Notifications — Orange outline */}
+        <Link href="/settings/notifications" className="block rounded-2xl border-2 border-[#ff6b35] p-4 mb-4 cursor-pointer transition-all duration-150 bg-white shadow-[0_4px_0_0_#cc5529] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#a34421] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#cc5529] dark:hover:shadow-[0_3px_0_0_#a34421] group">
+          <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] shrink-0">
               <Bell className="h-5 w-5" />
             </div>
@@ -88,10 +87,12 @@ export default function SettingsPage() {
               <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Telegram, email, alarms, and push notifications</p>
             </div>
             <ChevronRight className="h-4 w-4 text-[#ff6b35]/40 group-hover:translate-x-1 group-hover:text-[#ff6b35] transition-all" />
-          </Link>
+          </div>
+        </Link>
 
-          {/* Semesters row — Teal #06d6a0 */}
-          <Link href="/settings/semesters" className="w-full flex items-center gap-4 px-5 py-4 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-[#06d6a0] hover:bg-[#06d6a0]/[0.04] dark:hover:bg-[#06d6a0]/[0.04] border-b-2 border-b-gray-100 dark:border-b-[#2a2a3d]/50 group">
+        {/* Semesters — Teal outline */}
+        <Link href="/settings/semesters" className="block rounded-2xl border-2 border-[#06d6a0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-white shadow-[0_4px_0_0_#05a87e] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#049e77] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#05a87e] dark:hover:shadow-[0_3px_0_0_#049e77] group">
+          <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/15 text-[#06d6a0] shrink-0">
               <Calendar className="h-5 w-5" />
             </div>
@@ -100,10 +101,12 @@ export default function SettingsPage() {
               <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Manage your semesters and terms</p>
             </div>
             <ChevronRight className="h-4 w-4 text-[#06d6a0]/40 group-hover:translate-x-1 group-hover:text-[#06d6a0] transition-all" />
-          </Link>
+          </div>
+        </Link>
 
-          {/* Export Data row — Blue #4361ee */}
-          <Link href="/export" className="w-full flex items-center gap-4 px-5 py-4 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-[#4361ee] hover:bg-[#4361ee]/[0.04] dark:hover:bg-[#4361ee]/[0.04] border-b-2 border-b-gray-100 dark:border-b-[#2a2a3d]/50 group">
+        {/* Export Data — Blue outline */}
+        <Link href="/export" className="block rounded-2xl border-2 border-[#4361ee] p-4 mb-4 cursor-pointer transition-all duration-150 bg-white shadow-[0_4px_0_0_#3451cc] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#2a41a3] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3451cc] dark:hover:shadow-[0_3px_0_0_#2a41a3] group">
+          <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361ee]/15 text-[#4361ee] shrink-0">
               <Download className="h-5 w-5" />
             </div>
@@ -112,10 +115,12 @@ export default function SettingsPage() {
               <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Download your attendance as CSV</p>
             </div>
             <ChevronRight className="h-4 w-4 text-[#4361ee]/40 group-hover:translate-x-1 group-hover:text-[#4361ee] transition-all" />
-          </Link>
+          </div>
+        </Link>
 
-          {/* Medical Leave row — Coral #ef476f */}
-          <Link href="/medical-leave" className="w-full flex items-center gap-4 px-5 py-4 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-[#ef476f] hover:bg-[#ef476f]/[0.04] dark:hover:bg-[#ef476f]/[0.04] border-b-2 border-b-gray-100 dark:border-b-[#2a2a3d]/50 group">
+        {/* Medical Leave — Coral outline */}
+        <Link href="/medical-leave" className="block rounded-2xl border-2 border-[#ef476f] p-4 mb-4 cursor-pointer transition-all duration-150 bg-white shadow-[0_4px_0_0_#c43559] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#9e2a47] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#c43559] dark:hover:shadow-[0_3px_0_0_#9e2a47] group">
+          <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ef476f]/15 text-[#ef476f] shrink-0">
               <HeartPulse className="h-5 w-5" />
             </div>
@@ -124,20 +129,22 @@ export default function SettingsPage() {
               <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Bulk mark dates as excused</p>
             </div>
             <ChevronRight className="h-4 w-4 text-[#ef476f]/40 group-hover:translate-x-1 group-hover:text-[#ef476f] transition-all" />
-          </Link>
+          </div>
+        </Link>
 
-          {/* Goal Mode row — Orange #ff6b35 */}
-          <Link href="/settings/goal" className="w-full flex items-center gap-4 px-5 py-4 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-[#ff6b35] hover:bg-[#ff6b35]/[0.04] dark:hover:bg-[#ff6b35]/[0.04] group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] shrink-0">
+        {/* Goal Mode — Cyan outline */}
+        <Link href="/settings/goal" className="block rounded-2xl border-2 border-[#4cc9f0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-white shadow-[0_4px_0_0_#3aa3c4] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#2e829d] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3aa3c4] dark:hover:shadow-[0_3px_0_0_#2e829d] group">
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4cc9f0]/15 text-[#4cc9f0] shrink-0">
               <Target className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#ff6b35] transition-colors">Goal Mode</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#4cc9f0] transition-colors">Goal Mode</p>
               <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Set your attendance target</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-[#ff6b35]/40 group-hover:translate-x-1 group-hover:text-[#ff6b35] transition-all" />
-          </Link>
-        </div>
+            <ChevronRight className="h-4 w-4 text-[#4cc9f0]/40 group-hover:translate-x-1 group-hover:text-[#4cc9f0] transition-all" />
+          </div>
+        </Link>
 
         {/* Theme Appearance card */}
         <div className="rounded-2xl border-2 border-[#9b5de5] p-5 mb-4 bg-white shadow-[0_6px_0_0_#7c4ab8] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#5a3589] flex items-center justify-between">
