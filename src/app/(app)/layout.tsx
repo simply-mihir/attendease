@@ -118,7 +118,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Toggle button */}
         <button
           onClick={toggleSidebar}
-          className="hidden lg:flex mx-auto my-3 h-8 w-8 items-center justify-center rounded-lg border-2 border-gray-200 bg-white text-[#4a4a5a] shadow-[0_2px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_2px_0_0_#0d0d1a] dark:hover:shadow-[0_1px_0_0_#0d0d1a] transition-all duration-150"
+          className={clsx(
+            "hidden lg:flex my-3 h-9 w-9 items-center justify-center rounded-xl",
+            "border-2 border-[#FF2D78]/30 bg-[#FF2D78]/10 text-[#FF2D78]",
+            "shadow-[0_3px_0_0_rgba(255,45,120,0.2)]",
+            "hover:translate-y-[1px] hover:shadow-[0_2px_0_0_rgba(255,45,120,0.2)]",
+            "transition-all duration-150",
+            sidebarCollapsed ? "mx-auto" : "ml-3"
+          )}
+          style={{ animation: "sidebarTogglePulse 2s ease-in-out infinite" }}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
