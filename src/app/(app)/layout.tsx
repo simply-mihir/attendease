@@ -121,8 +121,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {(user.name || user.email || "U").charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate text-[#1a1a2e] dark:text-white">{user.name || "Student"}</p>
-              <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] truncate">{user.email}</p>
+              <p className="text-sm font-bold truncate text-text">{user.name || "Student"}</p>
+              <p className="text-xs text-text-muted truncate">{user.email}</p>
             </div>
           </div>
           <button onClick={handleLogout}

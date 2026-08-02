@@ -173,7 +173,7 @@ html.dark .btn-gradient:active, html.dark .btn-3d-primary:active {
   box-shadow: 0 1px 0 0 #b81e56;
 }
 
-.btn-ghost, .btn-3d-ghost {
+.btn-ghost, .btn-3d-ghost, .btn-3d-secondary {
   background-color: #ffffff;
   color: #4a4a5a;
   font-weight: 600;
@@ -183,28 +183,70 @@ html.dark .btn-gradient:active, html.dark .btn-3d-primary:active {
   box-shadow: 0 4px 0 0 #d1d5db;
   transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
-.btn-ghost:hover, .btn-3d-ghost:hover {
+.btn-ghost:hover, .btn-3d-ghost:hover, .btn-3d-secondary:hover {
   transform: translateY(2px);
   box-shadow: 0 2px 0 0 #d1d5db;
   color: #1a1a2e;
 }
-.btn-ghost:active, .btn-3d-ghost:active {
+.btn-ghost:active, .btn-3d-ghost:active, .btn-3d-secondary:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 0 #d1d5db;
 }
-html.dark .btn-ghost, html.dark .btn-3d-ghost {
+html.dark .btn-ghost, html.dark .btn-3d-ghost, html.dark .btn-3d-secondary {
   background-color: #141425;
   color: #c4c4d4;
   border-color: #2a2a3d;
   box-shadow: 0 4px 0 0 #0d0d1a;
 }
-html.dark .btn-ghost:hover, html.dark .btn-3d-ghost:hover {
+html.dark .btn-ghost:hover, html.dark .btn-3d-ghost:hover, html.dark .btn-3d-secondary:hover {
   box-shadow: 0 2px 0 0 #0d0d1a;
   color: #ffffff;
 }
-html.dark .btn-ghost:active, html.dark .btn-3d-ghost:active {
+html.dark .btn-ghost:active, html.dark .btn-3d-ghost:active, html.dark .btn-3d-secondary:active {
   box-shadow: 0 1px 0 0 #0d0d1a;
 }
+
+.btn-3d-coral {
+  background-color: #ef476f;
+  color: #ffffff;
+  border-width: 2px;
+  border-color: #c43559;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #c43559;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-coral:hover { transform: translateY(2px); box-shadow: 0 2px 0 0 #c43559; }
+.btn-3d-coral:active { transform: translateY(4px); box-shadow: none; }
+html.dark .btn-3d-coral { border-color: #a82e4d; box-shadow: 0 4px 0 0 #a82e4d; }
+html.dark .btn-3d-coral:hover { box-shadow: 0 2px 0 0 #a82e4d; }
+
+.btn-3d-cyan {
+  background-color: #00f5d4;
+  color: #0d0d1a;
+  border-width: 2px;
+  border-color: #00c4a7;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #00c4a7;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-cyan:hover { transform: translateY(2px); box-shadow: 0 2px 0 0 #00c4a7; }
+.btn-3d-cyan:active { transform: translateY(4px); box-shadow: none; }
+html.dark .btn-3d-cyan { border-color: #00a890; box-shadow: 0 4px 0 0 #00a890; }
+html.dark .btn-3d-cyan:hover { box-shadow: 0 2px 0 0 #00a890; }
+
+.btn-3d-amber {
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-width: 2px;
+  border-color: #d95220;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #d95220;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-amber:hover { transform: translateY(2px); box-shadow: 0 2px 0 0 #d95220; }
+.btn-3d-amber:active { transform: translateY(4px); box-shadow: none; }
+html.dark .btn-3d-amber { border-color: #b84114; box-shadow: 0 4px 0 0 #b84114; }
+html.dark .btn-3d-amber:hover { box-shadow: 0 2px 0 0 #b84114; }
 
 /* ===== TEXT — Dual Mode ===== */
 .text-gradient {
@@ -976,4 +1018,15 @@ html.dark select option {
   border-radius: 12px;
   background: inherit;
   z-index: -1;
+}
+
+@keyframes loaderSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes loaderProgress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
 }

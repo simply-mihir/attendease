@@ -129,7 +129,7 @@ export default function NotificationSettingsPage() {
   if (!currentSettings) {
     return (
       <div className="max-w-2xl mx-auto space-y-4 animate-fade-in">
-        <h1 className="text-2xl font-black text-[#1a1a2e] dark:text-white">Notification Settings</h1>
+        <h1 className="text-2xl font-black text-text">Notification Settings</h1>
         <div className="card-3d p-6">
           <p className="text-[#9ca3af] dark:text-[#6b6b80] font-bold">Failed to load settings.</p>
         </div>
@@ -142,12 +142,12 @@ export default function NotificationSettingsPage() {
       <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6 pb-28">
         {/* Header */}
         <div className="flex items-center gap-3" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
-          <Link href="/settings" className="p-3 rounded-xl border-2 border-transparent hover:bg-gray-200/60 dark:hover:bg-white/[0.04] text-[#4a4a5a] dark:text-[#6b6b80] hover:text-[#1a1a2e] dark:hover:text-white transition cursor-pointer">
+          <Link href="/settings" className="p-3 rounded-xl border-2 border-transparent hover:bg-gray-200/60 dark:hover:bg-white/[0.04] text-text-muted hover:text-[#1a1a2e] dark:hover:text-white transition cursor-pointer">
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Notifications</h1>
-            <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Choose how AttendEase keeps you updated</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Notifications</h1>
+            <p className="text-sm font-bold text-text-muted mt-0.5">Choose how AttendEase keeps you updated</p>
           </div>
         </div>
 
@@ -161,8 +161,8 @@ export default function NotificationSettingsPage() {
                   <Globe className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-black text-[#1a1a2e] dark:text-white text-sm">Timezone</p>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Set your local timezone</p>
+                  <p className="font-black text-text text-sm">Timezone</p>
+                  <p className="text-xs font-bold text-text-muted">Set your local timezone</p>
                 </div>
               </div>
               <select
@@ -194,8 +194,8 @@ export default function NotificationSettingsPage() {
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-black text-[#1a1a2e] dark:text-white text-sm">Daily Brief Time</p>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Morning class schedule summary</p>
+                  <p className="font-black text-text text-sm">Daily Brief Time</p>
+                  <p className="text-xs font-bold text-text-muted">Morning class schedule summary</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -230,8 +230,8 @@ export default function NotificationSettingsPage() {
                   <CalendarCheck className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-black text-[#1a1a2e] dark:text-white text-sm">Daily Report Time</p>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">End-of-day attendance summary</p>
+                  <p className="font-black text-text text-sm">Daily Report Time</p>
+                  <p className="text-xs font-bold text-text-muted">End-of-day attendance summary</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -266,8 +266,8 @@ export default function NotificationSettingsPage() {
                   <AlarmClock className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-black text-[#1a1a2e] dark:text-white text-sm">Pre-Class Alert</p>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">How early to notify before class</p>
+                  <p className="font-black text-text text-sm">Pre-Class Alert</p>
+                  <p className="text-xs font-bold text-text-muted">How early to notify before class</p>
                 </div>
               </div>
               <select
@@ -304,12 +304,12 @@ export default function NotificationSettingsPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-black text-[#1a1a2e] dark:text-white">{channel.label}</p>
+                        <p className="font-black text-text">{channel.label}</p>
                         {isPush && (
                           <StatusBadge status={pushStatus} />
                         )}
                       </div>
-                      <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">{channel.desc}</p>
+                      <p className="text-xs font-bold text-text-muted mt-0.5">{channel.desc}</p>
                     </div>
                   </div>
                   <Toggle3D
@@ -351,7 +351,7 @@ export default function NotificationSettingsPage() {
                     {pushStatus === "denied" && (
                       <div className="rounded-xl p-4 space-y-2 bg-[#ef476f]/10 border-2 border-[#ef476f]/20 shadow-[0_3px_0_0_rgba(239,71,111,0.2)]">
                         <p className="text-sm font-black text-[#ef476f]">Notifications blocked by browser</p>
-                        <ol className="text-xs font-bold text-[#4a4a5a] dark:text-[#c4c4d4] space-y-1 list-decimal list-inside">
+                        <ol className="text-xs font-bold text-text-secondary space-y-1 list-decimal list-inside">
                           <li>Open browser settings</li>
                           <li>Find AttendEase in site permissions</li>
                           <li>Change notifications to &quot;Allow&quot;</li>
@@ -378,8 +378,8 @@ export default function NotificationSettingsPage() {
                             <type.icon className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <p className="text-sm font-black text-[#1a1a2e] dark:text-white">{type.label}</p>
-                            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{type.desc}</p>
+                            <p className="text-sm font-black text-text">{type.label}</p>
+                            <p className="text-xs font-bold text-text-muted">{type.desc}</p>
                           </div>
                         </div>
                         <Toggle3D

@@ -39,13 +39,13 @@ export default function OptimizerPage() {
     <PageTransition direction="up" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center shadow-[0_3px_0_0_#038c67]">
             <Zap className="w-5 h-5 text-white" />
           </div>
           Smart Skip Optimizer
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Find the safest classes to skip while staying above every subject&apos;s minimum
         </p>
       </div>
@@ -53,7 +53,7 @@ export default function OptimizerPage() {
       {/* Controls */}
       <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white">
+          <label className="block text-sm font-black text-text">
             How many classes do you want to skip?
           </label>
           <span className="text-[#06d6a0] font-black text-xl px-3.5 py-0.5 bg-[#06d6a0]/15 rounded-xl border-2 border-[#06d6a0]/40 shadow-[0_2px_0_0_#06d6a0]">
@@ -68,7 +68,7 @@ export default function OptimizerPage() {
           onChange={(e) => setMaxSkips(parseInt(e.target.value))}
           className="w-full accent-[#06d6a0] cursor-pointer h-3 rounded-lg bg-gray-200 dark:bg-[#1f1f35]"
         />
-        <div className="flex justify-between text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80] mt-1.5">
+        <div className="flex justify-between text-xs font-black text-text-muted mt-1.5">
           <span>1</span>
           <span>5</span>
           <span>10</span>
@@ -112,7 +112,7 @@ export default function OptimizerPage() {
                 You can only safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes
               </p>
             )}
-            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
+            <p className="text-xs font-bold text-text-muted mt-0.5">
               Skips are distributed across subjects to maximize safety margin
             </p>
           </div>
@@ -127,8 +127,8 @@ export default function OptimizerPage() {
               <div className="w-14 h-14 rounded-2xl bg-[#ef476f]/15 border-2 border-[#ef476f]/30 flex items-center justify-center mx-auto mb-3 text-[#ef476f] shadow-[0_2px_0_0_#ef476f]">
                 <AlertTriangle className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white mb-1">No Safe Skips Available</h3>
-              <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold max-w-md mx-auto">
+              <h3 className="text-lg font-black text-text mb-1">No Safe Skips Available</h3>
+              <p className="text-text-muted text-sm font-bold max-w-md mx-auto">
                 All your subjects are too tight to skip any classes. Focus on attending!
               </p>
             </div>
@@ -147,7 +147,7 @@ export default function OptimizerPage() {
                       }}
                     />
                     <div>
-                      <h3 className="font-black text-[#1a1a2e] dark:text-white">{rec.subjectName}</h3>
+                      <h3 className="font-black text-text">{rec.subjectName}</h3>
                       <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-xl text-xs font-black bg-[#06d6a0]/15 text-[#06d6a0] border-2 border-[#06d6a0]/30 shadow-[0_2px_0_0_#06d6a0]">
                         <Sparkles className="w-3 h-3 text-[#06d6a0]" />
                         Skip {rec.skipsAllocated} {rec.skipsAllocated === 1 ? "class" : "classes"}
@@ -168,9 +168,9 @@ export default function OptimizerPage() {
                       >
                         {rec.currentPct}%
                       </p>
-                      <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Current</p>
+                      <p className="text-xs font-bold text-text-muted">Current</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-[#4a4a5a] dark:text-[#6b6b80]" />
+                    <ArrowRight className="w-4 h-4 text-text-muted" />
                     <div className="text-right">
                       <p
                         className={clsx(
@@ -184,7 +184,7 @@ export default function OptimizerPage() {
                       >
                         {rec.newPct}%
                       </p>
-                      <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">After</p>
+                      <p className="text-xs font-bold text-text-muted">After</p>
                     </div>
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export default function OptimizerPage() {
                       style={{ width: `${Math.min(100, rec.newPct)}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                  <div className="flex justify-between text-xs font-bold text-text-muted">
                     <span>
                       {rec.remainingBuffer > 0
                         ? `${rec.remainingBuffer} more skips available`

@@ -91,7 +91,7 @@ export default function SemesterDetailPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white flex items-center gap-3 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-text flex items-center gap-3 tracking-tight">
             {semester.name}
             {semester.isCurrent && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#06d6a0]/15 text-[#06d6a0] border border-[#06d6a0]">
@@ -99,7 +99,7 @@ export default function SemesterDetailPage() {
               </span>
             )}
           </h1>
-          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">
+          <p className="text-sm font-bold text-text-muted mt-1">
             {new Date(semester.startDate).toLocaleDateString()} — {new Date(semester.endDate).toLocaleDateString()}
           </p>
         </div>
@@ -146,7 +146,7 @@ export default function SemesterDetailPage() {
               className="card-3d p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-end"
             >
               <div className="flex-1 w-full">
-                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Holiday Name</label>
+                <label className="block text-xs font-black mb-1.5 text-text">Holiday Name</label>
                 <input
                   type="text"
                   required
@@ -157,7 +157,7 @@ export default function SemesterDetailPage() {
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Date</label>
+                <label className="block text-xs font-black mb-1.5 text-text">Date</label>
                 <input
                   type="date"
                   required
@@ -182,8 +182,8 @@ export default function SemesterDetailPage() {
                   className="card-3d p-4 flex items-center justify-between group transition-all"
                 >
                   <div>
-                    <h4 className="font-black text-sm text-[#1a1a2e] dark:text-white">{h.name}</h4>
-                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{new Date(h.date).toLocaleDateString()}</p>
+                    <h4 className="font-black text-sm text-text">{h.name}</h4>
+                    <p className="text-xs font-bold text-text-muted">{new Date(h.date).toLocaleDateString()}</p>
                   </div>
                   <button
                     onClick={() => deleteHoliday(h.id)}
@@ -195,7 +195,7 @@ export default function SemesterDetailPage() {
                 </div>
               ))}
               {semester.holidays?.length === 0 && (
-                <div className="col-span-full py-8 text-center text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                <div className="col-span-full py-8 text-center text-sm font-bold text-text-muted">
                   No holidays added yet.
                 </div>
               )}
@@ -210,7 +210,7 @@ export default function SemesterDetailPage() {
               className="card-3d p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-end"
             >
               <div className="flex-1 w-full">
-                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Exam Period Name</label>
+                <label className="block text-xs font-black mb-1.5 text-text">Exam Period Name</label>
                 <input
                   type="text"
                   required
@@ -221,7 +221,7 @@ export default function SemesterDetailPage() {
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Start Date</label>
+                <label className="block text-xs font-black mb-1.5 text-text">Start Date</label>
                 <input
                   type="date"
                   required
@@ -231,7 +231,7 @@ export default function SemesterDetailPage() {
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">End Date</label>
+                <label className="block text-xs font-black mb-1.5 text-text">End Date</label>
                 <input
                   type="date"
                   required
@@ -256,8 +256,8 @@ export default function SemesterDetailPage() {
                   className="card-3d p-4 flex items-center justify-between group transition-all"
                 >
                   <div>
-                    <h4 className="font-black text-sm text-[#1a1a2e] dark:text-white">{ep.name}</h4>
-                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                    <h4 className="font-black text-sm text-text">{ep.name}</h4>
+                    <p className="text-xs font-bold text-text-muted">
                       {new Date(ep.startDate).toLocaleDateString()} — {new Date(ep.endDate).toLocaleDateString()}
                     </p>
                   </div>
@@ -271,7 +271,7 @@ export default function SemesterDetailPage() {
                 </div>
               ))}
               {semester.examPeriods?.length === 0 && (
-                <div className="col-span-full py-8 text-center text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                <div className="col-span-full py-8 text-center text-sm font-bold text-text-muted">
                   No exam periods added yet.
                 </div>
               )}

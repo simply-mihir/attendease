@@ -298,13 +298,13 @@ export default function ImportPage() {
     <PageTransition direction="right" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#00b4d8] border-2 border-[#0096c7] flex items-center justify-center shadow-[0_3px_0_0_#0096c7]">
             <Camera className="w-5 h-5 text-white" />
           </div>
           Import Timetable
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Upload a photo, PDF, or spreadsheet of your timetable to auto-add all subjects
         </p>
       </div>
@@ -334,7 +334,7 @@ export default function ImportPage() {
           </div>
         ))}
       </div>
-      <div className="flex justify-center gap-12 text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+      <div className="flex justify-center gap-12 text-xs font-black text-text-muted" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <span className={clsx(step === 1 && "text-[#00b4d8] dark:text-[#00b4d8]")}>Upload</span>
         <span className={clsx(step === 2 && "text-[#00b4d8] dark:text-[#00b4d8]")}>Review</span>
         <span className={clsx(step === 3 && "text-[#00b4d8] dark:text-[#00b4d8]")}>Done</span>
@@ -360,7 +360,7 @@ export default function ImportPage() {
                   alt="Timetable preview"
                   className="rounded-2xl max-h-72 mx-auto object-contain border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_3px_0_0_rgba(0,0,0,0.1)]"
                 />
-                <p className="text-center text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                <p className="text-center text-xs font-bold text-text-muted">
                   Click to change file
                 </p>
               </div>
@@ -370,10 +370,10 @@ export default function ImportPage() {
                   <FileSpreadsheet className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="font-black text-[#1a1a2e] dark:text-white text-sm">{fileName}</p>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Ready to analyze</p>
+                  <p className="font-black text-text text-sm">{fileName}</p>
+                  <p className="text-xs font-bold text-text-muted">Ready to analyze</p>
                 </div>
-                <p className="text-center text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                <p className="text-center text-xs font-bold text-text-muted">
                   Click to change file
                 </p>
               </div>
@@ -382,23 +382,23 @@ export default function ImportPage() {
                 <div className="w-16 h-16 rounded-2xl bg-[#00b4d8] border-2 border-[#0096c7] flex items-center justify-center mx-auto mb-4 shadow-[0_3px_0_0_#0096c7]">
                   <Upload className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white mb-1">
+                <h3 className="text-lg font-black text-text mb-1">
                   Upload your timetable
                 </h3>
-                <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mb-4">
+                <p className="text-text-muted text-sm font-bold mb-4">
                   Drop a file here, or click to browse
                 </p>
                 <div className="flex items-center justify-center gap-2.5 flex-wrap">
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-[#1a1a2e] dark:text-white border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-text border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
                     📷 Photo
                   </span>
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-[#1a1a2e] dark:text-white border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-text border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
                     📄 PDF
                   </span>
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-[#1a1a2e] dark:text-white border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-text border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
                     📊 Excel / CSV
                   </span>
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-[#1a1a2e] dark:text-white border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-gray-50 dark:bg-[#141425] text-text border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">
                     📱 Screenshot
                   </span>
                 </div>
@@ -458,10 +458,10 @@ export default function ImportPage() {
                 <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-black text-[#1a1a2e] dark:text-white text-sm">
+                <p className="font-black text-text text-sm">
                   Found {subjects.length} subjects with {totalSlots} schedule slots
                 </p>
-                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                <p className="text-xs font-bold text-text-muted">
                   Review and edit before importing
                 </p>
               </div>
@@ -567,7 +567,7 @@ export default function ImportPage() {
                           day: dayLabel,
                         });
                       }}
-                      className="py-1.5 px-3 rounded-xl text-xs font-black border-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#1f1f35] text-[#1a1a2e] dark:text-white w-full md:w-auto min-w-[115px] focus:outline-none"
+                      className="py-1.5 px-3 rounded-xl text-xs font-black border-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#1f1f35] text-text w-full md:w-auto min-w-[115px] focus:outline-none"
                     >
                       {DAY_OPTIONS.map((d) => (
                         <option key={d.value} value={d.value}>
@@ -585,7 +585,7 @@ export default function ImportPage() {
                             startTime: e.target.value,
                           })
                         }
-                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-black text-[#1a1a2e] dark:text-white w-[110px] focus:outline-none"
+                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-black text-text w-[110px] focus:outline-none"
                       />
                       <span className="text-gray-400 text-xs font-bold">–</span>
                       <input
@@ -596,7 +596,7 @@ export default function ImportPage() {
                             endTime: e.target.value,
                           })
                         }
-                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-black text-[#1a1a2e] dark:text-white w-[110px] focus:outline-none"
+                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-black text-text w-[110px] focus:outline-none"
                       />
                     </div>
                     <div className="flex items-center gap-1.5 flex-1 min-w-[160px] w-full md:w-auto">
@@ -610,7 +610,7 @@ export default function ImportPage() {
                           })
                         }
                         placeholder="Room / Venue"
-                        className="py-1.5 px-3 rounded-xl text-xs font-bold border-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#1f1f35] text-[#1a1a2e] dark:text-white w-full focus:outline-none"
+                        className="py-1.5 px-3 rounded-xl text-xs font-bold border-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#1f1f35] text-text w-full focus:outline-none"
                       />
                     </div>
                     <button
@@ -635,7 +635,7 @@ export default function ImportPage() {
           {/* Add subject manually */}
           <button
             onClick={addSubject}
-            className="card-3d p-4 w-full flex items-center justify-center gap-2 text-sm font-black text-[#1a1a2e] dark:text-white transition cursor-pointer"
+            className="card-3d p-4 w-full flex items-center justify-center gap-2 text-sm font-black text-text transition cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Add Subject Manually
           </button>
@@ -670,10 +670,10 @@ export default function ImportPage() {
             <div className="w-20 h-20 rounded-3xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center mx-auto mb-5 shadow-[0_4px_0_0_#038c67] text-white">
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-black text-[#1a1a2e] dark:text-white mb-2">
+            <h2 className="text-2xl font-black text-text mb-2">
               Import Complete! 🎉
             </h2>
-            <p className="text-[#4a4a5a] dark:text-[#6b6b80] mb-6 font-bold">
+            <p className="text-text-muted mb-6 font-bold">
               <span className="font-black text-[#06d6a0]">
                 {importResult.succeeded} subjects
               </span>{" "}

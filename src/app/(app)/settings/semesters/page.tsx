@@ -128,7 +128,7 @@ export default function SemestersPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl font-black text-[#1a1a2e] dark:text-white">Semesters</h1>
+        <h1 className="text-2xl font-black text-text">Semesters</h1>
         <button onClick={() => setShowForm(!showForm)}
           className="btn-3d-primary flex items-center gap-2 px-6 py-3 cursor-pointer">
           <Plus className="w-4 h-4" /> New Semester
@@ -142,17 +142,17 @@ export default function SemestersPage() {
             className="input-3d w-full" />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Start Date</label>
+              <label className="block text-xs font-black text-text mb-1">Start Date</label>
               <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} required
                 className="input-3d w-full" />
             </div>
             <div>
-              <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">End Date</label>
+              <label className="block text-xs font-black text-text mb-1">End Date</label>
               <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} required
                 className="input-3d w-full" />
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm font-black text-[#1a1a2e] dark:text-white cursor-pointer w-fit">
+          <label className="flex items-center gap-2 text-sm font-black text-text cursor-pointer w-fit">
             <input type="checkbox" checked={form.isCurrent} onChange={(e) => setForm({ ...form, isCurrent: e.target.checked })}
               className="accent-[#FF2D78] w-4 h-4 cursor-pointer" />
             Set as current semester
@@ -171,10 +171,10 @@ export default function SemestersPage() {
           )}>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-[#1a1a2e] dark:text-white">{s.name}</h3>
+                <h3 className="font-black text-text">{s.name}</h3>
                 {s.isCurrent && <span className="px-3 py-1 bg-[#06d6a0]/15 text-[#06d6a0] border-2 border-[#06d6a0] text-xs rounded-xl font-black uppercase">Current</span>}
               </div>
-              <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">
+              <p className="text-xs font-bold text-text-muted mt-1">
                 {new Date(s.startDate).toLocaleDateString("en-IN")} — {new Date(s.endDate).toLocaleDateString("en-IN")}
                 {s.subjects && ` · ${s.subjects.length} subjects`}
               </p>
@@ -214,23 +214,23 @@ export default function SemestersPage() {
       {showEditModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1a1a2e]/60 dark:bg-black/60 backdrop-blur-sm">
           <form onSubmit={handleEdit} className="card-3d p-6 max-w-sm w-full animate-fade-in space-y-4">
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white mb-4">Edit Semester</h3>
+            <h3 className="text-xl font-black text-text mb-4">Edit Semester</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Name</label>
+                <label className="block text-xs font-black text-text mb-1">Name</label>
                 <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} required className="input-3d w-full" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Start Date</label>
+                  <label className="block text-xs font-black text-text mb-1">Start Date</label>
                   <input type="date" value={editForm.startDate} onChange={e => setEditForm({ ...editForm, startDate: e.target.value })} required className="input-3d w-full" />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">End Date</label>
+                  <label className="block text-xs font-black text-text mb-1">End Date</label>
                   <input type="date" value={editForm.endDate} onChange={e => setEditForm({ ...editForm, endDate: e.target.value })} required className="input-3d w-full" />
                 </div>
               </div>
-              <label className="flex items-center gap-2 text-sm font-black text-[#1a1a2e] dark:text-white cursor-pointer w-fit">
+              <label className="flex items-center gap-2 text-sm font-black text-text cursor-pointer w-fit">
                 <input type="checkbox" checked={editForm.isCurrent} onChange={e => setEditForm({ ...editForm, isCurrent: e.target.checked })} className="accent-[#FF2D78] w-4 h-4 cursor-pointer" />
                 Set as current semester
               </label>
@@ -247,8 +247,8 @@ export default function SemestersPage() {
       {linkSemesterId && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#1a1a2e]/60 dark:bg-black/60 backdrop-blur-sm">
           <div className="card-3d p-6 max-w-md w-full animate-fade-in flex flex-col max-h-[80vh]">
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white mb-1">Link Existing Subjects</h3>
-            <p className="text-sm text-[#4a4a5a] dark:text-[#6b6b80] font-bold mb-4">Select subjects to associate with this semester.</p>
+            <h3 className="text-xl font-black text-text mb-1">Link Existing Subjects</h3>
+            <p className="text-sm text-text-muted font-bold mb-4">Select subjects to associate with this semester.</p>
             
             <div className="flex-1 overflow-y-auto space-y-2 pr-2 mb-4 custom-scrollbar">
               {allSubjects.map(sub => (
@@ -260,7 +260,7 @@ export default function SemestersPage() {
                     className="accent-[#FF2D78] w-5 h-5 rounded cursor-pointer" 
                   />
                   <div>
-                    <p className="font-black text-[#1a1a2e] dark:text-white text-sm">{sub.name}</p>
+                    <p className="font-black text-text text-sm">{sub.name}</p>
                     <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">{sub.code || "No code"} {sub.semester?.name ? `· Currently in ${sub.semester.name}` : "· Unassigned"}</p>
                   </div>
                 </label>

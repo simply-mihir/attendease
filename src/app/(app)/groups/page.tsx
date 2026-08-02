@@ -136,13 +136,13 @@ export default function GroupsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
             <div className="w-11 h-11 rounded-2xl bg-[#ef476f] border-2 border-[#cc1a42] flex items-center justify-center shadow-[0_3px_0_0_#cc1a42]">
               <Users className="w-5 h-5 text-white" />
             </div>
             Friend Groups
           </h1>
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+          <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
             Share attendance stats with friends
           </p>
         </div>
@@ -173,7 +173,7 @@ export default function GroupsPage() {
       {/* Create modal */}
       {showCreate && (
         <div className="card-3d p-6 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-          <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Create a New Group</h3>
+          <h3 className="font-black text-base text-text">Create a New Group</h3>
           <input
             type="text"
             value={groupName}
@@ -207,7 +207,7 @@ export default function GroupsPage() {
       {/* Join modal */}
       {showJoin && (
         <div className="card-3d p-6 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-          <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Join a Group</h3>
+          <h3 className="font-black text-base text-text">Join a Group</h3>
           <input
             type="text"
             value={joinCode}
@@ -244,8 +244,8 @@ export default function GroupsPage() {
           <div className="w-16 h-16 rounded-2xl bg-[#ef476f] border-2 border-[#cc1a42] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#cc1a42]">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white mb-2">No Groups Yet</h3>
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mb-6 max-w-md mx-auto">
+          <h3 className="text-lg font-black text-text mb-2">No Groups Yet</h3>
+          <p className="text-text-muted text-sm font-bold mb-6 max-w-md mx-auto">
             Create a group to share attendance stats with friends, or join one with a code.
           </p>
           <div className="flex gap-3 justify-center">
@@ -276,8 +276,8 @@ export default function GroupsPage() {
             <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-[#1a1a2e] dark:text-white text-lg">{group.name}</h3>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
+                  <h3 className="font-black text-text text-lg">{group.name}</h3>
+                  <p className="text-xs font-bold text-text-muted mt-0.5">
                     {group.memberCount} {group.memberCount === 1 ? "member" : "members"}
                   </p>
                 </div>
@@ -313,8 +313,8 @@ export default function GroupsPage() {
 
                   {/* Name + overall */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm text-[#1a1a2e] dark:text-white truncate">{member.name}</p>
-                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                    <p className="font-black text-sm text-text truncate">{member.name}</p>
+                    <p className="text-xs font-bold text-text-muted">
                       Overall:{" "}
                       <span
                         className={clsx(
@@ -349,7 +349,7 @@ export default function GroupsPage() {
                       />
                     ))}
                     {member.subjects.length > 6 && (
-                      <span className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] font-black">
+                      <span className="text-xs text-text-muted font-black">
                         +{member.subjects.length - 6}
                       </span>
                     )}

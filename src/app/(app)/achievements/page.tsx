@@ -187,7 +187,7 @@ export default function AchievementsPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Sparkles className="h-7 w-7 text-[#FF2D78]" style={{ animation: "badgeSparkle 2s ease-in-out infinite" }} />
-          <h1 className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-text tracking-tight">
             Achievements & Badges
           </h1>
         </div>
@@ -204,7 +204,7 @@ export default function AchievementsPage() {
           shadow-[0_6px_0_0_rgba(255,45,120,0.15)]
           dark:shadow-[0_6px_0_0_rgba(255,45,120,0.2)]">
           <p className="text-sm font-semibold text-[#FF2D78] uppercase tracking-wide mb-1">Earned</p>
-          <p className="text-4xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">{earnedCount}</p>
+          <p className="text-4xl font-extrabold text-text tracking-tight">{earnedCount}</p>
           <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">of {ALL_BADGES.length} badges</p>
         </div>
 
@@ -215,7 +215,7 @@ export default function AchievementsPage() {
           dark:shadow-[0_6px_0_0_rgba(255,107,53,0.2)]">
           <p className="text-sm font-semibold text-[#ff6b35] uppercase tracking-wide mb-1">Streak</p>
           <div className="flex items-center justify-center gap-1">
-            <p className="text-4xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">{streak}</p>
+            <p className="text-4xl font-extrabold text-text tracking-tight">{streak}</p>
             <Flame className="h-6 w-6 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
           </div>
           <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">days</p>
@@ -227,7 +227,7 @@ export default function AchievementsPage() {
           shadow-[0_6px_0_0_rgba(6,214,160,0.15)]
           dark:shadow-[0_6px_0_0_rgba(6,214,160,0.2)]">
           <p className="text-sm font-semibold text-[#06d6a0] uppercase tracking-wide mb-1">Attended</p>
-          <p className="text-4xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">{totalAttended}</p>
+          <p className="text-4xl font-extrabold text-text tracking-tight">{totalAttended}</p>
           <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">classes total</p>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default function AchievementsPage() {
               </div>
 
               {/* Name */}
-              <span className={`text-sm font-bold tracking-tight ${earned ? "text-[#1a1a2e] dark:text-white" : "text-[#9ca3af] dark:text-[#6b6b80]"}`}>
+              <span className={`text-sm font-bold tracking-tight ${earned ? "text-text" : "text-[#9ca3af] dark:text-[#6b6b80]"}`}>
                 {badge.name}
               </span>
 
@@ -348,8 +348,8 @@ export default function AchievementsPage() {
               <selectedBadge.Icon className="h-7 w-7" style={{ color: selectedBadge.color }} />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-extrabold text-[#1a1a2e] dark:text-white text-lg tracking-tight">{selectedBadge.name}</h3>
-              <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#c4c4d4] mt-1">{selectedBadge.description}</p>
+              <h3 className="font-extrabold text-text text-lg tracking-tight">{selectedBadge.name}</h3>
+              <p className="text-sm font-medium text-text-secondary mt-1">{selectedBadge.description}</p>
               <div className="mt-3">
                 {isBadgeEarned(selectedBadge) ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold rounded-full px-3 py-1"
@@ -372,7 +372,7 @@ export default function AchievementsPage() {
         border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
         dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-bold text-[#1a1a2e] dark:text-white tracking-tight">Overall Completion</span>
+          <span className="font-bold text-text tracking-tight">Overall Completion</span>
           <span className="font-black text-[#FF2D78]">{Math.round((earnedCount / ALL_BADGES.length) * 100)}%</span>
         </div>
         <div className="h-4 w-full rounded-full bg-gray-100 dark:bg-[#0d0d1a] overflow-hidden border border-gray-200/50 dark:border-[#2a2a3d]/50">

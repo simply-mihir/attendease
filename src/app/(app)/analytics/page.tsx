@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
 
   return (
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+      <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         Analytics
       </h1>
 
@@ -78,8 +78,8 @@ export default function AnalyticsPage() {
           <div className="w-10 h-10 rounded-2xl bg-[#7b2cbf]/15 text-[#7b2cbf] dark:text-[#c77dff] border-2 border-[#7b2cbf]/30 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#7b2cbf]">
             <TrendingUp className="w-5 h-5" />
           </div>
-          <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">{dashboard.overallPct}%</p>
-          <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Overall Attendance</p>
+          <p className="text-3xl font-black text-text tracking-tight">{dashboard.overallPct}%</p>
+          <p className="text-xs font-bold text-text-muted mt-0.5">Overall Attendance</p>
         </div>
 
         <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0]">
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
 
       {/* Heatmap */}
       <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
-        <h3 className="font-black mb-4 text-base text-[#1a1a2e] dark:text-white">Attendance Heatmap — {year}</h3>
+        <h3 className="font-black mb-4 text-base text-text">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-1" style={{ minWidth: "700px" }}>
             {weeks.map((week, wi) => (
@@ -136,7 +136,7 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-text-muted">
             <span>Less</span>
             <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
             <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" />
@@ -150,13 +150,13 @@ export default function AnalyticsPage() {
 
       {/* Per-subject details */}
       <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-        <h3 className="font-black mb-4 text-base text-[#1a1a2e] dark:text-white">Subject Breakdown</h3>
+        <h3 className="font-black mb-4 text-base text-text">Subject Breakdown</h3>
         <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
           {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition">
+            <div key={s.id} className="flex items-center gap-4 p-4 card-3d transition">
               <div className="w-2.5 h-8 rounded-full shadow-sm" style={{ backgroundColor: s.colorHex || "#FF2D78" }} />
               <div className="flex-1 min-w-0">
-                <p className="font-black text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
+                <p className="font-black text-sm text-text truncate">{s.name}</p>
                 <div className="h-2.5 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-1.5 overflow-hidden">
                   <div className={clsx("h-full rounded-full transition-all duration-500",
                     s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
                 <span className={clsx("text-sm font-black",
                   s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
                 )}>{s.currentPercentage}%</span>
-                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
+                <p className="text-xs font-bold text-text-muted mt-0.5">
                   {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
                 </p>
               </div>

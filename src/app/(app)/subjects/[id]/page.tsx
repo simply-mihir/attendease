@@ -362,7 +362,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <Link
           href="/subjects"
-          className="inline-flex items-center gap-2 text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] hover:text-[#1a1a2e] dark:hover:text-white transition"
+          className="inline-flex items-center gap-2 text-sm font-bold text-text-muted hover:text-[#1a1a2e] dark:hover:text-white transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Subjects
         </Link>
@@ -391,8 +391,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <div className="flex items-center gap-4">
             <div className="w-3.5 h-16 rounded-full shadow-md shrink-0" style={{ backgroundColor: subject.colorHex || "#FF2D78" }} />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">{subject.name}</h1>
-              <p className="text-sm font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
+              <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">{subject.name}</h1>
+              <p className="text-sm font-semibold text-text-muted mt-0.5">
                 {subject.code || "No code"} {subject.instructorName && `· ${subject.instructorName}`}
               </p>
               {subject.semester && (
@@ -437,8 +437,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
           <div className="text-center p-3.5 bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a]">
-            <p className="text-2xl font-black text-[#1a1a2e] dark:text-white">{subject.totalClassesHeld}</p>
-            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Conducted</p>
+            <p className="text-2xl font-black text-text">{subject.totalClassesHeld}</p>
+            <p className="text-xs font-bold text-text-muted mt-0.5">Conducted</p>
           </div>
           <div className="text-center p-3.5 bg-[#06d6a0]/10 border-2 border-[#06d6a0]/40 rounded-2xl shadow-[0_3px_0_0_#06d6a0]/30">
             <p className="text-2xl font-black text-[#06d6a0]">{subject.totalPresent}</p>
@@ -454,7 +454,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           </div>
           <div className="col-span-2 sm:col-span-1 text-center p-3.5 bg-gray-100 dark:bg-[#1f1f35] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a]">
             <p className="text-2xl font-black text-[#1a1a2e] dark:text-[#c4c4d4]">{subject.totalCancelled || 0}</p>
-            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Cancelled</p>
+            <p className="text-xs font-bold text-text-muted mt-0.5">Cancelled</p>
           </div>
         </div>
       </div>
@@ -481,21 +481,21 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               {stats.isInDanger ? <XCircle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">
+              <h3 className="font-black text-base text-text">
                 {stats.isInDanger ? "Recovery Plan" : "Bunk Calculator"}
               </h3>
-              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Target: {subject.minAttendancePct}%</p>
+              <p className="text-xs font-semibold text-text-muted">Target: {subject.minAttendancePct}%</p>
             </div>
           </div>
           <p className={clsx("text-4xl font-black mb-1", stats.isInDanger ? "text-[#ef476f]" : "text-[#06d6a0]")}>
             {stats.isInDanger ? stats.mustAttendCount : stats.canSkipCount}
           </p>
-          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#c4c4d4]">
+          <p className="text-sm font-bold text-text-secondary">
             {stats.isInDanger
               ? `consecutive classes needed to reach ${subject.minAttendancePct}%`
               : `classes you can safely skip while staying above ${subject.minAttendancePct}%`}
           </p>
-          <div className="mt-3 pt-3 border-t-2 border-gray-100 dark:border-[#2a2a3d] text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] leading-relaxed">
+          <div className="mt-3 pt-3 border-t-2 border-gray-100 dark:border-[#2a2a3d] text-xs font-semibold text-text-muted leading-relaxed">
             {stats.reasoning}
           </div>
         </div>
@@ -506,14 +506,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Streak Stats</h3>
-              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Consistent attendance momentum</p>
+              <h3 className="font-black text-base text-text">Streak Stats</h3>
+              <p className="text-xs font-semibold text-text-muted">Consistent attendance momentum</p>
             </div>
           </div>
           <p className="text-4xl font-black text-[#ff6b35] flex items-center gap-2 mb-1">
             <Flame className="w-8 h-8 text-[#ff6b35]" /> {subject.streakCount} days
           </p>
-          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#c4c4d4]">Best record: {subject.longestStreak} days</p>
+          <p className="text-sm font-bold text-text-secondary">Best record: {subject.longestStreak} days</p>
         </div>
       </div>
 
@@ -527,8 +527,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Mark Attendance</h3>
-            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Quickly record your status for any class session</p>
+            <h3 className="font-black text-base text-text">Mark Attendance</h3>
+            <p className="text-xs font-semibold text-text-muted">Quickly record your status for any class session</p>
           </div>
         </div>
         <div className="flex gap-4 items-end flex-wrap sm:flex-nowrap">
@@ -576,8 +576,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Weekly Schedule</h3>
-              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Class timings and room venues</p>
+              <h3 className="font-black text-base text-text">Weekly Schedule</h3>
+              <p className="text-xs font-semibold text-text-muted">Class timings and room venues</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -596,24 +596,24 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           </div>
         </div>
         {subject.schedules?.length === 0 ? (
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No weekly schedule set yet.</p>
+          <p className="text-text-muted text-sm py-6 text-center font-bold">No weekly schedule set yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subject.schedules?.map((s: any) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all"
+                className="flex items-center justify-between p-3.5 card-3d transition-all"
               >
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-[#7b2cbf]/15 text-[#7b2cbf] border border-[#7b2cbf]/40 dark:text-[#c77dff]">
                     {DAYS[s.dayOfWeek]}
                   </span>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a1a2e] dark:text-white font-mono">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-text font-mono">
                     <Clock className="w-3.5 h-3.5 text-[#6b6b80]" />
                     <span>{s.startTime} – {s.endTime}</span>
                   </div>
                   {s.room && (
-                    <div className="flex items-center gap-1 text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">
+                    <div className="flex items-center gap-1 text-xs font-semibold text-text-muted">
                       <MapPin className="w-3.5 h-3.5 text-[#6b6b80]" />
                       <span>{s.room} {s.building && `(${s.building})`}</span>
                     </div>
@@ -652,8 +652,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Subject Reminders & Tasks</h3>
-              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Assignments, tests & deadlines for {subject.name}</p>
+              <h3 className="font-black text-base text-text">Subject Reminders & Tasks</h3>
+              <p className="text-xs font-semibold text-text-muted">Assignments, tests & deadlines for {subject.name}</p>
             </div>
           </div>
           <button
@@ -665,14 +665,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         </div>
 
         {subjectReminders.length === 0 ? (
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No reminders for this subject yet.</p>
+          <p className="text-text-muted text-sm py-6 text-center font-bold">No reminders for this subject yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subjectReminders.map((rem: any) => (
               <div
                 key={rem.id}
                 className={clsx(
-                  "flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all",
+                  "flex items-center justify-between p-3.5 card-3d transition-all",
                   rem.isCompleted && "opacity-50 line-through"
                 )}
               >
@@ -683,7 +683,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                   >
                     {rem.isCompleted ? <CheckCircle2 className="w-4 h-4 text-[#06d6a0]" /> : <Circle className="w-4 h-4" />}
                   </button>
-                  <span className="text-sm font-bold text-[#1a1a2e] dark:text-white">{rem.title}</span>
+                  <span className="text-sm font-bold text-text">{rem.title}</span>
                   <span className="text-xs font-mono text-[#ff6b35] bg-[#ff6b35]/15 border border-[#ff6b35]/40 px-2 py-0.5 rounded-lg font-bold">
                     {new Date(rem.dueDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                   </span>
@@ -714,12 +714,12 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             <CalIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Recent Attendance Records</h3>
-            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Detailed historical record of past classes</p>
+            <h3 className="font-black text-base text-text">Recent Attendance Records</h3>
+            <p className="text-xs font-semibold text-text-muted">Detailed historical record of past classes</p>
           </div>
         </div>
         {subject.attendanceRecords?.length === 0 ? (
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No records logged yet.</p>
+          <p className="text-text-muted text-sm py-6 text-center font-bold">No records logged yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subject.attendanceRecords?.map((r: any) => {
@@ -727,7 +727,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               return (
                 <div
                   key={r.id}
-                  className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all"
+                  className="flex items-center justify-between p-3.5 card-3d transition-all"
                 >
                   <div className="flex items-center gap-3 flex-wrap">
                     <CalIcon className="w-4 h-4 text-[#6b6b80]" />
@@ -743,7 +743,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                       </span>
                     )}
                     {r.notes && !isExtraClass && (
-                      <span className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] italic">({r.notes})</span>
+                      <span className="text-xs text-text-muted italic">({r.notes})</span>
                     )}
                   </div>
                   <div className="flex items-center gap-1">
@@ -773,7 +773,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       {showEditSubjectModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Edit Subject</h3>
+            <h3 className="text-xl font-black text-text">Edit Subject</h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject Name</label>
@@ -839,7 +839,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       {editingRecord && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Edit Record</h3>
+            <h3 className="text-xl font-black text-text">Edit Record</h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
@@ -893,7 +893,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             onSubmit={handleSaveSchedule}
             className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
           >
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">
+            <h3 className="text-xl font-black text-text">
               {scheduleMode === "add" ? "Add Schedule" : "Edit Schedule"}
             </h3>
             <div className="space-y-3">
@@ -982,8 +982,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <Zap className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Schedule Extra Class</h3>
-                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Add a one-off or makeup lecture for {subject.name}</p>
+                <h3 className="text-xl font-black text-text">Schedule Extra Class</h3>
+                <p className="text-xs font-semibold text-text-muted">Add a one-off or makeup lecture for {subject.name}</p>
               </div>
             </div>
 
@@ -1102,8 +1102,8 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <Bell className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">New Subject Reminder</h3>
-                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Set assignment, exam or task deadline for {subject.name}</p>
+                <h3 className="text-xl font-black text-text">New Subject Reminder</h3>
+                <p className="text-xs font-semibold text-text-muted">Set assignment, exam or task deadline for {subject.name}</p>
               </div>
             </div>
 
@@ -1263,12 +1263,12 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">Delete {subject.name}?</h3>
-                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">This action cannot be undone.</p>
+                <h3 className="text-lg font-black text-text">Delete {subject.name}?</h3>
+                <p className="text-xs font-semibold text-text-muted">This action cannot be undone.</p>
               </div>
             </div>
-            <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#c4c4d4]">
-              This will permanently delete <strong className="text-[#1a1a2e] dark:text-white font-bold">{subject.name}</strong>, its schedules, and all attendance logs.
+            <p className="text-sm font-medium text-text-secondary">
+              This will permanently delete <strong className="text-text font-bold">{subject.name}</strong>, its schedules, and all attendance logs.
             </p>
             <div className="flex gap-3 pt-2">
               <button

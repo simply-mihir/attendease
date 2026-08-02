@@ -43,20 +43,20 @@ export default function ExportPage() {
       </Link>
 
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center shadow-[0_3px_0_0_#038c67]">
             <Download className="w-5 h-5 text-white" />
           </div>
           Export Data
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Download your attendance logs as a CSV spreadsheet
         </p>
       </div>
 
       <div className="card-3d p-6 space-y-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <div>
-          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white mb-2">Subject</label>
+          <label className="block text-sm font-black text-text mb-2">Subject</label>
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
@@ -73,8 +73,8 @@ export default function ExportPage() {
               <FileSpreadsheet className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-black text-[#1a1a2e] dark:text-white">CSV Export</p>
-              <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Date, Subject, Code, Status, Notes, Marked At</p>
+              <p className="font-black text-text">CSV Export</p>
+              <p className="text-xs font-bold text-text-muted mt-0.5">Date, Subject, Code, Status, Notes, Marked At</p>
             </div>
           </div>
         </div>

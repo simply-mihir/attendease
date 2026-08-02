@@ -90,13 +90,13 @@ export default function MedicalLeavePage() {
 
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#ef476f] border-2 border-[#cc1a42] flex items-center justify-center shadow-[0_3px_0_0_#cc1a42]">
             <HeartPulse className="w-5 h-5 text-white" />
           </div>
           Medical Leave
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Bulk mark classes as excused for sick days, emergencies, or planned absences
         </p>
       </div>
@@ -109,8 +109,8 @@ export default function MedicalLeavePage() {
               <CheckCircle2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-black text-[#1a1a2e] dark:text-white">Leave Recorded Successfully</p>
-              <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+              <p className="font-black text-text">Leave Recorded Successfully</p>
+              <p className="text-sm font-bold text-text-muted">
                 Marked <span className="font-black text-[#06d6a0]">{result.marked}</span> classes as excused
               </p>
             </div>
@@ -129,12 +129,12 @@ export default function MedicalLeavePage() {
       <div className="card-3d p-6 space-y-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
         {/* Date range */}
         <div>
-          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white mb-2 flex items-center gap-2">
+          <label className="block text-sm font-black text-text mb-2 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-[#7b2cbf]" /> Date Range
           </label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mb-1">Start Date</label>
+              <label className="block text-xs font-bold text-text-muted mb-1">Start Date</label>
               <input
                 type="date"
                 value={startDate}
@@ -143,7 +143,7 @@ export default function MedicalLeavePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mb-1">End Date</label>
+              <label className="block text-xs font-bold text-text-muted mb-1">End Date</label>
               <input
                 type="date"
                 value={endDate}
@@ -156,7 +156,7 @@ export default function MedicalLeavePage() {
 
         {/* Subject selection */}
         <div>
-          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white mb-2">Subjects</label>
+          <label className="block text-sm font-black text-text mb-2">Subjects</label>
           <div className="flex gap-2 mb-3">
             <button
               onClick={() => setAllSubjects(true)}
@@ -201,7 +201,7 @@ export default function MedicalLeavePage() {
                     className="w-4 h-4 accent-[#ef476f] rounded cursor-pointer"
                   />
                   <div className="w-3.5 h-3.5 rounded-lg shadow-sm" style={{ backgroundColor: s.colorHex || "#FF2D78" }} />
-                  <span className="text-sm font-black text-[#1a1a2e] dark:text-white">{s.name}</span>
+                  <span className="text-sm font-black text-text">{s.name}</span>
                 </label>
               ))}
             </div>
@@ -210,7 +210,7 @@ export default function MedicalLeavePage() {
 
         {/* Reason */}
         <div>
-          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white mb-2">Reason</label>
+          <label className="block text-sm font-black text-text mb-2">Reason</label>
           <input
             type="text"
             value={reason}
@@ -244,14 +244,14 @@ export default function MedicalLeavePage() {
               <div className="w-10 h-10 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center shadow-[0_2px_0_0_#d95220]">
                 <AlertTriangle className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">Confirm Medical Leave</h3>
+              <h3 className="text-lg font-black text-text">Confirm Medical Leave</h3>
             </div>
-            <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
-              This will mark approximately <span className="font-black text-[#1a1a2e] dark:text-white">{estimateClasses()}</span> classes
-              across <span className="font-black text-[#1a1a2e] dark:text-white">{allSubjects ? subjects.length : selectedSubjects.size}</span> subjects
+            <p className="text-sm font-bold text-text-muted">
+              This will mark approximately <span className="font-black text-text">{estimateClasses()}</span> classes
+              across <span className="font-black text-text">{allSubjects ? subjects.length : selectedSubjects.size}</span> subjects
               as <span className="font-black text-[#06d6a0]">excused</span>.
             </p>
-            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+            <p className="text-xs font-bold text-text-muted">
               {startDate} → {endDate} · {reason}
             </p>
             <div className="flex gap-3 pt-2">

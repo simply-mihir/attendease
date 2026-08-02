@@ -96,13 +96,13 @@ export default function NewSemesterPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
             <div className="w-11 h-11 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_3px_0_0_#5a189a]">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             Start New Semester
           </h1>
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+          <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
             This will archive your current semester.
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function NewSemesterPage() {
         >
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-black mb-2 text-[#1a1a2e] dark:text-white">Semester Name</label>
+              <label className="block text-sm font-black mb-2 text-text">Semester Name</label>
               <input
                 type="text"
                 required
@@ -136,7 +136,7 @@ export default function NewSemesterPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-black mb-2 text-[#1a1a2e] dark:text-white">Start Date</label>
+                <label className="block text-sm font-black mb-2 text-text">Start Date</label>
                 <input
                   type="date"
                   required
@@ -146,7 +146,7 @@ export default function NewSemesterPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-black mb-2 text-[#1a1a2e] dark:text-white">End Date</label>
+                <label className="block text-sm font-black mb-2 text-text">End Date</label>
                 <input
                   type="date"
                   required
@@ -182,8 +182,8 @@ export default function NewSemesterPage() {
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
           <div>
-            <h2 className="text-xl font-black text-[#1a1a2e] dark:text-white">Import Subjects</h2>
-            <p className="mt-1 text-sm text-[#4a4a5a] dark:text-[#6b6b80] font-bold">
+            <h2 className="text-xl font-black text-text">Import Subjects</h2>
+            <p className="mt-1 text-sm text-text-muted font-bold">
               Carry over subjects from your previous semester? Attendance will start fresh.
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function NewSemesterPage() {
           <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
             {importableSubjects?.orphans && importableSubjects.orphans.length > 0 && (
               <div>
-                <h4 className="text-xs font-black uppercase tracking-wider text-[#4a4a5a] dark:text-[#6b6b80] mb-3 flex items-center gap-2">
+                <h4 className="text-xs font-black uppercase tracking-wider text-text-muted mb-3 flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-[#ff6b35]" /> Unassigned Subjects
                 </h4>
                 <div className="space-y-2">
@@ -209,7 +209,7 @@ export default function NewSemesterPage() {
             
             {importableSubjects?.fromOtherSemesters && importableSubjects.fromOtherSemesters.length > 0 && (
               <div>
-                <h4 className="text-xs font-black uppercase tracking-wider text-[#4a4a5a] dark:text-[#6b6b80] mb-3 flex items-center gap-2">
+                <h4 className="text-xs font-black uppercase tracking-wider text-text-muted mb-3 flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-[#00b4d8]" /> From Other Semesters
                 </h4>
                 <div className="space-y-2">
@@ -276,8 +276,8 @@ function ImportSubjectCard({
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-black text-[#1a1a2e] dark:text-white truncate">{subject.name}</p>
-        <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+        <p className="text-sm font-black text-text truncate">{subject.name}</p>
+        <p className="text-xs font-bold text-text-muted">
           {semesterName ? `From ${semesterName}` : "Not assigned to any semester"}
           {subject._count?.attendanceRecords > 0 && ` · ${subject._count.attendanceRecords} records`}
         </p>

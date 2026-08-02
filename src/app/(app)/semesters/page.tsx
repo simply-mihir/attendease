@@ -28,13 +28,13 @@ export default function SemestersPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
             <div className="w-11 h-11 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_3px_0_0_#5a189a]">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             Semesters
           </h1>
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+          <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
             Manage your academic timeline
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function SemestersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-1 flex-wrap">
-                    <h3 className="font-black text-lg text-[#1a1a2e] dark:text-white group-hover:text-[#7b2cbf] transition-colors">
+                    <h3 className="font-black text-lg text-text group-hover:text-[#7b2cbf] transition-colors">
                       {sem.name}
                     </h3>
                     {sem.isCurrent && (
@@ -80,10 +80,10 @@ export default function SemestersPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mb-2">
+                  <p className="text-sm font-bold text-text-muted mb-2">
                     {new Date(sem.startDate).toLocaleDateString()} — {new Date(sem.endDate).toLocaleDateString()}
                   </p>
-                  <div className="flex items-center gap-3 text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80] flex-wrap">
+                  <div className="flex items-center gap-3 text-xs font-black text-text-muted flex-wrap">
                     <span className="bg-gray-50 dark:bg-[#141425] px-2.5 py-1 rounded-xl border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">{sem._count.subjects} subjects</span>
                     <span className="bg-gray-50 dark:bg-[#141425] px-2.5 py-1 rounded-xl border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">{sem._count.holidays} holidays</span>
                     <span className="bg-gray-50 dark:bg-[#141425] px-2.5 py-1 rounded-xl border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]">{sem._count.examPeriods} exams</span>
@@ -105,7 +105,7 @@ export default function SemestersPage() {
 
         {semesters?.length === 0 && (
           <div className="card-3d p-8 text-center">
-            <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-bold">No semesters found. Create one to get started!</p>
+            <p className="text-text-muted font-bold">No semesters found. Create one to get started!</p>
           </div>
         )}
       </StaggerGrid>

@@ -58,13 +58,13 @@ export default function ForecastPage() {
     <PageTransition direction="left" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_3px_0_0_#5a189a]">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           Attendance Forecast
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Projected attendance by semester end ({data.summary.semesterEndDate})
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function ForecastPage() {
           )}
         </div>
         <div>
-          <p className="text-lg font-black text-[#1a1a2e] dark:text-white">
+          <p className="text-lg font-black text-text">
             <span
               className={clsx(
                 data.summary.passing === data.summary.total
@@ -98,7 +98,7 @@ export default function ForecastPage() {
             </span>{" "}
             of {data.summary.total} subjects on track to pass
           </p>
-          <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
+          <p className="text-xs font-bold text-text-muted mt-0.5">
             Based on your historical day-of-week attendance patterns
           </p>
         </div>
@@ -121,8 +121,8 @@ export default function ForecastPage() {
                   }}
                 />
                 <div>
-                  <h3 className="font-black text-base sm:text-lg text-[#1a1a2e] dark:text-white">{forecast.subjectName}</h3>
-                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                  <h3 className="font-black text-base sm:text-lg text-text">{forecast.subjectName}</h3>
+                  <p className="text-xs font-bold text-text-muted">
                     Current: {forecast.currentPct}% · Min: {forecast.minRequiredPct}%
                   </p>
                 </div>
@@ -136,7 +136,7 @@ export default function ForecastPage() {
                 >
                   {forecast.projectedEndPct}%
                 </p>
-                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Projected</p>
+                <p className="text-xs font-bold text-text-muted">Projected</p>
               </div>
             </div>
 
@@ -230,7 +230,7 @@ export default function ForecastPage() {
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+                  <span className="text-xs font-bold text-text-muted">
                     No consistently weak days
                   </span>
                 )}
@@ -262,7 +262,7 @@ export default function ForecastPage() {
         ))}
         {data.forecasts.length === 0 && (
           <div className="card-3d p-8 text-center">
-            <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-bold">No subjects to forecast. Add subjects first!</p>
+            <p className="text-text-muted font-bold">No subjects to forecast. Add subjects first!</p>
           </div>
         )}
       </StaggerGrid>

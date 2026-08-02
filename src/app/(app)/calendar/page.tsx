@@ -85,7 +85,7 @@ export default function CalendarPage() {
   return (
     <PageTransition direction="left" staggerChildren={false} className="space-y-6">
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Calendar</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Calendar</h1>
         <div className="flex gap-2">
           <button
             onClick={() => setView("week")}
@@ -113,7 +113,7 @@ export default function CalendarPage() {
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition cursor-pointer">
           <ChevronLeft className="w-5 h-5 text-[#4a4a5a] dark:text-[#a0a0b0]" />
         </button>
-        <span className="font-black text-[#1a1a2e] dark:text-white text-sm sm:text-base">
+        <span className="font-black text-text text-sm sm:text-base">
           {view === "week"
             ? `${weekDates[0].toLocaleDateString("en-IN", { month: "short", day: "numeric" })} — ${weekDates[6].toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}`
             : currentDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })
@@ -141,21 +141,21 @@ export default function CalendarPage() {
                 )}
               >
                 <div className="text-center mb-2.5 pb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
-                  <p className="text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80]">{DAYS[date.getDay()]}</p>
-                  <p className={clsx("text-lg font-black", today ? "text-[#FF2D78]" : "text-[#1a1a2e] dark:text-white")}>{date.getDate()}</p>
+                  <p className="text-xs font-black text-text-muted">{DAYS[date.getDay()]}</p>
+                  <p className={clsx("text-lg font-black", today ? "text-[#FF2D78]" : "text-text")}>{date.getDate()}</p>
                 </div>
                 <div className="space-y-1.5">
                   {dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     return (
                       <div key={cls.id} className="p-2 rounded-xl text-xs bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d]" style={{ borderLeft: `4px solid ${cls.subject.colorHex || '#FF2D78'}` }}>
-                        <p className="font-black truncate text-[#1a1a2e] dark:text-white">{cls.subject.name}</p>
-                        <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-mono font-bold text-[11px] mt-0.5">{cls.startTime}</p>
+                        <p className="font-black truncate text-text">{cls.subject.name}</p>
+                        <p className="text-text-muted font-mono font-bold text-[11px] mt-0.5">{cls.startTime}</p>
                         {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full", STATUS_DOT[rec.status])} />}
                       </div>
                     );
                   })}
-                  {dayClasses.length === 0 && <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] text-center mt-6 font-bold">No classes</p>}
+                  {dayClasses.length === 0 && <p className="text-xs text-text-muted text-center mt-6 font-bold">No classes</p>}
                 </div>
               </div>
             );
@@ -165,7 +165,7 @@ export default function CalendarPage() {
         /* Month View */
         <div className="card-3d p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((d) => <div key={d} className="text-center text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80] py-1">{d}</div>)}
+            {DAYS.map((d) => <div key={d} className="text-center text-xs font-black text-text-muted py-1">{d}</div>)}
           </div>
           <StaggerGrid className="grid grid-cols-7 gap-2" delay={200} staggerDelay={30} animation="scaleIn">
             {monthDays.map((date, i) => {
@@ -179,7 +179,7 @@ export default function CalendarPage() {
                     ? "bg-[#FF2D78]/10 border-[#FF2D78] shadow-[0_3px_0_0_#FF2D78]"
                     : "bg-gray-50 dark:bg-[#0f0f1c] border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400"
                 )}>
-                  <p className={clsx("text-sm font-black", today ? "text-[#FF2D78]" : "text-[#1a1a2e] dark:text-white")}>{date.getDate()}</p>
+                  <p className={clsx("text-sm font-black", today ? "text-[#FF2D78]" : "text-text")}>{date.getDate()}</p>
                   <div className="flex justify-center gap-1 mt-1.5 flex-wrap">
                     {dayRecords.map((r: any, ri: number) => (
                       <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
@@ -190,7 +190,7 @@ export default function CalendarPage() {
               );
             })}
           </StaggerGrid>
-          <div className="flex items-center gap-4 mt-6 text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] justify-center flex-wrap">
+          <div className="flex items-center gap-4 mt-6 text-xs font-bold text-text-muted justify-center flex-wrap">
             {Object.entries(STATUS_DOT).slice(0, 4).map(([k, v]) => (
               <span key={k} className="flex items-center gap-1.5">
                 <div className={clsx("w-2.5 h-2.5 rounded-full", v.split(" ")[0])} /> <span className="capitalize">{k}</span>

@@ -164,8 +164,8 @@ export default function RemindersPage() {
             <Bell className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Reminders & Tasks</h1>
-            <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Keep track of extra classes, assignments, exams & deadlines</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Reminders & Tasks</h1>
+            <p className="text-sm font-bold text-text-muted mt-0.5">Keep track of extra classes, assignments, exams & deadlines</p>
           </div>
         </div>
         <button
@@ -222,8 +222,8 @@ export default function RemindersPage() {
           <div className="w-12 h-12 rounded-2xl bg-[#ff6b35]/15 border-2 border-[#ff6b35]/30 text-[#ff6b35] mx-auto flex items-center justify-center shadow-[0_2px_0_0_#ff6b35]">
             <Bell className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">No Reminders Found</h3>
-          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] max-w-sm mx-auto">
+          <h3 className="text-lg font-black text-text">No Reminders Found</h3>
+          <p className="text-sm font-bold text-text-muted max-w-sm mx-auto">
             {activeCategory !== "all"
               ? `No reminders listed under ${activeCategory.replace("_", " ")}.`
               : "You don't have any pending reminders. Click below to add one!"}
@@ -259,7 +259,7 @@ export default function RemindersPage() {
 
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-black text-[#1a1a2e] dark:text-white text-base leading-snug">
+                    <span className="font-black text-text text-base leading-snug">
                       {reminder.title}
                     </span>
                     {reminder.subject && (
@@ -285,10 +285,10 @@ export default function RemindersPage() {
                   </div>
 
                   {reminder.description && (
-                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] line-clamp-2">{reminder.description}</p>
+                    <p className="text-xs font-bold text-text-muted line-clamp-2">{reminder.description}</p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] font-bold text-[#4a4a5a] dark:text-[#6b6b80] flex-wrap pt-1">
+                  <div className="flex items-center gap-3 text-[11px] font-bold text-text-muted flex-wrap pt-1">
                     <span className="flex items-center gap-1 font-mono">
                       <Calendar className="w-3 h-3 text-[#ff6b35]" />
                       {new Date(reminder.dueDate).toLocaleDateString("en-IN", {
@@ -303,13 +303,13 @@ export default function RemindersPage() {
                         {reminder.dueTime}
                       </span>
                     )}
-                    <span className="capitalize px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-[#1f1f35] text-[#1a1a2e] dark:text-white text-[10px] font-bold border border-gray-200 dark:border-[#2a2a3d]">
+                    <span className="capitalize px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-[#1f1f35] text-text text-[10px] font-bold border border-gray-200 dark:border-[#2a2a3d]">
                       {reminder.category.replace("_", " ")}
                     </span>
 
                     {/* Active Channels Icons */}
                     <div className="flex items-center gap-1.5 ml-auto text-[#ff6b35] bg-[#ff6b35]/10 px-2.5 py-0.5 rounded-xl border border-[#ff6b35]/30">
-                      <span className="text-[10px] font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Channels:</span>
+                      <span className="text-[10px] font-bold text-text-muted">Channels:</span>
                       {reminder.notifyPush && <span title="Browser Push Notification"><Bell className="w-3 h-3 text-[#ff6b35]" /></span>}
                       {reminder.notifyAlarm && <span title="Alarm Sound"><Volume2 className="w-3 h-3 text-[#ff6b35]" /></span>}
                       {reminder.notifyEmail && <span title="Email Alert"><Mail className="w-3 h-3 text-[#00b4d8]" /></span>}
@@ -343,14 +343,14 @@ export default function RemindersPage() {
                 <Bell className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Create Reminder</h3>
-                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Set task, assignment or extra class deadline</p>
+                <h3 className="text-xl font-black text-text">Create Reminder</h3>
+                <p className="text-xs font-bold text-text-muted">Set task, assignment or extra class deadline</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Title *</label>
+                <label className="block text-xs font-black text-text mb-1">Title *</label>
                 <input
                   type="text"
                   value={form.title}
@@ -363,7 +363,7 @@ export default function RemindersPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Category</label>
+                  <label className="block text-xs font-black text-text mb-1">Category</label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -377,7 +377,7 @@ export default function RemindersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Subject (Optional)</label>
+                  <label className="block text-xs font-black text-text mb-1">Subject (Optional)</label>
                   <select
                     value={form.subjectId}
                     onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
@@ -395,7 +395,7 @@ export default function RemindersPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Due Date *</label>
+                  <label className="block text-xs font-black text-text mb-1">Due Date *</label>
                   <input
                     type="date"
                     value={form.dueDate}
@@ -406,7 +406,7 @@ export default function RemindersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Due Time</label>
+                  <label className="block text-xs font-black text-text mb-1">Due Time</label>
                   <input
                     type="time"
                     value={form.dueTime}
@@ -417,7 +417,7 @@ export default function RemindersPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Priority</label>
+                <label className="block text-xs font-black text-text mb-1">Priority</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["low", "medium", "high"] as const).map((p) => (
                     <button
@@ -451,7 +451,7 @@ export default function RemindersPage() {
                       className="rounded accent-[#ff6b35] cursor-pointer"
                     />
                     <Bell className="w-3.5 h-3.5 text-[#ff6b35]" />
-                    <span className="font-bold text-[#1a1a2e] dark:text-white">Browser Push</span>
+                    <span className="font-bold text-text">Browser Push</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
@@ -462,7 +462,7 @@ export default function RemindersPage() {
                       className="rounded accent-[#ff6b35] cursor-pointer"
                     />
                     <Volume2 className="w-3.5 h-3.5 text-[#ff6b35]" />
-                    <span className="font-bold text-[#1a1a2e] dark:text-white">Alarm Sound</span>
+                    <span className="font-bold text-text">Alarm Sound</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
@@ -473,7 +473,7 @@ export default function RemindersPage() {
                       className="rounded accent-[#ff6b35] cursor-pointer"
                     />
                     <Mail className="w-3.5 h-3.5 text-[#00b4d8]" />
-                    <span className="font-bold text-[#1a1a2e] dark:text-white">Email Alert</span>
+                    <span className="font-bold text-text">Email Alert</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
@@ -484,13 +484,13 @@ export default function RemindersPage() {
                       className="rounded accent-[#ff6b35] cursor-pointer"
                     />
                     <MessageSquare className="w-3.5 h-3.5 text-[#06d6a0]" />
-                    <span className="font-bold text-[#1a1a2e] dark:text-white">Telegram</span>
+                    <span className="font-bold text-text">Telegram</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Description (Optional)</label>
+                <label className="block text-xs font-black text-text mb-1">Description (Optional)</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}

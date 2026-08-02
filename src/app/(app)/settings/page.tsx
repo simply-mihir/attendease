@@ -55,7 +55,7 @@ export default function SettingsPage() {
 
   return (
     <PageTransition direction="up" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>Settings</h1>
+      <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>Settings</h1>
 
       <StaggerGrid className="space-y-6" delay={100} staggerDelay={100} animation="fadeSlideUp">
         {/* Profile card */}
@@ -66,8 +66,8 @@ export default function SettingsPage() {
                 {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-lg font-black text-[#1a1a2e] dark:text-white">{user?.name || "Student"}</h2>
-                <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{user?.email}</p>
+                <h2 className="text-lg font-black text-text">{user?.name || "Student"}</h2>
+                <p className="text-sm font-bold text-text-muted">{user?.email}</p>
               </div>
             </div>
             <button onClick={openEditModal} className="btn-3d-secondary p-3 cursor-pointer">
@@ -85,10 +85,10 @@ export default function SettingsPage() {
                 <item.icon className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="font-black text-[#1a1a2e] dark:text-white group-hover:text-[#FF2D78] transition">{item.label}</p>
-                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">{item.desc}</p>
+                <p className="font-black text-text group-hover:text-[#FF2D78] transition">{item.label}</p>
+                <p className="text-xs font-bold text-text-muted mt-0.5">{item.desc}</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-[#4a4a5a] dark:text-[#6b6b80] group-hover:translate-x-1 group-hover:text-[#FF2D78] transition-all" />
+              <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 group-hover:text-[#FF2D78] transition-all" />
             </Link>
           ))}
         </div>
@@ -100,8 +100,8 @@ export default function SettingsPage() {
               <Moon className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-black text-[#1a1a2e] dark:text-white">Appearance</p>
-              <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Toggle between Light and Dark mode</p>
+              <p className="font-black text-text">Appearance</p>
+              <p className="text-xs font-bold text-text-muted mt-0.5">Toggle between Light and Dark mode</p>
             </div>
           </div>
           <ThemeToggle />
@@ -113,10 +113,10 @@ export default function SettingsPage() {
             <Trophy className="w-5 h-5" />
           </div>
           <div className="flex-1">
-            <p className="font-black text-[#1a1a2e] dark:text-white group-hover:text-[#ffbe0b] transition">Achievements & Badges</p>
-            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">View your earned badges and progress</p>
+            <p className="font-black text-text group-hover:text-[#ffbe0b] transition">Achievements & Badges</p>
+            <p className="text-xs font-bold text-text-muted mt-0.5">View your earned badges and progress</p>
           </div>
-          <ChevronRight className="w-5 h-5 text-[#4a4a5a] dark:text-[#6b6b80] group-hover:translate-x-1 group-hover:text-[#ffbe0b] transition-all" />
+          <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 group-hover:text-[#ffbe0b] transition-all" />
         </Link>
       </StaggerGrid>
 
@@ -124,15 +124,15 @@ export default function SettingsPage() {
       {showEditModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div className="card-3d p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4">
-            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white mb-2">Edit Profile</h3>
+            <h3 className="text-xl font-black text-text mb-2">Edit Profile</h3>
             {error && <p className="text-[#ef476f] text-xs font-bold bg-[#ef476f]/10 p-2.5 rounded-xl border-2 border-[#ef476f]/30">{error}</p>}
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Name</label>
+                <label className="block text-xs font-black text-text mb-1">Name</label>
                 <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="input-3d" />
               </div>
               <div>
-                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Email ID</label>
+                <label className="block text-xs font-black text-text mb-1">Email ID</label>
                 <input type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} className="input-3d" />
               </div>
             </div>

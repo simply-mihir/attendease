@@ -136,8 +136,8 @@ export default function NewSubjectPage() {
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
           <div>
-            <h2 className="text-xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Subject Details</h2>
-            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">Configure your course metadata and attendance targets.</p>
+            <h2 className="text-xl font-black text-text tracking-tight">Subject Details</h2>
+            <p className="text-xs font-semibold text-text-muted mt-1">Configure your course metadata and attendance targets.</p>
           </div>
 
           <div>
@@ -213,10 +213,10 @@ export default function NewSubjectPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl">
+          <div className="flex items-center justify-between p-4 card-3d">
             <div>
-              <span className="text-sm font-bold text-[#1a1a2e] dark:text-white block">Reminders & Notifications</span>
-              <span className="text-xs font-medium text-[#4a4a5a] dark:text-[#6b6b80]">Receive alerts before scheduled lectures</span>
+              <span className="text-sm font-bold text-text block">Reminders & Notifications</span>
+              <span className="text-xs font-medium text-text-muted">Receive alerts before scheduled lectures</span>
             </div>
             <button
               type="button"
@@ -247,15 +247,15 @@ export default function NewSubjectPage() {
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
           <div>
-            <h2 className="text-xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Class Schedule</h2>
-            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">When does this class meet weekly?</p>
+            <h2 className="text-xl font-black text-text tracking-tight">Class Schedule</h2>
+            <p className="text-xs font-semibold text-text-muted mt-1">When does this class meet weekly?</p>
           </div>
 
           <div className="space-y-3">
             {schedules.map((sched, i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl"
+                className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 card-3d"
               >
                 <div className="sm:col-span-3">
                   <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1">Day</label>

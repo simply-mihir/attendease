@@ -55,13 +55,13 @@ export default function GoalSettingsPage() {
 
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
           <div className="w-11 h-11 rounded-2xl bg-[#ff6b35] border-2 border-[#cc5529] flex items-center justify-center shadow-[0_3px_0_0_#cc5529]">
             <Target className="w-5 h-5 text-white" />
           </div>
           Goal Mode
         </h1>
-        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
+        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
           Set a target attendance percentage and get daily action plans
         </p>
       </div>
@@ -70,8 +70,8 @@ export default function GoalSettingsPage() {
         {/* Enable toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-black text-[#1a1a2e] dark:text-white">Enable Goal Mode</p>
-            <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] font-bold mt-0.5">Show daily action plan on your dashboard</p>
+            <p className="font-black text-text">Enable Goal Mode</p>
+            <p className="text-xs text-text-muted font-bold mt-0.5">Show daily action plan on your dashboard</p>
           </div>
           <button
             role="switch"
@@ -98,7 +98,7 @@ export default function GoalSettingsPage() {
           <div className="space-y-4 pt-2">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-black text-[#1a1a2e] dark:text-white">
+                <label className="block text-sm font-black text-text">
                   Target Attendance
                 </label>
                 <span className="text-[#ff6b35] text-2xl font-black tracking-tight">{targetPct}%</span>
@@ -119,7 +119,7 @@ export default function GoalSettingsPage() {
             </div>
 
             <div className="p-4 bg-[#ff6b35]/10 rounded-2xl border-2 border-[#ff6b35]/30 shadow-[0_3px_0_0_rgba(255,107,53,0.2)]">
-              <p className="text-sm text-[#4a4a5a] dark:text-[#c4c4d4] font-bold">
+              <p className="text-sm text-text-secondary font-bold">
                 {targetPct >= 90 ? (
                   <span>🎯 <strong className="text-[#ff6b35] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
                 ) : targetPct >= 75 ? (

@@ -325,9 +325,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
             bg-[#ff6b35]/[0.06] border-2 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ff6b35]
             dark:bg-[#ff6b35]/[0.08] dark:border-[#ff6b35]/40 dark:shadow-[0_6px_0_0_#cc5529] dark:hover:shadow-[0_4px_0_0_#cc5529]">
-            {currentStreak > 0 && (
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-[#ff6b35]/20 blur-2xl" style={{ animation: "streakGlow 2s ease-in-out infinite" }} />
-            )}
+
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold text-[#ff6b35] uppercase tracking-wider">Streak</p>

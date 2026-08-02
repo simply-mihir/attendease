@@ -4,10 +4,23 @@ import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
-import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera } from "lucide-react";
+import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera, TrendingUp, Minus, TrendingDown, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
+
+const SUBJECT_COLORS = [
+  { bg: "#FF2D78", shadow: "#cc1a5e", label: "Hot Pink" },
+  { bg: "#4361ee", shadow: "#3451cc", label: "Royal Blue" },
+  { bg: "#06d6a0", shadow: "#05a87e", label: "Teal" },
+  { bg: "#ff6b35", shadow: "#cc5529", label: "Orange" },
+  { bg: "#9b5de5", shadow: "#7c4ab8", label: "Purple" },
+  { bg: "#4cc9f0", shadow: "#3aa3c4", label: "Cyan" },
+  { bg: "#f15bb5", shadow: "#c14890", label: "Magenta" },
+  { bg: "#FFD166", shadow: "#ccaa52", label: "Gold" },
+  { bg: "#ef476f", shadow: "#c43559", label: "Coral" },
+  { bg: "#2ec4b6", shadow: "#249e92", label: "Mint" },
+];
 export default function SubjectsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [deletingSubject, setDeletingSubject] = useState<any | null>(null);
@@ -40,7 +53,7 @@ export default function SubjectsPage() {
   return (
     <PageTransition direction="left" staggerChildren={false} className="space-y-6">
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Subjects</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Subjects</h1>
         <div className="flex items-center gap-3">
           <button onClick={() => setShowArchived(!showArchived)}
             className="btn-3d-secondary px-3.5 py-2 text-sm font-bold cursor-pointer">
@@ -63,8 +76,8 @@ export default function SubjectsPage() {
               <Camera className="w-5 h-5 text-[#0d0d1a]" />
             </div>
             <div className="flex-1">
-              <p className="font-black text-sm text-[#1a1a2e] dark:text-white">Import from Photo</p>
-              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">
+              <p className="font-black text-sm text-text">Import from Photo</p>
+              <p className="text-xs font-semibold text-text-muted">
                 Snap your timetable or upload a PDF/Excel to auto-add all subjects
               </p>
             </div>
@@ -82,7 +95,7 @@ export default function SubjectsPage() {
           <div className="w-16 h-16 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#cc1a5e]">
             <BookOpen className="w-8 h-8 text-white" />
           </div>
-          <p className="text-[#4a4a5a] dark:text-[#6b6b80] mb-4 font-bold">{showArchived ? "No archived subjects" : "No subjects yet. Add one to get started!"}</p>
+          <p className="text-text-muted mb-4 font-bold">{showArchived ? "No archived subjects" : "No subjects yet. Add one to get started!"}</p>
           {!showArchived && (
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link href="/subjects/new" className="btn-3d-primary px-5 py-2.5 text-sm font-black inline-flex items-center gap-2">
@@ -95,56 +108,113 @@ export default function SubjectsPage() {
           )}
         </div>
       ) : (
-        <StaggerGrid className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" delay={150} staggerDelay={100} animation="scaleIn">
-          {subjects.map((s, idx) => {
-            const buffer = s.currentPercentage - s.minAttendancePct;
-            const color = buffer >= 10 ? "green" : buffer >= 0 ? "yellow" : "red";
-            const borderColors = [
-              "hover:border-[#FF2D78] dark:hover:border-[#FF2D78]",
-              "hover:border-[#06d6a0] dark:hover:border-[#06d6a0]",
-              "hover:border-[#4361ee] dark:hover:border-[#4361ee]",
-              "hover:border-[#ff6b35] dark:hover:border-[#ff6b35]",
-              "hover:border-[#00f5d4] dark:hover:border-[#00f5d4]",
-              "hover:border-[#f72585] dark:hover:border-[#f72585]",
-              "hover:border-[#7b2cbf] dark:hover:border-[#7b2cbf]"
-            ];
-            const borderClass = borderColors[idx % borderColors.length];
-
+        <StaggerGrid className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" delay={150} staggerDelay={80} animation="scaleIn">
+          {subjects.map((s, index) => {
+            const color = SUBJECT_COLORS[index % SUBJECT_COLORS.length];
+            const percentage = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
+            const min = s.minAttendancePct ?? 75;
+            const attended = s.totalPresent ?? 0;
+            const total = s.totalClassesHeld ?? 0;
+            
+            // Pick status icon
+            const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? Minus : TrendingDown;
+            
             return (
-              <div key={s.id} className={clsx("card-3d p-5 group relative transition-all", borderClass)}>
-                <Link href={`/subjects/${s.id}`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-2.5 h-12 rounded-full shadow-sm" style={{ backgroundColor: s.colorHex || "#FF2D78" }} />
-                    <div>
-                      <h3 className="font-black text-[#1a1a2e] dark:text-white group-hover:text-[#FF2D78] transition">{s.name}</h3>
-                      <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">{s.code || "No code"} {s.instructorName && `· ${s.instructorName}`}</p>
+              <div
+                key={s.id}
+                className="group relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-150 block hover:translate-y-[2px] overflow-hidden flex flex-col justify-between"
+                style={{
+                  borderColor: `${color.bg}40`,
+                  backgroundColor: `${color.bg}0D`,
+                  boxShadow: `0 6px 0 0 ${color.bg}30`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 4px 0 0 ${color.bg}30`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = `0 6px 0 0 ${color.bg}30`;
+                  e.currentTarget.style.transform = '';
+                }}
+              >
+                {/* Animated gradient shimmer on hover */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: `linear-gradient(135deg, ${color.bg}08 0%, ${color.bg}15 50%, ${color.bg}08 100%)`,
+                    backgroundSize: "200% 200%",
+                    animation: "subjectCardShimmer 3s ease-in-out infinite",
+                  }} />
+
+                {/* Top accent line */}
+                <div className="absolute inset-x-0 top-0 h-[2px]"
+                  style={{ background: `linear-gradient(to right, transparent, ${color.bg}60, transparent)` }} />
+
+                <Link href={`/subjects/${s.id}`} className="relative block flex-1">
+                  {/* Row 1: Label + Icon */}
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider truncate pr-2"
+                      style={{ color: color.bg }}>
+                      {s.name}
+                    </p>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-transform duration-300"
+                      style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>
+                      <BookOpen className="h-4 w-4" />
                     </div>
                   </div>
-                  <div className="h-3 bg-gray-100 dark:bg-[#0f0f1c] rounded-full overflow-hidden mb-2 border border-gray-200 dark:border-[#2a2a3d]">
-                    <div className={clsx("h-full rounded-full transition-all duration-500",
-                      color === "green" ? "bg-[#06d6a0]" : color === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
-                    )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
-                  </div>
-                  <div className="flex justify-between text-sm mb-3">
-                    <span className={clsx("font-black", color === "green" ? "text-[#06d6a0]" : color === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]")}>
-                      {s.currentPercentage}%
+
+                  {/* Row 2: Big percentage number */}
+                  <p className="text-3xl font-extrabold text-text mb-1">
+                    {percentage}%
+                  </p>
+
+                  {/* Row 3: Status + class count */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <StatusIcon className="h-3.5 w-3.5" style={{ color: color.bg }} />
+                      <span className="text-xs font-semibold"
+                        style={{ color: percentage >= min ? "#06d6a0" : percentage >= min - 15 ? "#ff6b35" : "#ef476f" }}>
+                        {percentage >= min ? "On track" : percentage >= min - 15 ? "At risk" : "Danger"}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
+                      {attended}/{total}
                     </span>
-                    <span className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Required: {s.minAttendancePct}%</span>
+                  </div>
+
+                  {/* Row 4: Mini progress bar */}
+                  <div className="mt-3">
+                    <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-700"
+                        style={{
+                          width: `${Math.min(100, percentage)}%`,
+                          backgroundColor: color.bg,
+                          boxShadow: `0 0 8px ${color.bg}40`,
+                        }} />
+                    </div>
+                  </div>
+
+                  {/* Subject code — small */}
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] mt-2 font-semibold">
+                    {s.code || "No code"}
+                  </p>
+
+                  {/* Arrow on hover */}
+                  <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0 -translate-x-2">
+                    <ChevronRight className="h-4 w-4" style={{ color: color.bg }} />
                   </div>
                 </Link>
 
-                <div className="flex items-center gap-2 text-xs pt-3 border-t-2 border-gray-100 dark:border-[#2a2a3d]">
-                  <span className="px-2.5 py-1 bg-gray-100 dark:bg-[#1f1f35] rounded-lg text-[#1a1a2e] dark:text-[#c4c4d4] font-bold border border-gray-200 dark:border-[#2a2a3d]">{s.totalClassesHeld} classes</span>
-                  <span className="px-2.5 py-1 bg-[#06d6a0]/15 text-[#06d6a0] border border-[#06d6a0]/40 rounded-lg font-extrabold">{s.totalPresent} present</span>
-                  <span className="px-2.5 py-1 bg-[#ef476f]/15 text-[#ef476f] border border-[#ef476f]/40 rounded-lg font-extrabold">{s.totalAbsent} absent</span>
-                  <div className="ml-auto flex items-center gap-1">
+                <div className="relative flex items-center justify-between pt-3 mt-4 border-t-2" style={{ borderColor: `${color.bg}20` }}>
+                  <div className="flex gap-2">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold" style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>{s.totalClassesHeld} held</span>
+                  </div>
+                  <div className="flex items-center gap-1">
                     <button onClick={(e) => { e.preventDefault(); toggleArchive(s.id, s.isArchived); }}
-                      className="p-1.5 text-[#6b6b80] hover:text-[#ff6b35] transition rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 cursor-pointer" title={s.isArchived ? "Restore" : "Archive"}>
-                      {s.isArchived ? <RotateCcw className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                      className="p-1.5 transition rounded-lg hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer" style={{ color: color.bg }} title={s.isArchived ? "Restore" : "Archive"}>
+                      {s.isArchived ? <RotateCcw className="w-3.5 h-3.5" /> : <Archive className="w-3.5 h-3.5" />}
                     </button>
                     <button onClick={(e) => { e.preventDefault(); setDeletingSubject(s); }}
-                      className="p-1.5 text-[#6b6b80] hover:text-[#ef476f] transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer" title="Delete Subject">
-                      <Trash2 className="w-4 h-4" />
+                      className="p-1.5 transition rounded-lg hover:bg-rose-500/10 cursor-pointer text-rose-500" title="Delete Subject">
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -163,12 +233,12 @@ export default function SubjectsPage() {
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">Delete Subject?</h3>
-                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">This action cannot be undone.</p>
+                <h3 className="text-lg font-black text-text">Delete Subject?</h3>
+                <p className="text-xs font-semibold text-text-muted">This action cannot be undone.</p>
               </div>
             </div>
-            <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#c4c4d4]">
-              Are you sure you want to permanently delete <strong className="text-[#1a1a2e] dark:text-white font-bold">{deletingSubject.name}</strong> and all its attendance records?
+            <p className="text-sm font-medium text-text-secondary">
+              Are you sure you want to permanently delete <strong className="text-text font-bold">{deletingSubject.name}</strong> and all its attendance records?
             </p>
             <div className="flex gap-3 pt-2">
               <button onClick={() => setDeletingSubject(null)} className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer">
