@@ -68,42 +68,57 @@ export default function AnalyticsPage() {
 
   return (
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        Analytics
-      </h1>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#4361ee]/10">
+          <BarChart3 className="h-6 w-6 text-[#4361ee]" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">Analytics</h1>
+          <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">Your performance at a glance</p>
+        </div>
+      </div>
 
       {/* Overview cards */}
-      <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4" delay={100} staggerDelay={80} animation="flipIn">
-        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1">
-          <div className="w-10 h-10 rounded-2xl bg-[#7b2cbf]/15 text-[#7b2cbf] dark:text-[#c77dff] border-2 border-[#7b2cbf]/30 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#7b2cbf]">
-            <TrendingUp className="w-5 h-5" />
+      <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="flipIn">
+        <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#8944cd] bg-[#9b5de5]/10 shadow-[0_4px_0_0_#8944cd] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#8944cd] dark:border-[#7d32b5] dark:shadow-[0_4px_0_0_#7d32b5] dark:hover:shadow-[0_2px_0_0_#7d32b5]">
+          <div className="flex justify-center mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#9b5de5]/20">
+              <TrendingUp className="h-6 w-6 text-[#9b5de5]" />
+            </div>
           </div>
-          <p className="text-3xl font-black text-text tracking-tight">{dashboard.overallPct}%</p>
-          <p className="text-xs font-bold text-text-muted mt-0.5">Overall Attendance</p>
+          <p className="text-3xl font-black text-[#9b5de5] tracking-tight">{dashboard.overallPct}%</p>
+          <p className="text-sm font-bold text-[#9b5de5] opacity-80 mt-1">Overall</p>
         </div>
 
-        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0]">
-          <div className="w-10 h-10 rounded-2xl bg-[#06d6a0]/15 text-[#06d6a0] border-2 border-[#06d6a0]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#06d6a0]">
-            <ShieldCheck className="w-5 h-5" />
+        <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e] dark:border-[#048261] dark:shadow-[0_4px_0_0_#048261] dark:hover:shadow-[0_2px_0_0_#048261]">
+          <div className="flex justify-center mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#06d6a0]/20">
+              <ShieldCheck className="h-6 w-6 text-[#06d6a0]" />
+            </div>
           </div>
           <p className="text-3xl font-black text-[#06d6a0] tracking-tight">{dashboard.safeSubjects}</p>
-          <p className="text-xs font-bold text-[#06d6a0] mt-0.5">Safe Subjects</p>
+          <p className="text-sm font-bold text-[#06d6a0] opacity-80 mt-1">Safe</p>
         </div>
 
-        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f]">
-          <div className="w-10 h-10 rounded-2xl bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#ef476f]">
-            <ShieldAlert className="w-5 h-5" />
+        <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f] dark:border-[#b83151] dark:shadow-[0_4px_0_0_#b83151] dark:hover:shadow-[0_2px_0_0_#b83151]">
+          <div className="flex justify-center mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ef476f]/20">
+              <ShieldAlert className="h-6 w-6 text-[#ef476f]" />
+            </div>
           </div>
           <p className="text-3xl font-black text-[#ef476f] tracking-tight">{dashboard.dangerSubjects}</p>
-          <p className="text-xs font-bold text-[#ef476f] mt-0.5">In Danger</p>
+          <p className="text-sm font-bold text-[#ef476f] opacity-80 mt-1">Danger</p>
         </div>
 
-        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35]">
-          <div className="w-10 h-10 rounded-2xl bg-[#ff6b35]/15 text-[#ff6b35] border-2 border-[#ff6b35]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#ff6b35]">
-            <Flame className="w-5 h-5" />
+        <div className="rounded-2xl border-2 p-5 text-center transition-all duration-150 border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827] dark:border-[#c5471c] dark:shadow-[0_4px_0_0_#c5471c] dark:hover:shadow-[0_2px_0_0_#c5471c]">
+          <div className="flex justify-center mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6b35]/20">
+              <Flame className="h-6 w-6 text-[#ff6b35]" />
+            </div>
           </div>
           <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
-          <p className="text-xs font-bold text-[#ff6b35] mt-0.5">Day Streak</p>
+          <p className="text-sm font-bold text-[#ff6b35] opacity-80 mt-1">Streak</p>
         </div>
       </StaggerGrid>
 
@@ -113,8 +128,8 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Heatmap */}
-      <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
-        <h3 className="font-black mb-4 text-base text-text">Attendance Heatmap — {year}</h3>
+      <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
+        <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-1" style={{ minWidth: "700px" }}>
             {weeks.map((week, wi) => (
@@ -136,7 +151,7 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-text-muted">
+          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">
             <span>Less</span>
             <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
             <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" />
@@ -149,25 +164,24 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Per-subject details */}
-      <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-        <h3 className="font-black mb-4 text-base text-text">Subject Breakdown</h3>
+      <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
+        <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
         <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
           {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="flex items-center gap-4 p-4 card-3d transition">
-              <div className="w-2.5 h-8 rounded-full shadow-sm" style={{ backgroundColor: s.colorHex || "#FF2D78" }} />
+            <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
               <div className="flex-1 min-w-0">
-                <p className="font-black text-sm text-text truncate">{s.name}</p>
-                <div className="h-2.5 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-1.5 overflow-hidden">
-                  <div className={clsx("h-full rounded-full transition-all duration-500",
+                <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
+                <div className="h-2 w-full rounded-full bg-gray-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35] mt-2">
+                  <div className={clsx("h-full rounded-full transition-all duration-500 shadow-[0_2px_0_0_rgba(0,0,0,0.2)]",
                     s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
                   )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
                 </div>
               </div>
-              <div className="text-right">
-                <span className={clsx("text-sm font-black",
+              <div className="text-right shrink-0">
+                <span className={clsx("text-lg font-extrabold tracking-tight",
                   s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
                 )}>{s.currentPercentage}%</span>
-                <p className="text-xs font-bold text-text-muted mt-0.5">
+                <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
                   {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
                 </p>
               </div>

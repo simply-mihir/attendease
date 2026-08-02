@@ -59,7 +59,7 @@ export default function SettingsPage() {
 
       <StaggerGrid className="space-y-6" delay={100} staggerDelay={100} animation="fadeSlideUp">
         {/* Profile card */}
-        <div className="card-3d p-6">
+        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-[#FF2D78] border-2 border-[#d61b60] flex items-center justify-center text-white text-2xl font-black shadow-[0_4px_0_0_#d61b60]">
@@ -70,14 +70,14 @@ export default function SettingsPage() {
                 <p className="text-sm font-bold text-text-muted">{user?.email}</p>
               </div>
             </div>
-            <button onClick={openEditModal} className="btn-3d-secondary p-3 cursor-pointer">
+            <button onClick={openEditModal} className="flex items-center justify-center rounded-xl border-2 p-3 transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]">
               <Edit2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Settings links */}
-        <div className="card-3d p-2 divide-y-2 divide-gray-100 dark:divide-[#2a2a3d] overflow-hidden">
+        <div className="rounded-2xl border-2 p-2 divide-y-2 divide-gray-100 dark:divide-[#2a2a3d] overflow-hidden border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
           {settingsItems.map((item) => (
             <Link key={item.href} href={item.href}
               className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-[#1f1f35] rounded-2xl transition group">
@@ -94,7 +94,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Theme Appearance card */}
-        <div className="card-3d p-5 flex items-center justify-between">
+        <div className="rounded-2xl border-2 p-5 flex items-center justify-between border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-[#7b2cbf]/15 text-[#7b2cbf] dark:text-[#c77dff] border-2 border-[#7b2cbf]/30 flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#7b2cbf]">
               <Moon className="w-5 h-5" />
@@ -108,7 +108,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Achievements link */}
-        <Link href="/analytics" className="card-3d p-5 flex items-center gap-4 hover:border-[#ffbe0b] transition block group">
+        <Link href="/analytics" className="rounded-2xl border-2 p-5 flex items-center gap-4 hover:border-[#ffbe0b] transition block group border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#d1d5db] dark:hover:shadow-[0_4px_0_0_#0d0d1a]">
           <div className="w-12 h-12 rounded-2xl bg-[#ffbe0b]/20 text-[#b58100] dark:text-[#ffbe0b] border-2 border-[#ffbe0b]/40 flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#ffbe0b]">
             <Trophy className="w-5 h-5" />
           </div>
@@ -123,22 +123,22 @@ export default function SettingsPage() {
       {/* Edit Profile Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="card-3d p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4">
+          <div className="rounded-2xl border-2 p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
             <h3 className="text-xl font-black text-text mb-2">Edit Profile</h3>
             {error && <p className="text-[#ef476f] text-xs font-bold bg-[#ef476f]/10 p-2.5 rounded-xl border-2 border-[#ef476f]/30">{error}</p>}
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-black text-text mb-1">Name</label>
-                <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="input-3d" />
+                <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="w-full rounded-xl border-2 px-4 py-3 text-sm font-bold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee]" />
               </div>
               <div>
                 <label className="block text-xs font-black text-text mb-1">Email ID</label>
-                <input type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} className="input-3d" />
+                <input type="email" value={editEmail} onChange={e => setEditEmail(e.target.value)} className="w-full rounded-xl border-2 px-4 py-3 text-sm font-bold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee]" />
               </div>
             </div>
             <div className="flex gap-3 pt-4">
-              <button onClick={() => setShowEditModal(false)} className="btn-3d-secondary flex-1 py-2.5 text-sm font-black cursor-pointer">Cancel</button>
-              <button onClick={handleSaveProfile} disabled={saving} className="btn-3d-primary flex-1 py-2.5 text-sm font-black cursor-pointer">{saving ? "Saving..." : "Save"}</button>
+              <button onClick={() => setShowEditModal(false)} className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]">Cancel</button>
+              <button onClick={handleSaveProfile} disabled={saving} className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-[#304bc9] bg-[#4361ee] text-white shadow-[0_3px_0_0_#304bc9] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#304bc9] disabled:opacity-50">{saving ? "Saving..." : "Save"}</button>
             </div>
           </div>
         </div>

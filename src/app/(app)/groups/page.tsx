@@ -134,28 +134,28 @@ export default function GroupsPage() {
   return (
     <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
-            <div className="w-11 h-11 rounded-2xl bg-[#ef476f] border-2 border-[#cc1a42] flex items-center justify-center shadow-[0_3px_0_0_#cc1a42]">
-              <Users className="w-5 h-5 text-white" />
-            </div>
-            Friend Groups
-          </h1>
-          <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
-            Share attendance stats with friends
-          </p>
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ef476f]/10">
+            <Users className="h-6 w-6 text-[#ef476f]" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">Friend Groups</h1>
+            <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">
+              Share attendance stats with friends
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => { setShowCreate(true); setShowJoin(false); setError(""); }}
-            className="btn-3d-danger px-4 py-2 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-[#d63b5f] bg-[#FF2D78] text-white shadow-[0_3px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d63b5f]"
           >
             <Plus className="w-3.5 h-3.5" /> Create
           </button>
           <button
             onClick={() => { setShowJoin(true); setShowCreate(false); setError(""); }}
-            className="btn-3d-secondary px-4 py-2 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]"
           >
             <LogIn className="w-3.5 h-3.5" /> Join
           </button>
@@ -164,22 +164,22 @@ export default function GroupsPage() {
 
       {/* Success message */}
       {successMsg && (
-        <div className="card-3d p-3.5 border-[#06d6a0] shadow-[0_4px_0_0_#06d6a0] bg-[#06d6a0]/10 flex items-center gap-2 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-          <CheckCircle2 className="w-4 h-4 text-[#06d6a0]" />
-          <p className="text-sm font-black text-[#06d6a0]">{successMsg}</p>
+        <div className="rounded-2xl border-2 p-4 flex items-center gap-2 animate-fade-in border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+          <CheckCircle2 className="w-5 h-5 text-[#06d6a0]" />
+          <p className="text-sm font-bold text-[#06d6a0]">{successMsg}</p>
         </div>
       )}
 
       {/* Create modal */}
       {showCreate && (
-        <div className="card-3d p-6 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-          <h3 className="font-black text-base text-text">Create a New Group</h3>
+        <div className="rounded-2xl border-2 p-6 space-y-4 animate-fade-in border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+          <h3 className="font-extrabold text-lg text-[#1a1a2e] dark:text-white">Create a New Group</h3>
           <input
             type="text"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             placeholder="Group name..."
-            className="input-3d"
+            className="w-full rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee]"
             maxLength={50}
           />
           {error && (
@@ -188,14 +188,14 @@ export default function GroupsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setShowCreate(false)}
-              className="btn-3d-secondary flex-1 py-2.5 font-black text-sm cursor-pointer"
+              className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
               disabled={creating || !groupName.trim()}
-              className="btn-3d-danger flex-1 py-2.5 font-black text-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 border-[#d63b5f] bg-[#FF2D78] text-white shadow-[0_3px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d63b5f] disabled:opacity-50"
             >
               {creating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
               {creating ? "Creating..." : "Create Group"}
@@ -206,14 +206,14 @@ export default function GroupsPage() {
 
       {/* Join modal */}
       {showJoin && (
-        <div className="card-3d p-6 space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-          <h3 className="font-black text-base text-text">Join a Group</h3>
+        <div className="rounded-2xl border-2 p-6 space-y-4 animate-fade-in border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+          <h3 className="font-extrabold text-lg text-[#1a1a2e] dark:text-white">Join a Group</h3>
           <input
             type="text"
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
             placeholder="6-character code"
-            className="input-3d text-center tracking-[0.4em] font-mono uppercase"
+            className="w-full rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee] text-center tracking-[0.4em] font-mono uppercase"
             maxLength={6}
           />
           {error && (
@@ -222,14 +222,14 @@ export default function GroupsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setShowJoin(false)}
-              className="btn-3d-secondary flex-1 py-2.5 font-black text-sm cursor-pointer"
+              className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]"
             >
               Cancel
             </button>
             <button
               onClick={handleJoin}
               disabled={joining || joinCode.trim().length !== 6}
-              className="btn-3d-primary flex-1 py-2.5 font-black text-sm cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="flex-1 rounded-xl border-2 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 border-[#304bc9] bg-[#4361ee] text-white shadow-[0_3px_0_0_#304bc9] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#304bc9] disabled:opacity-50"
             >
               {joining ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
               {joining ? "Joining..." : "Join Group"}
@@ -240,24 +240,24 @@ export default function GroupsPage() {
 
       {/* Empty state */}
       {groups.length === 0 && !showCreate && !showJoin && (
-        <div className="card-3d p-10 text-center" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-16 h-16 rounded-2xl bg-[#ef476f] border-2 border-[#cc1a42] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#cc1a42]">
-            <Users className="w-8 h-8 text-white" />
+        <div className="rounded-2xl border-2 p-10 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="w-16 h-16 rounded-2xl bg-[#ef476f]/10 border-2 border-[#d63b5f] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#d63b5f]">
+            <Users className="w-8 h-8 text-[#ef476f]" />
           </div>
-          <h3 className="text-lg font-black text-text mb-2">No Groups Yet</h3>
-          <p className="text-text-muted text-sm font-bold mb-6 max-w-md mx-auto">
+          <h3 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white mb-2">No Groups Yet</h3>
+          <p className="text-[#9ca3af] dark:text-[#6b6b80] text-sm font-bold mb-6 max-w-md mx-auto">
             Create a group to share attendance stats with friends, or join one with a code.
           </p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => { setShowCreate(true); setError(""); }}
-              className="btn-3d-danger px-5 py-2.5 text-sm font-black flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-2 rounded-xl border-2 px-5 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-[#d63b5f] bg-[#FF2D78] text-white shadow-[0_3px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d63b5f]"
             >
               <Plus className="w-4 h-4" /> Create Group
             </button>
             <button
               onClick={() => { setShowJoin(true); setError(""); }}
-              className="btn-3d-primary px-5 py-2.5 text-sm font-black flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-2 rounded-xl border-2 px-5 py-2.5 text-sm font-bold transition-all duration-150 cursor-pointer border-[#304bc9] bg-[#4361ee] text-white shadow-[0_3px_0_0_#304bc9] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#304bc9]"
             >
               <LogIn className="w-4 h-4" /> Join Group
             </button>
@@ -270,24 +270,24 @@ export default function GroupsPage() {
         {groups.map((group) => (
           <div
             key={group.id}
-            className="card-3d overflow-hidden transition-all"
+            className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"
           >
             {/* Group header */}
             <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-text text-lg">{group.name}</h3>
-                  <p className="text-xs font-bold text-text-muted mt-0.5">
+                  <h3 className="font-extrabold text-[#1a1a2e] dark:text-white text-lg">{group.name}</h3>
+                  <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
                     {group.memberCount} {group.memberCount === 1 ? "member" : "members"}
                   </p>
                 </div>
                 <button
                   onClick={() => copyCode(group.code)}
                   className={clsx(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer border-2",
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer border-2",
                     copiedCode === group.code
-                      ? "bg-[#06d6a0]/15 text-[#06d6a0] border-[#06d6a0] shadow-[0_2px_0_0_#06d6a0]"
-                      : "btn-3d-secondary"
+                      ? "bg-[#06d6a0]/10 text-[#06d6a0] border-[#05a87e] shadow-[0_2px_0_0_#05a87e] translate-y-[2px]"
+                      : "border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]"
                   )}
                 >
                   {copiedCode === group.code ? (
@@ -304,31 +304,33 @@ export default function GroupsPage() {
               {group.members.map((member) => (
                 <div
                   key={member.userId}
-                  className="flex items-center gap-3 p-3.5 bg-gray-50/80 dark:bg-[#141425] rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_2px_0_0_rgba(0,0,0,0.06)]"
+                  className="rounded-xl border-2 p-4 flex items-center justify-between border-gray-200 bg-gray-50 shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#1f1f35] dark:shadow-[0_4px_0_0_#0d0d1a]"
                 >
-                  {/* Avatar */}
-                  <div className="w-9 h-9 rounded-xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center text-white font-black text-sm shrink-0 shadow-[0_2px_0_0_#5a189a]">
-                    {(member.name || "S").charAt(0).toUpperCase()}
-                  </div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-xl bg-[#9b5de5]/10 border-2 border-[#7d32b5] flex items-center justify-center text-[#9b5de5] font-extrabold text-sm shrink-0 shadow-[0_2px_0_0_#7d32b5]">
+                      {(member.name || "S").charAt(0).toUpperCase()}
+                    </div>
 
-                  {/* Name + overall */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black text-sm text-text truncate">{member.name}</p>
-                    <p className="text-xs font-bold text-text-muted">
-                      Overall:{" "}
-                      <span
-                        className={clsx(
-                          "font-black",
-                          member.overallPct >= 75
-                            ? "text-[#06d6a0]"
-                            : member.overallPct >= 65
-                            ? "text-[#ff6b35]"
-                            : "text-[#ef476f]"
-                        )}
-                      >
-                        {member.overallPct}%
-                      </span>
-                    </p>
+                    {/* Name + overall */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{member.name}</p>
+                      <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">
+                        Overall:{" "}
+                        <span
+                          className={clsx(
+                            "font-extrabold",
+                            member.overallPct >= 75
+                              ? "text-[#06d6a0]"
+                              : member.overallPct >= 65
+                              ? "text-[#ff6b35]"
+                              : "text-[#ef476f]"
+                          )}
+                        >
+                          {member.overallPct}%
+                        </span>
+                      </p>
+                    </div>
                   </div>
 
                   {/* Subject health dots */}
@@ -363,7 +365,7 @@ export default function GroupsPage() {
               <button
                 onClick={() => handleNudge(group.id)}
                 disabled={nudging === group.id}
-                className="btn-3d-danger px-4 py-2 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-[#d63b5f] bg-[#FF2D78] text-white shadow-[0_3px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d63b5f] disabled:opacity-50"
               >
                 {nudging === group.id ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -375,7 +377,7 @@ export default function GroupsPage() {
               <button
                 onClick={() => handleLeave(group.id)}
                 disabled={leaving === group.id}
-                className="btn-3d-secondary flex items-center gap-1.5 px-3 py-2 text-xs font-black hover:text-[#ef476f] cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl border-2 px-3 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#ef476f] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#ef476f] dark:shadow-[0_3px_0_0_#0d0d1a] disabled:opacity-50"
               >
                 {leaving === group.id ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

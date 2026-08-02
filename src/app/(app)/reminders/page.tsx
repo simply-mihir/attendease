@@ -158,27 +158,27 @@ export default function RemindersPage() {
   return (
     <PageTransition direction="right" staggerChildren={false} className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 card-3d p-6" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center shadow-[0_4px_0_0_#d95220] shrink-0">
-            <Bell className="w-6 h-6 text-white" />
+      <div className="flex items-center justify-between mb-6" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ff6b35]/10">
+            <Bell className="h-6 w-6 text-[#ff6b35]" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Reminders & Tasks</h1>
-            <p className="text-sm font-bold text-text-muted mt-0.5">Keep track of extra classes, assignments, exams & deadlines</p>
+            <h1 className="text-2xl font-extrabold text-[#1a1a2e] dark:text-white">Reminders & Tasks</h1>
+            <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">Keep track of extra classes, assignments, exams & deadlines</p>
           </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-3d-primary flex items-center gap-2 cursor-pointer"
+          className="rounded-xl border-2 border-[#cc1a5e] bg-[#FF2D78] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_0_0_#cc1a5e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#cc1a5e] active:translate-y-[3px] active:shadow-none dark:border-[#b81e56] dark:shadow-[0_4px_0_0_#b81e56] dark:hover:shadow-[0_2px_0_0_#b81e56] transition-all duration-150 flex items-center gap-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" /> New Reminder
         </button>
       </div>
 
       {/* Filter Tabs & Toggle */}
-      <div className="flex items-center justify-between flex-wrap gap-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-wrap">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const active = activeCategory === cat.id;
@@ -186,14 +186,13 @@ export default function RemindersPage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={clsx(
-                  "px-4 py-2 text-xs font-black transition flex items-center gap-2 shrink-0 cursor-pointer",
+                className={`rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-1.5 cursor-pointer shrink-0 ${
                   active
-                    ? "btn-3d-primary"
-                    : "btn-3d-secondary"
-                )}
+                    ? "border-[#cc1a5e] bg-[#FF2D78] text-white shadow-[0_3px_0_0_#cc1a5e] dark:border-[#b81e56] dark:shadow-[0_3px_0_0_#b81e56]"
+                    : "border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]"
+                }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-4 h-4" />
                 {cat.label}
               </button>
             );
@@ -202,14 +201,9 @@ export default function RemindersPage() {
 
         <button
           onClick={() => setShowCompleted(!showCompleted)}
-          className={clsx(
-            "px-4 py-2 text-xs font-black transition flex items-center gap-2 ml-auto cursor-pointer",
-            showCompleted
-              ? "btn-3d-primary"
-              : "btn-3d-secondary"
-          )}
+          className="rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-2 ml-auto cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]"
         >
-          <Check className="w-3.5 h-3.5 text-[#06d6a0]" />
+          <Check className="w-4 h-4 text-[#06d6a0]" />
           {showCompleted ? "Hide Completed" : "Show Completed"}
         </button>
       </div>
@@ -218,21 +212,23 @@ export default function RemindersPage() {
       {isLoading ? (
         <FuturisticLoader variant="section" title="Loading reminders" Icon={AlarmClock} />
       ) : filteredReminders.length === 0 ? (
-        <div className="p-12 text-center card-3d space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-12 h-12 rounded-2xl bg-[#ff6b35]/15 border-2 border-[#ff6b35]/30 text-[#ff6b35] mx-auto flex items-center justify-center shadow-[0_2px_0_0_#ff6b35]">
-            <Bell className="w-6 h-6" />
+        <div className="rounded-2xl border-2 p-12 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="flex justify-center mb-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ff6b35]/10">
+              <Bell className="h-8 w-8 text-[#ff6b35]" />
+            </div>
           </div>
-          <h3 className="text-lg font-black text-text">No Reminders Found</h3>
-          <p className="text-sm font-bold text-text-muted max-w-sm mx-auto">
+          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-2">No Reminders Found</h3>
+          <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80] mb-6">
             {activeCategory !== "all"
               ? `No reminders listed under ${activeCategory.replace("_", " ")}.`
               : "You don't have any pending reminders. Click below to add one!"}
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-3d-primary inline-flex items-center gap-1.5 mt-2 cursor-pointer"
+            className="rounded-xl border-2 border-[#cc1a5e] bg-[#FF2D78] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_0_0_#cc1a5e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#cc1a5e] active:translate-y-[3px] active:shadow-none dark:border-[#b81e56] dark:shadow-[0_4px_0_0_#b81e56] dark:hover:shadow-[0_2px_0_0_#b81e56] transition-all duration-150 inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" /> Add Reminder
+            <Plus className="w-4 h-4" /> Add Reminder
           </button>
         </div>
       ) : (
@@ -240,10 +236,10 @@ export default function RemindersPage() {
           {filteredReminders.map((reminder) => (
             <div
               key={reminder.id}
-              className={clsx(
-                "card-3d p-4.5 flex items-center justify-between gap-4 group transition-all",
-                reminder.isCompleted && "line-through opacity-60 bg-gray-100 dark:bg-[#0f0f1c]"
-              )}
+              className={`rounded-2xl border-2 p-5 flex items-center justify-between gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] dark:hover:shadow-[0_4px_0_0_#0d0d1a] ${
+                reminder.isCompleted ? "opacity-60 bg-gray-50 dark:bg-white/[0.02]" : ""
+              }`}
+              style={{ borderLeftWidth: "5px", borderLeftColor: reminder.subject?.colorHex || "#4361ee" }}
             >
               <div className="flex items-start gap-3.5 flex-1 min-w-0">
                 <button

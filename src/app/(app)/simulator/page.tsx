@@ -44,24 +44,24 @@ export default function SimulatorPage() {
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
-      <div style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-text tracking-tight">
-          <div className="w-11 h-11 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_3px_0_0_#5a189a]">
-            <Sliders className="w-5 h-5 text-white" />
-          </div>
-          What-If Simulator
-        </h1>
-        <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">See how skipping or attending classes affects your attendance</p>
+      <div className="flex items-center gap-3 mb-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#9b5de5]/10">
+          <Sliders className="h-6 w-6 text-[#9b5de5]" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">What-If Simulator</h1>
+          <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">See how skipping or attending classes affects your attendance</p>
+        </div>
       </div>
 
-      <div className="card-3d p-6 space-y-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-2xl border-2 p-6 space-y-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
-          <label className="block text-sm font-black text-text mb-2">Select Subject</label>
+          <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
           <select
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
-            className="input-3d"
+            className="w-full rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee] appearance-none cursor-pointer"
           >
             {subjects.map((s) => (
               <option key={s.id} value={s.id}>{s.name} ({s.currentPercentage}%)</option>
@@ -71,27 +71,17 @@ export default function SimulatorPage() {
 
         {/* Scenario toggle */}
         <div>
-          <label className="block text-sm font-black text-text mb-2">Scenario</label>
-          <div className="flex gap-3">
+          <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Scenario</label>
+          <div className="flex rounded-xl border-2 overflow-hidden border-gray-200 shadow-[0_3px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:shadow-[0_3px_0_0_#0d0d1a]">
             <button
               onClick={() => setScenario("skip")}
-              className={clsx(
-                "flex-1 py-3 font-black text-sm transition cursor-pointer flex items-center justify-center gap-2",
-                scenario === "skip"
-                  ? "btn-3d-danger"
-                  : "btn-3d-secondary"
-              )}
+              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "skip" ? "bg-[#FF2D78] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
             >
               <XCircle className="w-4 h-4" /> Skip Classes
             </button>
             <button
               onClick={() => setScenario("attend")}
-              className={clsx(
-                "flex-1 py-3 font-black text-sm transition cursor-pointer flex items-center justify-center gap-2",
-                scenario === "attend"
-                  ? "btn-3d-success"
-                  : "btn-3d-secondary"
-              )}
+              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "attend" ? "bg-[#06d6a0] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
             >
               <CheckCircle2 className="w-4 h-4" /> Attend Classes
             </button>
@@ -101,10 +91,10 @@ export default function SimulatorPage() {
         {/* Count slider */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-black text-text">
+            <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white">
               Number of classes to {scenario}
             </label>
-            <span className="text-[#7b2cbf] dark:text-[#c77dff] font-black text-lg px-3 py-0.5 bg-[#7b2cbf]/15 rounded-xl border-2 border-[#7b2cbf]/40 shadow-[0_2px_0_0_#7b2cbf]">
+            <span className="text-[#9b5de5] font-extrabold text-lg px-3 py-0.5 bg-[#9b5de5]/10 rounded-xl border-2 border-[#9b5de5]/30 shadow-[0_2px_0_0_#9b5de5]">
               {count}
             </span>
           </div>
@@ -114,9 +104,9 @@ export default function SimulatorPage() {
             max={30}
             value={count}
             onChange={(e) => setCount(parseInt(e.target.value))}
-            className="w-full accent-[#7b2cbf] cursor-pointer h-3 rounded-lg bg-gray-200 dark:bg-[#1f1f35]"
+            className="w-full accent-[#9b5de5] cursor-pointer h-3 rounded-lg bg-gray-200 dark:bg-[#1f1f35]"
           />
-          <div className="flex justify-between text-xs font-black text-text-muted mt-1.5">
+          <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1.5">
             <span>1</span>
             <span>15</span>
             <span>30</span>
@@ -126,23 +116,23 @@ export default function SimulatorPage() {
 
       {/* Result */}
       {result && !loading && (
-        <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
-          <h3 className="font-black text-base mb-4 text-text">Simulation Result</h3>
+        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
+          <h3 className="font-extrabold text-lg mb-4 text-[#1a1a2e] dark:text-white">Simulation Result</h3>
 
           <div className="flex items-center gap-4 justify-center mb-6">
             {/* Current */}
             <div className="text-center">
-              <p className="text-xs font-bold text-text-muted mb-1">Current</p>
+              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mb-1">Current</p>
               <p className={clsx("text-4xl font-black",
                 result.currentStatus === "green" ? "text-[#06d6a0]" : result.currentStatus === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
               )}>{result.currentPct}%</p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-[#1f1f35] border-2 border-gray-200 dark:border-[#2a2a3d] flex items-center justify-center shadow-[0_2px_0_0_rgba(0,0,0,0.1)]">
-              <ArrowRight className="w-5 h-5 text-text-muted" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]">
+              <ArrowRight className="w-5 h-5" />
             </div>
             {/* After */}
             <div className="text-center">
-              <p className="text-xs font-bold text-text-muted mb-1">After {scenario === "skip" ? "skipping" : "attending"} {count}</p>
+              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mb-1">After {scenario === "skip" ? "skipping" : "attending"} {count}</p>
               <p className={clsx("text-4xl font-black",
                 result.newStatus === "green" ? "text-[#06d6a0]" : result.newStatus === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
               )}>{result.simulatedPct}%</p>
@@ -150,32 +140,32 @@ export default function SimulatorPage() {
           </div>
 
           {/* Status indicator */}
-          <div className={clsx("text-center p-4 rounded-2xl border-2",
+          <div className={clsx("text-center p-4 rounded-xl border-2",
             result.safe
-              ? "bg-[#06d6a0]/15 border-[#06d6a0] text-[#06d6a0] shadow-[0_3px_0_0_#06d6a0]"
-              : "bg-[#ef476f]/15 border-[#ef476f] text-[#ef476f] shadow-[0_3px_0_0_#ef476f]"
+              ? "bg-[#06d6a0]/10 border-[#05a87e] text-[#06d6a0] shadow-[0_3px_0_0_#05a87e]"
+              : "bg-[#ef476f]/10 border-[#d63b5f] text-[#ef476f] shadow-[0_3px_0_0_#d63b5f]"
           )}>
             {result.safe ? (
-              <p className="font-black flex items-center justify-center gap-1.5">
+              <p className="font-extrabold flex items-center justify-center gap-1.5">
                 <CheckCircle2 className="w-5 h-5 text-[#06d6a0]" />
-                Safe! You&apos;ll still be above {selected?.minAttendancePct}%
+                You are safe! Attendance remains above {selected?.minAttendancePct}%.
               </p>
             ) : (
-              <p className="font-black flex items-center justify-center gap-1.5">
+              <p className="font-extrabold flex items-center justify-center gap-1.5">
                 <XCircle className="w-5 h-5 text-[#ef476f]" />
-                Dangerous! You&apos;ll fall below {selected?.minAttendancePct}%
+                Warning! Attendance drops below {selected?.minAttendancePct}%.
               </p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="p-4 bg-gray-50 dark:bg-[#141425] rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] text-center shadow-[0_3px_0_0_rgba(0,0,0,0.1)]">
-              <p className="text-xl font-black text-text">{result.newCanSkip}</p>
-              <p className="text-xs font-bold text-text-muted mt-0.5">Can still skip after</p>
+            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
+              <p className="text-xl font-extrabold text-[#1a1a2e] dark:text-white">{result.newCanSkip}</p>
+              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Can still skip</p>
             </div>
-            <div className="p-4 bg-gray-50 dark:bg-[#141425] rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] text-center shadow-[0_3px_0_0_rgba(0,0,0,0.1)]">
-              <p className="text-xl font-black text-text">{result.newMustAttend}</p>
-              <p className="text-xs font-bold text-text-muted mt-0.5">Must attend to recover</p>
+            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
+              <p className="text-xl font-extrabold text-[#1a1a2e] dark:text-white">{result.newMustAttend}</p>
+              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Must attend</p>
             </div>
           </div>
         </div>
