@@ -122,8 +122,8 @@ export default function WidgetPage() {
   }
 
   const nextClass = getNextClass();
-  const dangerSubjects = dashboard?.subjectsSummary.filter(
-    (s) => s.statusColor === "red"
+  const dangerSubjects = dashboard?.subjectsSummary?.filter(
+    (s: any) => s.statusColor === "red"
   ) || [];
 
   return (

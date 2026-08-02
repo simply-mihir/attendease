@@ -32,16 +32,16 @@ export default function AnalyticsPage() {
     // We'll fall through and show skeletons
   }
 
-  const barData = dashboard?.subjectsSummary?.map((s: any) => ({
+  const barData = (dashboard?.subjectsSummary || dashboard?.subjects || []).map((s: any) => ({
     name: s.name,
     percentage: s.currentPercentage,
     fill: s.statusColor === "green" ? "#06d6a0" : s.statusColor === "yellow" ? "#ff6b35" : "#ef476f",
-  })) || [];
+  }));
 
   const pieData = dashboard ? [
-    { name: "Safe", value: dashboard.safeSubjects, color: "#06d6a0", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "green").map((s: any) => s.name) },
-    { name: "Warning", value: dashboard.warningSubjects, color: "#ff6b35", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "yellow").map((s: any) => s.name) },
-    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef476f", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "red").map((s: any) => s.name) },
+    { name: "Safe", value: dashboard.safeSubjects, color: "#06d6a0", subjects: (dashboard.subjectsSummary || dashboard.subjects || []).filter((s: any) => s.statusColor === "green").map((s: any) => s.name) },
+    { name: "Warning", value: dashboard.warningSubjects, color: "#ff6b35", subjects: (dashboard.subjectsSummary || dashboard.subjects || []).filter((s: any) => s.statusColor === "yellow").map((s: any) => s.name) },
+    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef476f", subjects: (dashboard.subjectsSummary || dashboard.subjects || []).filter((s: any) => s.statusColor === "red").map((s: any) => s.name) },
   ].filter((d) => d.value > 0) : [];
 
   // Build heatmap grid (GitHub-style)
@@ -196,31 +196,45 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Per-subject details */}
-      <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-        <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
-        <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
-          {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
-                <div className="h-2 w-full rounded-full bg-gray-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35] mt-2">
-                  <div className={clsx("h-full rounded-full transition-all duration-500 shadow-[0_2px_0_0_rgba(0,0,0,0.2)]",
-                    s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
-                  )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
+      {loading ? (
+        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
+          <div className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-2xl border-2 p-4 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
+                <Skeleton className="h-4 w-32 mb-2" />
+                <Skeleton className="h-2 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : dashboard && (
+        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
+          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
+          <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
+            {(dashboard.subjectsSummary || dashboard.subjects || []).map((s: any) => (
+              <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
+                  <div className="h-2 w-full rounded-full bg-gray-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35] mt-2">
+                    <div className={clsx("h-full rounded-full transition-all duration-500 shadow-[0_2px_0_0_rgba(0,0,0,0.2)]",
+                      s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
+                    )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className={clsx("text-lg font-extrabold tracking-tight",
+                    s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
+                  )}>{s.currentPercentage}%</span>
+                  <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
+                    {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
+                  </p>
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <span className={clsx("text-lg font-extrabold tracking-tight",
-                  s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
-                )}>{s.currentPercentage}%</span>
-                <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
-                  {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
-                </p>
-              </div>
-            </div>
-          ))}
-        </StaggerGrid>
-      </div>
+            ))}
+          </StaggerGrid>
+        </div>
+      )}
     </PageTransition>
   );
 }
