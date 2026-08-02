@@ -1,3 +1,5 @@
+"use client";
+
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { LineChart } from "lucide-react";
 

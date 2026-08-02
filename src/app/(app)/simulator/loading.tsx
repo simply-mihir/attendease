@@ -1,3 +1,5 @@
+"use client";
+
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { Calculator } from "lucide-react";
 
