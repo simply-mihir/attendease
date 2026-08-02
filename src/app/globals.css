@@ -1,66 +1,77 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme inline {
-  --color-primary: #6366F1;
-  --color-primary-dark: #4F46E5;
-  --color-primary-light: #818CF8;
-  --color-accent: #06B6D4;
-  --color-accent-dark: #0891B2;
-  --color-accent-light: #67E8F9;
-  --color-pink: #EC4899;
-  --color-pink-dark: #DB2777;
-  --color-orange: #F97316;
-  --color-lime: #10B981;
-  --color-danger: #F43F5E;
-  --color-warning: #F59E0B;
-  --color-success: #10B981;
+  --color-primary: #8b5cf6;
+  --color-primary-dark: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-accent: #06b6d4;
+  --color-accent-dark: #0891b2;
+  --color-accent-light: #67e8f9;
+  --color-pink: #ec4899;
+  --color-pink-dark: #db2777;
+  --color-orange: #f97316;
+  --color-lime: #10b981;
+  --color-danger: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
-:root {
-  /* Youthful Pastel & Cream Palette */
-  --color-surface: #FFFDF8;
-  --color-surface-2: #FFFFFF;
-  --color-surface-3: #FFEBF0;
-  
-  --color-border: #E2E8F0;
-  /* Thick cartoon borders - deep indigo/plum */
-  --color-border-heavy: #1E1B4B;
-  --color-shadow-heavy: #1E1B4B;
-  
-  --color-text: #1E1B4B;
-  --color-text-secondary: #4F46E5;
-  --color-text-muted: #8B87AC;
-  
-  --color-glass: #FFFFFF;
-  --color-glass-strong: #FFF0F5;
-  --color-glass-border: #1E1B4B;
-}
+@layer base {
+  :root {
+    /* Light Mode Palette (White + Vibrant Pop) */
+    --page-bg: #ffffff;
+    --sidebar-bg: #f9fafb;
+    --card-bg: #ffffff;
+    
+    --color-surface: #ffffff;
+    --color-surface-2: #f9fafb;
+    --color-surface-3: #f3f4f6;
+    
+    --color-border: #e5e7eb;
+    --color-border-heavy: #d1d5db;
+    --color-shadow-heavy: rgba(0, 0, 0, 0.08);
+    
+    --color-text: #111827;
+    --color-text-secondary: #4b5563;
+    --color-text-muted: #6b7280;
+    
+    --color-glass: #ffffff;
+    --color-glass-strong: #ffffff;
+    --color-glass-border: #e5e7eb;
+  }
 
-html.dark {
-  /* Soothing Youthful Dark Mode (Soft Pastel Midnight) */
-  --color-surface: #181926;
-  --color-surface-2: #24273A;
-  --color-surface-3: #363A4F;
-  
-  --color-border: #494D64;
-  --color-border-heavy: #0C0E14;
-  --color-shadow-heavy: #0C0E14;
-  
-  --color-text: #CAD3F5;
-  --color-text-secondary: #8AADF4;
-  --color-text-muted: #8087A2;
-  
-  --color-glass: #24273A;
-  --color-glass-strong: #363A4F;
-  --color-glass-border: #0C0E14;
+  .dark {
+    /* Dark Mode Palette (Deep Navy #0a0e1a + Neon Glow) */
+    --page-bg: #0a0e1a;
+    --sidebar-bg: #070b14;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    
+    --color-surface: #0a0e1a;
+    --color-surface-2: #070b14;
+    --color-surface-3: #111827;
+    
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-heavy: rgba(255, 255, 255, 0.15);
+    --color-shadow-heavy: rgba(0, 0, 0, 0.5);
+    
+    --color-text: #f9fafb;
+    --color-text-secondary: #9ca3af;
+    --color-text-muted: #6b7280;
+    
+    --color-glass: rgba(255, 255, 255, 0.04);
+    --color-glass-strong: #111827;
+    --color-glass-border: rgba(255, 255, 255, 0.08);
+  }
 }
 
 * { box-sizing: border-box; }
 
 body {
-  background: var(--color-surface);
+  background-color: var(--page-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -773,3 +784,14 @@ html.dark select option {
   51% { top: -5%; }
   100% { top: -5%; }
 }
+
+@keyframes loginOrbitSpin {
+  from { transform: translate(-50%, 0) rotate(0deg); }
+  to { transform: translate(-50%, 0) rotate(360deg); }
+}
+
+@keyframes loginFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+  50% { transform: translateY(-20px) scale(1.2); opacity: 0.7; }
+}
+

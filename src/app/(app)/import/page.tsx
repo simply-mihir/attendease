@@ -295,16 +295,16 @@ export default function ImportPage() {
 
   // ─── Render ───────────────────────────────────────────────────
   return (
-    <PageTransition direction="right" staggerChildren={false} className="max-w-3xl mx-auto space-y-6">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl font-bold flex items-center gap-3">
+        <h1 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-gray-900 dark:text-white tracking-tight">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
             <Camera className="w-5 h-5 text-white" />
           </div>
-          <span className="text-gradient">Import Timetable</span>
+          Import Timetable
         </h1>
-        <p className="text-text-muted text-sm mt-1 ml-[52px]">
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 ml-[52px]">
           Upload a photo, PDF, or spreadsheet of your timetable to auto-add all subjects
         </p>
       </div>
@@ -315,10 +315,10 @@ export default function ImportPage() {
           <div key={s} className="flex items-center gap-3">
             <div
               className={clsx(
-                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all",
+                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border transition-all",
                 step >= s
-                  ? "bg-gradient-to-br from-cyan-500 to-blue-500 border-border-heavy text-white shadow-lg shadow-cyan-500/20"
-                  : "border-border-heavy bg-surface-3 text-text-muted"
+                  ? "bg-gradient-to-br from-cyan-500 to-blue-500 border-cyan-400 text-white shadow-md shadow-cyan-500/20"
+                  : "border-gray-200 bg-gray-100 text-gray-400 dark:border-white/10 dark:bg-white/5 dark:text-gray-500"
               )}
             >
               {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
@@ -327,17 +327,17 @@ export default function ImportPage() {
               <div
                 className={clsx(
                   "w-12 h-1 rounded-full transition-all",
-                  step > s ? "bg-cyan-500" : "bg-surface-3 border border-border-heavy"
+                  step > s ? "bg-cyan-500" : "bg-gray-200 dark:bg-white/10"
                 )}
               />
             )}
           </div>
         ))}
       </div>
-      <div className="flex justify-center gap-12 text-xs text-text-muted font-bold" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-        <span className={clsx(step === 1 && "text-cyan-400")}>Upload</span>
-        <span className={clsx(step === 2 && "text-cyan-400")}>Review</span>
-        <span className={clsx(step === 3 && "text-cyan-400")}>Done</span>
+      <div className="flex justify-center gap-12 text-xs font-bold text-gray-400 dark:text-gray-500" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+        <span className={clsx(step === 1 && "text-cyan-600 dark:text-cyan-400")}>Upload</span>
+        <span className={clsx(step === 2 && "text-cyan-600 dark:text-cyan-400")}>Review</span>
+        <span className={clsx(step === 3 && "text-cyan-600 dark:text-cyan-400")}>Done</span>
       </div>
 
       {/* ────── Step 1: Upload ────── */}
@@ -349,7 +349,7 @@ export default function ImportPage() {
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
             className={clsx(
-              "glass rounded-2xl border-2 border-dashed cursor-pointer transition-all hover:border-cyan-500/50 hover:bg-surface-3/50",
+              "rounded-3xl border-2 border-dashed cursor-pointer transition-all bg-white border-gray-200 hover:border-cyan-500 hover:bg-cyan-50/20 dark:bg-white/[0.04] dark:border-white/10 dark:hover:border-cyan-500/50 dark:hover:bg-white/[0.06] shadow-sm",
               imagePreview ? "p-4" : "p-12"
             )}
           >
@@ -358,9 +358,9 @@ export default function ImportPage() {
                 <img
                   src={imagePreview}
                   alt="Timetable preview"
-                  className="rounded-xl max-h-72 mx-auto object-contain border-2 border-border-heavy"
+                  className="rounded-2xl max-h-72 mx-auto object-contain border border-gray-200 dark:border-white/10"
                 />
-                <p className="text-center text-xs text-text-muted font-bold">
+                <p className="text-center text-xs font-bold text-gray-500 dark:text-gray-400">
                   Click to change file
                 </p>
               </div>
@@ -370,10 +370,10 @@ export default function ImportPage() {
                   <FileSpreadsheet className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="font-bold text-text text-sm">{fileName}</p>
-                  <p className="text-xs text-text-muted">Ready to analyze</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-sm">{fileName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Ready to analyze</p>
                 </div>
-                <p className="text-center text-xs text-text-muted font-bold">
+                <p className="text-center text-xs font-bold text-gray-500 dark:text-gray-400">
                   Click to change file
                 </p>
               </div>
@@ -382,23 +382,23 @@ export default function ImportPage() {
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
                   <Upload className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-text mb-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                   Upload your timetable
                 </h3>
-                <p className="text-text-muted text-sm mb-4">
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
                   Drop a file here, or click to browse
                 </p>
-                <div className="flex items-center justify-center gap-3 flex-wrap">
-                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
+                <div className="flex items-center justify-center gap-2.5 flex-wrap">
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10">
                     📷 Photo
                   </span>
-                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10">
                     📄 PDF
                   </span>
-                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10">
                     📊 Excel / CSV
                   </span>
-                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-surface-3 text-text-secondary border-2 border-border-heavy">
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10">
                     📱 Screenshot
                   </span>
                 </div>
@@ -418,16 +418,16 @@ export default function ImportPage() {
           />
 
           {error && (
-            <div className="glass rounded-2xl p-4 border-red-500/30 flex items-center gap-3">
-              <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <p className="text-sm font-bold text-red-400">{error}</p>
+            <div className="rounded-2xl p-4 bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 flex items-center gap-3">
+              <XCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 shrink-0" />
+              <p className="text-sm font-bold text-rose-600 dark:text-rose-400">{error}</p>
             </div>
           )}
 
           <button
             onClick={analyzeImage}
             disabled={!imageBase64 || analyzing}
-            className="btn-gradient w-full py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {analyzing ? (
               <>
@@ -452,24 +452,23 @@ export default function ImportPage() {
       {step === 2 && (
         <div className="space-y-4 animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           {/* Summary bar */}
-          <div className="glass rounded-2xl p-4 flex items-center justify-between">
+          <div className="rounded-3xl p-4 sm:p-5 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
                 <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-bold text-text text-sm">
-                  Found {subjects.length} subjects with {totalSlots} schedule
-                  slots
+                <p className="font-extrabold text-gray-900 dark:text-white text-sm">
+                  Found {subjects.length} subjects with {totalSlots} schedule slots
                 </p>
-                <p className="text-xs text-text-muted">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                   Review and edit before importing
                 </p>
               </div>
             </div>
             <button
               onClick={() => setStep(1)}
-              className="text-xs text-text-muted hover:text-text transition flex items-center gap-1"
+              className="text-xs font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition flex items-center gap-1 cursor-pointer"
             >
               <ArrowLeft className="w-3 h-3" /> Re-upload
             </button>
@@ -479,14 +478,14 @@ export default function ImportPage() {
           {subjects.map((sub, si) => (
             <div
               key={si}
-              className="glass rounded-2xl p-5 space-y-4"
+              className="rounded-3xl p-5 sm:p-6 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-4 transition-all"
               style={{ animation: `fade-in 0.3s ease-out ${0.05 * si}s both` }}
             >
               {/* Subject header */}
               <div className="flex items-start gap-3">
                 <div
-                  className="w-2 h-12 rounded-full shrink-0 mt-1"
-                  style={{ backgroundColor: sub.colorHex }}
+                  className="w-2.5 h-12 rounded-full shrink-0 mt-1"
+                  style={{ backgroundColor: sub.colorHex, boxShadow: `0 0 10px ${sub.colorHex}40` }}
                 />
                 <div className="flex-1 space-y-2">
                   <input
@@ -496,7 +495,7 @@ export default function ImportPage() {
                       updateSubject(si, { name: e.target.value })
                     }
                     placeholder="Subject name"
-                    className="input-glass w-full py-2 rounded-xl text-sm font-bold"
+                    className="w-full px-3.5 py-2 rounded-xl text-sm font-bold border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <input
@@ -508,7 +507,7 @@ export default function ImportPage() {
                         })
                       }
                       placeholder="Code (optional)"
-                      className="input-glass py-1.5 rounded-xl text-xs"
+                      className="px-3 py-1.5 rounded-xl text-xs border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none"
                     />
                     <input
                       type="text"
@@ -519,13 +518,13 @@ export default function ImportPage() {
                         })
                       }
                       placeholder="Instructor (optional)"
-                      className="input-glass py-1.5 rounded-xl text-xs"
+                      className="px-3 py-1.5 rounded-xl text-xs border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none"
                     />
                   </div>
                 </div>
                 <button
                   onClick={() => removeSubject(si)}
-                  className="p-2 text-text-muted hover:text-red-400 hover:bg-red-500/10 rounded-xl transition shrink-0"
+                  className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition shrink-0 cursor-pointer"
                   title="Remove subject"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -539,9 +538,9 @@ export default function ImportPage() {
                     key={c}
                     onClick={() => updateSubject(si, { colorHex: c })}
                     className={clsx(
-                      "w-5 h-5 rounded-full transition-all border-2",
+                      "w-5 h-5 rounded-full transition-all border-2 cursor-pointer",
                       sub.colorHex === c
-                        ? "border-white scale-125 shadow-lg"
+                        ? "border-gray-900 dark:border-white scale-125 shadow-md"
                         : "border-transparent hover:scale-110"
                     )}
                     style={{ backgroundColor: c }}
@@ -554,7 +553,7 @@ export default function ImportPage() {
                 {sub.schedules.map((sch, sci) => (
                   <div
                     key={sci}
-                    className="flex flex-wrap md:flex-nowrap items-center gap-2.5 p-3 bg-surface-3 rounded-xl border-2 border-border-heavy"
+                    className="flex flex-wrap md:flex-nowrap items-center gap-2.5 p-3.5 bg-gray-50/80 dark:bg-white/[0.03] rounded-2xl border border-gray-200/60 dark:border-white/5"
                   >
                     <select
                       value={sch.dayOfWeek}
@@ -568,7 +567,7 @@ export default function ImportPage() {
                           day: dayLabel,
                         });
                       }}
-                      className="input-glass py-2 px-3 rounded-xl text-xs font-semibold w-full md:w-auto min-w-[115px]"
+                      className="py-1.5 px-3 rounded-xl text-xs font-bold border border-gray-200 bg-white text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white w-full md:w-auto min-w-[115px] focus:outline-none"
                     >
                       {DAY_OPTIONS.map((d) => (
                         <option key={d.value} value={d.value}>
@@ -576,8 +575,8 @@ export default function ImportPage() {
                         </option>
                       ))}
                     </select>
-                    <div className="flex items-center gap-1.5 bg-black/20 px-2 py-1 rounded-xl border border-white/5 shrink-0">
-                      <Clock className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <div className="flex items-center gap-1.5 bg-white dark:bg-black/30 px-2 py-1 rounded-xl border border-gray-200/60 dark:border-white/5 shrink-0">
+                      <Clock className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                       <input
                         type="time"
                         value={sch.startTime}
@@ -586,9 +585,9 @@ export default function ImportPage() {
                             startTime: e.target.value,
                           })
                         }
-                        className="input-glass py-1 px-2.5 rounded-lg text-xs font-mono font-medium w-[125px] sm:w-[135px]"
+                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-bold text-gray-900 dark:text-white w-[110px] focus:outline-none"
                       />
-                      <span className="text-text-muted text-xs font-bold">–</span>
+                      <span className="text-gray-400 text-xs font-bold">–</span>
                       <input
                         type="time"
                         value={sch.endTime}
@@ -597,11 +596,11 @@ export default function ImportPage() {
                             endTime: e.target.value,
                           })
                         }
-                        className="input-glass py-1 px-2.5 rounded-lg text-xs font-mono font-medium w-[125px] sm:w-[135px]"
+                        className="bg-transparent py-0.5 px-1.5 text-xs font-mono font-bold text-gray-900 dark:text-white w-[110px] focus:outline-none"
                       />
                     </div>
                     <div className="flex items-center gap-1.5 flex-1 min-w-[160px] w-full md:w-auto">
-                      <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0 ml-1" />
+                      <MapPin className="w-3.5 h-3.5 text-cyan-500 shrink-0 ml-1" />
                       <input
                         type="text"
                         value={sch.room || ""}
@@ -611,12 +610,12 @@ export default function ImportPage() {
                           })
                         }
                         placeholder="Room / Venue"
-                        className="input-glass py-1.5 px-3 rounded-xl text-xs w-full"
+                        className="py-1.5 px-3 rounded-xl text-xs border border-gray-200 bg-white text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white w-full focus:outline-none"
                       />
                     </div>
                     <button
                       onClick={() => removeSchedule(si, sci)}
-                      className="p-1.5 text-text-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition shrink-0 ml-auto md:ml-0"
+                      className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition shrink-0 ml-auto md:ml-0 cursor-pointer"
                       title="Remove slot"
                     >
                       <XCircle className="w-4 h-4" />
@@ -625,7 +624,7 @@ export default function ImportPage() {
                 ))}
                 <button
                   onClick={() => addSchedule(si)}
-                  className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text transition px-2 py-1"
+                  className="flex items-center gap-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline transition px-2 py-1 cursor-pointer"
                 >
                   <Plus className="w-3 h-3" /> Add time slot
                 </button>
@@ -636,7 +635,7 @@ export default function ImportPage() {
           {/* Add subject manually */}
           <button
             onClick={addSubject}
-            className="glass rounded-2xl p-4 w-full flex items-center justify-center gap-2 text-sm font-bold text-text-secondary hover:text-text hover:bg-surface-3 transition border-2 border-dashed border-border-heavy"
+            className="rounded-3xl p-4 w-full flex items-center justify-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-dashed border-gray-300 dark:bg-white/[0.04] dark:border-white/10 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/[0.06] transition cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Add Subject Manually
           </button>
@@ -647,7 +646,7 @@ export default function ImportPage() {
             disabled={
               importing || subjects.length === 0 || subjects.every((s) => !s.name.trim())
             }
-            className="btn-gradient w-full py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-40"
+            className="w-full py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white flex items-center justify-center gap-2 shadow-md shadow-cyan-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-40"
           >
             {importing ? (
               <>
@@ -667,27 +666,27 @@ export default function ImportPage() {
       {/* ────── Step 3: Done ────── */}
       {step === 3 && importResult && (
         <div className="animate-fade-in" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
-          <div className="glass rounded-2xl p-8 text-center">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/20 animate-pulse-glow">
+          <div className="rounded-3xl p-8 sm:p-10 text-center bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-teal-500/20 text-white">
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-black text-text mb-2">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
               Import Complete! 🎉
             </h2>
-            <p className="text-text-secondary mb-6">
-              <span className="font-bold text-green-400">
+            <p className="text-gray-600 dark:text-gray-300 mb-6 font-medium">
+              <span className="font-bold text-teal-600 dark:text-teal-400">
                 {importResult.succeeded} subjects
               </span>{" "}
               and{" "}
-              <span className="font-bold text-cyan-400">
+              <span className="font-bold text-cyan-600 dark:text-cyan-400">
                 {importResult.totalSlots} schedule slots
               </span>{" "}
               imported successfully
             </p>
 
             {importResult.failed > 0 && (
-              <div className="glass rounded-xl p-3 mb-6 border-yellow-500/30 inline-block">
-                <p className="text-xs text-yellow-400 font-bold">
+              <div className="rounded-2xl p-3 mb-6 bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 inline-block">
+                <p className="text-xs text-amber-700 dark:text-amber-300 font-bold">
                   ⚠ {importResult.failed} subjects could not be imported
                   (possibly duplicates or empty names)
                 </p>
@@ -697,13 +696,13 @@ export default function ImportPage() {
             <div className="flex gap-3 justify-center">
               <Link
                 href="/dashboard"
-                className="btn-gradient px-6 py-3 rounded-xl text-sm inline-flex items-center gap-2"
+                className="px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-teal-500 to-emerald-500 text-white inline-flex items-center gap-2 shadow-md shadow-teal-500/20 hover:shadow-lg transition"
               >
                 <BookOpen className="w-4 h-4" /> Go to Dashboard
               </Link>
               <Link
                 href="/subjects"
-                className="btn-ghost px-6 py-3 rounded-xl text-sm inline-flex items-center gap-2"
+                className="px-6 py-3 rounded-xl text-sm font-semibold border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 inline-flex items-center gap-2 transition"
               >
                 View Subjects
               </Link>
