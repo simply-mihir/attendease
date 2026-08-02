@@ -276,7 +276,7 @@ function ImportSubjectCard({
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-black text-text truncate">{subject.name}</p>
+        <p className="text-sm font-black text-text break-words">{subject.name}</p>
         <p className="text-xs font-bold text-text-muted">
           {semesterName ? `From ${semesterName}` : "Not assigned to any semester"}
           {subject._count?.attendanceRecords > 0 && ` · ${subject._count.attendanceRecords} records`}

@@ -168,7 +168,7 @@ export default function SubjectsPage() {
                 <Link href={`/subjects/${s.id}`} className="relative block flex-1">
                   {/* Row 1: Label + Icon */}
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wider truncate pr-2"
+                    <p className="text-[11px] font-bold uppercase tracking-wider break-words pr-2"
                       style={{ color: color.bg }}>
                       {s.name}
                     </p>

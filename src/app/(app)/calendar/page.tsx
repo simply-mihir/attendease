@@ -153,7 +153,7 @@ export default function CalendarPage() {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     return (
                       <div key={cls.id} className="rounded-lg border-2 px-2 py-1.5 mb-1 transition-all duration-150 cursor-pointer border-gray-200 bg-white shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: cls.subject?.colorHex || '#FF2D78' }}>
-                        <p className="text-xs font-bold text-[#1a1a2e] dark:text-white truncate">{cls.subject?.name}</p>
+                        <p className="text-xs font-bold text-[#1a1a2e] dark:text-white break-words">{cls.subject?.name}</p>
                         <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80]">{cls.startTime}</p>
                         {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full", STATUS_DOT[rec.status])} />}
                       </div>

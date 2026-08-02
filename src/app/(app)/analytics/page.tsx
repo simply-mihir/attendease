@@ -220,7 +220,7 @@ export default function AnalyticsPage() {
             {(dashboard.subjectsSummary || dashboard.subjects || []).map((s: any) => (
               <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
+                  <p className="font-bold text-sm text-[#1a1a2e] dark:text-white break-words">{s.name}</p>
                   <div className="h-2 w-full rounded-full bg-gray-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35] mt-2">
                     <div className={clsx("h-full rounded-full transition-all duration-500 shadow-[0_2px_0_0_rgba(0,0,0,0.2)]",
                       s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"

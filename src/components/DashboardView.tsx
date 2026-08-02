@@ -433,7 +433,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     >
                       <div className="w-2 h-10 rounded-full shadow-sm" style={{ backgroundColor: cls.colorHex }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{cls.subjectName}</p>
+                        <p className="font-bold text-sm text-[#1a1a2e] dark:text-white break-words">{cls.subjectName}</p>
                         <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] flex items-center gap-2 mt-0.5 font-medium">
                           <Clock className="w-3 h-3" /> {cls.startTime} - {cls.endTime}
                           {cls.room && <><MapPin className="w-3 h-3 ml-1" /> {cls.room}</>}
@@ -541,7 +541,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   <div className="relative">
                     {/* Row 1: Label + Icon */}
                     <div className="flex items-center justify-between mb-3 h-6">
-                      <div className="text-[11px] font-bold uppercase tracking-wider truncate pr-2 flex items-center"
+                      <div className="text-[11px] font-bold uppercase tracking-wider break-words pr-2 flex items-center"
                         style={{ color: color.bg }}>
                         {loading ? <FieldLoader size="sm" /> : s.name}
                       </div>
@@ -748,7 +748,7 @@ function ImportSubjectCard({
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{subject.name}</p>
+        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">{subject.name}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
           {semesterName ? `From ${semesterName}` : "Not assigned to any semester"}
           {subject._count?.attendanceRecords > 0 && ` · ${subject._count.attendanceRecords} records`}

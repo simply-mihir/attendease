@@ -19,6 +19,16 @@ interface AnalyticsChartsProps {
   pieData: { name: string; value: number; color: string; subjects?: string[] }[];
 }
 
+const CustomXAxisTick = ({ x, y, payload }: any) => {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#6b7280" fontSize={11} transform="rotate(-35)">
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
 export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsProps) {
   return (
     <div className="grid lg:grid-cols-3 gap-6">
@@ -34,7 +44,7 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={barData} margin={{ top: 5, right: 5, bottom: 80, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.15)" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6b7280" }} angle={-35} textAnchor="end" />
+              <XAxis dataKey="name" tick={<CustomXAxisTick />} interval={0} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#6b7280" }} />
               <Tooltip
                 formatter={(v: number) => [`${v}%`, "Attendance"]}
