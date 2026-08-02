@@ -121,7 +121,7 @@ export function FuturisticLoader({
 
         {/* Animated progress bar */}
         {showProgress && (
-          <div className="h-1 w-40 rounded-full bg-transparent overflow-hidden">
+          <div className="h-1 w-40 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-[#FF2D78] via-[#9b5de5] to-[#4361ee]"
               style={{ animation: "futuristicProgress 2s ease-in-out infinite" }}
