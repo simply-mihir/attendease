@@ -39,24 +39,24 @@ export default function OptimizerPage() {
     <PageTransition direction="up" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-gray-900 dark:text-white tracking-tight">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <div className="w-11 h-11 rounded-2xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center shadow-[0_3px_0_0_#038c67]">
             <Zap className="w-5 h-5 text-white" />
           </div>
           Smart Skip Optimizer
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 ml-[52px]">
+        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
           Find the safest classes to skip while staying above every subject&apos;s minimum
         </p>
       </div>
 
       {/* Controls */}
-      <div className="rounded-3xl p-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+      <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-bold text-gray-900 dark:text-white">
+          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white">
             How many classes do you want to skip?
           </label>
-          <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-xl px-3 py-0.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-200 dark:border-emerald-500/30">
+          <span className="text-[#06d6a0] font-black text-xl px-3.5 py-0.5 bg-[#06d6a0]/15 rounded-xl border-2 border-[#06d6a0]/40 shadow-[0_2px_0_0_#06d6a0]">
             {maxSkips}
           </span>
         </div>
@@ -66,9 +66,9 @@ export default function OptimizerPage() {
           max={15}
           value={maxSkips}
           onChange={(e) => setMaxSkips(parseInt(e.target.value))}
-          className="w-full accent-emerald-500 cursor-pointer"
+          className="w-full accent-[#06d6a0] cursor-pointer h-3 rounded-lg bg-gray-200 dark:bg-[#1f1f35]"
         />
-        <div className="flex justify-between text-xs font-semibold text-gray-400 dark:text-gray-500 mt-1">
+        <div className="flex justify-between text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80] mt-1.5">
           <span>1</span>
           <span>5</span>
           <span>10</span>
@@ -80,19 +80,19 @@ export default function OptimizerPage() {
       {result && !loading && (
         <div
           className={clsx(
-            "rounded-3xl p-5 flex items-center gap-4 border transition-all",
+            "card-3d p-5 flex items-center gap-4 transition-all",
             result.safeToSkipAll
-              ? "bg-teal-50/80 border-teal-200 dark:bg-teal-500/10 dark:border-teal-500/20"
-              : "bg-rose-50/80 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20"
+              ? "border-[#06d6a0] shadow-[0_6px_0_0_#06d6a0] bg-[#06d6a0]/10"
+              : "border-[#ef476f] shadow-[0_6px_0_0_#ef476f] bg-[#ef476f]/10"
           )}
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
         >
           <div
             className={clsx(
-              "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-md",
+              "w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2",
               result.safeToSkipAll
-                ? "bg-teal-500 text-white shadow-teal-500/20"
-                : "bg-rose-500 text-white shadow-rose-500/20"
+                ? "bg-[#06d6a0] border-[#038c67] text-white shadow-[0_3px_0_0_#038c67]"
+                : "bg-[#ef476f] border-[#cc1a42] text-white shadow-[0_3px_0_0_#cc1a42]"
             )}
           >
             {result.safeToSkipAll ? (
@@ -103,16 +103,16 @@ export default function OptimizerPage() {
           </div>
           <div>
             {result.safeToSkipAll ? (
-              <p className="text-sm font-bold text-teal-700 dark:text-teal-300 flex items-center gap-1.5">
+              <p className="text-sm font-black text-[#06d6a0] flex items-center gap-1.5">
                 <span>You can safely skip {result.totalSkipsUsed} classes this week!</span>
-                <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 inline" />
+                <Sparkles className="w-4 h-4 text-[#06d6a0] shrink-0 inline" />
               </p>
             ) : (
-              <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+              <p className="text-sm font-black text-[#ef476f]">
                 You can only safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes
               </p>
             )}
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
               Skips are distributed across subjects to maximize safety margin
             </p>
           </div>
@@ -123,12 +123,12 @@ export default function OptimizerPage() {
       {result && !loading && (
         <StaggerGrid className="space-y-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {result.recommendations.length === 0 ? (
-            <div className="rounded-3xl p-8 text-center bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08]">
-              <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center mx-auto mb-3 text-rose-500">
+            <div className="card-3d p-8 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[#ef476f]/15 border-2 border-[#ef476f]/30 flex items-center justify-center mx-auto mb-3 text-[#ef476f] shadow-[0_2px_0_0_#ef476f]">
                 <AlertTriangle className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">No Safe Skips Available</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto">
+              <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white mb-1">No Safe Skips Available</h3>
+              <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold max-w-md mx-auto">
                 All your subjects are too tight to skip any classes. Focus on attending!
               </p>
             </div>
@@ -136,21 +136,20 @@ export default function OptimizerPage() {
             result.recommendations.map((rec) => (
               <div
                 key={rec.subjectId}
-                className="rounded-3xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all"
+                className="card-3d p-5 transition-all hover:-translate-y-0.5"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-2.5 h-12 rounded-full"
+                      className="w-2.5 h-12 rounded-full shadow-sm"
                       style={{
-                        backgroundColor: rec.colorHex,
-                        boxShadow: `0 0 12px ${rec.colorHex}40`,
+                        backgroundColor: rec.colorHex || "#FF2D78",
                       }}
                     />
                     <div>
-                      <h3 className="font-extrabold text-gray-900 dark:text-white">{rec.subjectName}</h3>
-                      <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20">
-                        <Sparkles className="w-3 h-3 text-emerald-500" />
+                      <h3 className="font-black text-[#1a1a2e] dark:text-white">{rec.subjectName}</h3>
+                      <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-xl text-xs font-black bg-[#06d6a0]/15 text-[#06d6a0] border-2 border-[#06d6a0]/30 shadow-[0_2px_0_0_#06d6a0]">
+                        <Sparkles className="w-3 h-3 text-[#06d6a0]" />
                         Skip {rec.skipsAllocated} {rec.skipsAllocated === 1 ? "class" : "classes"}
                       </span>
                     </div>
@@ -161,44 +160,44 @@ export default function OptimizerPage() {
                         className={clsx(
                           "text-lg font-black",
                           rec.currentPct >= 75
-                            ? "text-teal-600 dark:text-teal-400"
+                            ? "text-[#06d6a0]"
                             : rec.currentPct >= 65
-                            ? "text-amber-500 dark:text-amber-400"
-                            : "text-rose-500 dark:text-rose-400"
+                            ? "text-[#ff6b35]"
+                            : "text-[#ef476f]"
                         )}
                       >
                         {rec.currentPct}%
                       </p>
-                      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Current</p>
+                      <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Current</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                    <ArrowRight className="w-4 h-4 text-[#4a4a5a] dark:text-[#6b6b80]" />
                     <div className="text-right">
                       <p
                         className={clsx(
                           "text-lg font-black",
                           rec.newStatus === "green"
-                            ? "text-teal-600 dark:text-teal-400"
+                            ? "text-[#06d6a0]"
                             : rec.newStatus === "yellow"
-                            ? "text-amber-500 dark:text-amber-400"
-                            : "text-rose-500 dark:text-rose-400"
+                            ? "text-[#ff6b35]"
+                            : "text-[#ef476f]"
                         )}
                       >
                         {rec.newPct}%
                       </p>
-                      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">After</p>
+                      <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">After</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Progress bars */}
                 <div className="space-y-1.5">
-                  <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-gray-200 dark:bg-[#1f1f35] rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+                      className="h-full rounded-full bg-[#06d6a0] transition-all duration-500"
                       style={{ width: `${Math.min(100, rec.newPct)}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                     <span>
                       {rec.remainingBuffer > 0
                         ? `${rec.remainingBuffer} more skips available`
@@ -206,12 +205,12 @@ export default function OptimizerPage() {
                     </span>
                     <span
                       className={clsx(
-                        "font-bold",
+                        "font-black",
                         rec.newStatus === "green"
-                          ? "text-teal-600 dark:text-teal-400"
+                          ? "text-[#06d6a0]"
                           : rec.newStatus === "yellow"
-                          ? "text-amber-500 dark:text-amber-400"
-                          : "text-rose-500 dark:text-rose-400"
+                          ? "text-[#ff6b35]"
+                          : "text-[#ef476f]"
                       )}
                     >
                       {rec.newStatus === "green"

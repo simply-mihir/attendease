@@ -22,49 +22,47 @@
 
 @layer base {
   :root {
-    /* Light Mode Palette (White + Vibrant Pop) */
-    --page-bg: #ffffff;
-    --sidebar-bg: #f9fafb;
+    /* Light Mode Palette (Warm White + 3D Raised Pop) */
+    --page-bg: #fafafa;
+    --sidebar-bg: #f3f4f6;
     --card-bg: #ffffff;
     
     --color-surface: #ffffff;
-    --color-surface-2: #f9fafb;
-    --color-surface-3: #f3f4f6;
+    --color-surface-2: #f3f4f6;
+    --color-surface-3: #e5e7eb;
     
     --color-border: #e5e7eb;
     --color-border-heavy: #d1d5db;
-    --color-shadow-heavy: rgba(0, 0, 0, 0.08);
+    --color-shadow-3d: #d1d5db;
     
-    --color-text: #111827;
-    --color-text-secondary: #4b5563;
-    --color-text-muted: #6b7280;
+    --color-text: #1a1a2e;
+    --color-text-secondary: #4a4a5a;
+    --color-text-muted: #9ca3af;
     
-    --color-glass: #ffffff;
-    --color-glass-strong: #ffffff;
-    --color-glass-border: #e5e7eb;
+    --color-primary-pop: #FF2D78;
+    --color-primary-shadow: #cc1a5e;
   }
 
   .dark {
-    /* Dark Mode Palette (Deep Navy #0a0e1a + Neon Glow) */
+    /* Dark Mode Palette (Deep Space Navy #0a0e1a + 3D Dark Panel #141425) */
     --page-bg: #0a0e1a;
     --sidebar-bg: #070b14;
-    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-bg: #141425;
     
-    --color-surface: #0a0e1a;
+    --color-surface: #141425;
     --color-surface-2: #070b14;
-    --color-surface-3: #111827;
+    --color-surface-3: #1a1a2e;
     
-    --color-border: rgba(255, 255, 255, 0.08);
-    --color-border-heavy: rgba(255, 255, 255, 0.15);
-    --color-shadow-heavy: rgba(0, 0, 0, 0.5);
+    --color-border: #2a2a3d;
+    --color-border-heavy: #3a3a52;
+    --color-shadow-3d: #0d0d1a;
     
-    --color-text: #f9fafb;
-    --color-text-secondary: #9ca3af;
-    --color-text-muted: #6b7280;
+    --color-text: #ffffff;
+    --color-text-secondary: #c4c4d4;
+    --color-text-muted: #6b6b80;
     
-    --color-glass: rgba(255, 255, 255, 0.04);
-    --color-glass-strong: #111827;
-    --color-glass-border: rgba(255, 255, 255, 0.08);
+    --color-primary-pop: #FF2D78;
+    --color-primary-shadow: #b81e56;
   }
 }
 
@@ -74,7 +72,7 @@ body {
   background-color: var(--page-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Backgrounds — light: clean gray-50 / dark: deep dark */
@@ -87,57 +85,54 @@ html.dark .bg-mesh-strong {
 }
 
 /* ===== GLASS CARDS — Dual Mode ===== */
-.glass {
-  background: #ffffff;
-  border: 1px solid #e5e7eb; /* gray-200 */
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+/* ===== 3D RAISED UTILITIES — Dual Mode ===== */
+.card-3d {
   border-radius: 1rem;
-}
-html.dark .glass {
-  background: rgb(255 255 255 / 0.03);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  box-shadow: none;
-  backdrop-filter: blur(20px);
-}
-
-.glass-card {
+  border-width: 2px;
+  border-color: #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: 0 6px 0 0 #d1d5db;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+.card-3d:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 0 #d1d5db;
 }
-html.dark .glass-card:hover {
-  box-shadow: 0 8px 25px rgb(139 92 246 / 0.08);
+.card-3d:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 0 #d1d5db;
 }
-.glass-card:active {
-  transform: translateY(0);
+html.dark .card-3d {
+  border-color: #2a2a3d;
+  background-color: #141425;
+  box-shadow: 0 6px 0 0 #0d0d1a;
 }
-
-.glass-strong {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
-  border-radius: 1rem;
+html.dark .card-3d:hover {
+  box-shadow: 0 4px 0 0 #0d0d1a;
 }
-html.dark .glass-strong {
-  background: #111827; /* gray-900 */
-  border: 1px solid rgb(255 255 255 / 0.08);
-  box-shadow: none;
+html.dark .card-3d:active {
+  box-shadow: 0 2px 0 0 #0d0d1a;
 }
 
-.glass-glow {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+.glass, .glass-card, .glass-strong {
   border-radius: 1rem;
+  border-width: 2px;
+  border-color: #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: 0 6px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
-html.dark .glass-glow {
-  background: rgb(255 255 255 / 0.03);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  box-shadow: 0 0 20px rgb(139 92 246 / 0.06);
-  backdrop-filter: blur(20px);
+.glass:hover, .glass-card:hover, .glass-strong:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 0 #d1d5db;
+}
+html.dark .glass, html.dark .glass-card, html.dark .glass-strong {
+  border-color: #2a2a3d;
+  background-color: #141425;
+  box-shadow: 0 6px 0 0 #0d0d1a;
+}
+html.dark .glass:hover, html.dark .glass-card:hover, html.dark .glass-strong:hover {
+  box-shadow: 0 4px 0 0 #0d0d1a;
 }
 
 /* Glass border helper */
@@ -145,111 +140,100 @@ html.dark .glass-glow {
   border-color: #e5e7eb;
 }
 html.dark .border-glass-border {
-  border-color: rgb(255 255 255 / 0.08);
+  border-color: #2a2a3d;
 }
 
-/* ===== BUTTONS — Dual Mode ===== */
-.btn-gradient {
-  background: linear-gradient(135deg, #7c3aed, #8b5cf6, #6366f1);
-  color: white;
+/* ===== 3D BUTTONS — Dual Mode ===== */
+.btn-gradient, .btn-3d-primary {
+  background-color: #FF2D78;
+  color: #ffffff;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  border: none;
+  border-width: 2px;
+  border-color: #cc1a5e;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 14px rgb(124 58 237 / 0.25);
+  box-shadow: 0 4px 0 0 #cc1a5e;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-gradient:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgb(124 58 237 / 0.35);
+.btn-gradient:hover, .btn-3d-primary:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #cc1a5e;
 }
-.btn-gradient:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgb(124 58 237 / 0.2);
+.btn-gradient:active, .btn-3d-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #cc1a5e;
 }
-
-.btn-gradient-cyan {
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
-  color: white;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  border: none;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 14px rgb(6 182 212 / 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+html.dark .btn-gradient, html.dark .btn-3d-primary {
+  border-color: #b81e56;
+  box-shadow: 0 4px 0 0 #b81e56;
 }
-.btn-gradient-cyan:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgb(6 182 212 / 0.35);
+html.dark .btn-gradient:hover, html.dark .btn-3d-primary:hover {
+  box-shadow: 0 2px 0 0 #b81e56;
 }
-.btn-gradient-cyan:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgb(6 182 212 / 0.2);
+html.dark .btn-gradient:active, html.dark .btn-3d-primary:active {
+  box-shadow: 0 1px 0 0 #b81e56;
 }
 
-.btn-ghost {
-  background: #f9fafb;
-  color: #374151;
+.btn-ghost, .btn-3d-ghost {
+  background-color: #ffffff;
+  color: #4a4a5a;
   font-weight: 600;
-  border: 1px solid #e5e7eb;
+  border-width: 2px;
+  border-color: #e5e7eb;
   border-radius: 0.75rem;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
-html.dark .btn-ghost {
-  background: rgb(255 255 255 / 0.05);
-  color: #d1d5db;
-  border: 1px solid rgb(255 255 255 / 0.1);
-  box-shadow: none;
+.btn-ghost:hover, .btn-3d-ghost:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #d1d5db;
+  color: #1a1a2e;
 }
-.btn-ghost:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+.btn-ghost:active, .btn-3d-ghost:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #d1d5db;
 }
-html.dark .btn-ghost:hover {
-  background: rgb(255 255 255 / 0.1);
-  border-color: rgb(139 92 246 / 0.2);
+html.dark .btn-ghost, html.dark .btn-3d-ghost {
+  background-color: #141425;
+  color: #c4c4d4;
+  border-color: #2a2a3d;
+  box-shadow: 0 4px 0 0 #0d0d1a;
+}
+html.dark .btn-ghost:hover, html.dark .btn-3d-ghost:hover {
+  box-shadow: 0 2px 0 0 #0d0d1a;
+  color: #ffffff;
+}
+html.dark .btn-ghost:active, html.dark .btn-3d-ghost:active {
+  box-shadow: 0 1px 0 0 #0d0d1a;
 }
 
 /* ===== TEXT — Dual Mode ===== */
 .text-gradient {
-  color: #7c3aed;
+  color: #FF2D78;
   font-weight: 800;
 }
 html.dark .text-gradient {
-  background: linear-gradient(135deg, #a78bfa, #818cf8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FF2D78;
   font-weight: 800;
-}
-
-.text-gradient-warm {
-  color: #db2777;
-  font-weight: 800;
-}
-html.dark .text-gradient-warm {
-  color: #f472b6;
 }
 
 /* Text color helpers */
 .text-text {
-  color: #111827;
+  color: #1a1a2e;
 }
 html.dark .text-text {
-  color: #f3f4f6;
+  color: #ffffff;
 }
 .text-text-secondary {
-  color: #6b7280;
+  color: #4a4a5a;
 }
 html.dark .text-text-secondary {
-  color: #9ca3af;
+  color: #c4c4d4;
 }
 .text-text-muted {
   color: #9ca3af;
 }
 html.dark .text-text-muted {
-  color: #6b7280;
+  color: #6b6b80;
 }
 
 /* Surface color helpers */
@@ -257,37 +241,37 @@ html.dark .text-text-muted {
   background: #f3f4f6;
 }
 html.dark .bg-surface-3 {
-  background: #1f2937;
+  background: #141425;
 }
 
-/* ===== INPUT — Dual Mode ===== */
-.input-glass {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-  color: #111827;
+/* ===== 3D INSET INPUT — Dual Mode ===== */
+.input-glass, .input-3d {
+  background-color: #fafafa;
+  border-width: 2px;
+  border-color: #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #1a1a2e;
   font-weight: 500;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
 }
-html.dark .input-glass {
-  background: rgb(255 255 255 / 0.05);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  color: #f3f4f6;
-  box-shadow: none;
-}
-.input-glass::placeholder { color: #9ca3af; font-weight: 400; }
-html.dark .input-glass::placeholder { color: #6b7280; }
-.input-glass:focus {
+.input-glass::placeholder, .input-3d::placeholder { color: #9ca3af; font-weight: 400; }
+.input-glass:focus, .input-3d:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgb(124 58 237 / 0.15);
+  border-color: #FF2D78;
+  box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.2);
 }
-html.dark .input-glass:focus {
-  border-color: rgb(139 92 246 / 0.5);
-  box-shadow: 0 0 0 3px rgb(139 92 246 / 0.1);
+html.dark .input-glass, html.dark .input-3d {
+  background-color: #0d0d1a;
+  border-color: #2a2a3d;
+  color: #ffffff;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+html.dark .input-glass::placeholder, html.dark .input-3d::placeholder { color: #6b6b80; }
+html.dark .input-glass:focus, html.dark .input-3d:focus {
+  border-color: #FF2D78;
+  box-shadow: 0 0 0 3px rgba(255, 45, 120, 0.2);
 }
 
 /* Status colors (Solid badges) */
@@ -327,14 +311,16 @@ html.dark ::-webkit-scrollbar-thumb:hover { background: rgb(255 255 255 / 0.25);
 
 /* Sidebar active item */
 .nav-active {
-  background: #ede9fe; /* purple-100 */
-  color: #6d28d9; /* purple-700 */
-  font-weight: 600;
+  background: rgba(255, 45, 120, 0.1);
+  color: #FF2D78;
+  font-weight: 700;
   border-radius: 0.75rem;
+  box-shadow: 0 3px 0 0 #fecdd3;
 }
 html.dark .nav-active {
-  background: rgb(139 92 246 / 0.1);
-  color: #a78bfa; /* purple-400 */
+  background: rgba(255, 45, 120, 0.1);
+  color: #FF2D78;
+  box-shadow: 0 3px 0 0 #3a1020;
 }
 
 /* Select element styling */

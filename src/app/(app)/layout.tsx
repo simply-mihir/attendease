@@ -62,28 +62,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <ProfileProvider>
     <NavigationProgress />
     <SWRPrefetcher />
-    <div className="min-h-screen flex bg-white dark:bg-[#0a0e1a]">
+    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#0a0e1a]">
       <OnboardingModal />
 
       {/* Sidebar */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-40 w-[260px] flex flex-col transition-transform lg:translate-x-0 lg:static",
-        "bg-gray-50 border-r border-gray-200 dark:bg-[#070b14] dark:border-white/[0.06]",
+        "bg-[#f3f4f6] border-r-2 border-gray-200 dark:bg-[#070b14] dark:border-[#2a2a3d]",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex items-center justify-between px-5 py-5 border-b border-gray-200 dark:border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-5 border-b-2 border-gray-200 dark:border-[#2a2a3d]">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <div className="w-9 h-9 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shadow-[0_3px_0_0_#cc1a5e]">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-violet-600 dark:text-violet-400">AttendEase</span>
+            <span className="text-lg font-black tracking-tight text-[#FF2D78]">AttendEase</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
@@ -91,38 +91,38 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 onMouseEnter={() => item.prefetchKey && preload(item.prefetchKey, fetcher)}
                 onTouchStart={() => item.prefetchKey && preload(item.prefetchKey, fetcher)}
                 className={clsx(
-                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150",
                   active
-                    ? "bg-violet-100 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-white"
+                    ? "bg-[#FF2D78]/10 text-[#FF2D78] shadow-[0_3px_0_0_#fecdd3] dark:shadow-[0_3px_0_0_#3a1020] border border-[#FF2D78]/20"
+                    : "text-[#4a4a5a] hover:bg-gray-200/60 hover:text-[#1a1a2e] dark:text-[#6b6b80] dark:hover:bg-white/[0.04] dark:hover:text-white"
                 )}>
                 <div className={clsx(
                   "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
                   active
-                    ? `bg-gradient-to-br ${item.gradient} shadow-md`
-                    : "bg-gray-100 dark:bg-white/5"
+                    ? `bg-gradient-to-br ${item.gradient} shadow-sm text-white`
+                    : "bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/5"
                 )}>
-                  <item.icon className={clsx("w-4 h-4", active ? "text-white" : "text-gray-400 dark:text-gray-500")} />
+                  <item.icon className={clsx("w-4 h-4", active ? "text-white" : "text-gray-500 dark:text-gray-400")} />
                 </div>
                 {item.label}
-                {active && <ChevronRight className="w-4 h-4 ml-auto text-violet-600 dark:text-violet-400" />}
+                {active && <ChevronRight className="w-4 h-4 ml-auto text-[#FF2D78]" />}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-gray-200 dark:border-white/[0.06]">
+        <div className="p-3 border-t-2 border-gray-200 dark:border-[#2a2a3d]">
           <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-violet-500/20">
+            <div className="w-9 h-9 rounded-xl bg-[#FF2D78] border border-[#cc1a5e] flex items-center justify-center text-white font-black text-sm shadow-[0_2px_0_0_#cc1a5e]">
               {(user.name || user.email || "U").charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate text-gray-900 dark:text-white">{user.name || "Student"}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+              <p className="text-sm font-bold truncate text-[#1a1a2e] dark:text-white">{user.name || "Student"}</p>
+              <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] truncate">{user.email}</p>
             </div>
           </div>
           <button onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition">
+            className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#4a4a5a] hover:bg-rose-50 hover:text-rose-600 dark:text-[#6b6b80] dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition cursor-pointer">
             <LogOut className="w-4 h-4" /> Sign out
           </button>
         </div>
@@ -134,10 +134,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#0a0e1a]">
-        <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/80 dark:bg-[#0a0e1a]/80 backdrop-blur-md border-b border-gray-200 dark:border-white/[0.06]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#fafafa] dark:bg-[#0a0e1a]">
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/90 dark:bg-[#0a0e1a]/90 backdrop-blur-md border-b-2 border-gray-200 dark:border-[#2a2a3d]">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition lg:hidden">
+            <button onClick={() => setSidebarOpen(true)} className="text-[#4a4a5a] hover:text-[#1a1a2e] dark:text-[#6b6b80] dark:hover:text-white transition lg:hidden">
               <Menu className="w-6 h-6" />
             </button>
             <ProfileSwitcher />
@@ -145,7 +145,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-white dark:bg-[#0a0e1a]">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[#fafafa] dark:bg-[#0a0e1a]">
           <ReminderNotifier />
           <div key={pathname} className="animate-fade-in">
             {children}

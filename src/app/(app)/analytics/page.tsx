@@ -34,13 +34,13 @@ export default function AnalyticsPage() {
   const barData = dashboard.subjectsSummary.map((s: any) => ({
     name: s.name,
     percentage: s.currentPercentage,
-    fill: s.statusColor === "green" ? "#22c55e" : s.statusColor === "yellow" ? "#f59e0b" : "#ef4444",
+    fill: s.statusColor === "green" ? "#06d6a0" : s.statusColor === "yellow" ? "#ff6b35" : "#ef476f",
   }));
 
   const pieData = [
-    { name: "Safe", value: dashboard.safeSubjects, color: "#22c55e", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "green").map((s: any) => s.name) },
-    { name: "Warning", value: dashboard.warningSubjects, color: "#f59e0b", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "yellow").map((s: any) => s.name) },
-    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef4444", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "red").map((s: any) => s.name) },
+    { name: "Safe", value: dashboard.safeSubjects, color: "#06d6a0", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "green").map((s: any) => s.name) },
+    { name: "Warning", value: dashboard.warningSubjects, color: "#ff6b35", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "yellow").map((s: any) => s.name) },
+    { name: "Danger", value: dashboard.dangerSubjects, color: "#ef476f", subjects: dashboard.subjectsSummary.filter((s: any) => s.statusColor === "red").map((s: any) => s.name) },
   ].filter((d) => d.value > 0);
 
   // Build heatmap grid (GitHub-style)
@@ -68,42 +68,42 @@ export default function AnalyticsPage() {
 
   return (
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
+      <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         Analytics
       </h1>
 
       {/* Overview cards */}
       <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4" delay={100} staggerDelay={80} animation="flipIn">
-        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.07] text-center">
-          <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 flex items-center justify-center mx-auto mb-2.5">
+        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1">
+          <div className="w-10 h-10 rounded-2xl bg-[#7b2cbf]/15 text-[#7b2cbf] dark:text-[#c77dff] border-2 border-[#7b2cbf]/30 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#7b2cbf]">
             <TrendingUp className="w-5 h-5" />
           </div>
-          <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{dashboard.overallPct}%</p>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Overall Attendance</p>
+          <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">{dashboard.overallPct}%</p>
+          <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Overall Attendance</p>
         </div>
 
-        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.07] text-center">
-          <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400 flex items-center justify-center mx-auto mb-2.5">
+        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0]">
+          <div className="w-10 h-10 rounded-2xl bg-[#06d6a0]/15 text-[#06d6a0] border-2 border-[#06d6a0]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#06d6a0]">
             <ShieldCheck className="w-5 h-5" />
           </div>
-          <p className="text-3xl font-extrabold text-teal-600 dark:text-teal-400 tracking-tight">{dashboard.safeSubjects}</p>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Safe Subjects</p>
+          <p className="text-3xl font-black text-[#06d6a0] tracking-tight">{dashboard.safeSubjects}</p>
+          <p className="text-xs font-bold text-[#06d6a0] mt-0.5">Safe Subjects</p>
         </div>
 
-        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.07] text-center">
-          <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 flex items-center justify-center mx-auto mb-2.5">
+        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f]">
+          <div className="w-10 h-10 rounded-2xl bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#ef476f]">
             <ShieldAlert className="w-5 h-5" />
           </div>
-          <p className="text-3xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight">{dashboard.dangerSubjects}</p>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">In Danger</p>
+          <p className="text-3xl font-black text-[#ef476f] tracking-tight">{dashboard.dangerSubjects}</p>
+          <p className="text-xs font-bold text-[#ef476f] mt-0.5">In Danger</p>
         </div>
 
-        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.07] text-center">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 flex items-center justify-center mx-auto mb-2.5">
+        <div className="card-3d p-5 text-center transition-all hover:-translate-y-1 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35]">
+          <div className="w-10 h-10 rounded-2xl bg-[#ff6b35]/15 text-[#ff6b35] border-2 border-[#ff6b35]/40 flex items-center justify-center mx-auto mb-2.5 shadow-[0_2px_0_0_#ff6b35]">
             <Flame className="w-5 h-5" />
           </div>
-          <p className="text-3xl font-extrabold text-amber-600 dark:text-amber-400 tracking-tight">{dashboard.currentStreak}</p>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Day Streak</p>
+          <p className="text-3xl font-black text-[#ff6b35] tracking-tight">{dashboard.currentStreak}</p>
+          <p className="text-xs font-bold text-[#ff6b35] mt-0.5">Day Streak</p>
         </div>
       </StaggerGrid>
 
@@ -113,8 +113,8 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Heatmap */}
-      <div className="rounded-2xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
-        <h3 className="font-bold mb-4 text-gray-900 dark:text-white">Attendance Heatmap — {year}</h3>
+      <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
+        <h3 className="font-black mb-4 text-base text-[#1a1a2e] dark:text-white">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-1" style={{ minWidth: "700px" }}>
             {weeks.map((week, wi) => (
@@ -122,13 +122,13 @@ export default function AnalyticsPage() {
                 {week.map((day, di) => (
                   <div key={di}
                     className={clsx(
-                      "w-3.5 h-3.5 rounded-sm transition-all",
+                      "w-3.5 h-3.5 rounded-md transition-all",
                       day.intensity === -1 ? "opacity-0" : "",
-                      day.intensity === 0 ? "bg-gray-100 dark:bg-white/5" :
-                      day.intensity === 1 ? "bg-rose-500 shadow-xs shadow-rose-500/20" :
-                      day.intensity === 2 ? "bg-amber-500 shadow-xs shadow-amber-500/20" :
-                      day.intensity === 3 ? "bg-emerald-400 shadow-xs shadow-emerald-400/20" :
-                      day.intensity === 4 ? "bg-teal-500 shadow-xs shadow-teal-500/20" : "transparent"
+                      day.intensity === 0 ? "bg-gray-200 dark:bg-[#1f1f35]" :
+                      day.intensity === 1 ? "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" :
+                      day.intensity === 2 ? "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" :
+                      day.intensity === 3 ? "bg-[#00f5d4] shadow-[0_2px_0_0_#00c4a7]" :
+                      day.intensity === 4 ? "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" : "transparent"
                     )}
                     title={day.date ? `${day.date}: ${["No class","Missed","Mixed","Mostly present","Perfect"][day.intensity] || ""}` : ""}
                   />
@@ -136,38 +136,38 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-4 text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
             <span>Less</span>
-            <div className="w-3.5 h-3.5 rounded-sm bg-gray-100 dark:bg-white/5" />
-            <div className="w-3.5 h-3.5 rounded-sm bg-rose-500" />
-            <div className="w-3.5 h-3.5 rounded-sm bg-amber-500" />
-            <div className="w-3.5 h-3.5 rounded-sm bg-emerald-400" />
-            <div className="w-3.5 h-3.5 rounded-sm bg-teal-500" />
+            <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#ff6b35]" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#00f5d4]" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#06d6a0]" />
             <span>More</span>
           </div>
         </div>
       </div>
 
       {/* Per-subject details */}
-      <div className="rounded-2xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-        <h3 className="font-bold mb-4 text-gray-900 dark:text-white">Subject Breakdown</h3>
+      <div className="card-3d p-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
+        <h3 className="font-black mb-4 text-base text-[#1a1a2e] dark:text-white">Subject Breakdown</h3>
         <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
           {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="flex items-center gap-4 p-3.5 bg-gray-50/80 border border-gray-100 dark:border-white/5 dark:bg-white/[0.03] rounded-xl hover:bg-gray-100/80 dark:hover:bg-white/[0.06] transition">
-              <div className="w-2.5 h-8 rounded-full" style={{ backgroundColor: s.colorHex }} />
+            <div key={s.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition">
+              <div className="w-2.5 h-8 rounded-full shadow-sm" style={{ backgroundColor: s.colorHex || "#FF2D78" }} />
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{s.name}</p>
-                <div className="h-2 bg-gray-200/70 dark:bg-white/10 rounded-full mt-1.5 overflow-hidden">
+                <p className="font-black text-sm text-[#1a1a2e] dark:text-white truncate">{s.name}</p>
+                <div className="h-2.5 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-1.5 overflow-hidden">
                   <div className={clsx("h-full rounded-full transition-all duration-500",
-                    s.statusColor === "green" ? "bg-gradient-to-r from-teal-500 to-emerald-400" : s.statusColor === "yellow" ? "bg-gradient-to-r from-orange-500 to-amber-400" : "bg-gradient-to-r from-rose-500 to-pink-400"
+                    s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
                   )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
                 </div>
               </div>
               <div className="text-right">
-                <span className={clsx("text-sm font-extrabold",
-                  s.statusColor === "green" ? "text-teal-600 dark:text-teal-400" : s.statusColor === "yellow" ? "text-orange-600 dark:text-orange-400" : "text-rose-600 dark:text-rose-400"
+                <span className={clsx("text-sm font-black",
+                  s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
                 )}>{s.currentPercentage}%</span>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
                   {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
                 </p>
               </div>

@@ -38,43 +38,43 @@ export default function ExportPage() {
 
   return (
     <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
-      <Link href="/settings" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-medium transition cursor-pointer" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
+      <Link href="/settings" className="btn-3d-secondary inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-black cursor-pointer" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
 
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-gray-900 dark:text-white tracking-tight">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <div className="w-11 h-11 rounded-2xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center shadow-[0_3px_0_0_#038c67]">
             <Download className="w-5 h-5 text-white" />
           </div>
           Export Data
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 ml-[52px]">
+        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
           Download your attendance logs as a CSV spreadsheet
         </p>
       </div>
 
-      <div className="rounded-3xl p-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-5 transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+      <div className="card-3d p-6 space-y-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <div>
-          <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Subject</label>
+          <label className="block text-sm font-black text-[#1a1a2e] dark:text-white mb-2">Subject</label>
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="input-3d"
           >
             <option value="all">All Subjects</option>
             {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
 
-        <div className="p-4 bg-emerald-50/60 dark:bg-emerald-500/10 rounded-2xl border border-emerald-200/80 dark:border-emerald-500/20">
+        <div className="p-4 bg-[#06d6a0]/10 rounded-2xl border-2 border-[#06d6a0]/30 shadow-[0_2px_0_0_#06d6a0]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#06d6a0] border-2 border-[#038c67] flex items-center justify-center shadow-[0_2px_0_0_#038c67] shrink-0">
               <FileSpreadsheet className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold text-gray-900 dark:text-white">CSV Export</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Date, Subject, Code, Status, Notes, Marked At</p>
+              <p className="font-black text-[#1a1a2e] dark:text-white">CSV Export</p>
+              <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Date, Subject, Code, Status, Notes, Marked At</p>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function ExportPage() {
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm shadow-md shadow-emerald-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+          className="btn-3d-success w-full py-3.5 font-black text-sm cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
         >
           <Download className="w-5 h-5" />
           {exporting ? "Exporting..." : "Download CSV"}

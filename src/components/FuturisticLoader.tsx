@@ -152,25 +152,25 @@ export function FuturisticLoader({
           <div className="absolute inset-6 rounded-full border border-indigo-500/20" style={{ animation: "spinSlow 4s linear infinite" }}>
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-lg shadow-indigo-500/50" />
           </div>
-          <div className="absolute inset-9 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-violet-600 shadow-xl shadow-purple-500/30" style={{ animation: "breathe 2s ease-in-out infinite" }}>
+          <div className="absolute inset-9 flex items-center justify-center rounded-full bg-[#FF2D78] border-2 border-[#cc1a5e] shadow-[0_4px_0_0_#cc1a5e]" style={{ animation: "breathe 2s ease-in-out infinite" }}>
             <Icon className="h-6 w-6 text-white" />
           </div>
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 128 128" style={{ animation: "spinSlow 10s linear infinite" }}>
-            <circle cx="64" cy="64" r="62" fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="1" strokeDasharray="20 40" strokeLinecap="round" />
+            <circle cx="64" cy="64" r="62" fill="none" stroke="rgba(255,45,120,0.2)" strokeWidth="1" strokeDasharray="20 40" strokeLinecap="round" />
           </svg>
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 128 128" style={{ animation: "spinSlow 7s linear infinite reverse" }}>
-            <circle cx="64" cy="64" r="55" fill="none" stroke="rgba(167,139,250,0.1)" strokeWidth="1" strokeDasharray="15 30" strokeLinecap="round" />
+            <circle cx="64" cy="64" r="55" fill="none" stroke="rgba(255,45,120,0.15)" strokeWidth="1" strokeDasharray="15 30" strokeLinecap="round" />
           </svg>
         </div>
 
         {/* Title */}
         <div className="flex flex-col items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-wider" style={{ animation: "textReveal 1s ease-out forwards" }}>
-            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-black tracking-wider" style={{ animation: "textReveal 1s ease-out forwards" }}>
+            <span className="text-[#FF2D78]">
               ATTENDEASE
             </span>
           </h1>
-          <div className="h-px w-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent" style={{ animation: "lineExpand 1.5s ease-out 0.5s forwards" }} />
+          <div className="h-px w-0 bg-gradient-to-r from-transparent via-[#FF2D78] to-transparent" style={{ animation: "lineExpand 1.5s ease-out 0.5s forwards" }} />
         </div>
 
         {/* Status */}

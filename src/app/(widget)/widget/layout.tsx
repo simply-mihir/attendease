@@ -16,28 +16,28 @@ export default function WidgetLayout({ children }: { children: React.ReactNode }
 
   if (status === "loading" || !session?.user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mesh">
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#0a0e1a]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 animate-pulse-glow">
-            <GraduationCap className="w-7 h-7 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shadow-[0_4px_0_0_#cc1a5e] animate-pulse">
+            <GraduationCap className="w-6 h-6 text-white" />
           </div>
-          <p className="text-text-muted text-xs">Loading...</p>
+          <p className="text-[#9ca3af] dark:text-[#6b6b80] font-bold text-xs">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-mesh">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0a0e1a]">
       {/* Minimal header */}
-      <header className="glass border-b border-glass-border px-4 py-2.5 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md shadow-purple-500/20">
+      <header className="bg-white/80 dark:bg-[#141425]/80 backdrop-blur-md border-b-2 border-gray-200 dark:border-[#2a2a3d] px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shadow-[0_2px_0_0_#cc1a5e]">
             <GraduationCap className="w-4 h-4 text-white" />
           </div>
-          <span className="text-sm font-black text-gradient">AttendEase</span>
+          <span className="text-sm font-black text-[#1a1a2e] dark:text-white tracking-tight">AttendEase</span>
         </div>
-        <span className="text-xs text-text-muted font-semibold">
+        <span className="text-xs text-[#9ca3af] dark:text-[#6b6b80] font-bold">
           {new Date().toLocaleDateString("en-US", {
             weekday: "short",
             month: "short",

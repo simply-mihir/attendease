@@ -16,12 +16,12 @@ import { PageTransition } from "@/components/PageTransition";
 
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const STATUS_COLORS: Record<string, string> = {
-  present: "bg-teal-50 text-teal-700 border border-teal-200/60 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20",
-  absent: "bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20",
-  late: "bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
-  excused: "bg-purple-50 text-purple-700 border border-purple-200/60 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20",
-  cancelled: "bg-slate-100 text-slate-700 border border-slate-200/60 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20",
-  holiday: "bg-slate-100 text-slate-700 border border-slate-200/60 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20",
+  present: "bg-[#06d6a0]/15 text-[#06d6a0] border border-[#06d6a0]/40",
+  absent: "bg-[#ef476f]/15 text-[#ef476f] border border-[#ef476f]/40",
+  late: "bg-[#ff6b35]/15 text-[#ff6b35] border border-[#ff6b35]/40",
+  excused: "bg-[#7b2cbf]/15 text-[#7b2cbf] dark:text-[#c77dff] border border-[#7b2cbf]/40",
+  cancelled: "bg-slate-100 text-slate-700 border border-slate-200 dark:bg-[#1f1f35] dark:text-slate-400 dark:border-[#2a2a3d]",
+  holiday: "bg-slate-100 text-slate-700 border border-slate-200 dark:bg-[#1f1f35] dark:text-slate-400 dark:border-[#2a2a3d]",
 };
 
 export default function SubjectDetailPage({ params }: { params: { id: string } }) {
@@ -354,7 +354,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (stats.currentPercentage / 100) * circumference;
   const ringGradientId = `ring-gradient-${id}`;
-  const ringColor = stats.statusColor === "green" ? ["#10b981", "#059669"] : stats.statusColor === "yellow" ? ["#f59e0b", "#d97706"] : ["#f43f5e", "#e11d48"];
+  const ringColor = stats.statusColor === "green" ? ["#06d6a0", "#00f5d4"] : stats.statusColor === "yellow" ? ["#ff6b35", "#ffa62b"] : ["#ef476f", "#FF2D78"];
 
   return (
     <PageTransition direction="right" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-16">
@@ -362,20 +362,20 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <Link
           href="/subjects"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+          className="inline-flex items-center gap-2 text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] hover:text-[#1a1a2e] dark:hover:text-white transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Subjects
         </Link>
         <div className="flex items-center gap-2">
           <button
             onClick={openEditSubjectModal}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white border border-gray-200/60 shadow-sm text-gray-700 hover:bg-gray-50 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10 flex items-center gap-1.5 transition cursor-pointer"
+            className="btn-3d-secondary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <Edit2 className="w-3.5 h-3.5" /> Edit Subject
           </button>
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20 flex items-center gap-1.5 transition cursor-pointer"
+            className="btn-3d-coral px-3 py-1.5 text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" /> Delete
           </button>
@@ -384,19 +384,19 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Header Banner Card */}
       <div
-        className="rounded-3xl p-6 sm:p-7 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl"
+        className="card-3d p-6 sm:p-7"
         style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
       >
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-3.5 h-16 rounded-full shadow-md shrink-0" style={{ backgroundColor: subject.colorHex }} />
+            <div className="w-3.5 h-16 rounded-full shadow-md shrink-0" style={{ backgroundColor: subject.colorHex || "#FF2D78" }} />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{subject.name}</h1>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+              <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">{subject.name}</h1>
+              <p className="text-sm font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
                 {subject.code || "No code"} {subject.instructorName && `· ${subject.instructorName}`}
               </p>
               {subject.semester && (
-                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-lg text-xs font-black bg-[#7b2cbf]/15 text-[#7b2cbf] border border-[#7b2cbf]/40 dark:text-[#c77dff]">
                   {subject.semester.name}
                 </span>
               )}
@@ -411,7 +411,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                   <stop offset="100%" stopColor={ringColor[1]} />
                 </linearGradient>
               </defs>
-              <circle cx="50" cy="50" r={radius} fill="none" stroke="currentColor" className="text-gray-100 dark:text-white/[0.08]" strokeWidth="8" />
+              <circle cx="50" cy="50" r={radius} fill="none" stroke="currentColor" className="text-gray-100 dark:text-[#1f1f35]" strokeWidth="8" />
               <circle
                 cx="50"
                 cy="50"
@@ -427,7 +427,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={clsx("text-lg font-black", stats.statusColor === "green" ? "text-teal-600 dark:text-teal-400" : stats.statusColor === "yellow" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400")}>
+              <span className={clsx("text-lg font-black", stats.statusColor === "green" ? "text-[#06d6a0]" : stats.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]")}>
                 {stats.currentPercentage}%
               </span>
             </div>
@@ -436,25 +436,25 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
-          <div className="text-center p-3.5 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl">
-            <p className="text-2xl font-black text-gray-900 dark:text-white">{subject.totalClassesHeld}</p>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">Conducted</p>
+          <div className="text-center p-3.5 bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a]">
+            <p className="text-2xl font-black text-[#1a1a2e] dark:text-white">{subject.totalClassesHeld}</p>
+            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Conducted</p>
           </div>
-          <div className="text-center p-3.5 bg-teal-50 border border-teal-200/60 dark:bg-teal-500/10 dark:border-teal-500/20 rounded-2xl">
-            <p className="text-2xl font-black text-teal-700 dark:text-teal-400">{subject.totalPresent}</p>
-            <p className="text-xs font-semibold text-teal-600 dark:text-teal-400/80 mt-0.5">Present</p>
+          <div className="text-center p-3.5 bg-[#06d6a0]/10 border-2 border-[#06d6a0]/40 rounded-2xl shadow-[0_3px_0_0_#06d6a0]/30">
+            <p className="text-2xl font-black text-[#06d6a0]">{subject.totalPresent}</p>
+            <p className="text-xs font-extrabold text-[#06d6a0] mt-0.5">Present</p>
           </div>
-          <div className="text-center p-3.5 bg-rose-50 border border-rose-200/60 dark:bg-rose-500/10 dark:border-rose-500/20 rounded-2xl">
-            <p className="text-2xl font-black text-rose-700 dark:text-rose-400">{subject.totalAbsent}</p>
-            <p className="text-xs font-semibold text-rose-600 dark:text-rose-400/80 mt-0.5">Absent</p>
+          <div className="text-center p-3.5 bg-[#ef476f]/10 border-2 border-[#ef476f]/40 rounded-2xl shadow-[0_3px_0_0_#ef476f]/30">
+            <p className="text-2xl font-black text-[#ef476f]">{subject.totalAbsent}</p>
+            <p className="text-xs font-extrabold text-[#ef476f] mt-0.5">Absent</p>
           </div>
-          <div className="text-center p-3.5 bg-amber-50 border border-amber-200/60 dark:bg-amber-500/10 dark:border-amber-500/20 rounded-2xl">
-            <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{subject.totalLate}</p>
-            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400/80 mt-0.5">Late</p>
+          <div className="text-center p-3.5 bg-[#ff6b35]/10 border-2 border-[#ff6b35]/40 rounded-2xl shadow-[0_3px_0_0_#ff6b35]/30">
+            <p className="text-2xl font-black text-[#ff6b35]">{subject.totalLate}</p>
+            <p className="text-xs font-extrabold text-[#ff6b35] mt-0.5">Late</p>
           </div>
-          <div className="col-span-2 sm:col-span-1 text-center p-3.5 bg-slate-50 border border-slate-200/60 dark:bg-slate-500/10 dark:border-slate-500/20 rounded-2xl">
-            <p className="text-2xl font-black text-slate-700 dark:text-slate-400">{subject.totalCancelled || 0}</p>
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400/80 mt-0.5">Cancelled</p>
+          <div className="col-span-2 sm:col-span-1 text-center p-3.5 bg-gray-100 dark:bg-[#1f1f35] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a]">
+            <p className="text-2xl font-black text-[#1a1a2e] dark:text-[#c4c4d4]">{subject.totalCancelled || 0}</p>
+            <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Cancelled</p>
           </div>
         </div>
       </div>
@@ -463,90 +463,90 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       <div className="grid md:grid-cols-2 gap-4" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
         <div
           className={clsx(
-            "rounded-3xl p-6 bg-white border shadow-sm dark:bg-white/[0.04] dark:backdrop-blur-xl transition-all",
+            "card-3d p-6 transition-all",
             stats.isInDanger
-              ? "border-rose-200 dark:border-rose-500/30"
-              : "border-teal-200 dark:border-teal-500/30"
+              ? "border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f]"
+              : "border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0]"
           )}
         >
           <div className="flex items-center gap-3 mb-3">
             <div
               className={clsx(
-                "w-10 h-10 rounded-2xl flex items-center justify-center shadow-md",
+                "w-10 h-10 rounded-2xl flex items-center justify-center border-2",
                 stats.isInDanger
-                  ? "bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/20"
-                  : "bg-gradient-to-br from-teal-500 to-emerald-500 text-white shadow-teal-500/20"
+                  ? "bg-[#ef476f] border-[#cc1a42] text-white shadow-[0_3px_0_0_#9e1a38]"
+                  : "bg-[#06d6a0] border-[#04b082] text-white shadow-[0_3px_0_0_#038c67]"
               )}
             >
               {stats.isInDanger ? <XCircle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">
+              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">
                 {stats.isInDanger ? "Recovery Plan" : "Bunk Calculator"}
               </h3>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Target: {subject.minAttendancePct}%</p>
+              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Target: {subject.minAttendancePct}%</p>
             </div>
           </div>
-          <p className={clsx("text-4xl font-black mb-1", stats.isInDanger ? "text-rose-600 dark:text-rose-400" : "text-teal-600 dark:text-teal-400")}>
+          <p className={clsx("text-4xl font-black mb-1", stats.isInDanger ? "text-[#ef476f]" : "text-[#06d6a0]")}>
             {stats.isInDanger ? stats.mustAttendCount : stats.canSkipCount}
           </p>
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#c4c4d4]">
             {stats.isInDanger
               ? `consecutive classes needed to reach ${subject.minAttendancePct}%`
               : `classes you can safely skip while staying above ${subject.minAttendancePct}%`}
           </p>
-          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/10 text-xs font-medium text-gray-500 dark:text-gray-400 leading-relaxed">
+          <div className="mt-3 pt-3 border-t-2 border-gray-100 dark:border-[#2a2a3d] text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] leading-relaxed">
             {stats.reasoning}
           </div>
         </div>
 
-        <div className="rounded-3xl p-6 bg-white border border-amber-200/60 shadow-sm dark:bg-white/[0.04] dark:border-amber-500/20 dark:backdrop-blur-xl">
+        <div className="card-3d p-6 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35]">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center text-white shadow-[0_3px_0_0_#b84114]">
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Streak Stats</h3>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Consistent attendance momentum</p>
+              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Streak Stats</h3>
+              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Consistent attendance momentum</p>
             </div>
           </div>
-          <p className="text-4xl font-black text-amber-500 flex items-center gap-2 mb-1">
-            <Flame className="w-8 h-8 text-amber-500" /> {subject.streakCount} days
+          <p className="text-4xl font-black text-[#ff6b35] flex items-center gap-2 mb-1">
+            <Flame className="w-8 h-8 text-[#ff6b35]" /> {subject.streakCount} days
           </p>
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Best record: {subject.longestStreak} days</p>
+          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#c4c4d4]">Best record: {subject.longestStreak} days</p>
         </div>
       </div>
 
       {/* Quick Mark Attendance */}
       <div
-        className="rounded-3xl p-6 sm:p-7 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl"
+        className="card-3d p-6 sm:p-7"
         style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}
       >
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+          <div className="w-10 h-10 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center text-white shadow-[0_3px_0_0_#cc1a5e]">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Mark Attendance</h3>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Quickly record your status for any class session</p>
+            <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Mark Attendance</h3>
+            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Quickly record your status for any class session</p>
           </div>
         </div>
         <div className="flex gap-4 items-end flex-wrap sm:flex-nowrap">
           <div className="flex-1 min-w-[140px] w-full">
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Date</label>
+            <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
             <input
               type="date"
               value={markDate}
               onChange={(e) => setMarkDate(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+              className="input-3d w-full text-sm font-semibold"
             />
           </div>
           <div className="flex-1 min-w-[140px] w-full">
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Status</label>
+            <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Status</label>
             <select
               value={markStatus}
               onChange={(e) => setMarkStatus(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+              className="input-3d w-full text-sm font-semibold"
             >
               <option value="present">Present</option>
               <option value="absent">Absent</option>
@@ -558,7 +558,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <button
             onClick={handleMark}
             disabled={marking}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50 h-[42px] flex items-center justify-center shrink-0"
+            className="w-full sm:w-auto px-6 py-2.5 btn-3d-primary text-sm font-black h-[46px] flex items-center justify-center shrink-0 disabled:opacity-50"
           >
             {marking ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Attendance"}
           </button>
@@ -567,54 +567,54 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Schedule Section */}
       <div
-        className="rounded-3xl p-6 sm:p-7 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl"
+        className="card-3d p-6 sm:p-7"
         style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 200ms forwards" }}
       >
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-[#4361ee] border-2 border-[#2b44c4] flex items-center justify-center text-white shadow-[0_3px_0_0_#2b44c4]">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Weekly Schedule</h3>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Class timings and room venues</p>
+              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Weekly Schedule</h3>
+              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Class timings and room venues</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={openAddExtraClassModal}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100 dark:bg-cyan-500/10 dark:text-cyan-400 dark:border-cyan-500/20 flex items-center gap-1.5 transition cursor-pointer"
+              className="btn-3d-cyan px-3 py-1.5 text-xs font-black flex items-center gap-1.5 cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" /> Extra Class
             </button>
             <button
               onClick={openAddScheduleModal}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white border border-gray-200/60 text-gray-700 hover:bg-gray-50 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10 flex items-center gap-1.5 transition cursor-pointer"
+              className="btn-3d-secondary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> Add Slot
             </button>
           </div>
         </div>
         {subject.schedules?.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm py-6 text-center font-medium">No weekly schedule set yet.</p>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No weekly schedule set yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subject.schedules?.map((s: any) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl hover:border-purple-300 dark:hover:border-white/20 transition-all"
+                className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all"
               >
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20">
+                  <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-[#7b2cbf]/15 text-[#7b2cbf] border border-[#7b2cbf]/40 dark:text-[#c77dff]">
                     {DAYS[s.dayOfWeek]}
                   </span>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 font-mono">
-                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a1a2e] dark:text-white font-mono">
+                    <Clock className="w-3.5 h-3.5 text-[#6b6b80]" />
                     <span>{s.startTime} – {s.endTime}</span>
                   </div>
                   {s.room && (
-                    <div className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                    <div className="flex items-center gap-1 text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">
+                      <MapPin className="w-3.5 h-3.5 text-[#6b6b80]" />
                       <span>{s.room} {s.building && `(${s.building})`}</span>
                     </div>
                   )}
@@ -622,14 +622,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => openEditScheduleModal(s)}
-                    className="p-1.5 text-gray-400 hover:text-purple-600 dark:text-gray-500 dark:hover:text-purple-400 transition rounded-lg hover:bg-purple-50 dark:hover:bg-white/5 cursor-pointer"
+                    className="p-1.5 text-[#6b6b80] hover:text-[#FF2D78] transition rounded-lg hover:bg-gray-200 dark:hover:bg-white/5 cursor-pointer"
                     title="Edit slot"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteSchedule(s.id)}
-                    className="p-1.5 text-gray-400 hover:text-rose-600 dark:text-gray-500 dark:hover:text-rose-400 transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+                    className="p-1.5 text-[#6b6b80] hover:text-[#ef476f] transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
                     title="Delete slot"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -643,57 +643,57 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Subject Reminders & Tasks */}
       <div
-        className="rounded-3xl p-6 sm:p-7 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl"
+        className="card-3d p-6 sm:p-7"
         style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}
       >
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] text-white flex items-center justify-center shadow-[0_3px_0_0_#b84114]">
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Subject Reminders & Tasks</h3>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Assignments, tests & deadlines for {subject.name}</p>
+              <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Subject Reminders & Tasks</h3>
+              <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Assignments, tests & deadlines for {subject.name}</p>
             </div>
           </div>
           <button
             onClick={() => setShowSubjectReminderModal(true)}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30 flex items-center gap-1.5 transition cursor-pointer"
+            className="btn-3d-secondary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" /> Add Reminder
           </button>
         </div>
 
         {subjectReminders.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm py-6 text-center font-medium">No reminders for this subject yet.</p>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No reminders for this subject yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subjectReminders.map((rem: any) => (
               <div
                 key={rem.id}
                 className={clsx(
-                  "flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl transition-all hover:border-amber-300 dark:hover:border-white/20",
+                  "flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all",
                   rem.isCompleted && "opacity-50 line-through"
                 )}
               >
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     onClick={() => toggleSubjectReminder(rem.id, rem.isCompleted)}
-                    className="text-gray-400 hover:text-teal-600 dark:text-gray-500 dark:hover:text-teal-400 transition cursor-pointer"
+                    className="text-[#6b6b80] hover:text-[#06d6a0] transition cursor-pointer"
                   >
-                    {rem.isCompleted ? <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400" /> : <Circle className="w-4 h-4" />}
+                    {rem.isCompleted ? <CheckCircle2 className="w-4 h-4 text-[#06d6a0]" /> : <Circle className="w-4 h-4" />}
                   </button>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{rem.title}</span>
-                  <span className="text-xs font-mono text-amber-700 bg-amber-50 border border-amber-200 dark:text-amber-300 dark:bg-amber-500/10 dark:border-amber-500/20 px-2 py-0.5 rounded-md font-semibold">
+                  <span className="text-sm font-bold text-[#1a1a2e] dark:text-white">{rem.title}</span>
+                  <span className="text-xs font-mono text-[#ff6b35] bg-[#ff6b35]/15 border border-[#ff6b35]/40 px-2 py-0.5 rounded-lg font-bold">
                     {new Date(rem.dueDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                   </span>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400">
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg bg-gray-100 text-[#4a4a5a] dark:bg-white/5 dark:text-[#a0a0b0] border border-gray-200 dark:border-[#2a2a3d]">
                     {rem.category.replace("_", " ")}
                   </span>
                 </div>
                 <button
                   onClick={() => deleteSubjectReminder(rem.id)}
-                  className="p-1.5 text-gray-400 hover:text-rose-600 dark:text-gray-500 dark:hover:text-rose-400 transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+                  className="p-1.5 text-[#6b6b80] hover:text-[#ef476f] transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
                   title="Delete reminder"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -706,20 +706,20 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Attendance History */}
       <div
-        className="rounded-3xl p-6 sm:p-7 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl"
+        className="card-3d p-6 sm:p-7"
         style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}
       >
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white shadow-md shadow-pink-500/20">
+          <div className="w-10 h-10 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center text-white shadow-[0_3px_0_0_#cc1a5e]">
             <CalIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-extrabold text-base text-gray-900 dark:text-white">Recent Attendance Records</h3>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Detailed historical record of past classes</p>
+            <h3 className="font-black text-base text-[#1a1a2e] dark:text-white">Recent Attendance Records</h3>
+            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Detailed historical record of past classes</p>
           </div>
         </div>
         {subject.attendanceRecords?.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm py-6 text-center font-medium">No records logged yet.</p>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm py-6 text-center font-bold">No records logged yet.</p>
         ) : (
           <div className="space-y-2.5">
             {subject.attendanceRecords?.map((r: any) => {
@@ -727,36 +727,36 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               return (
                 <div
                   key={r.id}
-                  className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl hover:border-purple-300 dark:hover:border-white/20 transition-all"
+                  className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl transition-all"
                 >
                   <div className="flex items-center gap-3 flex-wrap">
-                    <CalIcon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                    <CalIcon className="w-4 h-4 text-[#6b6b80]" />
+                    <span className="text-sm font-bold text-[#1a1a2e] dark:text-gray-200">
                       {new Date(r.date).toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" })}
                     </span>
-                    <span className={clsx("px-2.5 py-0.5 rounded-full text-xs font-black capitalize", STATUS_COLORS[r.status])}>
+                    <span className={clsx("px-2.5 py-0.5 rounded-lg text-xs font-black capitalize", STATUS_COLORS[r.status])}>
                       {r.status}
                     </span>
                     {isExtraClass && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/30 flex items-center gap-1">
+                      <span className="px-2.5 py-0.5 rounded-lg text-xs font-black bg-[#00f5d4]/15 text-[#00f5d4] border border-[#00f5d4]/40 flex items-center gap-1">
                         <Zap className="w-3 h-3" /> Extra Class
                       </span>
                     )}
                     {r.notes && !isExtraClass && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400 italic">({r.notes})</span>
+                      <span className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] italic">({r.notes})</span>
                     )}
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditAttendanceModal(r)}
-                      className="p-1.5 text-gray-400 hover:text-purple-600 dark:text-gray-500 dark:hover:text-purple-400 transition rounded-lg hover:bg-purple-50 dark:hover:bg-white/5 cursor-pointer"
+                      className="p-1.5 text-[#6b6b80] hover:text-[#FF2D78] transition rounded-lg hover:bg-gray-200 dark:hover:bg-white/5 cursor-pointer"
                       title="Edit record"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => deleteRecord(r.id)}
-                      className="p-1.5 text-gray-400 hover:text-rose-600 dark:text-gray-500 dark:hover:text-rose-400 transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+                      className="p-1.5 text-[#6b6b80] hover:text-[#ef476f] transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
                       title="Delete record"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -772,45 +772,45 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       {/* Edit Subject Modal */}
       {showEditSubjectModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-white/10">
-            <h3 className="text-xl font-black text-gray-900 dark:text-white">Edit Subject</h3>
+          <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
+            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Edit Subject</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Subject Name</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject Name</label>
                 <input
                   type="text"
                   value={editSubjectData.name}
                   onChange={e => setEditSubjectData({...editSubjectData, name: e.target.value})}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Course Code (Optional)</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Course Code (Optional)</label>
                 <input
                   type="text"
                   value={editSubjectData.code}
                   onChange={e => setEditSubjectData({...editSubjectData, code: e.target.value})}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Instructor (Optional)</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Instructor (Optional)</label>
                 <input
                   type="text"
                   value={editSubjectData.instructorName}
                   onChange={e => setEditSubjectData({...editSubjectData, instructorName: e.target.value})}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Min. Attendance %</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Min. Attendance %</label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   value={editSubjectData.minAttendancePct}
                   onChange={e => setEditSubjectData({...editSubjectData, minAttendancePct: parseInt(e.target.value) || 0})}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
             </div>
@@ -818,7 +818,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button
                 type="button"
                 onClick={() => setShowEditSubjectModal(false)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -826,7 +826,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 type="button"
                 onClick={handleSaveSubject}
                 disabled={savingSubject}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+                className="btn-3d-primary flex-1 py-2.5 text-sm font-black disabled:opacity-50 cursor-pointer"
               >
                 {savingSubject ? "Saving..." : "Save Changes"}
               </button>
@@ -838,24 +838,24 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       {/* Edit Attendance Modal */}
       {editingRecord && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-white/10">
-            <h3 className="text-xl font-black text-gray-900 dark:text-white">Edit Record</h3>
+          <div className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
+            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Edit Record</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Date</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
                 <input
                   type="date"
                   value={editRecordDate}
                   onChange={e => setEditRecordDate(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Status</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Status</label>
                 <select
                   value={editRecordStatus}
                   onChange={e => setEditRecordStatus(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 >
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
@@ -869,7 +869,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button
                 type="button"
                 onClick={() => setEditingRecord(null)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -877,7 +877,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 type="button"
                 onClick={handleSaveAttendance}
                 disabled={savingRecord}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+                className="btn-3d-primary flex-1 py-2.5 text-sm font-black disabled:opacity-50 cursor-pointer"
               >
                 {savingRecord ? "Saving..." : "Save"}
               </button>
@@ -891,61 +891,61 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveSchedule}
-            className="rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-white/10"
+            className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
           >
-            <h3 className="text-xl font-black text-gray-900 dark:text-white">
+            <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">
               {scheduleMode === "add" ? "Add Schedule" : "Edit Schedule"}
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Day of Week</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Day of Week</label>
                 <select
                   value={scheduleForm.dayOfWeek}
                   onChange={e => setScheduleForm({ ...scheduleForm, dayOfWeek: Number(e.target.value) })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 >
                   {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Start Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Start Time</label>
                   <input
                     type="time"
                     value={scheduleForm.startTime}
                     onChange={e => setScheduleForm({ ...scheduleForm, startTime: e.target.value })}
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">End Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">End Time</label>
                   <input
                     type="time"
                     value={scheduleForm.endTime}
                     onChange={e => setScheduleForm({ ...scheduleForm, endTime: e.target.value })}
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Room (Optional)</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Room (Optional)</label>
                   <input
                     type="text"
                     value={scheduleForm.room}
                     onChange={e => setScheduleForm({ ...scheduleForm, room: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-semibold placeholder-gray-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Building (Optional)</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Building (Optional)</label>
                   <input
                     type="text"
                     value={scheduleForm.building}
                     onChange={e => setScheduleForm({ ...scheduleForm, building: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-semibold placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -954,14 +954,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button
                 type="button"
                 onClick={() => setShowScheduleModal(false)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={savingSchedule}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+                className="btn-3d-primary flex-1 py-2.5 text-sm font-black disabled:opacity-50 cursor-pointer"
               >
                 {savingSchedule ? "Saving..." : "Save"}
               </button>
@@ -975,81 +975,81 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveExtraClass}
-            className="rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-cyan-500/30"
+            className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#00f5d4]/40 bg-white shadow-[0_12px_0_0_#00c4a7] dark:border-[#00f5d4]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
           >
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-md shadow-cyan-500/20 shrink-0 text-white">
+              <div className="w-10 h-10 rounded-2xl bg-[#00f5d4] border-2 border-[#00c4a7] flex items-center justify-center shadow-[0_3px_0_0_#00a890] shrink-0 text-[#0d0d1a]">
                 <Zap className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-gray-900 dark:text-white">Schedule Extra Class</h3>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Add a one-off or makeup lecture for {subject.name}</p>
+                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Schedule Extra Class</h3>
+                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Add a one-off or makeup lecture for {subject.name}</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Date</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
                 <input
                   type="date"
                   value={extraClassForm.date}
                   onChange={e => setExtraClassForm({ ...extraClassForm, date: e.target.value })}
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Start Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Start Time</label>
                   <input
                     type="time"
                     value={extraClassForm.startTime}
                     onChange={e => setExtraClassForm({ ...extraClassForm, startTime: e.target.value })}
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">End Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">End Time</label>
                   <input
                     type="time"
                     value={extraClassForm.endTime}
                     onChange={e => setExtraClassForm({ ...extraClassForm, endTime: e.target.value })}
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Room / Venue (Optional)</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Room / Venue (Optional)</label>
                 <input
                   type="text"
                   value={extraClassForm.room}
                   onChange={e => setExtraClassForm({ ...extraClassForm, room: e.target.value })}
                   placeholder="e.g. Hall 301 / Lab B"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Topic / Notes (Optional)</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Topic / Notes (Optional)</label>
                 <input
                   type="text"
                   value={extraClassForm.topic}
                   onChange={e => setExtraClassForm({ ...extraClassForm, topic: e.target.value })}
                   placeholder="e.g. Revision / Special Lecture"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Attendance Status</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Attendance Status</label>
                 <select
                   value={extraClassForm.status}
                   onChange={e => setExtraClassForm({ ...extraClassForm, status: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold"
                 >
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
@@ -1059,12 +1059,12 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 </select>
               </div>
 
-              <label className="flex items-center gap-2 text-xs font-bold text-gray-700 dark:text-gray-300 cursor-pointer pt-1">
+              <label className="flex items-center gap-2 text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={addReminderForExtraClass}
                   onChange={e => setAddReminderForExtraClass(e.target.checked)}
-                  className="rounded accent-cyan-500 w-4 h-4 cursor-pointer"
+                  className="rounded accent-[#00f5d4] w-4 h-4 cursor-pointer"
                 />
                 Also create a reminder for this extra class
               </label>
@@ -1074,14 +1074,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button
                 type="button"
                 onClick={() => setShowExtraClassModal(false)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={savingExtraClass}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md shadow-cyan-500/20 hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
+                className="btn-3d-cyan flex-1 py-2.5 text-sm font-black flex items-center justify-center gap-2 cursor-pointer"
               >
                 {savingExtraClass ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} Save Extra Class
               </button>
@@ -1095,38 +1095,38 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveSubjectReminder}
-            className="rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-amber-500/30"
+            className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#ff6b35]/40 bg-white shadow-[0_12px_0_0_#d95220] dark:border-[#ff6b35]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
           >
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0 text-white">
+              <div className="w-10 h-10 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center shadow-[0_3px_0_0_#b84114] shrink-0 text-white">
                 <Bell className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-gray-900 dark:text-white">New Subject Reminder</h3>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Set assignment, exam or task deadline for {subject.name}</p>
+                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">New Subject Reminder</h3>
+                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Set assignment, exam or task deadline for {subject.name}</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Title *</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Title *</label>
                 <input
                   type="text"
                   value={subjectReminderForm.title}
                   onChange={e => setSubjectReminderForm({ ...subjectReminderForm, title: e.target.value })}
                   placeholder="e.g. Lab Report Submission"
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-sm font-semibold placeholder-gray-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Category</label>
                   <select
                     value={subjectReminderForm.category}
                     onChange={e => setSubjectReminderForm({ ...subjectReminderForm, category: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-semibold"
                   >
                     <option value="assignment">Assignment</option>
                     <option value="extra_class">Extra Class</option>
@@ -1135,11 +1135,11 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Priority</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Priority</label>
                   <select
                     value={subjectReminderForm.priority}
                     onChange={e => setSubjectReminderForm({ ...subjectReminderForm, priority: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-semibold"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -1150,86 +1150,86 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Due Date *</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Due Date *</label>
                   <input
                     type="date"
                     value={subjectReminderForm.dueDate}
                     onChange={e => setSubjectReminderForm({ ...subjectReminderForm, dueDate: e.target.value })}
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-semibold"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Due Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Due Time</label>
                   <input
                     type="time"
                     value={subjectReminderForm.dueTime}
                     onChange={e => setSubjectReminderForm({ ...subjectReminderForm, dueTime: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
               </div>
 
               {/* Notification Channels */}
-              <div className="p-3.5 bg-amber-50/50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl space-y-2">
-                <label className="block text-xs font-bold text-amber-800 dark:text-amber-300">
+              <div className="p-3.5 bg-amber-500/10 border-2 border-amber-500/30 rounded-2xl space-y-2">
+                <label className="block text-xs font-bold text-[#ff6b35]">
                   Notify Me Via:
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10 font-semibold text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] font-bold text-[#1a1a2e] dark:text-[#c4c4d4]">
                     <input
                       type="checkbox"
                       checked={subjectReminderForm.notifyPush}
                       onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyPush: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Bell className="w-3.5 h-3.5 text-amber-500" />
+                    <Bell className="w-3.5 h-3.5 text-[#ff6b35]" />
                     <span>Browser Push</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10 font-semibold text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] font-bold text-[#1a1a2e] dark:text-[#c4c4d4]">
                     <input
                       type="checkbox"
                       checked={subjectReminderForm.notifyAlarm}
                       onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyAlarm: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Volume2 className="w-3.5 h-3.5 text-amber-500" />
+                    <Volume2 className="w-3.5 h-3.5 text-[#ff6b35]" />
                     <span>Alarm Sound</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10 font-semibold text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] font-bold text-[#1a1a2e] dark:text-[#c4c4d4]">
                     <input
                       type="checkbox"
                       checked={subjectReminderForm.notifyEmail}
                       onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyEmail: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Mail className="w-3.5 h-3.5 text-blue-500" />
+                    <Mail className="w-3.5 h-3.5 text-[#4361ee]" />
                     <span>Email Alert</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10 font-semibold text-gray-700 dark:text-gray-300">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] font-bold text-[#1a1a2e] dark:text-[#c4c4d4]">
                     <input
                       type="checkbox"
                       checked={subjectReminderForm.notifyTelegram}
                       onChange={(e) => setSubjectReminderForm({ ...subjectReminderForm, notifyTelegram: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <MessageSquare className="w-3.5 h-3.5 text-cyan-500" />
+                    <MessageSquare className="w-3.5 h-3.5 text-[#00f5d4]" />
                     <span>Telegram</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Description (Optional)</label>
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Description (Optional)</label>
                 <textarea
                   value={subjectReminderForm.description}
                   onChange={e => setSubjectReminderForm({ ...subjectReminderForm, description: e.target.value })}
                   placeholder="Details, questions to solve, submission portal..."
                   rows={2}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d w-full text-xs font-medium placeholder-gray-400"
                 />
               </div>
             </div>
@@ -1238,14 +1238,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               <button
                 type="button"
                 onClick={() => setShowSubjectReminderModal(false)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={savingSubjectReminder}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/20 hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
+                className="btn-3d-coral flex-1 py-2.5 text-sm font-black flex items-center justify-center gap-2 cursor-pointer"
               >
                 {savingSubjectReminder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />} Save Reminder
               </button>
@@ -1257,31 +1257,31 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       {/* Delete Subject Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl animate-fade-in space-y-4 bg-white border border-gray-200 dark:bg-[#0f172a] dark:border-white/10">
+          <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 flex items-center justify-center shadow-[0_3px_0_0_#ef476f]">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-gray-900 dark:text-white">Delete {subject.name}?</h3>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+                <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">Delete {subject.name}?</h3>
+                <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">This action cannot be undone.</p>
               </div>
             </div>
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-              This will permanently delete <strong className="text-gray-900 dark:text-white">{subject.name}</strong>, its schedules, and all attendance logs.
+            <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#c4c4d4]">
+              This will permanently delete <strong className="text-[#1a1a2e] dark:text-white font-bold">{subject.name}</strong>, its schedules, and all attendance logs.
             </p>
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 text-sm font-bold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteSubject}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md shadow-rose-500/20 hover:shadow-lg transition cursor-pointer"
+                className="btn-3d-coral text-white font-black flex-1 py-2.5 text-sm cursor-pointer"
               >
                 Delete Permanently
               </button>

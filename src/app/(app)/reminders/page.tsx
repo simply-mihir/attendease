@@ -51,9 +51,9 @@ const CATEGORIES = [
 ];
 
 const PRIORITY_BADGES = {
-  high: "bg-rose-50 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30",
-  medium: "bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30",
-  low: "bg-cyan-50 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/30",
+  high: "bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 shadow-[0_2px_0_0_#ef476f]",
+  medium: "bg-[#ff6b35]/15 text-[#ff6b35] border-2 border-[#ff6b35]/40 shadow-[0_2px_0_0_#ff6b35]",
+  low: "bg-[#00f5d4]/15 text-[#00b4d8] dark:text-[#00f5d4] border-2 border-[#00f5d4]/40 shadow-[0_2px_0_0_#00b4d8]",
 };
 
 export default function RemindersPage() {
@@ -158,19 +158,19 @@ export default function RemindersPage() {
   return (
     <PageTransition direction="right" staggerChildren={false} className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 rounded-3xl p-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
+      <div className="flex items-center justify-between flex-wrap gap-4 card-3d p-6" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center shadow-[0_4px_0_0_#d95220] shrink-0">
             <Bell className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Reminders & Tasks</h1>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">Keep track of extra classes, assignments, exams & deadlines</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Reminders & Tasks</h1>
+            <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">Keep track of extra classes, assignments, exams & deadlines</p>
           </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="px-5 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-2 shadow-md shadow-amber-500/20 hover:shadow-lg transition cursor-pointer"
+          className="btn-3d-primary flex items-center gap-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" /> New Reminder
         </button>
@@ -187,10 +187,10 @@ export default function RemindersPage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={clsx(
-                  "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer border",
+                  "px-4 py-2 text-xs font-black transition flex items-center gap-2 shrink-0 cursor-pointer",
                   active
-                    ? "bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/20"
-                    : "bg-white border-gray-200 text-gray-600 hover:text-gray-900 dark:bg-white/5 dark:border-white/10 dark:text-gray-400 dark:hover:text-white"
+                    ? "btn-3d-primary"
+                    : "btn-3d-secondary"
                 )}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -203,13 +203,13 @@ export default function RemindersPage() {
         <button
           onClick={() => setShowCompleted(!showCompleted)}
           className={clsx(
-            "px-4 py-2 rounded-xl text-xs font-semibold transition border flex items-center gap-2 ml-auto cursor-pointer",
+            "px-4 py-2 text-xs font-black transition flex items-center gap-2 ml-auto cursor-pointer",
             showCompleted
-              ? "bg-gray-100 text-gray-900 border-gray-300 dark:bg-white/10 dark:text-white dark:border-white/20"
-              : "bg-white border-gray-200 text-gray-500 hover:text-gray-900 dark:bg-white/5 dark:border-white/10 dark:text-gray-400 dark:hover:text-white"
+              ? "btn-3d-primary"
+              : "btn-3d-secondary"
           )}
         >
-          <Check className="w-3.5 h-3.5 text-teal-500" />
+          <Check className="w-3.5 h-3.5 text-[#06d6a0]" />
           {showCompleted ? "Hide Completed" : "Show Completed"}
         </button>
       </div>
@@ -218,19 +218,19 @@ export default function RemindersPage() {
       {isLoading ? (
         <FuturisticLoader variant="section" title="Loading reminders" Icon={AlarmClock} />
       ) : filteredReminders.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-500 mx-auto flex items-center justify-center">
+        <div className="p-12 text-center card-3d space-y-3" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="w-12 h-12 rounded-2xl bg-[#ff6b35]/15 border-2 border-[#ff6b35]/30 text-[#ff6b35] mx-auto flex items-center justify-center shadow-[0_2px_0_0_#ff6b35]">
             <Bell className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Reminders Found</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+          <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">No Reminders Found</h3>
+          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] max-w-sm mx-auto">
             {activeCategory !== "all"
               ? `No reminders listed under ${activeCategory.replace("_", " ")}.`
               : "You don't have any pending reminders. Click below to add one!"}
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white inline-flex items-center gap-1.5 mt-2 shadow-md shadow-cyan-500/20 hover:shadow-lg transition cursor-pointer"
+            className="btn-3d-primary inline-flex items-center gap-1.5 mt-2 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" /> Add Reminder
           </button>
@@ -241,19 +241,17 @@ export default function RemindersPage() {
             <div
               key={reminder.id}
               className={clsx(
-                "p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 group",
-                reminder.isCompleted
-                  ? "bg-gray-50/80 border-gray-200 text-gray-400 dark:bg-white/[0.02] dark:border-white/5 line-through opacity-60"
-                  : "bg-white border-gray-200/70 hover:border-amber-400/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:hover:border-amber-500/40"
+                "card-3d p-4.5 flex items-center justify-between gap-4 group transition-all",
+                reminder.isCompleted && "line-through opacity-60 bg-gray-100 dark:bg-[#0f0f1c]"
               )}
             >
-              <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
                 <button
                   onClick={() => handleToggleComplete(reminder)}
-                  className="mt-0.5 text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition shrink-0 cursor-pointer"
+                  className="mt-0.5 text-gray-400 hover:text-[#06d6a0] transition shrink-0 cursor-pointer"
                 >
                   {reminder.isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                    <CheckCircle2 className="w-5 h-5 text-[#06d6a0]" />
                   ) : (
                     <Circle className="w-5 h-5" />
                   )}
@@ -261,15 +259,15 @@ export default function RemindersPage() {
 
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-gray-900 dark:text-white text-base leading-snug">
+                    <span className="font-black text-[#1a1a2e] dark:text-white text-base leading-snug">
                       {reminder.title}
                     </span>
                     {reminder.subject && (
                       <span
-                        className="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                        className="px-2.5 py-0.5 rounded-xl text-[11px] font-black border-2 shadow-[0_2px_0_0_currentColor]"
                         style={{
                           backgroundColor: `${reminder.subject.colorHex}15`,
-                          borderColor: `${reminder.subject.colorHex}40`,
+                          borderColor: `${reminder.subject.colorHex}50`,
                           color: reminder.subject.colorHex,
                         }}
                       >
@@ -278,7 +276,7 @@ export default function RemindersPage() {
                     )}
                     <span
                       className={clsx(
-                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
+                        "px-2 py-0.5 rounded-xl text-[10px] font-black uppercase",
                         PRIORITY_BADGES[reminder.priority]
                       )}
                     >
@@ -287,12 +285,12 @@ export default function RemindersPage() {
                   </div>
 
                   {reminder.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{reminder.description}</p>
+                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] line-clamp-2">{reminder.description}</p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 flex-wrap pt-1">
+                  <div className="flex items-center gap-3 text-[11px] font-bold text-[#4a4a5a] dark:text-[#6b6b80] flex-wrap pt-1">
                     <span className="flex items-center gap-1 font-mono">
-                      <Calendar className="w-3 h-3 text-amber-500" />
+                      <Calendar className="w-3 h-3 text-[#ff6b35]" />
                       {new Date(reminder.dueDate).toLocaleDateString("en-IN", {
                         weekday: "short",
                         month: "short",
@@ -301,21 +299,21 @@ export default function RemindersPage() {
                     </span>
                     {reminder.dueTime && (
                       <span className="flex items-center gap-1 font-mono">
-                        <Clock className="w-3 h-3 text-cyan-500" />
+                        <Clock className="w-3 h-3 text-[#00f5d4]" />
                         {reminder.dueTime}
                       </span>
                     )}
-                    <span className="capitalize px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-[10px] font-medium">
+                    <span className="capitalize px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-[#1f1f35] text-[#1a1a2e] dark:text-white text-[10px] font-bold border border-gray-200 dark:border-[#2a2a3d]">
                       {reminder.category.replace("_", " ")}
                     </span>
 
                     {/* Active Channels Icons */}
-                    <div className="flex items-center gap-1.5 ml-auto text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-0.5 rounded-lg border border-amber-200 dark:border-amber-500/20">
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400">Channels:</span>
-                      {reminder.notifyPush && <span title="Browser Push Notification"><Bell className="w-3 h-3 text-amber-500" /></span>}
-                      {reminder.notifyAlarm && <span title="Alarm Sound"><Volume2 className="w-3 h-3 text-amber-500" /></span>}
-                      {reminder.notifyEmail && <span title="Email Alert"><Mail className="w-3 h-3 text-blue-500" /></span>}
-                      {reminder.notifyTelegram && <span title="Telegram Message"><MessageSquare className="w-3 h-3 text-cyan-500" /></span>}
+                    <div className="flex items-center gap-1.5 ml-auto text-[#ff6b35] bg-[#ff6b35]/10 px-2.5 py-0.5 rounded-xl border border-[#ff6b35]/30">
+                      <span className="text-[10px] font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Channels:</span>
+                      {reminder.notifyPush && <span title="Browser Push Notification"><Bell className="w-3 h-3 text-[#ff6b35]" /></span>}
+                      {reminder.notifyAlarm && <span title="Alarm Sound"><Volume2 className="w-3 h-3 text-[#ff6b35]" /></span>}
+                      {reminder.notifyEmail && <span title="Email Alert"><Mail className="w-3 h-3 text-[#00b4d8]" /></span>}
+                      {reminder.notifyTelegram && <span title="Telegram Message"><MessageSquare className="w-3 h-3 text-[#06d6a0]" /></span>}
                     </div>
                   </div>
                 </div>
@@ -323,7 +321,7 @@ export default function RemindersPage() {
 
               <button
                 onClick={() => handleDelete(reminder.id)}
-                className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition shrink-0 opacity-80 group-hover:opacity-100 cursor-pointer"
+                className="p-2 text-gray-400 hover:text-[#ef476f] hover:bg-[#ef476f]/10 rounded-xl transition shrink-0 opacity-80 group-hover:opacity-100 cursor-pointer"
                 title="Delete Reminder"
               >
                 <Trash2 className="w-4 h-4" />
@@ -335,41 +333,41 @@ export default function RemindersPage() {
 
       {/* New Reminder Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <form
             onSubmit={handleCreateReminder}
-            className="rounded-3xl p-6 max-w-md w-full shadow-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-white/10 animate-fade-in space-y-4 max-h-[90vh] overflow-y-auto"
+            className="card-3d p-6 max-w-md w-full shadow-2xl animate-fade-in space-y-4 max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-[#ff6b35] border-2 border-[#d95220] flex items-center justify-center shadow-[0_3px_0_0_#d95220] shrink-0">
                 <Bell className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white">Create Reminder</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Set task, assignment or extra class deadline</p>
+                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white">Create Reminder</h3>
+                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Set task, assignment or extra class deadline</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Title *</label>
+                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Title *</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. Mathematics Assignment Submission"
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="input-3d"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Category</label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="input-3d"
                   >
                     <option value="assignment">Assignment</option>
                     <option value="extra_class">Extra Class</option>
@@ -379,11 +377,11 @@ export default function RemindersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Subject (Optional)</label>
+                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Subject (Optional)</label>
                   <select
                     value={form.subjectId}
                     onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="input-3d"
                   >
                     <option value="">-- General / None --</option>
                     {subjects.map((sub) => (
@@ -397,29 +395,29 @@ export default function RemindersPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Due Date *</label>
+                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Due Date *</label>
                   <input
                     type="date"
                     value={form.dueDate}
                     onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="input-3d"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Due Time</label>
+                  <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Due Time</label>
                   <input
                     type="time"
                     value={form.dueTime}
                     onChange={(e) => setForm({ ...form, dueTime: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="input-3d font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Priority</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["low", "medium", "high"] as const).map((p) => (
                     <button
@@ -427,10 +425,10 @@ export default function RemindersPage() {
                       type="button"
                       onClick={() => setForm({ ...form, priority: p })}
                       className={clsx(
-                        "py-2 rounded-xl text-xs font-bold capitalize transition border cursor-pointer",
+                        "py-2 rounded-xl text-xs font-black capitalize transition border-2 cursor-pointer",
                         form.priority === p
                           ? PRIORITY_BADGES[p]
-                          : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:border-white/10"
+                          : "btn-3d-secondary"
                       )}
                     >
                       {p}
@@ -440,65 +438,65 @@ export default function RemindersPage() {
               </div>
 
               {/* Notification Channel Opt-In */}
-              <div className="p-3.5 bg-amber-50/60 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl space-y-2">
-                <label className="block text-xs font-bold text-amber-700 dark:text-amber-300">
+              <div className="p-3.5 bg-[#ff6b35]/10 border-2 border-[#ff6b35]/30 rounded-2xl space-y-2">
+                <label className="block text-xs font-black text-[#ff6b35]">
                   Notify Me Via (Choose Channels):
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/80 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
                     <input
                       type="checkbox"
                       checked={form.notifyPush}
                       onChange={(e) => setForm({ ...form, notifyPush: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Bell className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">Browser Push</span>
+                    <Bell className="w-3.5 h-3.5 text-[#ff6b35]" />
+                    <span className="font-bold text-[#1a1a2e] dark:text-white">Browser Push</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/80 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
                     <input
                       type="checkbox"
                       checked={form.notifyAlarm}
                       onChange={(e) => setForm({ ...form, notifyAlarm: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Volume2 className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">Alarm Sound</span>
+                    <Volume2 className="w-3.5 h-3.5 text-[#ff6b35]" />
+                    <span className="font-bold text-[#1a1a2e] dark:text-white">Alarm Sound</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/80 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
                     <input
                       type="checkbox"
                       checked={form.notifyEmail}
                       onChange={(e) => setForm({ ...form, notifyEmail: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <Mail className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">Email Alert</span>
+                    <Mail className="w-3.5 h-3.5 text-[#00b4d8]" />
+                    <span className="font-bold text-[#1a1a2e] dark:text-white">Email Alert</span>
                   </label>
 
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-white/5 border border-gray-200/80 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition">
+                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400 transition">
                     <input
                       type="checkbox"
                       checked={form.notifyTelegram}
                       onChange={(e) => setForm({ ...form, notifyTelegram: e.target.checked })}
-                      className="rounded accent-amber-500 cursor-pointer"
+                      className="rounded accent-[#ff6b35] cursor-pointer"
                     />
-                    <MessageSquare className="w-3.5 h-3.5 text-cyan-500" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">Telegram</span>
+                    <MessageSquare className="w-3.5 h-3.5 text-[#06d6a0]" />
+                    <span className="font-bold text-[#1a1a2e] dark:text-white">Telegram</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
+                <label className="block text-xs font-black text-[#1a1a2e] dark:text-white mb-1">Description (Optional)</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="Additional details, room location, or requirements..."
                   rows={2}
-                  className="w-full px-3.5 py-2 rounded-xl text-xs border border-gray-200 bg-gray-50 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="input-3d"
                 />
               </div>
             </div>
@@ -507,14 +505,14 @@ export default function RemindersPage() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 text-sm font-semibold transition cursor-pointer"
+                className="btn-3d-secondary flex-1 py-2.5 font-black text-sm cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
+                className="btn-3d-primary flex-1 py-2.5 font-black text-sm cursor-pointer flex items-center justify-center gap-2"
               >
                 {submitting ? "Saving..." : "Save Reminder"}
               </button>

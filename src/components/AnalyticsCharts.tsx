@@ -23,9 +23,9 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
   return (
     <div className="grid lg:grid-cols-3 gap-6">
       {/* Bar chart */}
-      <div className="lg:col-span-2 rounded-2xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all">
-        <h3 className="font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shadow-md shadow-violet-500/20">
+      <div className="lg:col-span-2 card-3d p-6">
+        <h3 className="font-black mb-4 flex items-center gap-2 text-[#1a1a2e] dark:text-white">
+          <div className="w-8 h-8 rounded-xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_2px_0_0_#5a189a]">
             <BarChart3 className="w-4 h-4 text-white" />
           </div>
           Subject Comparison
@@ -38,7 +38,7 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
               <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#6b7280" }} />
               <Tooltip
                 formatter={(v: number) => [`${v}%`, "Attendance"]}
-                contentStyle={{ backgroundColor: "var(--card-bg, #111827)", border: "1px solid rgba(150,150,150,0.2)", borderRadius: "12px", color: "#fff" }}
+                contentStyle={{ backgroundColor: "#141425", border: "2px solid #2a2a3d", borderRadius: "12px", color: "#fff" }}
                 itemStyle={{ color: "#fff" }}
                 labelStyle={{ color: "#9ca3af" }}
                 cursor={{ fill: "rgba(150,150,150,0.08)" }}
@@ -51,13 +51,13 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-12">No data yet</p>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm text-center py-12 font-bold">No data yet</p>
         )}
       </div>
 
       {/* Pie chart */}
-      <div className="rounded-2xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all">
-        <h3 className="font-bold mb-4 text-gray-900 dark:text-white">Status Distribution</h3>
+      <div className="card-3d p-6">
+        <h3 className="font-black mb-4 text-[#1a1a2e] dark:text-white">Status Distribution</h3>
         {pieData.length > 0 ? (
           <>
             <ResponsiveContainer width="100%" height={200}>
@@ -66,7 +66,7 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
                   {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: "var(--card-bg, #111827)", border: "1px solid rgba(150,150,150,0.2)", borderRadius: "12px", color: "#fff" }}
+                  contentStyle={{ backgroundColor: "#141425", border: "2px solid #2a2a3d", borderRadius: "12px", color: "#fff" }}
                   itemStyle={{ color: "#fff" }}
                   labelStyle={{ color: "#9ca3af" }}
                 />
@@ -75,8 +75,8 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
             <div className="mt-4 space-y-3 px-2 max-h-40 overflow-y-auto custom-scrollbar">
               {pieData.map((group, i) => (
                 <div key={i} className="text-sm">
-                  <span className="font-bold" style={{ color: group.color }}>{group.name}:</span>
-                  <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs leading-relaxed font-medium">
+                  <span className="font-black" style={{ color: group.color }}>{group.name}:</span>
+                  <p className="text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5 text-xs leading-relaxed font-semibold">
                     {group.subjects && group.subjects.length > 0 ? group.subjects.join(", ") : "None"}
                   </p>
                 </div>
@@ -84,7 +84,7 @@ export default function AnalyticsCharts({ barData, pieData }: AnalyticsChartsPro
             </div>
           </>
         ) : (
-          <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-12">No data</p>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm text-center py-12 font-bold">No data</p>
         )}
       </div>
     </div>

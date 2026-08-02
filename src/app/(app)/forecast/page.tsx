@@ -58,25 +58,25 @@ export default function ForecastPage() {
     <PageTransition direction="left" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-gray-900 dark:text-white tracking-tight">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <div className="w-11 h-11 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a189a] flex items-center justify-center shadow-[0_3px_0_0_#5a189a]">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           Attendance Forecast
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 ml-[52px]">
+        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
           Projected attendance by semester end ({data.summary.semesterEndDate})
         </p>
       </div>
 
       {/* Summary card */}
-      <div className="rounded-3xl p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex items-center gap-4 transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+      <div className="card-3d p-5 flex items-center gap-4 transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div
           className={clsx(
-            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md",
+            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
             data.summary.passing === data.summary.total
-              ? "bg-gradient-to-br from-teal-500 to-emerald-500 shadow-teal-500/20"
-              : "bg-gradient-to-br from-amber-500 to-orange-500 shadow-amber-500/20"
+              ? "bg-[#06d6a0] border-[#038c67] text-white shadow-[0_3px_0_0_#038c67]"
+              : "bg-[#ff6b35] border-[#d95220] text-white shadow-[0_3px_0_0_#d95220]"
           )}
         >
           {data.summary.passing === data.summary.total ? (
@@ -86,19 +86,19 @@ export default function ForecastPage() {
           )}
         </div>
         <div>
-          <p className="text-lg font-extrabold text-gray-900 dark:text-white">
+          <p className="text-lg font-black text-[#1a1a2e] dark:text-white">
             <span
               className={clsx(
                 data.summary.passing === data.summary.total
-                  ? "text-teal-600 dark:text-teal-400"
-                  : "text-amber-600 dark:text-amber-400"
+                  ? "text-[#06d6a0]"
+                  : "text-[#ff6b35]"
               )}
             >
               {data.summary.passing}
             </span>{" "}
             of {data.summary.total} subjects on track to pass
           </p>
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">
             Based on your historical day-of-week attendance patterns
           </p>
         </div>
@@ -109,21 +109,20 @@ export default function ForecastPage() {
         {data.forecasts.map((forecast) => (
           <div
             key={forecast.subjectId}
-            className="rounded-3xl p-5 sm:p-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-4 transition-all"
+            className="card-3d p-5 sm:p-6 space-y-4 transition-all"
           >
             {/* Subject header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-2.5 h-10 rounded-full"
+                  className="w-2.5 h-10 rounded-full shadow-sm"
                   style={{
-                    backgroundColor: forecast.colorHex,
-                    boxShadow: `0 0 10px ${forecast.colorHex}40`,
+                    backgroundColor: forecast.colorHex || "#FF2D78",
                   }}
                 />
                 <div>
-                  <h3 className="font-extrabold text-base sm:text-lg text-gray-900 dark:text-white">{forecast.subjectName}</h3>
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  <h3 className="font-black text-base sm:text-lg text-[#1a1a2e] dark:text-white">{forecast.subjectName}</h3>
+                  <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                     Current: {forecast.currentPct}% · Min: {forecast.minRequiredPct}%
                   </p>
                 </div>
@@ -132,12 +131,12 @@ export default function ForecastPage() {
                 <p
                   className={clsx(
                     "text-2xl sm:text-3xl font-black",
-                    forecast.willPass ? "text-teal-600 dark:text-teal-400" : "text-rose-500 dark:text-rose-400"
+                    forecast.willPass ? "text-[#06d6a0]" : "text-[#ef476f]"
                   )}
                 >
                   {forecast.projectedEndPct}%
                 </p>
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Projected</p>
+                <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">Projected</p>
               </div>
             </div>
 
@@ -173,41 +172,42 @@ export default function ForecastPage() {
                       formatter={(v: number) => [`${v}%`, "Projected"]}
                       contentStyle={{
                         backgroundColor: "rgba(15, 23, 42, 0.92)",
-                        border: "1px solid rgba(255,255,255,0.15)",
+                        border: "2px solid #2a2a3d",
                         borderRadius: "16px",
                         fontSize: "12px",
-                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)",
+                        boxShadow: "0 6px 0 0 rgba(0, 0, 0, 0.3)",
                       }}
-                      itemStyle={{ color: "#fff" }}
+                      itemStyle={{ color: "#fff", fontWeight: "bold" }}
                       labelStyle={{ color: "#94a3b8" }}
                     />
                     <ReferenceLine
                       y={forecast.minRequiredPct}
-                      stroke="#f43f5e"
+                      stroke="#ef476f"
                       strokeDasharray="6 4"
                       strokeWidth={2}
                       label={{
                         value: `Min ${forecast.minRequiredPct}%`,
                         position: "right",
-                        fill: "#f43f5e",
+                        fill: "#ef476f",
                         fontSize: 10,
+                        fontWeight: "bold",
                       }}
                     />
                     <Area
                       type="monotone"
                       dataKey="projectedPct"
-                      fill={forecast.willPass ? "rgba(13,148,136,0.12)" : "rgba(244,63,94,0.12)"}
+                      fill={forecast.willPass ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)"}
                       stroke="transparent"
                     />
                     <Line
                       type="monotone"
                       dataKey="projectedPct"
-                      stroke={forecast.colorHex}
-                      strokeWidth={2.5}
+                      stroke={forecast.colorHex || "#FF2D78"}
+                      strokeWidth={3}
                       dot={false}
                       activeDot={{
                         r: 5,
-                        fill: forecast.colorHex,
+                        fill: forecast.colorHex || "#FF2D78",
                         stroke: "#fff",
                         strokeWidth: 2,
                       }}
@@ -224,33 +224,33 @@ export default function ForecastPage() {
                   forecast.weakDays.map((wd) => (
                     <span
                       key={wd.day}
-                      className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                      className="px-3 py-1 rounded-xl text-xs font-black bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/30 shadow-[0_2px_0_0_#ef476f]"
                     >
                       {wd.day}: {wd.attendanceRate}%
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                     No consistently weak days
                   </span>
                 )}
               </div>
               <div
                 className={clsx(
-                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border",
+                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black border-2",
                   forecast.willPass
-                    ? "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:border-teal-500/20"
-                    : "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                    ? "bg-[#06d6a0]/15 text-[#06d6a0] border-[#06d6a0] shadow-[0_2px_0_0_#06d6a0]"
+                    : "bg-[#ef476f]/15 text-[#ef476f] border-[#ef476f] shadow-[0_2px_0_0_#ef476f]"
                 )}
               >
                 {forecast.willPass ? (
                   <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#06d6a0]" />
                     On track to pass
                   </>
                 ) : (
                   <>
-                    <XCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
+                    <XCircle className="w-3.5 h-3.5 text-[#ef476f]" />
                     Projected to fail
                     {forecast.weakDays.length > 0 &&
                       ` — attend more ${forecast.weakDays[0].day}s`}
@@ -261,8 +261,8 @@ export default function ForecastPage() {
           </div>
         ))}
         {data.forecasts.length === 0 && (
-          <div className="rounded-3xl p-8 text-center bg-white border border-gray-200/60 dark:bg-white/[0.04] dark:border-white/[0.08]">
-            <p className="text-gray-500 dark:text-gray-400">No subjects to forecast. Add subjects first!</p>
+          <div className="card-3d p-8 text-center">
+            <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-bold">No subjects to forecast. Add subjects first!</p>
           </div>
         )}
       </StaggerGrid>

@@ -101,22 +101,22 @@ export default function NewSubjectPage() {
         <div
           className={`w-9 h-9 rounded-2xl flex items-center justify-center text-sm font-black transition-all ${
             step >= 1
-              ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20"
-              : "bg-gray-100 text-gray-400 dark:bg-white/10 dark:text-gray-500"
+              ? "bg-[#FF2D78] border-2 border-[#cc1a5e] text-white shadow-[0_3px_0_0_#cc1a5e]"
+              : "bg-gray-100 border-2 border-gray-200 text-gray-400 dark:bg-[#141425] dark:border-[#2a2a3d] dark:text-gray-500"
           }`}
         >
           1
         </div>
         <div
-          className={`h-1 w-12 rounded-full transition-all ${
-            step >= 2 ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-200 dark:bg-white/10"
+          className={`h-1.5 w-12 rounded-full transition-all ${
+            step >= 2 ? "bg-[#FF2D78]" : "bg-gray-200 dark:bg-[#2a2a3d]"
           }`}
         />
         <div
           className={`w-9 h-9 rounded-2xl flex items-center justify-center text-sm font-black transition-all ${
             step >= 2
-              ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20"
-              : "bg-gray-100 text-gray-400 dark:bg-white/10 dark:text-gray-500"
+              ? "bg-[#FF2D78] border-2 border-[#cc1a5e] text-white shadow-[0_3px_0_0_#cc1a5e]"
+              : "bg-gray-100 border-2 border-gray-200 text-gray-400 dark:bg-[#141425] dark:border-[#2a2a3d] dark:text-gray-500"
           }`}
         >
           2
@@ -124,7 +124,7 @@ export default function NewSubjectPage() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400 text-sm font-medium mb-6">
+        <div className="p-4 rounded-2xl bg-[#ef476f]/15 border-2 border-[#ef476f]/40 text-[#ef476f] text-sm font-bold mb-6 shadow-[0_3px_0_0_#9e1a38]">
           {error}
         </div>
       )}
@@ -132,44 +132,44 @@ export default function NewSubjectPage() {
       {step === 1 ? (
         <form
           onSubmit={handleCreateSubject}
-          className="rounded-3xl p-6 sm:p-8 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-6"
+          className="card-3d p-6 sm:p-8 space-y-6"
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
           <div>
-            <h2 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">Subject Details</h2>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">Configure your course metadata and attendance targets.</p>
+            <h2 className="text-xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Subject Details</h2>
+            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">Configure your course metadata and attendance targets.</p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Subject Name *</label>
+            <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject Name *</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => updateForm("name", e.target.value)}
               required
-              className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+              className="input-3d w-full text-sm font-medium"
               placeholder="e.g. Data Structures & Algorithms"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Subject Code (Optional)</label>
+              <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject Code (Optional)</label>
               <input
                 type="text"
                 value={form.code}
                 onChange={(e) => updateForm("code", e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                className="input-3d w-full text-sm font-medium"
                 placeholder="CS301"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Instructor (Optional)</label>
+              <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Instructor (Optional)</label>
               <input
                 type="text"
                 value={form.instructorName}
                 onChange={(e) => updateForm("instructorName", e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                className="input-3d w-full text-sm font-medium"
                 placeholder="Prof. Sharma"
               />
             </div>
@@ -177,8 +177,8 @@ export default function NewSubjectPage() {
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Minimum Required Attendance</label>
-              <span className="text-sm font-extrabold text-purple-600 dark:text-purple-400">{form.minAttendancePct}%</span>
+              <label className="text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4]">Minimum Required Attendance</label>
+              <span className="text-sm font-black text-[#FF2D78]">{form.minAttendancePct}%</span>
             </div>
             <input
               type="range"
@@ -187,7 +187,7 @@ export default function NewSubjectPage() {
               step={5}
               value={form.minAttendancePct}
               onChange={(e) => updateForm("minAttendancePct", parseInt(e.target.value))}
-              className="w-full accent-purple-500 cursor-pointer"
+              className="w-full accent-[#FF2D78] cursor-pointer"
             />
             <div className="flex justify-between text-xs font-bold text-gray-400 dark:text-gray-500 mt-1">
               <span>50%</span>
@@ -197,15 +197,15 @@ export default function NewSubjectPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Subject Color Tag</label>
+            <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-2">Subject Color Tag</label>
             <div className="flex gap-2.5 flex-wrap">
               {COLORS.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => updateForm("colorHex", c)}
-                  className={`w-8 h-8 rounded-full border-2 transition hover:scale-110 cursor-pointer ${
-                    form.colorHex === c ? "border-purple-600 scale-110 shadow-md" : "border-transparent"
+                  className={`w-8 h-8 rounded-full border-2 transition hover:scale-110 cursor-pointer shadow-[0_2px_0_0_rgba(0,0,0,0.2)] ${
+                    form.colorHex === c ? "border-white scale-110 ring-2 ring-[#FF2D78]" : "border-transparent"
                   }`}
                   style={{ backgroundColor: c }}
                 />
@@ -213,20 +213,20 @@ export default function NewSubjectPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl">
             <div>
-              <span className="text-sm font-bold text-gray-900 dark:text-white block">Reminders & Notifications</span>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Receive alerts before scheduled lectures</span>
+              <span className="text-sm font-bold text-[#1a1a2e] dark:text-white block">Reminders & Notifications</span>
+              <span className="text-xs font-medium text-[#4a4a5a] dark:text-[#6b6b80]">Receive alerts before scheduled lectures</span>
             </div>
             <button
               type="button"
               onClick={() => updateForm("reminderEnabled", !form.reminderEnabled)}
-              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-                form.reminderEnabled ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-200 dark:bg-white/10"
+              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer border border-black/10 ${
+                form.reminderEnabled ? "bg-[#FF2D78]" : "bg-gray-200 dark:bg-white/10"
               }`}
             >
               <div
-                className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${
+                className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${
                   form.reminderEnabled ? "left-6" : "left-1"
                 }`}
               />
@@ -236,62 +236,62 @@ export default function NewSubjectPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3.5 btn-3d-primary rounded-2xl font-black text-sm transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />} Next: Add Schedule
           </button>
         </form>
       ) : (
         <div
-          className="rounded-3xl p-6 sm:p-8 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-6"
+          className="card-3d p-6 sm:p-8 space-y-6"
           style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
           <div>
-            <h2 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">Class Schedule</h2>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">When does this class meet weekly?</p>
+            <h2 className="text-xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Class Schedule</h2>
+            <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">When does this class meet weekly?</p>
           </div>
 
           <div className="space-y-3">
             {schedules.map((sched, i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 bg-gray-50 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/[0.08] rounded-2xl"
+                className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end p-4 bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl"
               >
                 <div className="sm:col-span-3">
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Day</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1">Day</label>
                   <select
                     value={sched.dayOfWeek}
                     onChange={(e) => updateSchedule(i, "dayOfWeek", parseInt(e.target.value))}
-                    className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-2 rounded-xl text-sm font-medium text-gray-900 dark:text-white"
+                    className="input-3d w-full text-sm font-semibold"
                   >
                     {DAYS.map((d, di) => <option key={di} value={di}>{d}</option>)}
                   </select>
                 </div>
                 <div className="sm:col-span-3">
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Start Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1">Start Time</label>
                   <input
                     type="time"
                     value={sched.startTime}
                     onChange={(e) => updateSchedule(i, "startTime", e.target.value)}
-                    className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-2 rounded-xl text-sm font-mono text-gray-900 dark:text-white"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
                 <div className="sm:col-span-3">
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">End Time</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1">End Time</label>
                   <input
                     type="time"
                     value={sched.endTime}
                     onChange={(e) => updateSchedule(i, "endTime", e.target.value)}
-                    className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-2 rounded-xl text-sm font-mono text-gray-900 dark:text-white"
+                    className="input-3d w-full text-sm font-mono font-semibold"
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Room</label>
+                  <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1">Room</label>
                   <input
                     type="text"
                     value={sched.room}
                     onChange={(e) => updateSchedule(i, "room", e.target.value)}
-                    className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-2 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400"
+                    className="input-3d w-full text-sm placeholder-gray-400 font-semibold"
                     placeholder="Hall 301"
                   />
                 </div>
@@ -300,7 +300,7 @@ export default function NewSubjectPage() {
                     <button
                       type="button"
                       onClick={() => removeScheduleSlot(i)}
-                      className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
+                      className="p-2 text-[#ef476f] hover:bg-[#ef476f]/10 rounded-xl transition cursor-pointer"
                       title="Remove slot"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -314,7 +314,7 @@ export default function NewSubjectPage() {
           <button
             type="button"
             onClick={addScheduleSlot}
-            className="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm font-bold hover:underline transition cursor-pointer"
+            className="flex items-center gap-2 text-[#FF2D78] text-sm font-black hover:underline transition cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Add another time slot
           </button>
@@ -323,7 +323,7 @@ export default function NewSubjectPage() {
             <button
               type="button"
               onClick={() => router.push("/subjects")}
-              className="flex-1 py-3 rounded-2xl font-bold text-sm border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 transition cursor-pointer"
+              className="btn-3d-secondary flex-1 py-3 text-sm font-bold cursor-pointer"
             >
               Skip Schedule
             </button>
@@ -331,7 +331,7 @@ export default function NewSubjectPage() {
               type="button"
               onClick={handleSaveSchedules}
               disabled={loading}
-              className="flex-1 py-3 rounded-2xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              className="btn-3d-primary flex-1 py-3 text-sm font-black disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />} Save & Finish
             </button>

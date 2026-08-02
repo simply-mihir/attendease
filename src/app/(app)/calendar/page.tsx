@@ -9,8 +9,12 @@ import { StaggerGrid } from "@/components/StaggerGrid";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const STATUS_DOT: Record<string, string> = {
-  present: "bg-teal-500 shadow-sm shadow-teal-500/30", absent: "bg-rose-500 shadow-sm shadow-rose-500/30", late: "bg-amber-500 shadow-sm shadow-amber-500/30",
-  excused: "bg-violet-500 shadow-sm shadow-violet-500/30", cancelled: "bg-gray-400 dark:bg-gray-600", holiday: "bg-gray-400 dark:bg-gray-600",
+  present: "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]",
+  absent: "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]",
+  late: "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]",
+  excused: "bg-[#7b2cbf] dark:bg-[#c77dff] shadow-[0_2px_0_0_#5a189a]",
+  cancelled: "bg-gray-400 dark:bg-gray-600",
+  holiday: "bg-gray-400 dark:bg-gray-600",
 };
 
 export default function CalendarPage() {
@@ -81,32 +85,42 @@ export default function CalendarPage() {
   return (
     <PageTransition direction="left" staggerChildren={false} className="space-y-6">
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Calendar</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">Calendar</h1>
         <div className="flex gap-2">
-          <button onClick={() => setView("week")}
-            className={clsx("px-4 py-1.5 rounded-xl text-sm font-bold transition-all cursor-pointer",
-              view === "week" ? "bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-violet-500/20" : "border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"
-            )}>Week</button>
-          <button onClick={() => setView("month")}
-            className={clsx("px-4 py-1.5 rounded-xl text-sm font-bold transition-all cursor-pointer",
-              view === "month" ? "bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-md shadow-violet-500/20" : "border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"
-            )}>Month</button>
+          <button
+            onClick={() => setView("week")}
+            className={clsx(
+              "px-4 py-1.5 text-xs font-black transition-all cursor-pointer",
+              view === "week" ? "btn-3d-primary" : "btn-3d-secondary"
+            )}
+          >
+            Week
+          </button>
+          <button
+            onClick={() => setView("month")}
+            className={clsx(
+              "px-4 py-1.5 text-xs font-black transition-all cursor-pointer",
+              view === "month" ? "btn-3d-primary" : "btn-3d-secondary"
+            )}
+          >
+            Month
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between rounded-2xl p-3.5 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
+      <div className="flex items-center justify-between card-3d p-3.5 transition-all" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition cursor-pointer">
-          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <ChevronLeft className="w-5 h-5 text-[#4a4a5a] dark:text-[#a0a0b0]" />
         </button>
-        <span className="font-bold text-gray-900 dark:text-white text-sm sm:text-base">
+        <span className="font-black text-[#1a1a2e] dark:text-white text-sm sm:text-base">
           {view === "week"
             ? `${weekDates[0].toLocaleDateString("en-IN", { month: "short", day: "numeric" })} — ${weekDates[6].toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}`
             : currentDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })
           }
         </span>
         <button onClick={() => navigate(1)} className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition cursor-pointer">
-          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <ChevronRight className="w-5 h-5 text-[#4a4a5a] dark:text-[#a0a0b0]" />
         </button>
       </div>
 
@@ -117,26 +131,31 @@ export default function CalendarPage() {
             const dayClasses = getClassesForDay(date.getDay());
             const dateStr = date.toISOString().slice(0, 10);
             const dayRecords = recordMap.get(dateStr) || [];
+            const today = isToday(date);
             return (
-              <div key={i} className={clsx("rounded-2xl p-3 min-h-[180px] bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all",
-                isToday(date) ? "border-violet-500/60 ring-2 ring-violet-500/20 bg-violet-50/40 dark:bg-violet-500/10 dark:border-violet-500/40" : ""
-              )}>
-                <div className="text-center mb-2.5 pb-2 border-b border-gray-100 dark:border-white/5">
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{DAYS[date.getDay()]}</p>
-                  <p className={clsx("text-lg font-extrabold", isToday(date) ? "text-violet-600 dark:text-violet-400" : "text-gray-900 dark:text-white")}>{date.getDate()}</p>
+              <div
+                key={i}
+                className={clsx(
+                  "card-3d p-3 min-h-[180px] transition-all",
+                  today && "border-[#FF2D78] shadow-[0_6px_0_0_#FF2D78] bg-[#FF2D78]/5"
+                )}
+              >
+                <div className="text-center mb-2.5 pb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
+                  <p className="text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80]">{DAYS[date.getDay()]}</p>
+                  <p className={clsx("text-lg font-black", today ? "text-[#FF2D78]" : "text-[#1a1a2e] dark:text-white")}>{date.getDate()}</p>
                 </div>
                 <div className="space-y-1.5">
                   {dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     return (
-                      <div key={cls.id} className="p-2 rounded-xl text-xs bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5" style={{ borderLeft: `3px solid ${cls.subject.colorHex}` }}>
-                        <p className="font-bold truncate text-gray-900 dark:text-gray-200">{cls.subject.name}</p>
-                        <p className="text-gray-500 dark:text-gray-400 font-medium text-[11px] mt-0.5">{cls.startTime}</p>
-                        {rec && <span className={clsx("inline-block mt-1 w-2 h-2 rounded-full", STATUS_DOT[rec.status])} />}
+                      <div key={cls.id} className="p-2 rounded-xl text-xs bg-gray-50 dark:bg-[#0f0f1c] border-2 border-gray-200 dark:border-[#2a2a3d]" style={{ borderLeft: `4px solid ${cls.subject.colorHex || '#FF2D78'}` }}>
+                        <p className="font-black truncate text-[#1a1a2e] dark:text-white">{cls.subject.name}</p>
+                        <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-mono font-bold text-[11px] mt-0.5">{cls.startTime}</p>
+                        {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full", STATUS_DOT[rec.status])} />}
                       </div>
                     );
                   })}
-                  {dayClasses.length === 0 && <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-6 font-medium">No classes</p>}
+                  {dayClasses.length === 0 && <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] text-center mt-6 font-bold">No classes</p>}
                 </div>
               </div>
             );
@@ -144,20 +163,23 @@ export default function CalendarPage() {
         </StaggerGrid>
       ) : (
         /* Month View */
-        <div className="rounded-2xl p-4 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl transition-all" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
+        <div className="card-3d p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}>
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((d) => <div key={d} className="text-center text-xs font-bold text-gray-500 dark:text-gray-400 py-1">{d}</div>)}
+            {DAYS.map((d) => <div key={d} className="text-center text-xs font-black text-[#4a4a5a] dark:text-[#6b6b80] py-1">{d}</div>)}
           </div>
-          <StaggerGrid className="grid grid-cols-7 gap-1" delay={200} staggerDelay={30} animation="scaleIn">
+          <StaggerGrid className="grid grid-cols-7 gap-2" delay={200} staggerDelay={30} animation="scaleIn">
             {monthDays.map((date, i) => {
               if (!date) return <div key={i} />;
               const dateStr = date.toISOString().slice(0, 10);
               const dayRecords = recordMap.get(dateStr) || [];
+              const today = isToday(date);
               return (
-                <div key={i} className={clsx("p-2 rounded-xl text-center min-h-[64px] transition",
-                  isToday(date) ? "bg-violet-50 border border-violet-400 dark:bg-violet-500/10 dark:border-violet-500/50" : "hover:bg-gray-50 dark:hover:bg-white/5"
+                <div key={i} className={clsx("p-2 rounded-xl text-center min-h-[64px] border-2 transition",
+                  today
+                    ? "bg-[#FF2D78]/10 border-[#FF2D78] shadow-[0_3px_0_0_#FF2D78]"
+                    : "bg-gray-50 dark:bg-[#0f0f1c] border-gray-200 dark:border-[#2a2a3d] hover:border-gray-400"
                 )}>
-                  <p className={clsx("text-sm", isToday(date) ? "font-extrabold text-violet-600 dark:text-violet-400" : "font-semibold text-gray-700 dark:text-gray-300")}>{date.getDate()}</p>
+                  <p className={clsx("text-sm font-black", today ? "text-[#FF2D78]" : "text-[#1a1a2e] dark:text-white")}>{date.getDate()}</p>
                   <div className="flex justify-center gap-1 mt-1.5 flex-wrap">
                     {dayRecords.map((r: any, ri: number) => (
                       <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
@@ -168,7 +190,7 @@ export default function CalendarPage() {
               );
             })}
           </StaggerGrid>
-          <div className="flex items-center gap-4 mt-6 text-xs font-semibold text-gray-500 dark:text-gray-400 justify-center flex-wrap">
+          <div className="flex items-center gap-4 mt-6 text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] justify-center flex-wrap">
             {Object.entries(STATUS_DOT).slice(0, 4).map(([k, v]) => (
               <span key={k} className="flex items-center gap-1.5">
                 <div className={clsx("w-2.5 h-2.5 rounded-full", v.split(" ")[0])} /> <span className="capitalize">{k}</span>

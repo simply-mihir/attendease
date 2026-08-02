@@ -86,27 +86,27 @@ export default function SemesterDetailPage() {
       <div className="flex items-center gap-4" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <Link
           href="/semesters"
-          className="p-2.5 rounded-2xl bg-white border border-gray-200/60 shadow-sm hover:bg-gray-50 text-gray-600 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/10 transition-colors"
+          className="btn-3d-secondary p-2.5 rounded-2xl cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white flex items-center gap-3 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white flex items-center gap-3 tracking-tight">
             {semester.name}
             {semester.isCurrent && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#06d6a0]/15 text-[#06d6a0] border border-[#06d6a0]">
                 ACTIVE
               </span>
             )}
           </h1>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">
             {new Date(semester.startDate).toLocaleDateString()} — {new Date(semester.endDate).toLocaleDateString()}
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200/60 dark:border-white/10 pb-4 overflow-x-auto no-scrollbar" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
+      <div className="flex gap-2 border-b-2 border-gray-100 dark:border-[#2a2a3d] pb-4 overflow-x-auto no-scrollbar" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
         {[
           { id: "dashboard", label: "Dashboard", icon: <FileText className="w-4 h-4" /> },
           { id: "holidays", label: "Holidays", icon: <Calendar className="w-4 h-4" /> },
@@ -116,10 +116,10 @@ export default function SemesterDetailPage() {
             key={t.id}
             onClick={() => setActiveTab(t.id as any)}
             className={clsx(
-              "px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer",
+              "px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer border-2",
               activeTab === t.id
-                ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-white/10 dark:text-white dark:border-white/10 shadow-sm"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
+                ? "bg-[#7b2cbf] border-[#5a189a] text-white shadow-[0_3px_0_0_#5a189a]"
+                : "btn-3d-secondary"
             )}
           >
             {t.icon} {t.label}
@@ -143,33 +143,33 @@ export default function SemesterDetailPage() {
           <div className="space-y-6">
             <form
               onSubmit={addHoliday}
-              className="rounded-3xl p-5 sm:p-6 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex flex-col sm:flex-row gap-4 items-end"
+              className="card-3d p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-end"
             >
               <div className="flex-1 w-full">
-                <label className="block text-xs font-bold mb-1.5 text-gray-700 dark:text-gray-300">Holiday Name</label>
+                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Holiday Name</label>
                 <input
                   type="text"
                   required
                   value={holidayName}
                   onChange={e => setHolidayName(e.target.value)}
                   placeholder="e.g. Diwali"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d"
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-bold mb-1.5 text-gray-700 dark:text-gray-300">Date</label>
+                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Date</label>
                 <input
                   type="date"
                   required
                   value={holidayDate}
                   onChange={e => setHolidayDate(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d"
                 />
               </div>
               <button
                 disabled={adding}
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center gap-2 h-[42px] shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+                className="btn-3d-primary w-full sm:w-auto px-6 py-2.5 font-black text-xs flex items-center justify-center gap-2 h-[42px] cursor-pointer disabled:opacity-50"
               >
                 {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Add Holiday
               </button>
@@ -179,15 +179,15 @@ export default function SemesterDetailPage() {
               {semester.holidays?.map((h: any) => (
                 <div
                   key={h.id}
-                  className="rounded-2xl p-4 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex items-center justify-between group hover:border-purple-300 dark:hover:border-white/20 transition-all"
+                  className="card-3d p-4 flex items-center justify-between group transition-all"
                 >
                   <div>
-                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">{h.name}</h4>
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{new Date(h.date).toLocaleDateString()}</p>
+                    <h4 className="font-black text-sm text-[#1a1a2e] dark:text-white">{h.name}</h4>
+                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{new Date(h.date).toLocaleDateString()}</p>
                   </div>
                   <button
                     onClick={() => deleteHoliday(h.id)}
-                    className="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    className="w-8 h-8 rounded-xl bg-[#ef476f]/10 text-[#ef476f] hover:bg-[#ef476f]/20 flex items-center justify-center transition-all cursor-pointer"
                     title="Delete holiday"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -195,7 +195,7 @@ export default function SemesterDetailPage() {
                 </div>
               ))}
               {semester.holidays?.length === 0 && (
-                <div className="col-span-full py-8 text-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                <div className="col-span-full py-8 text-center text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                   No holidays added yet.
                 </div>
               )}
@@ -207,43 +207,43 @@ export default function SemesterDetailPage() {
           <div className="space-y-6">
             <form
               onSubmit={addExam}
-              className="rounded-3xl p-5 sm:p-6 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex flex-col sm:flex-row gap-4 items-end"
+              className="card-3d p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-end"
             >
               <div className="flex-1 w-full">
-                <label className="block text-xs font-bold mb-1.5 text-gray-700 dark:text-gray-300">Exam Period Name</label>
+                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Exam Period Name</label>
                 <input
                   type="text"
                   required
                   value={examName}
                   onChange={e => setExamName(e.target.value)}
                   placeholder="e.g. Midterms"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d"
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-bold mb-1.5 text-gray-700 dark:text-gray-300">Start Date</label>
+                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">Start Date</label>
                 <input
                   type="date"
                   required
                   value={examStart}
                   onChange={e => setExamStart(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d"
                 />
               </div>
               <div className="flex-1 w-full">
-                <label className="block text-xs font-bold mb-1.5 text-gray-700 dark:text-gray-300">End Date</label>
+                <label className="block text-xs font-black mb-1.5 text-[#1a1a2e] dark:text-white">End Date</label>
                 <input
                   type="date"
                   required
                   value={examEnd}
                   onChange={e => setExamEnd(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-white/5 dark:border-white/10 dark:text-white font-medium"
+                  className="input-3d"
                 />
               </div>
               <button
                 disabled={adding}
                 type="submit"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center gap-2 h-[42px] shadow-md shadow-purple-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+                className="btn-3d-primary w-full sm:w-auto px-6 py-2.5 font-black text-xs flex items-center justify-center gap-2 h-[42px] cursor-pointer disabled:opacity-50"
               >
                 {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Add Exam
               </button>
@@ -253,17 +253,17 @@ export default function SemesterDetailPage() {
               {semester.examPeriods?.map((ep: any) => (
                 <div
                   key={ep.id}
-                  className="rounded-2xl p-4 bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl flex items-center justify-between group hover:border-purple-300 dark:hover:border-white/20 transition-all"
+                  className="card-3d p-4 flex items-center justify-between group transition-all"
                 >
                   <div>
-                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">{ep.name}</h4>
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <h4 className="font-black text-sm text-[#1a1a2e] dark:text-white">{ep.name}</h4>
+                    <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                       {new Date(ep.startDate).toLocaleDateString()} — {new Date(ep.endDate).toLocaleDateString()}
                     </p>
                   </div>
                   <button
                     onClick={() => deleteExam(ep.id)}
-                    className="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    className="w-8 h-8 rounded-xl bg-[#ef476f]/10 text-[#ef476f] hover:bg-[#ef476f]/20 flex items-center justify-center transition-all cursor-pointer"
                     title="Delete exam period"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function SemesterDetailPage() {
                 </div>
               ))}
               {semester.examPeriods?.length === 0 && (
-                <div className="col-span-full py-8 text-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                <div className="col-span-full py-8 text-center text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                   No exam periods added yet.
                 </div>
               )}

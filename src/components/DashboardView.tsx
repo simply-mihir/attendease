@@ -205,12 +205,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     <PageTransition direction="up" staggerChildren={false} className="space-y-6">
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
-                  {/* Greeting */}
+      {/* Greeting */}
       <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          Hello, <span className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 dark:from-violet-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">{displayName}</span>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">
+          Hello, <span className="text-[#FF2D78]">{displayName}</span>
         </h1>
-        <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-sm font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">
           {dashboard?.semesterName 
             ? `Your attendance report for ${dashboard.semesterName} is ready. Let's make every class count!` 
             : "Here is your attendance overview. Let's make every class count!"} 
@@ -220,41 +220,40 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       </div>
 
       {/* Semester Banner */}
-      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:shadow-none p-5 overflow-hidden gap-4" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a] p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF2D78]/10 text-[#FF2D78] border border-[#FF2D78]/20 shadow-sm">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-white">{dashboard?.semesterName || "All Semesters"}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{today?.dayName}, {today?.date}</p>
+            <h2 className="font-extrabold text-[#1a1a2e] dark:text-white">{dashboard?.semesterName || "All Semesters"}</h2>
+            <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80]">{today?.dayName}, {today?.date}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-white/5 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer"
+              className="btn-3d-ghost flex items-center gap-2 px-4 py-2 text-sm font-bold cursor-pointer"
             >
               <ArrowDown className="h-4 w-4" /> Import
             </button>
           )}
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 px-4 py-2 text-sm font-bold text-white shadow-md shadow-violet-500/20 hover:shadow-lg hover:shadow-violet-500/30 transition-all active:scale-95">
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-3d-primary flex items-center gap-2 px-4 py-2 text-sm font-bold">
             <Plus className="h-4 w-4" /> Add Subject
           </Link>
         </div>
       </div>
 
       {todayHoliday && (
-        <div className="rounded-2xl border border-teal-200 bg-teal-50 dark:border-teal-500/20 dark:bg-teal-500/5 dark:backdrop-blur-xl p-5 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
+        <div className="rounded-2xl border-2 border-[#06d6a0]/30 bg-[#06d6a0]/10 dark:border-[#06d6a0]/20 dark:bg-[#06d6a0]/5 p-5 mb-6 shadow-[0_4px_0_0_#06d6a0/20]" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/20 text-[#06d6a0] border border-[#06d6a0]/30">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-bold text-teal-800 dark:text-teal-300">{todayHoliday.name}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Holiday today — no classes scheduled. Enjoy!</p>
+              <h3 className="font-extrabold text-[#06d6a0] dark:text-[#06d6a0]">{todayHoliday.name}</h3>
+              <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#c4c4d4]">Holiday today — no classes scheduled. Enjoy!</p>
             </div>
           </div>
         </div>
@@ -262,13 +261,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Danger Alert */}
       {isCurrent && dangerSubjectsList.length > 0 && (
-        <div className="rounded-2xl p-4 flex items-start gap-3 bg-rose-50 border border-rose-200 dark:bg-rose-500/5 dark:border-rose-500/20 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shrink-0 shadow-md shadow-rose-500/20">
+        <div className="rounded-2xl p-4 flex items-start gap-3 bg-[#ef476f]/10 border-2 border-[#ef476f]/30 shadow-[0_4px_0_0_#ef476f/20] mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 50ms forwards" }}>
+          <div className="w-10 h-10 rounded-xl bg-[#ef476f] border border-[#c43559] flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#c43559]">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
           <div>
-            <p className="font-bold text-rose-700 dark:text-rose-400 text-sm">Attendance Danger Zone</p>
-            <p className="text-sm text-rose-600/90 dark:text-gray-300 mt-1">
+            <p className="font-extrabold text-[#ef476f] text-sm">Attendance Danger Zone</p>
+            <p className="text-sm font-medium text-[#ef476f]/90 dark:text-rose-300 mt-1">
               {dangerSubjectsList.map((s) => s.name).join(", ")} — below minimum threshold. Attend classes immediately!
             </p>
           </div>
@@ -279,81 +278,73 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {dashboard && (
         <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
           {/* Overall (Teal) */}
-          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
-            bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:shadow-teal-500/15 hover:border-teal-300
-            dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.07] dark:hover:border-teal-500/30 dark:hover:shadow-lg dark:hover:shadow-teal-500/15">
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+            bg-[#06d6a0]/[0.06] border-2 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#06d6a0]
+            dark:bg-[#06d6a0]/[0.08] dark:border-[#06d6a0]/40 dark:shadow-[0_6px_0_0_#049e77] dark:hover:shadow-[0_4px_0_0_#049e77]">
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">Overall</p>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400 group-hover:scale-110 group-hover:bg-teal-200 dark:group-hover:bg-teal-500/20 transition-all">
+                <p className="text-xs font-bold text-[#06d6a0] uppercase tracking-wider">Overall</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/20 text-[#06d6a0] border border-[#06d6a0]/30 shadow-sm">
                   <TrendingUp className="h-5 w-5" />
                 </div>
               </div>
-              <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight"><AnimatedCounter value={overallPct} suffix="%" /></p>
+              <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={overallPct} suffix="%" /></p>
             </div>
           </div>
 
-          {/* Subjects (Blue) */}
-          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
-            bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:shadow-blue-500/15 hover:border-blue-300
-            dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.07] dark:hover:border-blue-500/30 dark:hover:shadow-lg dark:hover:shadow-blue-500/15">
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Subjects (Royal Blue) */}
+          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+            bg-[#4361ee]/[0.06] border-2 border-[#4361ee]/40 shadow-[0_6px_0_0_#4361ee] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#4361ee]
+            dark:bg-[#4361ee]/[0.08] dark:border-[#4361ee]/40 dark:shadow-[0_6px_0_0_#3451cc] dark:hover:shadow-[0_4px_0_0_#3451cc]">
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">Subjects</p>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 group-hover:scale-110 group-hover:bg-blue-200 dark:group-hover:bg-blue-500/20 transition-all">
+                <p className="text-xs font-bold text-[#4361ee] uppercase tracking-wider">Subjects</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361ee]/20 text-[#4361ee] border border-[#4361ee]/30 shadow-sm">
                   <BookOpen className="h-5 w-5" />
                 </div>
               </div>
-              <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight"><AnimatedCounter value={totalSubjects} /></p>
+              <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={totalSubjects} /></p>
             </div>
           </div>
 
           {/* Streak (Orange) */}
-          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
-            bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:shadow-orange-500/15 hover:border-orange-300
-            dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.07] dark:hover:border-orange-500/30 dark:hover:shadow-lg dark:hover:shadow-orange-500/15">
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+            bg-[#ff6b35]/[0.06] border-2 border-[#ff6b35]/40 shadow-[0_6px_0_0_#ff6b35] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ff6b35]
+            dark:bg-[#ff6b35]/[0.08] dark:border-[#ff6b35]/40 dark:shadow-[0_6px_0_0_#cc5529] dark:hover:shadow-[0_4px_0_0_#cc5529]">
             {currentStreak > 0 && (
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-orange-500/15 blur-2xl" style={{ animation: "streakGlow 2s ease-in-out infinite" }} />
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-[#ff6b35]/20 blur-2xl" style={{ animation: "streakGlow 2s ease-in-out infinite" }} />
             )}
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">Streak</p>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 group-hover:scale-110 group-hover:bg-orange-200 dark:group-hover:bg-orange-500/20 transition-all">
+                <p className="text-xs font-bold text-[#ff6b35] uppercase tracking-wider">Streak</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/20 text-[#ff6b35] border border-[#ff6b35]/30 shadow-sm">
                   <Flame className="h-5 w-5" style={currentStreak > 0 ? { animation: "streakFlicker 1.5s ease-in-out infinite" } : undefined} />
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
+                <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
                 {currentStreak > 0 && (
                   <div className="relative h-8 w-6">
-                    <Flame className="h-5 w-5 text-orange-500 dark:text-orange-400 absolute bottom-0 left-0" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
-                    <Flame className="h-3 w-3 text-amber-400/80 absolute bottom-1 left-2" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
+                    <Flame className="h-5 w-5 text-[#ff6b35] absolute bottom-0 left-0" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+                    <Flame className="h-3 w-3 text-amber-400/90 absolute bottom-1 left-2" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* In Danger (Rose) */}
-          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
-            bg-white border border-gray-200/60 shadow-sm hover:shadow-md hover:shadow-rose-500/15 hover:border-rose-300
-            dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.07] dark:hover:border-rose-500/30 dark:hover:shadow-lg dark:hover:shadow-rose-500/15">
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/50 to-transparent" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* In Danger (Coral) */}
+          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+            bg-[#ef476f]/[0.06] border-2 border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ef476f]
+            dark:bg-[#ef476f]/[0.08] dark:border-[#ef476f]/40 dark:shadow-[0_6px_0_0_#c43559] dark:hover:shadow-[0_4px_0_0_#c43559]">
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">{isCurrent ? "In Danger" : "Failed"}</p>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all group-hover:scale-110 ${dangerCount > 0 ? "bg-rose-100 text-rose-600 group-hover:bg-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:group-hover:bg-rose-500/20" : "bg-teal-100 text-teal-600 group-hover:bg-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:group-hover:bg-teal-500/20"}`}>
+                <p className="text-xs font-bold text-[#ef476f] uppercase tracking-wider">{isCurrent ? "In Danger" : "Failed"}</p>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${dangerCount > 0 ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" : "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"}`}>
                   <AlertTriangle className="h-5 w-5" />
                 </div>
               </div>
-              <p className={`text-3xl font-extrabold tracking-tight ${dangerCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-900 dark:text-white"}`}><AnimatedCounter value={dangerCount} /></p>
+              <p className={`text-3xl font-black tracking-tight ${dangerCount > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}><AnimatedCounter value={dangerCount} /></p>
             </div>
           </div>
         </StaggerGrid>
@@ -363,26 +354,24 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {isCurrent && goalPlan && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 120ms forwards" }}>
           {goalPlan.goalEnabled && goalPlan.todaysPlan.length > 0 ? (
-            <div className="rounded-2xl border overflow-hidden transition-all
-              bg-white border-gray-200/60 shadow-sm hover:shadow-md
-              dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.06]">
+            <div className="rounded-2xl border-2 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] overflow-hidden transition-all">
               <button
                 onClick={() => setGoalExpanded(!goalExpanded)}
                 className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-500/10 flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[#9b5de5]/20 text-[#9b5de5] border border-[#9b5de5]/30 flex items-center justify-center font-bold shadow-sm">
                     <Target className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-bold text-gray-900 dark:text-white">Today&apos;s Goal Plan</h3>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <h3 className="font-extrabold text-[#1a1a2e] dark:text-white">Today&apos;s Goal Plan</h3>
+                    <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80]">
                       Attend {goalPlan.summary.mustAttend} of {goalPlan.summary.total} to stay on track
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20">
+                  <span className="px-3 py-1 rounded-full text-xs font-black bg-[#9b5de5]/20 text-[#9b5de5] border border-[#9b5de5]/30">
                     {goalPlan.goalPct}% goal
                   </span>
                   <ChevronDown className={clsx("w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform", goalExpanded && "rotate-180")} />
@@ -394,26 +383,26 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     <div
                       key={cls.scheduleId}
                       className={clsx(
-                        "flex items-center gap-3 p-3 rounded-xl border transition",
-                        cls.priority === "mandatory" ? "border-rose-200 bg-rose-50/50 dark:border-rose-500/30 dark:bg-rose-500/5" :
-                        cls.priority === "recommended" ? "border-amber-200 bg-amber-50/50 dark:border-amber-500/30 dark:bg-amber-500/5" :
-                        "border-teal-200 bg-teal-50/50 dark:border-teal-500/30 dark:bg-teal-500/5"
+                        "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
+                        cls.priority === "mandatory" ? "border-[#ef476f]/30 bg-[#ef476f]/[0.06]" :
+                        cls.priority === "recommended" ? "border-[#ff6b35]/30 bg-[#ff6b35]/[0.06]" :
+                        "border-[#06d6a0]/30 bg-[#06d6a0]/[0.06]"
                       )}
                     >
-                      <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: cls.colorHex }} />
+                      <div className="w-2 h-10 rounded-full shadow-sm" style={{ backgroundColor: cls.colorHex }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">{cls.subjectName}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5">
+                        <p className="font-bold text-sm text-[#1a1a2e] dark:text-white truncate">{cls.subjectName}</p>
+                        <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] flex items-center gap-2 mt-0.5 font-medium">
                           <Clock className="w-3 h-3" /> {cls.startTime} - {cls.endTime}
                           {cls.room && <><MapPin className="w-3 h-3 ml-1" /> {cls.room}</>}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
                         <span className={clsx(
-                          "text-xs font-bold px-2.5 py-1 rounded-lg",
-                          cls.priority === "mandatory" ? "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400" :
-                          cls.priority === "recommended" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400" :
-                          "bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400"
+                          "text-xs font-bold px-2.5 py-1 rounded-lg border",
+                          cls.priority === "mandatory" ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" :
+                          cls.priority === "recommended" ? "bg-[#ff6b35]/20 text-[#ff6b35] border-[#ff6b35]/30" :
+                          "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"
                         )}>
                           {cls.priority === "mandatory" ? "🔴 Must attend" :
                            cls.priority === "recommended" ? "🟡 Should attend" :
@@ -426,20 +415,18 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               )}
             </div>
           ) : !goalPlan.goalEnabled ? (
-            <Link href="/settings/goal" className="group relative flex items-center justify-between rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer
-              bg-gradient-to-r from-violet-50 to-pink-50 border border-violet-200/60 shadow-sm hover:shadow-md hover:shadow-violet-500/10 hover:border-violet-300
-              dark:from-violet-500/[0.05] dark:to-pink-500/[0.05] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:from-violet-500/[0.08] dark:hover:to-pink-500/[0.08] dark:hover:border-violet-500/25">
-              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+            <Link href="/settings/goal" className="group relative flex items-center justify-between rounded-2xl overflow-hidden p-5 transition-all duration-150 hover:translate-y-[2px] cursor-pointer
+              bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
               <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 shadow-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#9b5de5]/20 text-[#9b5de5] border border-[#9b5de5]/30 shadow-sm">
                   <Target className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white">Set Your Attendance Goal</h3>
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Get a daily action plan showing which classes to attend</p>
+                  <h3 className="font-extrabold text-[#1a1a2e] dark:text-white">Set Your Attendance Goal</h3>
+                  <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80]">Get a daily action plan showing which classes to attend</p>
                 </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#FF2D78] group-hover:translate-x-1 transition-all" />
             </Link>
           ) : null}
         </div>
@@ -448,8 +435,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Today's Classes */}
       {isCurrent && todayClasses.length > 0 && (
         <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 150ms forwards" }}>
-          <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
-            <Sparkles className="w-5 h-5 text-violet-500" /> Today&apos;s Classes
+          <h2 className="text-lg font-extrabold mb-3 flex items-center gap-2 text-[#1a1a2e] dark:text-white">
+            <Sparkles className="w-5 h-5 text-[#FF2D78]" /> Today&apos;s Classes
           </h2>
           <StaggerGrid className="grid gap-3" delay={180} staggerDelay={80} animation="fadeSlideUp">
             {todayClasses.map((cls, i) => (
@@ -463,8 +450,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {dashboard && subjectsList.length > 0 && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">All Subjects</h2>
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{subjectsList.length} courses</span>
+            <h2 className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">All Subjects</h2>
+            <span className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{subjectsList.length} courses</span>
           </div>
           <StaggerGrid className="grid gap-4 md:grid-cols-2" delay={250} staggerDelay={80} animation="fadeSlideUp">
             {subjectsList.map((s: any, i: number) => {
@@ -473,75 +460,64 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               const statusLabel = isCurrent ? (percentage >= min ? "On track" : percentage >= min - 5 ? "At risk" : "Action needed") :
                                             (percentage >= min ? "Met requirement" : "Failed requirement");
               
-              const accentColors = [
-                { from: "from-violet-500", to: "to-pink-500", hover: "hover:border-violet-300 dark:hover:border-violet-500/30", shadow: "hover:shadow-violet-500/10" },
-                { from: "from-blue-500", to: "to-cyan-500", hover: "hover:border-blue-300 dark:hover:border-blue-500/30", shadow: "hover:shadow-blue-500/10" },
-                { from: "from-teal-500", to: "to-emerald-500", hover: "hover:border-teal-300 dark:hover:border-teal-500/30", shadow: "hover:shadow-teal-500/10" },
-                { from: "from-orange-500", to: "to-amber-500", hover: "hover:border-orange-300 dark:hover:border-orange-500/30", shadow: "hover:shadow-orange-500/10" },
-                { from: "from-pink-500", to: "to-rose-500", hover: "hover:border-pink-300 dark:hover:border-pink-500/30", shadow: "hover:shadow-pink-500/10" },
-                { from: "from-cyan-500", to: "to-blue-500", hover: "hover:border-cyan-300 dark:hover:border-cyan-500/30", shadow: "hover:shadow-cyan-500/10" },
-                { from: "from-rose-500", to: "to-pink-500", hover: "hover:border-rose-300 dark:hover:border-rose-500/30", shadow: "hover:shadow-rose-500/10" },
+              const popColors = [
+                "#FF2D78", // Hot Pink
+                "#4361ee", // Royal Blue
+                "#06d6a0", // Electric Teal
+                "#ff6b35", // Vivid Orange
+                "#9b5de5", // Purple
+                "#4cc9f0", // Cyan
+                "#f15bb5", // Magenta
               ];
-              const accent = accentColors[i % accentColors.length];
-              const barColorStyle = s.colorHex ? { backgroundColor: s.colorHex, backgroundImage: 'none' } : {};
+              const cardColor = s.colorHex || popColors[i % popColors.length];
 
               return (
               <Link key={s.id} href={`/subjects/${s.id}`}
-                className={`group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 cursor-pointer block
-                  bg-white border border-gray-200/60 border-l-4 shadow-sm hover:shadow-md ${accent.shadow}
-                  dark:bg-white/[0.04] dark:border-white/[0.08] dark:border-l-4 dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.07] dark:hover:shadow-lg
-                  ${accent.hover}`}
-                style={{ borderLeftColor: s.colorHex || undefined }}
+                className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150 hover:translate-y-[2px] cursor-pointer block
+                  bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] hover:shadow-[0_4px_0_0_#d1d5db]
+                  dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a] dark:hover:shadow-[0_4px_0_0_#0d0d1a]"
+                style={{ borderLeftWidth: "6px", borderLeftColor: cardColor }}
               >
-                {/* Top gradient line */}
-                <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
-                
-                {/* Left accent bar */}
-                <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-gradient-to-b ${accent.from} ${accent.to}`} style={barColorStyle} />
-                
-                <div className="pl-4">
+                <div>
                   <div className="flex items-center justify-between mb-1">
                     <div className="min-w-0 pr-4">
-                      <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors truncate">{s.name}</h3>
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">{s.code}</p>
+                      <h3 className="font-extrabold text-[#1a1a2e] dark:text-white group-hover:text-[#FF2D78] transition-colors truncate">{s.name}</h3>
+                      <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5">{s.code}</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-violet-600 dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#FF2D78] group-hover:translate-x-1 transition-all" />
                   </div>
                   
-                  {/* Progress bar */}
+                  {/* Progress bar — 3D Inset Chunky Bar */}
                   <div className="mt-3 mb-2">
-                    <div className="h-2.5 w-full rounded-full bg-gray-100 dark:bg-white/[0.06] overflow-hidden">
+                    <div className="h-3 w-full rounded-full bg-gray-100 dark:bg-[#0d0d1a] border border-gray-200/60 dark:border-[#2a2a3d]/60 overflow-hidden p-[1px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
                       <div
-                        className={`h-full rounded-full transition-all duration-700 ease-out ${
-                          percentage >= 75
-                            ? "bg-gradient-to-r from-teal-500 to-emerald-400"
-                            : percentage >= 60
-                            ? "bg-gradient-to-r from-orange-500 to-amber-400"
-                            : "bg-gradient-to-r from-rose-500 to-pink-400"
-                        }`}
-                        style={{ width: `${Math.min(100, percentage)}%` }}
+                        className="h-full rounded-full transition-all duration-700 ease-out shadow-sm"
+                        style={{
+                          width: `${Math.min(100, percentage)}%`,
+                          backgroundColor: percentage >= 75 ? "#06d6a0" : percentage >= 60 ? "#ff6b35" : "#ef476f"
+                        }}
                       />
                     </div>
                   </div>
 
                   {/* Stats Row */}
                   <div className="flex items-center justify-between pt-1">
-                    <span className={`text-sm font-extrabold ${
-                      percentage >= 75 ? "text-teal-600 dark:text-teal-400" :
-                      percentage >= 60 ? "text-orange-600 dark:text-orange-400" :
-                      "text-rose-600 dark:text-rose-400"
+                    <span className={`text-sm font-black ${
+                      percentage >= 75 ? "text-[#06d6a0]" :
+                      percentage >= 60 ? "text-[#ff6b35]" :
+                      "text-[#ef476f]"
                     }`}>
                       {percentage}%
                     </span>
-                    <span className={`text-xs font-semibold ${
-                      percentage >= 75 ? "text-teal-700 dark:text-teal-400/80" :
-                      percentage >= 60 ? "text-orange-700 dark:text-orange-400/80" :
-                      "text-rose-700 dark:text-rose-400/80"
+                    <span className={`text-xs font-bold ${
+                      percentage >= 75 ? "text-[#06d6a0]" :
+                      percentage >= 60 ? "text-[#ff6b35]" :
+                      "text-[#ef476f]"
                     }`}>
                       {statusLabel}
                     </span>
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                      <Flame className="h-3.5 w-3.5 text-orange-500 dark:text-orange-400" /> {s.totalPresent ?? 0}
+                    <span className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80] flex items-center gap-1">
+                      <Flame className="h-3.5 w-3.5 text-[#ff6b35]" /> {s.totalPresent ?? 0}
                     </span>
                   </div>
                 </div>
@@ -553,24 +529,24 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
       {/* Empty state */}
       {dashboard && totalSubjects === 0 && (
-        <div className="text-center py-16 rounded-2xl bg-white border border-gray-200/60 shadow-sm dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 100ms forwards" }}>
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20">
+        <div className="text-center py-16 rounded-2xl bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 100ms forwards" }}>
+          <div className="w-20 h-20 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#cc1a5e]">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">No subjects yet</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">Add your first subject to start tracking attendance</p>
+          <h2 className="text-xl font-black mb-2 text-[#1a1a2e] dark:text-white">No subjects yet</h2>
+          <p className="text-[#4a4a5a] dark:text-[#6b6b80] mb-6 font-medium">Add your first subject to start tracking attendance</p>
 
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-gradient px-6 py-3 rounded-xl inline-flex items-center gap-2 font-bold shadow-md shadow-violet-500/20">
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-3d-primary px-6 py-3 rounded-xl inline-flex items-center gap-2 font-bold">
             <Plus className="w-5 h-5" /> Add Your First Subject
           </Link>
-          <p className="text-gray-400 dark:text-gray-500 text-sm mt-3">or</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-3 font-semibold">or</p>
           <div className="flex flex-col gap-2 mt-2 items-center">
             {isCurrent && activeSemId && (
-              <button onClick={() => setShowImportSubjects(true)} className="btn-gradient-cyan px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 w-full max-w-xs font-bold cursor-pointer">
+              <button onClick={() => setShowImportSubjects(true)} className="btn-3d-cyan px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 w-full max-w-xs font-bold cursor-pointer">
                 <Download className="w-5 h-5" /> Import Existing Subjects
               </button>
             )}
-            <Link href="/import" className="px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-gray-300 dark:border-white/10 transition w-full max-w-xs font-medium">
+            <Link href="/import" className="btn-3d-secondary px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 w-full max-w-xs font-bold">
               <Camera className="w-5 h-5" /> Import from Timetable Photo
             </Link>
           </div>
@@ -580,12 +556,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Import Modal */}
       {showImportSubjects && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowImportSubjects(false)}>
-          <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border shadow-2xl bg-white border-gray-200 dark:border-white/10 dark:bg-[#0f172a] dark:backdrop-blur-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-lg max-h-[80vh] flex flex-col rounded-2xl border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a]" onClick={(e) => e.stopPropagation()}>
             
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-white/5">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Import Subjects</h3>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
+            <div className="p-6 border-b-2 border-gray-200 dark:border-[#2a2a3d]">
+              <h3 className="text-lg font-black text-[#1a1a2e] dark:text-white">Import Subjects</h3>
+              <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80] mt-1">
                 Add existing subjects to this semester
               </p>
             </div>
@@ -599,8 +575,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   {/* Orphan subjects */}
                   {importableSubjects?.orphans && importableSubjects.orphans.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      <h4 className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-3 flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-[#ff6b35]" />
                         Unassigned Subjects
                       </h4>
                       <div className="space-y-2">
@@ -620,8 +596,8 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   {/* Subjects from other semesters */}
                   {importableSubjects?.fromOtherSemesters && importableSubjects.fromOtherSemesters.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-blue-500" />
+                      <h4 className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-3 flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-[#4361ee]" />
                         From Other Semesters
                       </h4>
                       <div className="space-y-2">
@@ -640,7 +616,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
                   {(!importableSubjects?.orphans?.length && !importableSubjects?.fromOtherSemesters?.length) && (
                     <div className="flex flex-col items-center justify-center py-8">
-                      <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">No subjects available to import</p>
+                      <p className="text-[#4a4a5a] dark:text-[#c4c4d4] text-sm font-semibold">No subjects available to import</p>
                       <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">All subjects are already in this semester</p>
                     </div>
                   )}
@@ -649,16 +625,16 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-gray-200 dark:border-white/5 flex items-center justify-between">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="p-6 border-t-2 border-gray-200 dark:border-[#2a2a3d] flex items-center justify-between">
+              <p className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                 {selectedImports.size > 0 ? `${selectedImports.size} subject${selectedImports.size > 1 ? "s" : ""} selected` : "Select subjects to import"}
               </p>
               <div className="flex items-center gap-3">
-                <button onClick={() => setShowImportSubjects(false)} className="rounded-xl px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer">
+                <button onClick={() => setShowImportSubjects(false)} className="btn-3d-ghost px-4 py-2 text-sm font-bold cursor-pointer">
                   Cancel
                 </button>
                 <button onClick={handleImport} disabled={selectedImports.size === 0 || importing}
-                  className="rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-500/20 hover:shadow-lg hover:shadow-violet-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  className="btn-3d-primary px-5 py-2.5 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
                 >
                   {importing ? "Importing..." : `Import ${selectedImports.size > 0 ? selectedImports.size : ""}`}
                 </button>

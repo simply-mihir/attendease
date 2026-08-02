@@ -127,211 +127,209 @@ export default function WidgetPage() {
   ) || [];
 
   return (
-    <div className="space-y-3 animate-fade-in max-w-lg mx-auto">
+    <div className="space-y-4 animate-fade-in max-w-lg mx-auto p-4 bg-[#fafafa] dark:bg-[#0a0e1a] min-h-screen">
       {/* Overall percentage */}
       {dashboard && (
-        <div className="glass rounded-2xl p-4 flex items-center justify-between">
+        <div className="card-3d p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
               className={clsx(
-                "w-10 h-10 rounded-xl flex items-center justify-center shadow-lg",
+                "w-11 h-11 rounded-2xl flex items-center justify-center border-2 shadow-[0_3px_0_0_rgba(0,0,0,0.2)]",
                 dashboard.overallPct >= 75
-                  ? "bg-gradient-to-br from-green-500 to-emerald-500 shadow-green-500/20"
-                  : "bg-gradient-to-br from-red-500 to-orange-500 shadow-red-500/20"
+                  ? "bg-[#06d6a0] border-[#05a87e] text-white shadow-[#05a87e]"
+                  : "bg-[#ef476f] border-[#c43559] text-white shadow-[#c43559]"
               )}
             >
-              <TrendingUp className="w-5 h-5 text-white" />
+              <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-2xl font-black text-text">
+              <p className="text-2xl font-black text-[#1a1a2e] dark:text-white">
                 {dashboard.overallPct}%
               </p>
-              <p className="text-xs text-text-muted font-semibold">
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] font-bold">
                 Overall Attendance
               </p>
             </div>
           </div>
-          {dashboard.dangerSubjects > 0 && (
-            <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-500/10 text-red-400 border border-red-500/20">
-              {dashboard.dangerSubjects} in danger
-            </span>
-          )}
+          <Link href="/dashboard" className="btn-3d-secondary px-3 py-2 text-xs flex items-center gap-1 cursor-pointer">
+            Dashboard <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       )}
 
-      {/* Next class card */}
+      {/* Next Class Quick Mark */}
       {nextClass && (
-        <div className="glass rounded-2xl p-4 border-l-4" style={{ borderLeftColor: nextClass.colorHex }}>
+        <div className="card-3d p-4 border-[#FF2D78]/30 bg-[#FF2D78]/5 dark:border-[#b81e56]/30 shadow-[0_4px_0_0_#cc1a5e/20] dark:shadow-[0_4px_0_0_#b81e56/20]">
           <div className="flex items-center justify-between mb-3">
+            <h3 className="font-black text-[#1a1a2e] dark:text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#FF2D78]" /> Next Class
+            </h3>
+            <span className="text-xs font-bold text-[#FF2D78] bg-[#FF2D78]/10 px-2.5 py-1 rounded-xl">
+              {getCountdown(nextClass.startTime)}
+            </span>
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <div
+              className="w-1.5 rounded-full"
+              style={{ backgroundColor: nextClass.colorHex }}
+            />
             <div>
-              <p className="text-xs text-text-muted font-bold uppercase tracking-wider">
-                Next Class
-              </p>
-              <h3 className="font-black text-text text-lg">
+              <p className="font-black text-[#1a1a2e] dark:text-white truncate max-w-[200px]">
                 {nextClass.subjectName}
-              </h3>
-            </div>
-            <div className="text-right">
-              <span className="text-xs font-black px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                {getCountdown(nextClass.startTime)}
-              </span>
+              </p>
+              <div className="flex items-center gap-3 text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-bold">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  {nextClass.startTime}
+                </span>
+                {nextClass.room && (
+                  <span className="flex items-center gap-1 truncate max-w-[100px]">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {nextClass.room}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-xs text-text-muted mb-3">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {nextClass.startTime} - {nextClass.endTime}
-            </span>
-            {nextClass.room && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {nextClass.room}
-              </span>
-            )}
-            <span
-              className={clsx(
-                "font-bold",
-                nextClass.statusColor === "green"
-                  ? "text-green-400"
-                  : nextClass.statusColor === "yellow"
-                  ? "text-yellow-400"
-                  : "text-red-400"
-              )}
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              disabled={!!marking}
+              onClick={() =>
+                quickMark(nextClass.subjectId, nextClass.scheduleId, "present")
+              }
+              className="btn-3d-success py-2 text-sm flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
             >
-              {nextClass.currentPct}%
-            </span>
-          </div>
-          {/* Quick mark buttons */}
-          <div className="grid grid-cols-4 gap-2">
-            {(["present", "absent", "late", "cancelled"] as const).map(
-              (status) => (
-                <button
-                  key={status}
-                  onClick={() =>
-                    quickMark(
-                      nextClass.subjectId,
-                      nextClass.scheduleId,
-                      status
-                    )
-                  }
-                  disabled={marking === `${nextClass.subjectId}-${status}`}
-                  className={clsx(
-                    "py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1",
-                    status === "present"
-                      ? "glass border-green-500/20 text-green-400 hover:bg-green-500/10"
-                      : status === "absent"
-                      ? "glass border-red-500/20 text-red-400 hover:bg-red-500/10"
-                      : status === "late"
-                      ? "glass border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/10"
-                      : "glass border-slate-500/20 text-slate-400 hover:bg-slate-500/10"
-                  )}
-                >
-                  {status === "present" ? (
-                    <CheckCircle2 className="w-3 h-3" />
-                  ) : status === "absent" ? (
-                    <XCircle className="w-3 h-3" />
-                  ) : status === "late" ? (
-                    <Timer className="w-3 h-3" />
-                  ) : (
-                    <Ban className="w-3 h-3" />
-                  )}
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </button>
-              )
-            )}
+              <CheckCircle2 className="w-4 h-4" /> Present
+            </button>
+            <button
+              disabled={!!marking}
+              onClick={() =>
+                quickMark(nextClass.subjectId, nextClass.scheduleId, "absent")
+              }
+              className="btn-3d-danger py-2 text-sm flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+            >
+              <XCircle className="w-4 h-4" /> Absent
+            </button>
           </div>
         </div>
       )}
 
-      {/* Danger subjects strip */}
+      {/* Action Plan (Danger subjects) */}
       {dangerSubjects.length > 0 && (
-        <div>
-          <p className="text-xs font-black text-red-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-            <AlertTriangle className="w-3 h-3" /> Danger Subjects
-          </p>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="card-3d p-4 border-[#ef476f]/30 bg-[#ef476f]/5 dark:border-[#c43559]/30 shadow-[0_4px_0_0_#c43559/20]">
+          <h3 className="font-black text-[#1a1a2e] dark:text-white flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-4 h-4 text-[#ef476f]" /> Danger Zone
+          </h3>
+          <div className="space-y-2">
             {dangerSubjects.map((s) => (
               <div
                 key={s.id}
-                className="glass rounded-xl px-3 py-2 flex items-center gap-2 shrink-0 border-red-500/20"
+                className="flex items-center justify-between p-2 rounded-xl bg-white/50 dark:bg-black/20 border-2 border-[#ef476f]/10"
               >
-                <div
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: s.colorHex }}
-                />
-                <span className="text-xs font-bold text-text whitespace-nowrap">
-                  {s.name}
-                </span>
-                <span className="text-xs font-black text-red-400">
-                  {s.currentPercentage}%
-                </span>
+                <div className="flex items-center gap-2 min-w-0 pr-2">
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: s.colorHex }}
+                  />
+                  <p className="text-sm font-bold text-[#1a1a2e] dark:text-white truncate">
+                    {s.name}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-sm font-black text-[#ef476f]">
+                    {s.currentPercentage}%
+                  </span>
+                  <span className="text-[10px] font-black uppercase bg-[#ef476f] text-white px-2 py-0.5 rounded-lg">
+                    +{s.mustAttendCount} classes
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Today's remaining classes */}
+      {/* Today's Schedule Overview */}
       {today && today.classes.length > 0 && (
-        <div className="glass rounded-2xl p-4">
-          <p className="text-xs font-black text-text-muted uppercase tracking-wider mb-2">
-            Today&apos;s Classes
-          </p>
+        <div className="card-3d p-4">
+          <h3 className="font-black text-[#1a1a2e] dark:text-white mb-3">Today</h3>
           <div className="space-y-2">
-            {today.classes.map((cls) => (
+            {today.classes.map((c) => (
               <div
-                key={cls.scheduleId}
-                className="flex items-center gap-3 py-1.5"
+                key={c.scheduleId}
+                className={clsx(
+                  "flex items-center justify-between p-3 rounded-2xl border-2 transition-all cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1f1f35]",
+                  c.attendanceMarked
+                    ? "border-transparent bg-gray-50 dark:bg-white/5 opacity-70"
+                    : "border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#141425]"
+                )}
               >
-                <div
-                  className="w-1.5 h-8 rounded-full shrink-0"
-                  style={{ backgroundColor: cls.colorHex }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-text truncate">
-                    {cls.subjectName}
-                  </p>
-                  <p className="text-xs text-text-muted">
-                    {cls.startTime} - {cls.endTime}
-                  </p>
-                </div>
-                <div className="shrink-0">
-                  {cls.attendanceMarked ? (
-                    <span
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-1.5 h-10 rounded-full shrink-0"
+                    style={{ backgroundColor: c.colorHex }}
+                  />
+                  <div className="min-w-0">
+                    <p
                       className={clsx(
-                        "w-2.5 h-2.5 rounded-full inline-block",
-                        cls.attendanceStatus === "present"
-                          ? "bg-green-400"
-                          : cls.attendanceStatus === "late"
-                          ? "bg-yellow-400"
-                          : cls.attendanceStatus === "cancelled"
-                          ? "bg-slate-400"
-                          : "bg-red-400"
+                        "text-sm font-black truncate",
+                        c.attendanceMarked
+                          ? "line-through text-[#9ca3af] dark:text-[#6b6b80]"
+                          : "text-[#1a1a2e] dark:text-white"
                       )}
-                    />
-                  ) : (
-                    <span className="w-2.5 h-2.5 rounded-full inline-block bg-white/20" />
-                  )}
+                    >
+                      {c.subjectName}
+                    </p>
+                    <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-0.5 font-bold">
+                      {c.startTime}
+                    </p>
+                  </div>
                 </div>
+
+                {c.attendanceMarked ? (
+                  <div
+                    className={clsx(
+                      "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2",
+                      c.attendanceStatus === "present"
+                        ? "bg-[#06d6a0]/10 text-[#06d6a0] border-[#06d6a0]/30"
+                        : c.attendanceStatus === "absent"
+                        ? "bg-[#ef476f]/10 text-[#ef476f] border-[#ef476f]/30"
+                        : "bg-gray-100 text-gray-500 border-gray-200 dark:bg-[#2a2a3d] dark:border-[#3a3a4d]"
+                    )}
+                  >
+                    {c.attendanceStatus === "present" ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : c.attendanceStatus === "absent" ? (
+                      <XCircle className="w-4 h-4" />
+                    ) : c.attendanceStatus === "cancelled" ? (
+                      <Ban className="w-4 h-4" />
+                    ) : (
+                      <Timer className="w-4 h-4" />
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-xs font-black px-2 py-1 rounded-xl bg-gray-100 dark:bg-[#2a2a3d] text-[#9ca3af] dark:text-[#6b6b80]">
+                    Pending
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
-
-      {/* No classes today */}
+      
       {today && today.classes.length === 0 && (
-        <div className="glass rounded-2xl p-6 text-center">
-          <p className="text-text-muted text-sm font-bold">
-            No classes today — enjoy your day off! 🎉
-          </p>
+        <div className="card-3d p-6 text-center border-dashed">
+          <p className="text-sm font-black text-[#9ca3af] dark:text-[#6b6b80]">No classes today! 🎉</p>
         </div>
       )}
 
       {/* Open full app link */}
       <Link
         href="/dashboard"
-        className="flex items-center justify-center gap-2 py-3 text-sm font-bold text-text-secondary hover:text-text transition"
+        className="btn-3d-secondary w-full py-3 text-sm flex items-center justify-center gap-2 cursor-pointer"
       >
         Open full app <ArrowRight className="w-4 h-4" />
       </Link>

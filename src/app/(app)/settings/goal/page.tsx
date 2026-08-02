@@ -49,44 +49,46 @@ export default function GoalSettingsPage() {
 
   return (
     <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
-      <Link href="/settings" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-medium transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
+      <Link href="/settings" className="btn-3d-secondary inline-flex items-center gap-2 transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
 
       {/* Header */}
       <div style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 50ms forwards" }}>
-        <h1 className="text-2xl sm:text-3xl font-extrabold flex items-center gap-3 text-gray-900 dark:text-white tracking-tight">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+        <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-[#1a1a2e] dark:text-white tracking-tight">
+          <div className="w-11 h-11 rounded-2xl bg-[#ff6b35] border-2 border-[#cc5529] flex items-center justify-center shadow-[0_3px_0_0_#cc5529]">
             <Target className="w-5 h-5 text-white" />
           </div>
           Goal Mode
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 ml-[52px]">
+        <p className="text-[#4a4a5a] dark:text-[#6b6b80] text-sm font-bold mt-1 ml-[56px]">
           Set a target attendance percentage and get daily action plans
         </p>
       </div>
 
-      <StaggerGrid className="rounded-3xl p-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl space-y-6 transition-all" delay={150} staggerDelay={80} animation="fadeSlideUp">
+      <StaggerGrid className="card-3d p-6 space-y-6 transition-all" delay={150} staggerDelay={80} animation="fadeSlideUp">
         {/* Enable toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold text-gray-900 dark:text-white">Enable Goal Mode</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Show daily action plan on your dashboard</p>
+            <p className="font-black text-[#1a1a2e] dark:text-white">Enable Goal Mode</p>
+            <p className="text-xs text-[#4a4a5a] dark:text-[#6b6b80] font-bold mt-0.5">Show daily action plan on your dashboard</p>
           </div>
           <button
             role="switch"
             aria-checked={enabled}
             onClick={() => setEnabled(!enabled)}
-            className={clsx(
-              "w-12 h-7 rounded-full transition-all relative cursor-pointer",
-              enabled ? "bg-gradient-to-r from-amber-500 to-orange-500 shadow-md shadow-amber-500/20" : "bg-gray-200 dark:bg-white/10"
-            )}
+            className={`relative h-7 w-12 rounded-full border-2 transition-all duration-150 cursor-pointer ${
+              enabled
+                ? "bg-[#FF2D78] border-[#cc1a5e] shadow-[0_3px_0_0_#cc1a5e]"
+                : "bg-gray-200 border-gray-300 shadow-[0_3px_0_0_#d1d5db] dark:bg-[#2a2a3d] dark:border-[#1a1a2e] dark:shadow-[0_3px_0_0_#0d0d1a]"
+            }`}
           >
-            <div
-              className={clsx(
-                "w-5 h-5 bg-white rounded-full absolute top-1 transition-transform shadow-sm",
-                enabled ? "translate-x-6" : "translate-x-1"
-              )}
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full border-2 bg-white transition-all duration-150 ${
+                enabled
+                  ? "translate-x-5 border-white shadow-[0_2px_0_0_#cc1a5e]"
+                  : "translate-x-0.5 border-gray-300 shadow-[0_2px_0_0_#d1d5db] dark:border-[#1a1a2e] dark:shadow-[0_2px_0_0_#0d0d1a]"
+              }`}
             />
           </button>
         </div>
@@ -96,10 +98,10 @@ export default function GoalSettingsPage() {
           <div className="space-y-4 pt-2">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                <label className="block text-sm font-black text-[#1a1a2e] dark:text-white">
                   Target Attendance
                 </label>
-                <span className="text-amber-600 dark:text-amber-400 text-2xl font-extrabold tracking-tight">{targetPct}%</span>
+                <span className="text-[#ff6b35] text-2xl font-black tracking-tight">{targetPct}%</span>
               </div>
               <input
                 type="range"
@@ -107,23 +109,23 @@ export default function GoalSettingsPage() {
                 max={100}
                 value={targetPct}
                 onChange={(e) => setTargetPct(parseInt(e.target.value))}
-                className="w-full accent-amber-500 cursor-pointer h-2 bg-gray-200 dark:bg-white/10 rounded-lg"
+                className="w-full accent-[#ff6b35] cursor-pointer h-3 border-2 border-gray-200 dark:border-[#2a2a3d] bg-gray-100 dark:bg-[#0d0d1a] rounded-full shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] dark:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)]"
               />
-              <div className="flex justify-between text-xs font-semibold text-gray-400 dark:text-gray-500 mt-1">
+              <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1">
                 <span>50%</span>
                 <span>75%</span>
                 <span>100%</span>
               </div>
             </div>
 
-            <div className="p-4 bg-amber-50/60 dark:bg-amber-500/10 rounded-2xl border border-amber-200/80 dark:border-amber-500/20">
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+            <div className="p-4 bg-[#ff6b35]/10 rounded-2xl border-2 border-[#ff6b35]/30 shadow-[0_3px_0_0_rgba(255,107,53,0.2)]">
+              <p className="text-sm text-[#4a4a5a] dark:text-[#c4c4d4] font-bold">
                 {targetPct >= 90 ? (
-                  <span>🎯 <strong className="text-amber-600 dark:text-amber-400 font-bold">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
+                  <span>🎯 <strong className="text-[#ff6b35] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
                 ) : targetPct >= 75 ? (
-                  <span>✅ <strong className="text-teal-600 dark:text-teal-400 font-bold">Solid target.</strong> You&apos;ll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
+                  <span>✅ <strong className="text-[#06d6a0] font-black">Solid target.</strong> You&apos;ll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
                 ) : (
-                  <span>⚠️ <strong className="text-rose-600 dark:text-rose-400 font-bold">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
+                  <span>⚠️ <strong className="text-[#ef476f] font-black">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
                 )}
               </p>
             </div>
@@ -136,7 +138,7 @@ export default function GoalSettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-amber-500/20 hover:shadow-lg transition cursor-pointer disabled:opacity-50"
+          className="btn-3d-primary w-full py-3 font-black text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saved ? "Saved!" : "Save Goal Settings"}

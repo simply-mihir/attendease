@@ -139,32 +139,29 @@ export default function RegisterPage() {
           </div>
 
           {/* App name */}
-          <h1 className="text-3xl font-bold tracking-wider mb-2" style={{ animation: "textReveal 1s ease-out forwards" }}>
-            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-black tracking-wider mb-2" style={{ animation: "textReveal 1s ease-out forwards" }}>
+            <span className="bg-gradient-to-r from-[#FF2D78] via-[#a855f7] to-[#06d6a0] bg-clip-text text-transparent">
               ATTENDEASE
             </span>
           </h1>
-          <div className="h-px w-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent" style={{ animation: "lineExpand 1.5s ease-out 0.3s forwards" }} />
-          <p className="text-gray-500 text-sm mt-3" style={{ animation: "fadeInUp 0.6s ease-out 0.5s both" }}>
+          <div className="h-0.5 w-16 bg-gradient-to-r from-[#FF2D78] to-[#06d6a0] rounded-full" style={{ animation: "lineExpand 1.5s ease-out 0.3s forwards" }} />
+          <p className="text-[#a0a0b8] text-sm mt-3 font-semibold" style={{ animation: "fadeInUp 0.6s ease-out 0.5s both" }}>
             Smart Attendance Tracking for Students
           </p>
         </div>
 
-        {/* Register Card — glassmorphic */}
+        {/* Register Card — 3D raised */}
         <div
-          className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-2xl shadow-purple-500/5"
+          className="rounded-2xl border-2 border-[#2a2a3d] bg-[#141425] p-8 shadow-[0_10px_0_0_#0d0d1a]"
           style={{ animation: "fadeInUp 0.6s ease-out 0.3s both" }}
         >
-          {/* Gradient line at top of card */}
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent rounded-t-2xl" />
-          
-          <h1 className="text-2xl font-bold mb-1 text-white">Create your account</h1>
-          <p className="text-text-secondary text-sm mb-6">Start tracking your attendance in under a minute</p>
+          <h1 className="text-2xl font-black mb-1 text-white">Create your account</h1>
+          <p className="text-[#a0a0b8] text-sm mb-6 font-medium">Start tracking your attendance in under a minute</p>
 
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              className="btn-ghost py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 hover:border-red-500/30">
+              className="btn-3d-secondary py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 font-bold">
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 5c1.61 0 3.08.55 4.23 1.46L19.54 3.2A11.96 11.96 0 0 0 12 0 12 12 0 0 0 1.21 6.53l4.06 3.23Z"/>
                 <path fill="#34A853" d="M16.04 18.01A7.05 7.05 0 0 1 12 19.08c-2.92 0-5.44-1.78-6.52-4.32l-4.06 3.13A12 12 0 0 0 12 24c3.05 0 5.82-1.13 7.94-2.98l-3.9-3.01Z"/>
@@ -174,59 +171,59 @@ export default function RegisterPage() {
               Google
             </button>
             <button onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
-              className="btn-ghost py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 hover:border-purple-500/30">
+              className="btn-3d-secondary py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 font-bold">
               <Github className="w-4 h-4" /> GitHub
             </button>
           </div>
 
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-glass-border" />
-            <span className="text-text-muted text-xs uppercase tracking-wider">or</span>
-            <div className="flex-1 h-px bg-glass-border" />
+            <div className="flex-1 h-0.5 bg-[#2a2a3d]" />
+            <span className="text-[#6b6b80] text-xs uppercase font-bold tracking-wider">or</span>
+            <div className="flex-1 h-0.5 bg-[#2a2a3d]" />
           </div>
 
-          {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl mb-4">{error}</div>}
+          {error && <div className="bg-[#ef476f]/15 border-2 border-[#ef476f]/40 text-[#ef476f] text-sm p-3 rounded-xl mb-4 font-bold shadow-[0_3px_0_0_#9e1a38]">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-text-secondary">Full Name</label>
+              <label className="block text-sm font-bold mb-1.5 text-[#e0e0ee]">Full Name</label>
               <input type="text" value={form.fullName} onChange={(e) => update("fullName", e.target.value)} required
-                className="w-full px-4 py-3 rounded-xl input-glass text-sm" placeholder="Prateek Raushan" />
+                className="input-3d w-full text-sm" placeholder="Prateek Raushan" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-text-secondary">Email</label>
+              <label className="block text-sm font-bold mb-1.5 text-[#e0e0ee]">Email</label>
               <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required
-                className="w-full px-4 py-3 rounded-xl input-glass text-sm" placeholder="you@university.edu" />
+                className="input-3d w-full text-sm" placeholder="you@university.edu" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-text-secondary">Password</label>
+              <label className="block text-sm font-bold mb-1.5 text-[#e0e0ee]">Password</label>
               <div className="relative">
                 <input type={showPw ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} required
-                  className="w-full px-4 py-3 rounded-xl input-glass text-sm pr-11" placeholder="Min 8 characters" />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3 text-text-muted">
+                  className="input-3d w-full text-sm pr-11" placeholder="Min 8 characters" />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3.5 text-[#6b6b80] hover:text-white transition cursor-pointer">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-text-secondary">Confirm Password</label>
+              <label className="block text-sm font-bold mb-1.5 text-[#e0e0ee]">Confirm Password</label>
               <input type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} required
-                className="w-full px-4 py-3 rounded-xl input-glass text-sm" placeholder="Repeat your password" />
+                className="input-3d w-full text-sm" placeholder="Repeat your password" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3 btn-gradient rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50">
+              className="w-full py-3 btn-3d-primary rounded-xl text-sm font-black flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
               Create account
             </button>
           </form>
 
-          <p className="text-center text-sm text-text-secondary mt-6">
-            Already have an account? <Link href="/login" className="text-purple-400 font-medium hover:text-purple-300 transition">Sign in</Link>
+          <p className="text-center text-sm text-[#a0a0b8] font-medium mt-6">
+            Already have an account? <Link href="/login" className="text-[#FF2D78] font-bold hover:underline transition">Sign in</Link>
           </p>
         </div>
 
         {/* Footer text */}
-        <p className="text-center text-xs text-gray-600 mt-6" style={{ animation: "fadeInUp 0.6s ease-out 0.8s both" }}>
+        <p className="text-center text-xs text-gray-500 font-semibold mt-6" style={{ animation: "fadeInUp 0.6s ease-out 0.8s both" }}>
           Track attendance. Stay on track. Graduate with confidence.
         </p>
       </div>

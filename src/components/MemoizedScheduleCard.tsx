@@ -31,21 +31,20 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
         onSwipeLeft={() => onMark(cls.subjectId, cls.id || cls.scheduleId, "absent")}
         disabled={!!hasMarked || !!marking}
       >
-        <div className="rounded-2xl p-4 sm:p-5 bg-white border border-gray-200/60 shadow-sm hover:shadow-md dark:bg-white/[0.04] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.07] transition-all">
+        <div className="card-3d p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div
-                className="w-1.5 h-12 rounded-full"
+                className="w-2 h-12 rounded-full shadow-sm"
                 style={{
-                  backgroundColor: cls.colorHex || cls.subject?.colorHex,
-                  boxShadow: `0 0 12px ${cls.colorHex || cls.subject?.colorHex}40`,
+                  backgroundColor: cls.colorHex || cls.subject?.colorHex || "#FF2D78",
                 }}
               />
               <div>
-                <h3 className="font-bold text-gray-900 dark:text-white">
+                <h3 className="font-extrabold text-[#1a1a2e] dark:text-white">
                   {cls.subjectName || cls.subject?.name}
                 </h3>
-                <div className="flex items-center gap-3 text-xs font-medium text-gray-500 dark:text-gray-400 mt-1">
+                <div className="flex items-center gap-3 text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-1">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
                     {cls.startTime} - {cls.endTime}
@@ -62,17 +61,17 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
             <div className="text-right">
               <span
                 className={clsx(
-                  "text-xl font-extrabold tracking-tight",
+                  "text-xl font-black tracking-tight",
                   statusColor === "green" || currentPct >= minPct
-                    ? "text-teal-600 dark:text-teal-400"
+                    ? "text-[#06d6a0]"
                     : statusColor === "yellow"
-                    ? "text-orange-600 dark:text-orange-400"
-                    : "text-rose-600 dark:text-rose-400"
+                    ? "text-[#ff6b35]"
+                    : "text-[#ef476f]"
                 )}
               >
                 {currentPct}%
               </span>
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+              <p className="text-xs font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
                 min {minPct}%
               </p>
             </div>
@@ -81,14 +80,14 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
           {hasMarked ? (
             <div
               className={clsx(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)]",
                 (cls.attendanceStatus || cls.attendance?.status) === "present"
-                  ? "bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20"
+                  ? "bg-[#06d6a0]/15 text-[#06d6a0] border-[#06d6a0]/40"
                   : (cls.attendanceStatus || cls.attendance?.status) === "late"
-                  ? "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
+                  ? "bg-[#ff6b35]/15 text-[#ff6b35] border-[#ff6b35]/40"
                   : (cls.attendanceStatus || cls.attendance?.status) === "cancelled"
-                  ? "bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20"
-                  : "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                  ? "bg-gray-100 text-gray-700 border-gray-300 dark:bg-white/10 dark:text-gray-300 dark:border-white/20"
+                  : "bg-[#ef476f]/15 text-[#ef476f] border-[#ef476f]/40"
               )}
             >
               <CheckCircle2 className="w-4 h-4" />
@@ -105,14 +104,14 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                     }
                     disabled={marking === `${cls.subjectId}-${status}`}
                     className={clsx(
-                      "py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95",
+                      "py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all",
                       status === "present"
-                        ? "border border-teal-200/80 bg-teal-50/50 text-teal-700 hover:bg-teal-100 hover:border-teal-300 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20"
+                        ? "btn-3d-teal"
                         : status === "absent"
-                        ? "border border-rose-200/80 bg-rose-50/50 text-rose-700 hover:bg-rose-100 hover:border-rose-300 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20"
+                        ? "btn-3d-coral"
                         : status === "late"
-                        ? "border border-amber-200/80 bg-amber-50/50 text-amber-700 hover:bg-amber-100 hover:border-amber-300 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20"
-                        : "border border-slate-200/80 bg-slate-50/50 text-slate-700 hover:bg-slate-100 hover:border-slate-300 dark:border-slate-500/30 dark:bg-slate-500/10 dark:text-slate-400 dark:hover:bg-slate-500/20"
+                        ? "btn-3d-orange"
+                        : "btn-3d-secondary"
                     )}
                   >
                     {status === "present" ? (
