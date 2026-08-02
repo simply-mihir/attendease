@@ -62,7 +62,7 @@ export default function SettingsPage() {
         <div className="glass rounded-3xl p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-black border-2 border-border-heavy">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-black shadow-md shadow-purple-500/20">
                 {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
               </div>
               <div>
@@ -70,18 +70,18 @@ export default function SettingsPage() {
                 <p className="text-sm font-semibold text-text-secondary">{user?.email}</p>
               </div>
             </div>
-            <button onClick={openEditModal} className="btn-ghost p-3 text-text hover:text-primary transition">
+            <button onClick={openEditModal} className="btn-ghost p-3 text-text hover:text-purple-600 dark:hover:text-purple-400 transition">
               <Edit2 className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Settings links */}
-        <div className="glass rounded-3xl divide-y-2 divide-border-heavy overflow-hidden">
+        <div className="glass rounded-3xl divide-y divide-gray-200 dark:divide-white/10 overflow-hidden">
           {settingsItems.map((item) => (
             <Link key={item.href} href={item.href}
-              className="flex items-center gap-4 p-5 hover:bg-surface-3 transition">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shrink-0 border-2 border-border-heavy`}>
+              className="flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shrink-0 shadow-md`}>
                 <item.icon className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
@@ -96,8 +96,8 @@ export default function SettingsPage() {
         {/* Theme Appearance card */}
         <div className="glass rounded-3xl p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shrink-0 border-2 border-border-heavy">
-              <Moon className="w-5 h-5 text-border-heavy" />
+            <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <Moon className="w-5 h-5" />
             </div>
             <div>
               <p className="font-black text-text">Appearance</p>
@@ -108,9 +108,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Achievements link */}
-        <Link href="/analytics" className="flex items-center gap-4 glass rounded-3xl p-5 hover:bg-surface-3 transition block">
-          <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center shrink-0 border-2 border-border-heavy">
-            <Trophy className="w-5 h-5 text-border-heavy" />
+        <Link href="/analytics" className="flex items-center gap-4 glass rounded-3xl p-5 hover:bg-gray-50 dark:hover:bg-white/5 transition block">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Trophy className="w-5 h-5" />
           </div>
           <div className="flex-1">
             <p className="font-black text-text">Achievements & Badges</p>

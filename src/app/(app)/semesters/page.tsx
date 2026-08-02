@@ -62,16 +62,16 @@ export default function SemestersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className="font-bold text-lg text-text group-hover:text-purple-400 transition-colors">
+                    <h3 className="font-bold text-lg text-text group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                       {sem.name}
                     </h3>
                     {sem.isCurrent && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
                         ACTIVE
                       </span>
                     )}
                     {!sem.isCurrent && isEnded && (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-gray-500/10 text-gray-400 border border-gray-500/20">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20">
                         ENDED
                       </span>
                     )}
@@ -79,10 +79,10 @@ export default function SemestersPage() {
                   <p className="text-sm text-text-muted mb-2">
                     {new Date(sem.startDate).toLocaleDateString()} — {new Date(sem.endDate).toLocaleDateString()}
                   </p>
-                  <div className="flex items-center gap-4 text-xs font-medium text-gray-400">
-                    <span className="bg-white/5 px-2 py-1 rounded-md">{sem._count.subjects} subjects</span>
-                    <span className="bg-white/5 px-2 py-1 rounded-md">{sem._count.holidays} holidays</span>
-                    <span className="bg-white/5 px-2 py-1 rounded-md">{sem._count.examPeriods} exams</span>
+                  <div className="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span className="bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{sem._count.subjects} subjects</span>
+                    <span className="bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{sem._count.holidays} holidays</span>
+                    <span className="bg-gray-100 dark:bg-white/5 px-2 py-1 rounded-md">{sem._count.examPeriods} exams</span>
                   </div>
                 </div>
               </div>
@@ -90,7 +90,7 @@ export default function SemestersPage() {
               <div className="flex items-center gap-3 shrink-0">
                 <Link
                   href={`/semesters/${sem.id}`}
-                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-semibold transition-colors flex items-center gap-2"
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-gray-200 text-sm font-semibold transition-colors flex items-center gap-2"
                 >
                   {sem.isCurrent ? "Manage" : "View Dashboard"} <ArrowRight className="w-4 h-4" />
                 </Link>

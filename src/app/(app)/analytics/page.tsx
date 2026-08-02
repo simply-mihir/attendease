@@ -72,37 +72,45 @@ export default function AnalyticsPage() {
 
       {/* Overview cards */}
       <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4" delay={100} staggerDelay={80} animation="flipIn">
-        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
+          bg-white border border-gray-200 shadow-sm hover:shadow-md hover:shadow-purple-500/5 hover:border-purple-300
+          dark:bg-white/[0.03] dark:border-white/10 dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.06] dark:hover:border-purple-500/20 dark:hover:shadow-lg dark:hover:shadow-purple-500/5 text-center">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
           <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center mx-auto mb-2">
             <TrendingUp className="w-5 h-5 text-purple-400" />
           </div>
-          <p className="text-3xl font-bold text-white">{dashboard.overallPct}%</p>
-          <p className="text-xs text-gray-400">Overall</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{dashboard.overallPct}%</p>
+          <p className="text-xs text-gray-400 dark:text-gray-400">Overall</p>
         </div>
-        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
+          bg-white border border-gray-200 shadow-sm hover:shadow-md hover:shadow-purple-500/5 hover:border-purple-300
+          dark:bg-white/[0.03] dark:border-white/10 dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.06] dark:hover:border-purple-500/20 dark:hover:shadow-lg dark:hover:shadow-purple-500/5 text-center">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-2">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-3xl font-bold text-white">{dashboard.safeSubjects}</p>
-          <p className="text-xs text-gray-400">Safe</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{dashboard.safeSubjects}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-400">Safe</p>
         </div>
-        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
+          bg-white border border-gray-200 shadow-sm hover:shadow-md hover:shadow-purple-500/5 hover:border-purple-300
+          dark:bg-white/[0.03] dark:border-white/10 dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.06] dark:hover:border-purple-500/20 dark:hover:shadow-lg dark:hover:shadow-purple-500/5 text-center">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
           <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center mx-auto mb-2">
             <ShieldAlert className="w-5 h-5 text-red-400" />
           </div>
-          <p className="text-3xl font-bold text-white">{dashboard.dangerSubjects}</p>
-          <p className="text-xs text-gray-400">In Danger</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{dashboard.dangerSubjects}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-400">In Danger</p>
         </div>
-        <div className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 transition-all duration-300 hover:bg-white/[0.06] hover:border-purple-500/20 hover:shadow-lg hover:shadow-purple-500/5 overflow-hidden text-center">
+        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1
+          bg-white border border-gray-200 shadow-sm hover:shadow-md hover:shadow-purple-500/5 hover:border-purple-300
+          dark:bg-white/[0.03] dark:border-white/10 dark:backdrop-blur-xl dark:shadow-none dark:hover:bg-white/[0.06] dark:hover:border-purple-500/20 dark:hover:shadow-lg dark:hover:shadow-purple-500/5 text-center">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-2">
             <Flame className="w-5 h-5 text-amber-400" />
           </div>
-          <p className="text-3xl font-bold text-white">{dashboard.currentStreak}</p>
-          <p className="text-xs text-gray-400">Streak</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{dashboard.currentStreak}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-400">Streak</p>
         </div>
       </StaggerGrid>
 
@@ -113,7 +121,7 @@ export default function AnalyticsPage() {
 
       {/* Heatmap */}
       <div className="glass rounded-2xl p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
-        <h3 className="font-semibold mb-4 text-white">Attendance Heatmap — {year}</h3>
+        <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">Attendance Heatmap — {year}</h3>
         <div className="overflow-x-auto">
           <div className="flex gap-0.5" style={{ minWidth: "700px" }}>
             {weeks.map((week, wi) => (
@@ -140,14 +148,14 @@ export default function AnalyticsPage() {
 
       {/* Per-subject details */}
       <div className="glass rounded-2xl p-5" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
-        <h3 className="font-semibold mb-4 text-white">Subject Breakdown</h3>
+        <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">Subject Breakdown</h3>
         <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
           {dashboard.subjectsSummary.map((s: any) => (
-            <div key={s.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition">
+            <div key={s.id} className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition">
               <div className="w-2.5 h-8 rounded-full" style={{ backgroundColor: s.colorHex }} />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm text-gray-200 truncate">{s.name}</p>
-                <div className="h-1.5 bg-white/10 rounded-full mt-1">
+                <p className="font-medium text-sm text-gray-700 dark:text-gray-200 truncate">{s.name}</p>
+                <div className="h-1.5 bg-gray-100 dark:bg-white/10 rounded-full mt-1">
                   <div className={clsx("h-full rounded-full",
                     s.statusColor === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" : s.statusColor === "yellow" ? "bg-gradient-to-r from-yellow-500 to-amber-400" : "bg-gradient-to-r from-red-500 to-rose-400"
                   )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />

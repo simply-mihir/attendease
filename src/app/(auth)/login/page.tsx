@@ -144,7 +144,7 @@ export default function LoginPage() {
           {/* Gradient line at top of card */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent rounded-t-2xl" />
           
-          <h1 className="text-2xl font-bold mb-1">Welcome back</h1>
+          <h1 className="text-2xl font-bold mb-1 text-white">Welcome back</h1>
           <p className="text-text-secondary text-sm mb-6">Sign in to continue tracking your attendance</p>
 
           {/* OAuth buttons */}

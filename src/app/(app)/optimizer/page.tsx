@@ -99,11 +99,12 @@ export default function OptimizerPage() {
           </div>
           <div>
             {result.safeToSkipAll ? (
-              <p className="text-sm font-bold text-green-400">
-                You can safely skip {result.totalSkipsUsed} classes this week! ✨
+              <p className="text-sm font-bold text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                <span>You can safely skip {result.totalSkipsUsed} classes this week!</span>
+                <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 inline" />
               </p>
             ) : (
-              <p className="text-sm font-bold text-red-400">
+              <p className="text-sm font-bold text-red-600 dark:text-red-400">
                 You can only safely skip {result.totalSkipsUsed} out of {result.totalRequested} requested classes
               </p>
             )}

@@ -83,22 +83,22 @@ export function ProfileSwitcher() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-glass-border text-xs font-medium select-none"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-xs font-medium select-none"
         style={{ transition: "background-color 0.15s ease" }}
       >
         <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shrink-0">
           <GraduationCap className="w-3 h-3" />
         </div>
-        <span className="max-w-[130px] truncate text-text">
+        <span className="max-w-[130px] truncate text-gray-900 dark:text-gray-100">
           {currentProfile?.name || "Select Profile"}
         </span>
-        <ChevronDown className={clsx("w-3.5 h-3.5 text-text-muted transition-transform duration-200", open && "rotate-180")} />
+        <ChevronDown className={clsx("w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-200", open && "rotate-180")} />
       </button>
 
       {/* Dropdown */}
       {open && (
         <div
-          className="absolute left-0 mt-2 w-64 glass-strong rounded-2xl p-2 z-50 shadow-2xl space-y-1 border border-glass-border"
+          className="absolute left-0 mt-2 w-64 rounded-2xl p-2 z-50 shadow-2xl space-y-1 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-700"
           style={{ animation: "dropdown-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
         >
           <style>{`
@@ -107,7 +107,7 @@ export function ProfileSwitcher() {
               to { opacity: 1; transform: translateY(0) scale(1); }
             }
           `}</style>
-          <div className="px-3 py-1.5 text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+          <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
             Degree Profiles
           </div>
           {profiles.map((p) => (
@@ -117,14 +117,14 @@ export function ProfileSwitcher() {
               className={clsx(
                 "flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium text-left",
                 p.isCurrent
-                  ? "bg-purple-500/15 text-purple-400 border border-purple-500/30"
-                  : "hover:bg-white/5 text-text-secondary",
+                  ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/30"
+                  : "hover:bg-gray-100 text-gray-600 dark:hover:bg-white/5 dark:text-gray-400",
                 "transition-colors duration-150"
               )}
             >
               <div className="truncate pr-2">
-                <p className="font-semibold text-text truncate">{p.name}</p>
-                <p className="text-[10px] text-text-muted truncate">{p.degreeType}{p.institution ? ` · ${p.institution}` : ""}</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{p.name}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{p.degreeType}{p.institution ? ` · ${p.institution}` : ""}</p>
               </div>
               {p.isCurrent && <Check className="w-4 h-4 text-purple-400 shrink-0" />}
             </button>
@@ -155,12 +155,12 @@ export function ProfileSwitcher() {
           `}</style>
 
           <div
-            className="glass-strong rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-purple-500/30"
+            className="rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-purple-500/30"
             style={{ animation: "modal-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gradient">Add New Degree Profile</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-text-muted hover:text-text transition-colors">
+              <h3 className="text-lg font-bold text-purple-700 dark:text-purple-400">Add New Degree Profile</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>

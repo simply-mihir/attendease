@@ -107,7 +107,7 @@ export default function SubjectsPage() {
                       <p className="text-xs text-text-muted">{s.code || "No code"} {s.instructorName && `· ${s.instructorName}`}</p>
                     </div>
                   </div>
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-2">
+                  <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden mb-2">
                     <div className={clsx("h-full rounded-full transition-all duration-500",
                       color === "green" ? "bg-gradient-to-r from-green-500 to-emerald-400" : color === "yellow" ? "bg-gradient-to-r from-yellow-500 to-amber-400" : "bg-gradient-to-r from-red-500 to-rose-400"
                     )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
@@ -121,16 +121,16 @@ export default function SubjectsPage() {
                 </Link>
 
                 <div className="flex items-center gap-2 text-xs pt-2 border-t border-glass-border">
-                  <span className="px-2 py-1 bg-white/5 rounded-lg text-text-secondary">{s.totalClassesHeld} classes</span>
+                  <span className="px-2 py-1 bg-gray-100 dark:bg-white/5 rounded-lg text-gray-500 dark:text-gray-400">{s.totalClassesHeld} classes</span>
                   <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-lg">{s.totalPresent} present</span>
                   <span className="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg">{s.totalAbsent} absent</span>
                   <div className="ml-auto flex items-center gap-1">
                     <button onClick={(e) => { e.preventDefault(); toggleArchive(s.id, s.isArchived); }}
-                      className="p-1.5 text-text-muted hover:text-yellow-400 transition rounded-lg hover:bg-white/5" title={s.isArchived ? "Restore" : "Archive"}>
+                      className="p-1.5 text-gray-400 hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-400 transition rounded-lg hover:bg-yellow-50 dark:hover:bg-white/5" title={s.isArchived ? "Restore" : "Archive"}>
                       {s.isArchived ? <RotateCcw className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
                     </button>
                     <button onClick={(e) => { e.preventDefault(); setDeletingSubject(s); }}
-                      className="p-1.5 text-text-muted hover:text-red-400 transition rounded-lg hover:bg-red-500/10" title="Delete Subject">
+                      className="p-1.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10" title="Delete Subject">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

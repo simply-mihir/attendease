@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Github, UserPlus } from "lucide-react";
+import { Eye, EyeOff, Loader2, Github, UserPlus, GraduationCap } from "lucide-react";
 import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             </div>
             <div className="absolute inset-2 rounded-full border border-violet-500/15" style={{ animation: "spinSlow 5s linear infinite reverse" }} />
             <div className="absolute inset-5 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-violet-600 shadow-xl shadow-purple-500/30" style={{ animation: "breathe 2.5s ease-in-out infinite" }}>
-              <span className="text-2xl">🎓</span>
+              <GraduationCap className="h-7 w-7 text-white" />
             </div>
           </div>
 
@@ -158,7 +158,7 @@ export default function RegisterPage() {
           {/* Gradient line at top of card */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent rounded-t-2xl" />
           
-          <h1 className="text-2xl font-bold mb-1">Create your account</h1>
+          <h1 className="text-2xl font-bold mb-1 text-white">Create your account</h1>
           <p className="text-text-secondary text-sm mb-6">Start tracking your attendance in under a minute</p>
 
           {/* OAuth buttons */}
