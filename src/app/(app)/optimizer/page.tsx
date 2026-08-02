@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { Skeleton } from "@/components/Skeleton";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -32,7 +33,7 @@ export default function OptimizerPage() {
   const initialLoad = loading && !result;
 
   if (initialLoad) {
-    return <FuturisticLoader variant="section" title="Loading optimizer" Icon={Zap} />;
+    // We'll show skeletons
   }
 
   return (
@@ -77,7 +78,15 @@ export default function OptimizerPage() {
       </div>
 
       {/* Summary banner */}
-      {result && !loading && (
+      {initialLoad ? (
+        <div className="rounded-2xl border-2 p-5 flex items-center gap-4 mb-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+          <Skeleton className="w-12 h-12 rounded-2xl shrink-0" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-64" />
+            <Skeleton className="h-3 w-48" />
+          </div>
+        </div>
+      ) : result && (
         <div
           className={clsx(
             "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150",
@@ -120,8 +129,32 @@ export default function OptimizerPage() {
       )}
 
       {/* Results */}
-      {result && !loading && (
-        <StaggerGrid className="space-y-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
+      {initialLoad ? (
+        <div className="space-y-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="rounded-2xl border-2 p-5 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <Skeleton className="h-5 w-32 mb-1" />
+                    <Skeleton className="h-6 w-24 rounded-lg" />
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Skeleton className="h-4 w-12" />
+                    <ArrowRight className="w-4 h-4 text-gray-300 dark:text-[#2a2a3d]" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <Skeleton className="h-3 w-16 ml-auto" />
+                </div>
+              </div>
+              <Skeleton className="h-1.5 w-full rounded-full" />
+            </div>
+          ))}
+        </div>
+      ) : result && (
+        <StaggerGrid className={clsx("space-y-3", loading && "opacity-50")} delay={150} staggerDelay={80} animation="fadeSlideUp">
           {result.recommendations.length === 0 ? (
             <div className="rounded-2xl border-2 p-8 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
               <div className="w-14 h-14 rounded-2xl bg-[#ef476f]/10 border-2 border-[#d63b5f] flex items-center justify-center mx-auto mb-3 text-[#ef476f] shadow-[0_2px_0_0_#d63b5f]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/Skeleton";
 import { Shield, Zap, Crown, Trophy, Sparkles, Lock, Star, Award, Flame, TrendingUp, Target, Calendar } from "lucide-react";
 
 // ===== BADGE DEFINITIONS =====
@@ -123,6 +124,7 @@ const ALL_BADGES: BadgeDef[] = [
 ];
 
 export default function AchievementsPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [streak, setStreak] = useState(0);
   const [totalAttended, setTotalAttended] = useState(0);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -141,6 +143,8 @@ export default function AchievementsPage() {
         }
       } catch (e) {
         console.error("Failed to fetch dashboard data for badges:", e);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchData();
@@ -197,141 +201,178 @@ export default function AchievementsPage() {
       </div>
 
       {/* Stats overview — 3D cards row */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        {/* Badges earned */}
-        <div className="rounded-2xl border-2 p-5 text-center
-          border-[#FF2D78]/30 bg-[#FF2D78]/[0.06]
-          shadow-[0_6px_0_0_rgba(255,45,120,0.15)]
-          dark:shadow-[0_6px_0_0_rgba(255,45,120,0.2)]">
-          <p className="text-sm font-semibold text-[#FF2D78] uppercase tracking-wide mb-1">Earned</p>
-          <p className="text-4xl font-extrabold text-text tracking-tight">{earnedCount}</p>
-          <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">of {ALL_BADGES.length} badges</p>
+      {isLoading ? (
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="rounded-2xl border-2 p-5 text-center
+              border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
+              dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+              <Skeleton className="h-3 w-16 mx-auto mb-3" />
+              <Skeleton className="h-10 w-12 mx-auto mb-2 rounded-xl" />
+              <Skeleton className="h-3 w-20 mx-auto" />
+            </div>
+          ))}
         </div>
-
-        {/* Current streak */}
-        <div className="rounded-2xl border-2 p-5 text-center
-          border-[#ff6b35]/30 bg-[#ff6b35]/[0.06]
-          shadow-[0_6px_0_0_rgba(255,107,53,0.15)]
-          dark:shadow-[0_6px_0_0_rgba(255,107,53,0.2)]">
-          <p className="text-sm font-semibold text-[#ff6b35] uppercase tracking-wide mb-1">Streak</p>
-          <div className="flex items-center justify-center gap-1">
-            <p className="text-4xl font-extrabold text-text tracking-tight">{streak}</p>
-            <Flame className="h-6 w-6 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+      ) : (
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {/* Badges earned */}
+          <div className="rounded-2xl border-2 p-5 text-center
+            border-[#FF2D78]/30 bg-[#FF2D78]/[0.06]
+            shadow-[0_6px_0_0_rgba(255,45,120,0.15)]
+            dark:shadow-[0_6px_0_0_rgba(255,45,120,0.2)]">
+            <p className="text-sm font-semibold text-[#FF2D78] uppercase tracking-wide mb-1">Earned</p>
+            <p className="text-4xl font-extrabold text-text tracking-tight">{earnedCount}</p>
+            <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">of {ALL_BADGES.length} badges</p>
           </div>
-          <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">days</p>
-        </div>
 
-        {/* Total classes */}
-        <div className="rounded-2xl border-2 p-5 text-center
-          border-[#06d6a0]/30 bg-[#06d6a0]/[0.06]
-          shadow-[0_6px_0_0_rgba(6,214,160,0.15)]
-          dark:shadow-[0_6px_0_0_rgba(6,214,160,0.2)]">
-          <p className="text-sm font-semibold text-[#06d6a0] uppercase tracking-wide mb-1">Attended</p>
-          <p className="text-4xl font-extrabold text-text tracking-tight">{totalAttended}</p>
-          <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">classes total</p>
+          {/* Current streak */}
+          <div className="rounded-2xl border-2 p-5 text-center
+            border-[#ff6b35]/30 bg-[#ff6b35]/[0.06]
+            shadow-[0_6px_0_0_rgba(255,107,53,0.15)]
+            dark:shadow-[0_6px_0_0_rgba(255,107,53,0.2)]">
+            <p className="text-sm font-semibold text-[#ff6b35] uppercase tracking-wide mb-1">Streak</p>
+            <div className="flex items-center justify-center gap-1">
+              <p className="text-4xl font-extrabold text-text tracking-tight">{streak}</p>
+              <Flame className="h-6 w-6 text-[#ff6b35]" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+            </div>
+            <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">days</p>
+          </div>
+
+          {/* Total classes */}
+          <div className="rounded-2xl border-2 p-5 text-center
+            border-[#06d6a0]/30 bg-[#06d6a0]/[0.06]
+            shadow-[0_6px_0_0_rgba(6,214,160,0.15)]
+            dark:shadow-[0_6px_0_0_rgba(6,214,160,0.2)]">
+            <p className="text-sm font-semibold text-[#06d6a0] uppercase tracking-wide mb-1">Attended</p>
+            <p className="text-4xl font-extrabold text-text tracking-tight">{totalAttended}</p>
+            <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-1 font-medium">classes total</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Category filter tabs — 3D pill buttons */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {categories.map(cat => (
-          <button
-            key={cat.key}
-            onClick={() => setActiveCategory(cat.key)}
-            className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all duration-150 cursor-pointer
-              ${activeCategory === cat.key
-                ? "border-[#FF2D78]/40 bg-[#FF2D78]/10 text-[#FF2D78] shadow-[0_3px_0_0_rgba(255,45,120,0.2)] translate-y-[1px]"
-                : "border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#141425] text-[#9ca3af] dark:text-[#6b6b80] shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:hover:shadow-[0_2px_0_0_#0d0d1a]"
-              }`}
-          >
-            {cat.label} ({cat.count})
-          </button>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-9 w-24 rounded-xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {categories.map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => setActiveCategory(cat.key)}
+              className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all duration-150 cursor-pointer
+                ${activeCategory === cat.key
+                  ? "border-[#FF2D78]/40 bg-[#FF2D78]/10 text-[#FF2D78] shadow-[0_3px_0_0_rgba(255,45,120,0.2)] translate-y-[1px]"
+                  : "border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#141425] text-[#9ca3af] dark:text-[#6b6b80] shadow-[0_3px_0_0_#d1d5db] dark:shadow-[0_3px_0_0_#0d0d1a] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:hover:shadow-[0_2px_0_0_#0d0d1a]"
+                }`}
+            >
+              {cat.label} ({cat.count})
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Badge grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {filteredBadges.map((badge) => {
-          const earned = isBadgeEarned(badge);
-          const isLatestStreak = badge.category === "streak" && earned && 
-            !ALL_BADGES.find(b => b.category === "streak" && b.requiredStreak! > badge.requiredStreak! && streak >= b.requiredStreak!);
+      {isLoading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="rounded-2xl border-2 p-6 text-center
+              border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
+              dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+              <Skeleton className="h-12 w-12 mx-auto mb-3 rounded-xl" />
+              <Skeleton className="h-4 w-24 mx-auto mb-2" />
+              <Skeleton className="h-3 w-16 mx-auto mb-2" />
+              <Skeleton className="h-3 w-32 mx-auto" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {filteredBadges.map((badge) => {
+            const earned = isBadgeEarned(badge);
+            const isLatestStreak = badge.category === "streak" && earned && 
+              !ALL_BADGES.find(b => b.category === "streak" && b.requiredStreak! > badge.requiredStreak! && streak >= b.requiredStreak!);
 
-          return (
-            <button
-              key={badge.id}
-              onClick={() => setSelectedBadge(selectedBadge?.id === badge.id ? null : badge)}
-              className={`relative flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition-all duration-150 text-center
-                ${earned
-                  ? "hover:translate-y-[2px] cursor-pointer"
-                  : "opacity-50 cursor-default"
-                }
-                ${selectedBadge?.id === badge.id ? "translate-y-[2px]" : ""}
-              `}
-              style={earned ? {
-                borderColor: `${badge.color}50`,
-                backgroundColor: `${badge.color}0F`,
-                boxShadow: `0 6px 0 0 ${badge.color}30`,
-              } : {
-                borderColor: "rgba(156,163,175,0.3)",
-                backgroundColor: "rgba(156,163,175,0.03)",
-                boxShadow: "0 6px 0 0 rgba(156,163,175,0.15)",
-              }}
-            >
-              {/* Badge icon */}
-              <div
-                className="relative flex h-16 w-16 items-center justify-center rounded-2xl"
+            return (
+              <button
+                key={badge.id}
+                onClick={() => setSelectedBadge(selectedBadge?.id === badge.id ? null : badge)}
+                className={`relative flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition-all duration-150 text-center
+                  ${earned
+                    ? "hover:translate-y-[2px] cursor-pointer"
+                    : "opacity-50 cursor-default"
+                  }
+                  ${selectedBadge?.id === badge.id ? "translate-y-[2px]" : ""}
+                `}
                 style={earned ? {
-                  backgroundColor: `${badge.color}1A`,
-                  animation: isLatestStreak ? "badgeBounce 2s ease-in-out infinite" : undefined,
-                } : { backgroundColor: "rgba(156,163,175,0.1)" }}
-              >
-                {earned && (
-                  <div className="absolute inset-0 rounded-2xl"
-                    style={{
-                      boxShadow: `0 0 20px ${badge.color}40, 0 0 40px ${badge.color}20`,
-                      animation: "badgeGlow 2s ease-in-out infinite",
-                    }} />
-                )}
-                {earned ? (
-                  <badge.Icon className="h-8 w-8 relative z-10" style={{ color: badge.color }} />
-                ) : (
-                  <Lock className="h-6 w-6 text-[#9ca3af] dark:text-[#6b6b80]" />
-                )}
-              </div>
-
-              {/* Name */}
-              <span className={`text-sm font-bold tracking-tight ${earned ? "text-text" : "text-[#9ca3af] dark:text-[#6b6b80]"}`}>
-                {badge.name}
-              </span>
-
-              {/* Category tag */}
-              <span className="text-[10px] font-bold uppercase tracking-widest rounded-full px-2 py-0.5"
-                style={earned ? {
-                  color: badge.color,
-                  backgroundColor: `${badge.color}15`,
+                  borderColor: `${badge.color}50`,
+                  backgroundColor: `${badge.color}0F`,
+                  boxShadow: `0 6px 0 0 ${badge.color}30`,
                 } : {
-                  color: "#9ca3af",
-                  backgroundColor: "rgba(156,163,175,0.1)",
-                }}>
-                {badge.category}
-              </span>
+                  borderColor: "rgba(156,163,175,0.3)",
+                  backgroundColor: "rgba(156,163,175,0.03)",
+                  boxShadow: "0 6px 0 0 rgba(156,163,175,0.15)",
+                }}
+              >
+                {/* Badge icon */}
+                <div
+                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl"
+                  style={earned ? {
+                    backgroundColor: `${badge.color}1A`,
+                    animation: isLatestStreak ? "badgeBounce 2s ease-in-out infinite" : undefined,
+                  } : { backgroundColor: "rgba(156,163,175,0.1)" }}
+                >
+                  {earned && (
+                    <div className="absolute inset-0 rounded-2xl"
+                      style={{
+                        boxShadow: `0 0 20px ${badge.color}40, 0 0 40px ${badge.color}20`,
+                        animation: "badgeGlow 2s ease-in-out infinite",
+                      }} />
+                  )}
+                  {earned ? (
+                    <badge.Icon className="h-8 w-8 relative z-10" style={{ color: badge.color }} />
+                  ) : (
+                    <Lock className="h-6 w-6 text-[#9ca3af] dark:text-[#6b6b80]" />
+                  )}
+                </div>
 
-              {/* Requirement */}
-              <span className="text-[11px] font-medium text-[#9ca3af] dark:text-[#6b6b80]">
-                {badge.requiredStreak ? `${badge.requiredStreak}-day streak` : badge.description.split(".")[0]}
-              </span>
+                {/* Name */}
+                <span className={`text-sm font-bold tracking-tight ${earned ? "text-text" : "text-[#9ca3af] dark:text-[#6b6b80]"}`}>
+                  {badge.name}
+                </span>
 
-              {/* Sparkle particles on latest earned */}
-              {earned && isLatestStreak && (
-                <>
-                  <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full" style={{ backgroundColor: badge.color, animation: "badgeParticle1 2s ease-in-out infinite" }} />
-                  <div className="absolute top-2 -left-1 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: badge.color, opacity: 0.6, animation: "badgeParticle2 2.5s ease-in-out 0.5s infinite" }} />
-                </>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                {/* Category tag */}
+                <span className="text-[10px] font-bold uppercase tracking-widest rounded-full px-2 py-0.5"
+                  style={earned ? {
+                    color: badge.color,
+                    backgroundColor: `${badge.color}15`,
+                  } : {
+                    color: "#9ca3af",
+                    backgroundColor: "rgba(156,163,175,0.1)",
+                  }}>
+                  {badge.category}
+                </span>
+
+                {/* Requirement */}
+                <span className="text-[11px] font-medium text-[#9ca3af] dark:text-[#6b6b80]">
+                  {badge.requiredStreak ? `${badge.requiredStreak}-day streak` : badge.description.split(".")[0]}
+                </span>
+
+                {/* Sparkle particles on latest earned */}
+                {earned && isLatestStreak && (
+                  <>
+                    <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full" style={{ backgroundColor: badge.color, animation: "badgeParticle1 2s ease-in-out infinite" }} />
+                    <div className="absolute top-2 -left-1 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: badge.color, opacity: 0.6, animation: "badgeParticle2 2.5s ease-in-out 0.5s infinite" }} />
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Selected badge detail */}
       {selectedBadge && (

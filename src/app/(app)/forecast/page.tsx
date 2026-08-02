@@ -1,6 +1,7 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { Skeleton } from "@/components/Skeleton";
 import { TrendingUp, CheckCircle2, XCircle, AlertTriangle , Sparkles } from "lucide-react";
 import clsx from "clsx";
 import {
@@ -48,11 +49,12 @@ interface ForecastResponse {
 export default function ForecastPage() {
   const { data, isLoading: loading } = useSWRFetch<ForecastResponse>("/analytics/forecast");
 
-  if (loading) {
-    return <FuturisticLoader variant="section" title="Loading forecast" Icon={Sparkles} />;
+  if (loading && !data) {
+    // We'll show skeletons instead
   }
 
-  if (!data) return null;
+  // We need to handle when data is still loading but hasn't arrived
+  const isInitialLoading = loading && !data;
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-12">
@@ -65,57 +67,89 @@ export default function ForecastPage() {
         <div>
           <h1 className="text-2xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight">Attendance Forecast</h1>
           <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80]">
-            Projected attendance by semester end ({data.summary.semesterEndDate})
+            Projected attendance by semester end {data?.summary?.semesterEndDate ? `(${data.summary.semesterEndDate})` : ""}
           </p>
         </div>
       </div>
 
       {/* Summary card */}
-      <div
-        className={clsx(
-          "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150 mb-6",
-          data.summary.passing === data.summary.total
-            ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
-            : "border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827]"
-        )}
-        style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
-      >
+      {isInitialLoading ? (
+        <div className="rounded-2xl border-2 p-5 flex items-center gap-4 mb-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+          <Skeleton className="w-12 h-12 rounded-2xl shrink-0" />
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-64" />
+            <Skeleton className="h-3 w-48" />
+          </div>
+        </div>
+      ) : data && (
         <div
           className={clsx(
-            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
+            "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150 mb-6",
             data.summary.passing === data.summary.total
-              ? "bg-[#06d6a0]/20 text-[#06d6a0] border-transparent"
-              : "bg-[#ff6b35]/20 text-[#ff6b35] border-transparent"
+              ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
+              : "border-[#e85827] bg-[#ff6b35]/10 shadow-[0_4px_0_0_#e85827] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e85827]"
           )}
+          style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}
         >
-          {data.summary.passing === data.summary.total ? (
-            <CheckCircle2 className="w-6 h-6" />
-          ) : (
-            <AlertTriangle className="w-6 h-6" />
-          )}
+          <div
+            className={clsx(
+              "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2",
+              data.summary.passing === data.summary.total
+                ? "bg-[#06d6a0]/20 text-[#06d6a0] border-transparent"
+                : "bg-[#ff6b35]/20 text-[#ff6b35] border-transparent"
+            )}
+          >
+            {data.summary.passing === data.summary.total ? (
+              <CheckCircle2 className="w-6 h-6" />
+            ) : (
+              <AlertTriangle className="w-6 h-6" />
+            )}
+          </div>
+          <div>
+            <p className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">
+              <span
+                className={clsx(
+                  data.summary.passing === data.summary.total
+                    ? "text-[#06d6a0]"
+                    : "text-[#ff6b35]"
+                )}
+              >
+                {data.summary.passing}
+              </span>{" "}
+              of {data.summary.total} subjects on track to pass
+            </p>
+            <p className={clsx("text-xs font-bold mt-0.5 opacity-80", data.summary.passing === data.summary.total ? "text-[#06d6a0]" : "text-[#ff6b35]")}>
+              Based on your historical day-of-week attendance patterns
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">
-            <span
-              className={clsx(
-                data.summary.passing === data.summary.total
-                  ? "text-[#06d6a0]"
-                  : "text-[#ff6b35]"
-              )}
-            >
-              {data.summary.passing}
-            </span>{" "}
-            of {data.summary.total} subjects on track to pass
-          </p>
-          <p className={clsx("text-xs font-bold mt-0.5 opacity-80", data.summary.passing === data.summary.total ? "text-[#06d6a0]" : "text-[#ff6b35]")}>
-            Based on your historical day-of-week attendance patterns
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Per-subject forecast cards */}
-      <StaggerGrid className="space-y-4" delay={150} staggerDelay={80} animation="fadeSlideUp">
-        {data.forecasts.map((forecast) => (
+      {isInitialLoading ? (
+        <div className="space-y-4">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="rounded-2xl border-2 p-5 sm:p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-2.5 h-12 rounded-full" />
+                  <div>
+                    <Skeleton className="h-5 w-32 mb-1" />
+                    <Skeleton className="h-3 w-40" />
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Skeleton className="h-8 w-16 mb-1 ml-auto" />
+                  <Skeleton className="h-3 w-12 ml-auto" />
+                </div>
+              </div>
+              <Skeleton className="h-48 w-full rounded-xl" />
+            </div>
+          ))}
+        </div>
+      ) : data && (
+        <StaggerGrid className="space-y-4" delay={150} staggerDelay={80} animation="fadeSlideUp">
+          {data.forecasts.map((forecast) => (
           <div
             key={forecast.subjectId}
             className="rounded-2xl border-2 p-5 sm:p-6 space-y-4 transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]"
@@ -275,6 +309,7 @@ export default function ForecastPage() {
           </div>
         )}
       </StaggerGrid>
+      )}
     </PageTransition>
   );
 }

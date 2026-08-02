@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { Skeleton } from "@/components/Skeleton";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
@@ -211,8 +212,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
   });
 
-  if (loading) {
-    return <FuturisticLoader variant="section" title="Loading your dashboard" Icon={BarChart3} />;
+  if (loading && !dashboard) {
+    // Only show full-page loader if we don't even have old data to skeleton
+    // Actually, we'll just fall through to the skeletons if we don't have dashboard data
   }
 
   return (
@@ -289,7 +291,21 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Stats Row */}
-      {dashboard && (
+      {loading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border-2 p-5
+              border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
+              dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+              <div className="flex items-center justify-between mb-3">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-10 w-10 rounded-xl" />
+              </div>
+              <Skeleton className="h-9 w-16 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      ) : dashboard && (
         <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
           {/* Overall (Teal) */}
           <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
@@ -486,7 +502,29 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Subject Cards */}
-      {dashboard && subjectsList.length > 0 && (
+      {loading ? (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border-2 p-5
+                border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
+                dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+                <Skeleton className="h-5 w-40 mb-2" />
+                <Skeleton className="h-3 w-24 mb-3" />
+                <Skeleton className="h-3 w-full rounded-full mb-2" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-12" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : dashboard && subjectsList.length > 0 && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">All Subjects</h2>
