@@ -19,6 +19,7 @@ import { apiFetch } from "@/hooks/useApi";
 import { SWRPrefetcher } from "@/components/SWRPrefetcher";
 import { ReminderNotifier } from "@/components/ReminderNotifier";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { VibrantBackground } from "@/components/VibrantBackground";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
@@ -63,64 +64,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <ProfileProvider>
     <NavigationProgress />
     <SWRPrefetcher />
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50/30 dark:bg-[#0a0e1a] dark:bg-none relative z-0">
-      {/* Dark mode vibrant gradient — VISIBLE colored washes */}
-      <div className="fixed inset-0 -z-10 hidden dark:block">
-        {/* Base */}
-        <div className="absolute inset-0 bg-[#0a0e1a]" />
-        
-        {/* Hot pink glow — top left — STRONG */}
-        <div className="absolute -top-20 -left-20 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/20 blur-[120px]" />
-        
-        {/* Blue glow — top right — STRONG */}
-        <div className="absolute -top-10 right-0 h-[400px] w-[400px] rounded-full bg-[#4361ee]/20 blur-[100px]" />
-        
-        {/* Purple glow — center left */}
-        <div className="absolute top-1/2 -left-20 h-[350px] w-[350px] rounded-full bg-[#9b5de5]/15 blur-[100px]" />
-        
-        {/* Teal glow — bottom right */}
-        <div className="absolute bottom-0 right-10 h-[400px] w-[400px] rounded-full bg-[#06d6a0]/15 blur-[100px]" />
-        
-        {/* Orange glow — bottom center */}
-        <div className="absolute -bottom-20 left-1/3 h-[300px] w-[300px] rounded-full bg-[#ff6b35]/12 blur-[100px]" />
-        
-        {/* Slow drifting animation on some orbs */}
-        <div className="absolute top-1/4 left-1/3 h-[250px] w-[250px] rounded-full bg-[#FF2D78]/10 blur-[80px]" 
-          style={{ animation: "bgOrbFloat 20s ease-in-out infinite" }} />
-        <div className="absolute top-2/3 right-1/4 h-[200px] w-[200px] rounded-full bg-[#4361ee]/10 blur-[80px]" 
-          style={{ animation: "bgOrbFloat 25s ease-in-out 5s infinite reverse" }} />
-      </div>
-      
-      {/* Light mode vibrant gradient — soft but VISIBLE colorful washes */}
-      <div className="fixed inset-0 -z-10 dark:hidden">
-        {/* Base warm white */}
-        <div className="absolute inset-0 bg-[#fafafa]" />
-        
-        {/* Pink wash — top left */}
-        <div className="absolute -top-20 -left-20 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/12 blur-[120px]" />
-        
-        {/* Blue wash — top right */}
-        <div className="absolute -top-10 right-0 h-[400px] w-[400px] rounded-full bg-[#4361ee]/10 blur-[100px]" />
-        
-        {/* Purple wash — center */}
-        <div className="absolute top-1/2 left-1/4 h-[350px] w-[350px] rounded-full bg-[#9b5de5]/8 blur-[100px]" />
-        
-        {/* Teal wash — bottom right */}
-        <div className="absolute bottom-0 right-10 h-[400px] w-[400px] rounded-full bg-[#06d6a0]/8 blur-[100px]" />
-        
-        {/* Orange wash — bottom left */}
-        <div className="absolute -bottom-20 left-10 h-[300px] w-[300px] rounded-full bg-[#ff6b35]/8 blur-[100px]" />
-        
-        {/* Slow drift */}
-        <div className="absolute top-1/3 right-1/3 h-[200px] w-[200px] rounded-full bg-[#FF2D78]/6 blur-[80px]" 
-          style={{ animation: "bgOrbFloat 22s ease-in-out 3s infinite" }} />
-      </div>
+    <div className="flex min-h-screen relative z-0">
+      {/* Vibrant scattered bubbles — covers all pages automatically */}
+      <VibrantBackground />
       <OnboardingModal />
 
       {/* Sidebar */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-40 w-[260px] flex flex-col transition-transform lg:translate-x-0 lg:static",
-        "bg-gradient-to-b from-gray-50 via-gray-50 to-gray-100 border-r-2 border-gray-200 dark:from-[#070b14] dark:via-[#0a0e1a] dark:to-[#0d1020] dark:border-[#2a2a3d]",
+        "bg-gray-50/95 border-r-2 border-gray-200 dark:bg-[#070b14]/95 dark:border-[#2a2a3d] backdrop-blur-sm",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex items-center justify-between px-5 py-5 border-b-2 border-gray-200 dark:border-[#2a2a3d]">
@@ -185,7 +137,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Main content */}
+      {/* Main content — transparent bg so bubbles show through */}
       <div className="flex-1 flex flex-col min-w-0 bg-transparent">
         <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/60 dark:bg-[#0a0e1a]/60 backdrop-blur-md border-b-2 border-gray-200 dark:border-[#2a2a3d]">
           <div className="flex items-center gap-3">

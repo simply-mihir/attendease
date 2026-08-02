@@ -40,21 +40,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4">
-      {/* Dark mode login bg */}
-      <div className="fixed inset-0 -z-10 hidden dark:block">
-        <div className="absolute inset-0 bg-[#0a0e1a]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-[#FF2D78]/25 blur-[150px]" />
-        <div className="absolute -top-20 -left-20 h-[400px] w-[400px] rounded-full bg-[#4361ee]/20 blur-[120px]" />
-        <div className="absolute -bottom-20 -right-20 h-[400px] w-[400px] rounded-full bg-[#9b5de5]/18 blur-[120px]" />
-      </div>
-      
-      {/* Light mode login bg */}
-      <div className="fixed inset-0 -z-10 dark:hidden">
-        <div className="absolute inset-0 bg-[#fafafa]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#FF2D78]/15 blur-[150px]" />
-        <div className="absolute -top-20 -left-20 h-[300px] w-[300px] rounded-full bg-[#4361ee]/10 blur-[100px]" />
-        <div className="absolute -bottom-20 -right-20 h-[300px] w-[300px] rounded-full bg-[#9b5de5]/10 blur-[100px]" />
-      </div>
       
       {/* === ANIMATED BACKGROUND === */}
       
