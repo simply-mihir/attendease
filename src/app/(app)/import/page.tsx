@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useCallback } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import {
@@ -443,7 +444,10 @@ export default function ImportPage() {
           </button>
 
           {analyzing && (
-            <FuturisticLoader variant="section" title="AI is reading your timetable..." Icon={Sparkles} />
+            <div className="card-3d p-6 flex flex-col items-center justify-center gap-4 mt-6">
+              <FieldLoader size="md" />
+              <p className="text-sm font-bold text-text-muted">AI is reading your timetable...</p>
+            </div>
           )}
         </div>
       )}

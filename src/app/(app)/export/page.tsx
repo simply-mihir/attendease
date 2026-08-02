@@ -1,11 +1,30 @@
 "use client";
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 import { PageTransition } from "@/components/PageTransition";
+
+function ExportSkeleton() {
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="h-8 w-32 bg-gray-200 dark:bg-[#141425] rounded-xl" />
+      <div>
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-gray-200 dark:bg-white/5" />
+          <div className="h-8 w-48 bg-gray-200 dark:bg-[#141425] rounded-lg" />
+        </div>
+        <div className="h-4 w-64 bg-gray-100 dark:bg-[#141425] rounded-md mt-2 ml-[56px]" />
+      </div>
+      <div className="card-3d p-6 h-64 flex items-center justify-center">
+        <FieldLoader size="lg" />
+      </div>
+    </div>
+  );
+}
 
 export default function ExportPage() {
   const [selectedSubject, setSelectedSubject] = useState("all");
@@ -15,7 +34,7 @@ export default function ExportPage() {
   const subjects = data?.subjects || [];
 
   if (pageLoading) {
-    return <FuturisticLoader variant="section" title="Loading export" Icon={Download} />;
+    return <ExportSkeleton />;
   }
 
   async function handleExport() {

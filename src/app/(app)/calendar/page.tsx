@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { ChevronLeft, ChevronRight, Clock, MapPin, CheckCircle2, XCircle, Timer , Calendar } from "lucide-react";
 import clsx from "clsx";
@@ -51,9 +52,6 @@ export default function CalendarPage() {
   const records = recData?.records || [];
   const pageLoading = schedLoading || recLoading;
 
-  if (pageLoading) {
-    return <FuturisticLoader variant="section" title="Loading calendar" Icon={Calendar} />;
-  }
 
   function navigate(dir: number) {
     const d = new Date(currentDate);
@@ -143,7 +141,15 @@ export default function CalendarPage() {
                   <p className={clsx("mt-1", today ? "text-[#FF2D78] font-extrabold text-lg" : "text-[#1a1a2e] dark:text-white font-bold text-lg")}>{date.getDate()}</p>
                 </div>
                 <div className="space-y-1.5">
-                  {dayClasses.map((cls: any) => {
+                  {pageLoading ? (
+                    <div className="py-8 flex justify-center">
+                      <FieldLoader size="md" />
+                    </div>
+                  ) : dayClasses.length === 0 ? (
+                    <div className="py-4 text-center">
+                      <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
+                    </div>
+                  ) : dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     return (
                       <div key={cls.id} className="rounded-lg border-2 px-2 py-1.5 mb-1 transition-all duration-150 cursor-pointer border-gray-200 bg-white shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: cls.subject?.colorHex || '#FF2D78' }}>
@@ -153,7 +159,7 @@ export default function CalendarPage() {
                       </div>
                     );
                   })}
-                  {dayClasses.length === 0 && <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] text-center mt-6">No classes</p>}
+                  {dayClasses.length === 0 && !pageLoading && <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] text-center mt-6">No classes</p>}
                 </div>
               </div>
             );
@@ -178,12 +184,18 @@ export default function CalendarPage() {
                     : "bg-gray-50 dark:bg-[#0d0d1a] border-gray-200 dark:border-[#2a2a3d]/50 hover:border-gray-400 dark:hover:border-gray-600"
                 )}>
                   <p className={today ? "text-[#FF2D78] font-extrabold text-sm" : "text-[#1a1a2e] dark:text-white font-bold text-sm"}>{date.getDate()}</p>
-                  <div className="flex justify-center gap-1 mt-1.5 flex-wrap">
-                    {dayRecords.map((r: any, ri: number) => (
-                      <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
-                        title={`${r.subject?.name}: ${r.status}`} />
-                    ))}
-                  </div>
+                  {pageLoading ? (
+                    <div className="flex justify-center mt-2">
+                      <FieldLoader size="sm" />
+                    </div>
+                  ) : (
+                    <div className="flex justify-center gap-1 mt-1.5 flex-wrap">
+                      {dayRecords.map((r: any, ri: number) => (
+                        <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
+                          title={`${r.subject?.name}: ${r.status}`} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

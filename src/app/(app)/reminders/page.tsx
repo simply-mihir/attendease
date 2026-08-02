@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { apiFetch } from "@/hooks/useApi";
 import {
@@ -210,7 +211,27 @@ export default function RemindersPage() {
 
       {/* Reminders List */}
       {isLoading ? (
-        <FuturisticLoader variant="section" title="Loading reminders" Icon={AlarmClock} />
+        <StaggerGrid className="space-y-3" delay={100} staggerDelay={50} animation="fadeSlideUp">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border-2 p-5 flex items-center justify-between gap-4 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ borderLeftWidth: "5px", borderLeftColor: "#4361ee" }}>
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                <div className="mt-0.5 shrink-0">
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-200 dark:border-gray-700" />
+                </div>
+                <div className="space-y-2 w-full">
+                  <div className="h-5 w-48 bg-gray-200 dark:bg-white/5 rounded-md" />
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-24 bg-gray-100 dark:bg-white/5 rounded-md" />
+                    <div className="h-4 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
+                  </div>
+                </div>
+              </div>
+              <div className="shrink-0 flex items-center">
+                <FieldLoader size="md" />
+              </div>
+            </div>
+          ))}
+        </StaggerGrid>
       ) : filteredReminders.length === 0 ? (
         <div className="rounded-2xl border-2 p-12 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
           <div className="flex justify-center mb-4">

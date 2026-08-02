@@ -1,6 +1,7 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import Link from "next/link";
 import { GraduationCap, Calendar, BookOpen, ArrowRight } from "lucide-react";
 import clsx from "clsx";
@@ -19,9 +20,6 @@ interface SemesterSummary {
 export default function SemestersPage() {
   const { data: semesters, isLoading } = useSWRFetch<SemesterSummary[]>("/semesters");
 
-  if (isLoading) {
-    return <FuturisticLoader variant="section" title="Loading semesters" Icon={GraduationCap} />;
-  }
 
   return (
     <PageTransition direction="up" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-12">
@@ -46,7 +44,30 @@ export default function SemestersPage() {
 
       {/* List */}
       <StaggerGrid className="space-y-4" delay={100} staggerDelay={80} animation="fadeSlideUp">
-        {semesters?.map((sem) => {
+        {isLoading ? (
+          [1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="group rounded-2xl border-2 p-5 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"
+              style={{ borderLeftWidth: "5px", borderLeftColor: "#4361ee" }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 shrink-0" />
+                <div className="space-y-2">
+                  <div className="h-6 w-32 bg-gray-200 dark:bg-white/5 rounded-md" />
+                  <div className="h-4 w-48 bg-gray-100 dark:bg-white/5 rounded-md" />
+                  <div className="flex gap-2">
+                    <div className="h-6 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
+                    <div className="h-6 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                 <FieldLoader size="md" />
+              </div>
+            </div>
+          ))
+        ) : semesters?.map((sem) => {
           const isEnded = new Date(sem.endDate) < new Date();
           return (
             <div

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import { Skeleton } from "@/components/Skeleton";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
@@ -255,7 +256,9 @@ export default function OptimizerPage() {
       )}
 
       {loading && !initialLoad && (
-        <FuturisticLoader variant="inline" title="Calculating optimal skip plan..." Icon={Zap} />
+        <div className="flex justify-center p-4">
+          <FieldLoader size="md" />
+        </div>
       )}
     </PageTransition>
   );

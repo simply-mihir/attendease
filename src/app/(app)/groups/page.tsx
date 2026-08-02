@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import {
@@ -127,9 +128,6 @@ export default function GroupsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   }
 
-  if (loading) {
-    return <FuturisticLoader variant="section" title="Loading groups" Icon={Users} />;
-  }
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
@@ -267,7 +265,24 @@ export default function GroupsPage() {
 
       {/* Group cards */}
       <StaggerGrid className="space-y-6" delay={150} staggerDelay={80} animation="fadeSlideUp">
-        {groups.map((group) => (
+        {loading ? (
+          [1, 2].map((i) => (
+            <div key={i} className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+              <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="h-6 w-32 bg-gray-200 dark:bg-white/5 rounded-md" />
+                    <div className="h-4 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
+                  </div>
+                  <div className="h-8 w-24 bg-gray-200 dark:bg-white/5 rounded-xl" />
+                </div>
+              </div>
+              <div className="p-8 flex justify-center items-center">
+                <FieldLoader size="lg" />
+              </div>
+            </div>
+          ))
+        ) : groups.map((group) => (
           <div
             key={group.id}
             className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"

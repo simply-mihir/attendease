@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
+import { FieldLoader } from "@/components/FieldLoader";
 import dynamic from "next/dynamic";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Skeleton } from "@/components/Skeleton";
@@ -13,7 +14,11 @@ const AnalyticsCharts = dynamic(
   () => import("@/components/AnalyticsCharts"),
   {
     ssr: false,
-    loading: () => <FuturisticLoader variant="section" title="Loading charts..." Icon={BarChart3} />,
+    loading: () => (
+      <div className="card-3d p-6 h-[300px] flex items-center justify-center">
+        <FieldLoader size="lg" />
+      </div>
+    ),
   }
 );
 

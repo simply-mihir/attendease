@@ -1,6 +1,5 @@
 "use client";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
-import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { Skeleton } from "@/components/Skeleton";
 import { TrendingUp, CheckCircle2, XCircle, AlertTriangle , Sparkles } from "lucide-react";
 import clsx from "clsx";
