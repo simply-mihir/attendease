@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
-import { Skeleton } from "@/components/Skeleton";
+import { FieldLoader } from "@/components/FieldLoader";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
@@ -291,36 +291,25 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Stats Row */}
-      {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl border-2 p-5
-              border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
-              dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-              <div className="flex items-center justify-between mb-3">
-                <Skeleton className="h-3 w-16" />
-                <Skeleton className="h-10 w-10 rounded-xl" />
+      <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
+        {/* Overall (Teal) */}
+        <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
+          bg-[#06d6a0]/[0.06] border-2 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#06d6a0]
+          dark:bg-[#06d6a0]/[0.08] dark:border-[#06d6a0]/40 dark:shadow-[0_6px_0_0_#049e77] dark:hover:shadow-[0_4px_0_0_#049e77]">
+          <div className="relative">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-bold text-[#06d6a0] uppercase tracking-wider">Overall</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/20 text-[#06d6a0] border border-[#06d6a0]/30 shadow-sm">
+                <TrendingUp className="h-5 w-5" />
               </div>
-              <Skeleton className="h-9 w-16 rounded-lg" />
             </div>
-          ))}
-        </div>
-      ) : dashboard && (
-        <StaggerGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" delay={100} staggerDelay={80} animation="fadeSlideUp">
-          {/* Overall (Teal) */}
-          <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
-            bg-[#06d6a0]/[0.06] border-2 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#06d6a0]
-            dark:bg-[#06d6a0]/[0.08] dark:border-[#06d6a0]/40 dark:shadow-[0_6px_0_0_#049e77] dark:hover:shadow-[0_4px_0_0_#049e77]">
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold text-[#06d6a0] uppercase tracking-wider">Overall</p>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/20 text-[#06d6a0] border border-[#06d6a0]/30 shadow-sm">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-              </div>
-              <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={overallPct} suffix="%" /></p>
-            </div>
+            {loading ? (
+              <div className="flex items-center h-9 mt-1"><FieldLoader size="lg" /></div>
+            ) : (
+              <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight mt-1"><AnimatedCounter value={overallPct} suffix="%" /></p>
+            )}
           </div>
+        </div>
 
           {/* Subjects (Royal Blue) */}
           <div className="group relative rounded-2xl overflow-hidden p-5 transition-all duration-150
@@ -333,7 +322,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   <BookOpen className="h-5 w-5" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={totalSubjects} /></p>
+              {loading ? (
+                <div className="flex items-center h-9 mt-1"><FieldLoader size="lg" /></div>
+              ) : (
+                <p className="text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight mt-1"><AnimatedCounter value={totalSubjects} /></p>
+              )}
             </div>
           </div>
 
@@ -353,29 +346,20 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   />
                 </div>
               </div>
-              <div className="flex items-baseline gap-1 mt-1">
-                <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
-                {currentStreak > 0 && (
-                  <div className="flex items-end -mb-0.5">
-                    {/* Main flame — large, bright */}
-                    <Flame 
-                      className="h-7 w-7 text-[#ff6b35] drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]" 
-                      fill="#ff6b35"
-                      style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} 
-                    />
-                    {/* Secondary flame — smaller, offset left behind the main one */}
-                    <Flame 
-                      className="h-5 w-5 text-[#FFD166] -ml-3 mb-0.5 drop-shadow-[0_0_6px_rgba(255,209,102,0.5)]" 
-                      fill="#FFD166"
-                      style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} 
-                    />
-                    {/* Tiny spark — topmost */}
-                    <Flame 
-                      className="h-3 w-3 text-[#fff1cc] -ml-2 mb-2 drop-shadow-[0_0_4px_rgba(255,241,204,0.6)]" 
-                      fill="#fff1cc"
-                      style={{ animation: "streakFlicker 1s ease-in-out 0.6s infinite" }} 
-                    />
-                  </div>
+              <div className="flex items-baseline gap-1 mt-1 h-9">
+                {loading ? (
+                  <FieldLoader size="lg" />
+                ) : (
+                  <>
+                    <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white tracking-tight"><AnimatedCounter value={currentStreak} /></p>
+                    {currentStreak > 0 && (
+                      <div className="flex items-end -mb-0.5">
+                        <Flame className="h-7 w-7 text-[#ff6b35] drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]" fill="#ff6b35" style={{ animation: "streakFlicker 1.5s ease-in-out infinite" }} />
+                        <Flame className="h-5 w-5 text-[#FFD166] -ml-3 mb-0.5 drop-shadow-[0_0_6px_rgba(255,209,102,0.5)]" fill="#FFD166" style={{ animation: "streakFlicker 1.2s ease-in-out 0.3s infinite" }} />
+                        <Flame className="h-3 w-3 text-[#fff1cc] -ml-2 mb-2 drop-shadow-[0_0_4px_rgba(255,241,204,0.6)]" fill="#fff1cc" style={{ animation: "streakFlicker 1s ease-in-out 0.6s infinite" }} />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -392,11 +376,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   <AlertTriangle className="h-5 w-5" />
                 </div>
               </div>
-              <p className={`text-3xl font-black tracking-tight ${dangerCount > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}><AnimatedCounter value={dangerCount} /></p>
+              {loading ? (
+                <div className="flex items-center h-9 mt-1"><FieldLoader size="lg" /></div>
+              ) : (
+                <p className={`text-3xl font-black tracking-tight mt-1 ${dangerCount > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}><AnimatedCounter value={dangerCount} /></p>
+              )}
             </div>
           </div>
         </StaggerGrid>
-      )}
 
       {/* Streak Badges */}
       {isCurrent && (
@@ -502,49 +489,27 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Subject Cards */}
-      {loading ? (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border-2 p-5
-                border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db]
-                dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-                <Skeleton className="h-5 w-40 mb-2" />
-                <Skeleton className="h-3 w-24 mb-3" />
-                <Skeleton className="h-3 w-full rounded-full mb-2" />
-                <div className="flex justify-between">
-                  <Skeleton className="h-3 w-12" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : dashboard && subjectsList.length > 0 && (
+      {(loading || (dashboard && subjectsList.length > 0)) && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 200ms forwards" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">All Subjects</h2>
-            <span className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">{subjectsList.length} courses</span>
+            <span className="text-sm font-bold text-[#4a4a5a] dark:text-[#6b6b80]">
+              {loading ? <div className="flex items-center gap-1 opacity-60"><FieldLoader size="sm" /></div> : `${subjectsList.length} courses`}
+            </span>
           </div>
           <StaggerGrid className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" delay={250} staggerDelay={80} animation="fadeSlideUp">
-            {subjectsList.map((s: any, index: number) => {
+            {(loading ? Array.from({ length: 4 }).map((_, i) => ({ id: `dummy-${i}`, dummy: true })) : subjectsList).map((s: any, index: number) => {
               const color = SUBJECT_COLORS[index % SUBJECT_COLORS.length];
-              const percentage = s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100);
-              const min = s.minAttendancePct ?? 75;
-              const attended = s.totalPresent ?? 0;
-              const total = s.totalClassesHeld ?? 0;
-              
-              // Pick status icon
+              const percentage = s.dummy ? 0 : (s.currentPercentage ?? (s.totalClassesHeld > 0 ? Math.round(((s.totalPresent + s.totalLate) / s.totalClassesHeld) * 100) : 100));
+              const min = s.dummy ? 75 : (s.minAttendancePct ?? 75);
+              const attended = s.dummy ? 0 : (s.totalPresent ?? 0);
+              const total = s.dummy ? 0 : (s.totalClassesHeld ?? 0);
               const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? Minus : TrendingDown;
               
               return (
                 <Link
                   key={s.id}
-                  href={`/subjects/${s.id}`}
+                  href={s.dummy ? "#" : `/subjects/${s.id}`}
                   className="group relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-150 block
                     hover:translate-y-[2px] overflow-hidden"
                   style={{
@@ -552,6 +517,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     backgroundColor: `${color.bg}0D`,
                     boxShadow: `0 6px 0 0 ${color.bg}30`,
                   }}
+                  onClick={(e) => s.dummy && e.preventDefault()}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.boxShadow = `0 4px 0 0 ${color.bg}30`;
                   }}
@@ -574,11 +540,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
                   <div className="relative">
                     {/* Row 1: Label + Icon */}
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[11px] font-bold uppercase tracking-wider truncate pr-2"
+                    <div className="flex items-center justify-between mb-3 h-6">
+                      <div className="text-[11px] font-bold uppercase tracking-wider truncate pr-2 flex items-center"
                         style={{ color: color.bg }}>
-                        {s.name}
-                      </p>
+                        {loading ? <FieldLoader size="sm" /> : s.name}
+                      </div>
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-all duration-300"
                         style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>
                         <BookOpen className="h-4 w-4 block group-hover:hidden" />
@@ -587,22 +553,28 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     </div>
 
                     {/* Row 2: Big percentage number */}
-                    <p className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white mb-1">
-                      {percentage}%
-                    </p>
+                    <div className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white mb-1 h-9 flex items-center">
+                      {loading ? <FieldLoader size="lg" /> : `${percentage}%`}
+                    </div>
 
                     {/* Row 3: Status + class count */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <StatusIcon className="h-3.5 w-3.5" style={{ color: color.bg }} />
-                        <span className="text-xs font-semibold"
-                          style={{ color: percentage >= min ? "#06d6a0" : percentage >= min - 15 ? "#ff6b35" : "#ef476f" }}>
-                          {percentage >= min ? "On track" : percentage >= min - 15 ? "At risk" : "Danger"}
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
-                        {attended}/{total}
-                      </span>
+                    <div className="flex items-center justify-between h-4">
+                      {loading ? (
+                        <div className="opacity-60"><FieldLoader size="sm" /></div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-1">
+                            <StatusIcon className="h-3.5 w-3.5" style={{ color: color.bg }} />
+                            <span className="text-xs font-semibold"
+                              style={{ color: percentage >= min ? "#06d6a0" : percentage >= min - 15 ? "#ff6b35" : "#ef476f" }}>
+                              {percentage >= min ? "On track" : percentage >= min - 15 ? "At risk" : "Danger"}
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
+                            {attended}/{total}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     {/* Row 4: Mini progress bar */}
