@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
 
       {loading || !dashboard ? (
         <div className="flex justify-center py-20">
-          <FuturisticLoader title="Loading Analytics..." variant="inner" />
+          <FuturisticLoader title="Loading Analytics..." variant="section" />
         </div>
       ) : (
         <>

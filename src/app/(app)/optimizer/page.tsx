@@ -80,7 +80,7 @@ export default function OptimizerPage() {
 
       {initialLoad ? (
         <div className="flex justify-center py-20">
-          <FuturisticLoader title="Optimizing Schedule..." variant="inner" />
+          <FuturisticLoader title="Optimizing Schedule..." variant="section" />
         </div>
       ) : result && (
         <>

@@ -73,7 +73,7 @@ export default function ForecastPage() {
 
       {isInitialLoading ? (
         <div className="flex justify-center py-20">
-          <FuturisticLoader title="Generating Forecast..." variant="inner" />
+          <FuturisticLoader title="Generating Forecast..." variant="section" />
         </div>
       ) : data && (
         <>
