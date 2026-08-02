@@ -39,7 +39,9 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-950">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#fff5f7] via-white to-[#f0f0ff] dark:bg-[#0a0e1a]">
+      {/* Dark mode gradient overlay */}
+      <div className="pointer-events-none fixed inset-0 -z-10 hidden dark:block bg-[radial-gradient(ellipse_at_center,_rgba(255,45,120,0.12)_0%,_transparent_60%),_radial-gradient(ellipse_at_top,_rgba(67,97,238,0.08)_0%,_transparent_50%),_linear-gradient(to_bottom,_#0a0e1a,_#100e24,_#0a0e1a)]" />
       
       {/* === ANIMATED BACKGROUND === */}
       

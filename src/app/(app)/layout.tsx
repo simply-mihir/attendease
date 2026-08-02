@@ -62,13 +62,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <ProfileProvider>
     <NavigationProgress />
     <SWRPrefetcher />
-    <div className="min-h-screen flex bg-[#fafafa] dark:bg-[#0a0e1a]">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-violet-50/30 dark:bg-[#0a0e1a] dark:bg-none relative z-0">
+      {/* Dark mode: layered gradient via CSS */}
+      <div className="fixed inset-0 -z-10 hidden dark:block bg-[radial-gradient(ellipse_at_top_left,_rgba(255,45,120,0.08)_0%,_transparent_50%),_radial-gradient(ellipse_at_top_right,_rgba(67,97,238,0.08)_0%,_transparent_50%),_radial-gradient(ellipse_at_bottom_left,_rgba(155,93,229,0.06)_0%,_transparent_50%),_radial-gradient(ellipse_at_bottom_right,_rgba(6,214,160,0.06)_0%,_transparent_50%),_linear-gradient(to_bottom_right,_#0a0e1a,_#0f1428,_#0a0e1a)]" />
+      
+      {/* Light mode: soft warm gradient */}
+      <div className="fixed inset-0 -z-10 dark:hidden bg-[radial-gradient(ellipse_at_top_left,_rgba(255,45,120,0.04)_0%,_transparent_40%),_radial-gradient(ellipse_at_top_right,_rgba(67,97,238,0.04)_0%,_transparent_40%),_radial-gradient(ellipse_at_bottom_center,_rgba(155,93,229,0.03)_0%,_transparent_40%),_linear-gradient(to_bottom_right,_#fafafa,_#fff5f7,_#f0f0ff,_#fafafa)]" />
       <OnboardingModal />
 
       {/* Sidebar */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-40 w-[260px] flex flex-col transition-transform lg:translate-x-0 lg:static",
-        "bg-[#f3f4f6] border-r-2 border-gray-200 dark:bg-[#070b14] dark:border-[#2a2a3d]",
+        "bg-gradient-to-b from-gray-50 via-gray-50 to-gray-100 border-r-2 border-gray-200 dark:from-[#070b14] dark:via-[#0a0e1a] dark:to-[#0d1020] dark:border-[#2a2a3d]",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex items-center justify-between px-5 py-5 border-b-2 border-gray-200 dark:border-[#2a2a3d]">
@@ -134,8 +139,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#fafafa] dark:bg-[#0a0e1a]">
-        <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/90 dark:bg-[#0a0e1a]/90 backdrop-blur-md border-b-2 border-gray-200 dark:border-[#2a2a3d]">
+      <div className="flex-1 flex flex-col min-w-0 bg-transparent">
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/60 dark:bg-[#0a0e1a]/60 backdrop-blur-md border-b-2 border-gray-200 dark:border-[#2a2a3d]">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="text-[#4a4a5a] hover:text-[#1a1a2e] dark:text-[#6b6b80] dark:hover:text-white transition lg:hidden">
               <Menu className="w-6 h-6" />
@@ -145,7 +150,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[#fafafa] dark:bg-[#0a0e1a]">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-transparent relative">
           <ReminderNotifier />
           <div key={pathname} className="animate-fade-in">
             {children}

@@ -15,6 +15,7 @@ import { MarkingProgressBar } from "@/components/MarkingProgressBar";
 import { ParticleBurst } from "@/components/ParticleBurst";
 import { StreakFlame } from "@/components/StreakFlame";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { StreakBadges } from "@/components/StreakBadges";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 interface TodayClass {
@@ -208,7 +209,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Greeting */}
       <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl sm:text-3xl font-black text-[#1a1a2e] dark:text-white tracking-tight">
-          Hello, <span className="text-[#FF2D78]">{displayName}</span>
+          Hello,{" "}
+          <span className="greeting-name-animated relative inline-block">
+            {displayName}
+            {/* Shimmer overlay */}
+            <span className="greeting-shimmer absolute inset-0 pointer-events-none" aria-hidden="true" />
+          </span>
         </h1>
         <p className="mt-1 text-sm font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">
           {dashboard?.semesterName 
@@ -348,6 +354,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             </div>
           </div>
         </StaggerGrid>
+      )}
+
+      {/* Streak Badges */}
+      {isCurrent && (
+        <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 100ms forwards" }}>
+          <StreakBadges streak={currentStreak} />
+        </div>
       )}
 
       {/* Goal Mode Card */}
