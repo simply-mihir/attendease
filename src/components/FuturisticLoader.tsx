@@ -59,7 +59,7 @@ export function FuturisticLoader({
 
   // variant === "full"
   return (
-    <div className="flex min-h-[80vh] w-full items-center justify-center">
+    <div className="flex min-h-screen w-full items-center justify-center">
       <div className="flex flex-col items-center gap-6">
 
         {/* Animated orbital system — ENLARGED */}

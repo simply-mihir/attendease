@@ -55,7 +55,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (status === "loading" || !session?.user) {
-    return <FuturisticLoader title="Loading..." Icon={GraduationCap} variant="full" />;
+    return (
+      <div className="flex min-h-screen relative z-0">
+        <VibrantBackground />
+        <FuturisticLoader title="Loading..." Icon={GraduationCap} variant="full" />
+      </div>
+    );
   }
 
   const user = session.user;
