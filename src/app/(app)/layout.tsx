@@ -41,7 +41,7 @@ const navItems = [
   { href: "/subjects", label: "Subjects", icon: BookOpen },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/settings", label: "More", icon: Menu },
+  { href: "#menu", label: "Menu", icon: Menu },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -49,6 +49,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
@@ -280,13 +281,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-gray-200 bg-white/95 backdrop-blur-sm dark:border-[#2a2a3d] dark:bg-[#0a0e1a]/95 md:hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around py-2 px-2">
           {mobileNavItems.map(item => {
-            const active = pathname.startsWith(item.href);
+            const active = pathname.startsWith(item.href) && item.href !== "#menu";
+            
+            if (item.href === "#menu") {
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="flex flex-col items-center justify-center gap-1 px-3 py-1 rounded-xl text-[10px] font-bold transition-all text-[#9ca3af] dark:text-[#6b6b80] active:scale-95 cursor-pointer"
+                >
+                  <item.icon className="h-5 w-5 mb-0.5" />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={clsx(
-                  "flex flex-col items-center justify-center gap-1 px-3 py-1 rounded-xl text-[10px] font-bold transition-all",
+                  "flex flex-col items-center justify-center gap-1 px-3 py-1 rounded-xl text-[10px] font-bold transition-all active:scale-95 cursor-pointer",
                   active ? "text-[#FF2D78]" : "text-[#9ca3af] dark:text-[#6b6b80]"
                 )}
               >
@@ -297,6 +312,87 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+
+      {/* ===== MOBILE FULLSCREEN MENU ===== */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-[#0a0e1a] animate-fade-in md:hidden">
+          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#070b14]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shrink-0 shadow-[0_3px_0_0_#cc1a5e]">
+                <GraduationCap className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-black tracking-tight text-[#FF2D78]">Menu</span>
+            </div>
+            <button 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="p-2 rounded-xl border-2 border-gray-200 bg-gray-50 text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] active:translate-y-[2px] active:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#1a1a2e] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a]"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-6 bg-gray-50 dark:bg-[#070b14]">
+             <div>
+               <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-1">Navigation</h3>
+               <div className="grid grid-cols-2 gap-3">
+                 {navItems.map(item => {
+                   const active = pathname.startsWith(item.href);
+                   return (
+                     <Link 
+                       key={item.href} 
+                       href={item.href} 
+                       onClick={() => setMobileMenuOpen(false)}
+                       className={clsx(
+                         "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-150 shadow-[0_4px_0_0_#d1d5db] dark:shadow-[0_4px_0_0_#0d0d1a] active:translate-y-[2px] active:shadow-[0_2px_0_0_#d1d5db] dark:active:shadow-[0_2px_0_0_#0d0d1a]",
+                         active 
+                           ? "bg-[#FF2D78]/10 border-[#FF2D78]/30 shadow-[0_4px_0_0_#fecdd3] dark:shadow-[0_4px_0_0_#3a1020]" 
+                           : "bg-white border-gray-200 dark:bg-[#141425] dark:border-[#2a2a3d]"
+                       )}
+                     >
+                        <div className={clsx(
+                          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mb-1",
+                          active
+                            ? `bg-gradient-to-br ${item.gradient} shadow-sm text-white`
+                            : "bg-gray-100 dark:bg-white/5 border border-gray-200/60 dark:border-white/5"
+                        )}>
+                          <item.icon className={clsx("w-5 h-5", active ? "text-white" : "text-gray-500 dark:text-gray-400")} />
+                        </div>
+                        <span className={clsx("text-xs font-bold text-center", active ? "text-[#FF2D78]" : "text-[#4a4a5a] dark:text-[#c4c4d4]")}>
+                          {item.label}
+                        </span>
+                     </Link>
+                   );
+                 })}
+               </div>
+             </div>
+
+             <div className="border-t-2 border-gray-200 dark:border-[#2a2a3d] pt-6">
+                <Link 
+                  href="/settings?edit=true" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]"
+                >
+                  <UserAvatar user={user} size="lg" className="shadow-[0_2px_0_0_#cc1a5e]" />
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-bold text-[#1a1a2e] dark:text-white truncate">{user?.name || "Student"}</p>
+                    <p className="text-xs font-semibold text-[#9ca3af] dark:text-[#6b6b80] truncate">{user?.email}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </Link>
+             </div>
+
+             <button
+               onClick={handleLogout}
+               disabled={signingOut}
+               className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-[#0e7490] bg-[#06b6d4] text-white font-black shadow-[0_4px_0_0_#0e7490] active:translate-y-[2px] active:shadow-[0_2px_0_0_#0e7490] disabled:opacity-60 transition-all duration-150 cursor-pointer"
+             >
+               {signingOut ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogOut className="w-5 h-5" />}
+               {signingOut ? "Signing out..." : "Sign Out"}
+             </button>
+          </div>
+        </div>
+      )}
+      
       <ScheduleChatbot />
     </div>
     </ProfileProvider>
