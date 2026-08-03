@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Bell, Calendar, Download, Moon, ChevronRight, Trophy, Edit2, HeartPulse, Target } from "lucide-react";
@@ -35,6 +35,17 @@ export default function SettingsPage() {
     setError("");
     setShowEditModal(true);
   }
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && user) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("edit") === "true") {
+        openEditModal();
+        // Remove the query param so it doesn't reopen on refresh
+        window.history.replaceState({}, '', '/settings');
+      }
+    }
+  }, [user]);
 
   async function handleSaveProfile() {
     setSaving(true);
