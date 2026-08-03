@@ -103,6 +103,10 @@ export function ScheduleChatbot() {
         botMsg.content += "\n\nYour subjects: " + data.suggestions.join(", ");
       }
 
+      if (data.success) {
+        window.dispatchEvent(new CustomEvent("scheduleOverrideChanged"));
+      }
+
       setMessages(prev => [...prev, botMsg]);
     } catch {
       setMessages(prev => [

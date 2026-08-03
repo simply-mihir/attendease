@@ -5,7 +5,7 @@ import { FieldLoader } from "@/components/FieldLoader";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/hooks/useApi";
-import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
+import { useSWRFetch, invalidate, invalidatePrefix } from "@/hooks/useSWRFetch";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
   Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap, Minus, TrendingDown
@@ -19,6 +19,7 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { StreakBadges } from "@/components/StreakBadges";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
+import { getClassesForDay } from "@/lib/schedule-utils";
 const SUBJECT_COLORS = [
   { bg: "#FF2D78", shadow: "#cc1a5e", label: "Hot Pink" },
   { bg: "#4361ee", shadow: "#3451cc", label: "Royal Blue" },
@@ -92,6 +93,21 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   const [loadingImportable, setLoadingImportable] = useState(false);
   const [selectedImports, setSelectedImports] = useState<Map<string, "move" | "copy">>(new Map());
   const [importing, setImporting] = useState(false);
+
+  // Fetch overrides for today
+  const currentDate = new Date();
+  const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()).toISOString();
+  const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 23, 59, 59).toISOString();
+  const { data: overData } = useSWRFetch<{ overrides: any[] }>(`/schedule-override?startDate=${startOfDay}&endDate=${endOfDay}`);
+
+  useEffect(() => {
+    const handler = () => {
+      invalidatePrefix("/schedule-override");
+      invalidatePrefix("/dashboard");
+    };
+    window.addEventListener("scheduleOverrideChanged", handler);
+    return () => window.removeEventListener("scheduleOverrideChanged", handler);
+  }, []);
 
   const loading = dashLoading || goalLoading;
 
@@ -473,17 +489,33 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       )}
 
       {/* Today's Classes */}
-      {isCurrent && todayClasses.length > 0 && (
-        <div style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 150ms forwards" }}>
-          <h2 className="text-lg font-extrabold mb-3 flex items-center gap-2 text-[#1a1a2e] dark:text-white">
-            <Sparkles className="w-5 h-5 text-[#FF2D78]" /> Today&apos;s Classes
-          </h2>
-          <StaggerGrid className="grid gap-3" delay={180} staggerDelay={80} animation="fadeSlideUp">
-            {todayClasses.map((cls, i) => (
-              <ScheduleCard key={cls.scheduleId} cls={cls} marking={markingId} onMark={quickMark} />
-            ))}
-          </StaggerGrid>
-        </div>
+      {isCurrent && (
+        (() => {
+          const todayClasses = getClassesForDay(new Date(), dashboard?.todaySchedule || [], overData?.overrides || []);
+          return todayClasses.length > 0 ? (
+            <div className="space-y-4 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white flex items-center gap-2">
+                  <Clock className="w-6 h-6 text-[#4361ee]" />
+                  Today's Classes
+                </h2>
+                <Link href="/calendar" className="text-sm font-bold text-[#FF2D78] hover:text-[#cc1a5e] flex items-center gap-1 transition-colors">
+                  View Calendar <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <StaggerGrid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" delay={200} staggerDelay={80} animation="scaleIn">
+                {todayClasses.map((schedule: any) => (
+                  <ScheduleCard 
+                    key={schedule.id || schedule.subjectId + schedule.startTime} 
+                    cls={schedule} 
+                    marking={markingId}
+                    onMark={quickMark} 
+                  />
+                ))}
+              </StaggerGrid>
+            </div>
+          ) : null;
+        })()
       )}
 
       {/* Subject Cards */}
