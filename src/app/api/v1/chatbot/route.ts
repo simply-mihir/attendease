@@ -601,49 +601,8 @@ CRITICAL RULES:
         result = { error: "I'm not sure what you need. Try asking about your classes, attendance, or analytics!" };
     }
 
-    // Step 3: Format the result with a second LLM call
-    const formatPrompt = `You are AttendEase Assistant. Given the user's question and the data below, write a concise, friendly response.
-Use emojis sparingly (✅ ❌ 📊 📅 🔥 ⚠️) to make it scannable.
-For tables of data, use simple line-by-line formatting — not markdown tables.
-Keep it SHORT — 2-5 lines max unless there's a lot of data.
-If there's an error, explain it helpfully.
-Do NOT output JSON. Write a natural human response.`;
-
-    const formatMessages = [
-      { role: "system", content: formatPrompt },
-      { role: "user", content: `User asked: "${message}"\n\nData:\n${JSON.stringify(result, null, 2)}` },
-    ];
-
-    const formatRes = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://attendease-c7wl.vercel.app",
-        "X-Title": "AttendEase",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: formatMessages,
-        temperature: 0.4,
-        max_tokens: 512,
-      }),
-    });
-
-    if (!formatRes.ok) {
-      // Fallback: return a simple formatted response without LLM
-      return NextResponse.json({
-        reply: formatFallback(intent, result),
-        actions,
-      });
-    }
-
-    const formatData = await formatRes.json();
-    let reply = formatData.choices?.[0]?.message?.content || formatFallback(intent, result);
-
-    // Strip thinking tags
-    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
-
+    // Step 3: Format using deterministic formatter (no second LLM call — avoids hallucinated numbers)
+    const reply = formatFallback(intent, result);
     return NextResponse.json({ reply, actions });
   } catch (error) {
     console.error("[Chatbot] Error:", error);
@@ -658,42 +617,89 @@ function formatFallback(intent: string, result: any): string {
 
   switch (intent) {
     case "get_todays_classes": {
-      if (result.classes.length === 0) return `📅 No classes today (${result.dayName})!`;
-      const lines = result.classes.map((c: any) =>
-        `${c.attendanceMarked ? (c.attendanceStatus === "present" ? "✅" : "❌") : "⬜"} ${c.startTime}–${c.endTime} ${c.subjectName} (${c.currentPct}%)`
-      );
-      return `📅 ${result.dayName} — ${result.totalClasses} classes:\n${lines.join("\n")}`;
-    }
-    case "mark_attendance":
-      return `✅ Marked ${result.status} for ${result.subjectName}. Attendance: ${result.newPercentage}%`;
-    case "mark_bulk_attendance":
-      return `✅ Marked ${result.status} for ${result.count} classes: ${result.subjects.join(", ")}`;
-    case "get_analytics": {
-      const lines = result.subjects.map((s: any) =>
-        `${s.status === "green" ? "🟢" : s.status === "yellow" ? "🟡" : "🔴"} ${s.name}: ${s.currentPct}% (can skip ${s.canSkip})`
-      );
-      return `📊 Overall: ${result.overallPct}% across ${result.totalSubjects} subjects\n${lines.join("\n")}`;
-    }
-    case "get_subject_info":
-      return `📚 ${result.name}: ${result.currentPct}% | Classes: ${result.totalClasses} | Streak: ${result.streak} 🔥\nCan skip: ${result.canSkip} | Must attend: ${result.needToAttend}`;
-    case "skip_optimizer": {
-      if (result.recommendations.length === 0) return "⚠️ Can't safely skip any classes right now.";
-      const lines = result.recommendations.map((r: any) =>
-        `${r.subjectName}: skip ${r.skipsAllocated} (${r.currentPct}% → ${r.newPct}%)`
-      );
-      let msg = `🎯 Skip plan (${result.totalSkipsUsed}/${result.totalRequested} allocated):\n${lines.join("\n")}`;
-      if (result.cannotSkip.length > 0) msg += `\n⚠️ Don't skip: ${result.cannotSkip.join(", ")}`;
+      if (result.classes.length === 0) return `📅 No classes today (${result.dayName})! Enjoy your day off 🎉`;
+      const lines = result.classes.map((c: any) => {
+        const icon = c.attendanceMarked
+          ? (c.attendanceStatus === "present" || c.attendanceStatus === "late" ? "✅" : "❌")
+          : "⬜";
+        return `${icon} ${c.startTime}–${c.endTime}  ${c.subjectName}${c.room ? ` (${c.room})` : ""} — ${c.currentPct}%`;
+      });
+      const marked = result.classes.filter((c: any) => c.attendanceMarked).length;
+      let msg = `📅 ${result.dayName} — ${result.totalClasses} class${result.totalClasses > 1 ? "es" : ""}:\n${lines.join("\n")}`;
+      if (marked > 0) msg += `\n\n${marked}/${result.totalClasses} marked`;
       return msg;
     }
-    case "schedule_override":
-      return `📅 ${result.action === "swap" ? `Swapped ${result.subject1} and ${result.subject2}` : `${result.action} ${result.subjectName}`} on ${result.date}${result.newTime ? ` at ${result.newTime}` : ""}`;
-    case "get_attendance_history": {
-      if (result.records.length === 0) return "No attendance records found for that period.";
-      const lines = result.records.slice(0, 10).map((r: any) =>
-        `${r.status === "present" ? "✅" : r.status === "absent" ? "❌" : "⏰"} ${r.date} ${r.subject}: ${r.status}`
-      );
-      return `📋 Last ${result.days} days (${result.total} records):\n${lines.join("\n")}`;
+
+    case "mark_attendance":
+      return `✅ Marked **${result.status}** for **${result.subjectName}**\nUpdated attendance: ${result.newPercentage}%`;
+
+    case "mark_bulk_attendance":
+      return `✅ Marked **${result.status}** for all ${result.count} classes today:\n${result.subjects.join(", ")}`;
+
+    case "get_analytics": {
+      const lines = result.subjects.map((s: any) => {
+        const dot = s.status === "green" ? "🟢" : s.status === "yellow" ? "🟡" : "🔴";
+        const skipInfo = s.canSkip > 0 ? `can skip ${s.canSkip}` : "can't skip";
+        return `${dot} ${s.name}: ${s.currentPct}% (${skipInfo})`;
+      });
+      return `📊 Overall attendance: **${result.overallPct}%** across ${result.totalSubjects} subjects\n\n${lines.join("\n")}`;
     }
+
+    case "get_subject_info": {
+      const statusDot = result.status === "green" ? "🟢" : result.status === "yellow" ? "🟡" : "🔴";
+      let msg = `📚 **${result.name}**${result.code ? ` (${result.code})` : ""}\n\n`;
+      msg += `${statusDot} Current: ${result.currentPct}%  (min required: ${result.minRequired}%)\n`;
+      msg += `📖 Classes: ${result.totalPresent} present / ${result.totalClasses} total\n`;
+      msg += `🔥 Streak: ${result.streak} days\n`;
+      if (result.canSkip > 0) {
+        msg += `✅ Can skip: ${result.canSkip} class${result.canSkip > 1 ? "es" : ""}`;
+      } else if (result.needToAttend > 0) {
+        msg += `⚠️ Must attend next ${result.needToAttend} class${result.needToAttend > 1 ? "es" : ""} to recover`;
+      } else {
+        msg += `⚠️ Right at the edge — don't skip!`;
+      }
+      if (result.schedule && result.schedule.length > 0) {
+        msg += `\n\n📅 Schedule:\n${result.schedule.map((s: any) => `  ${s.day} ${s.time}${s.room ? ` (${s.room})` : ""}`).join("\n")}`;
+      }
+      return msg;
+    }
+
+    case "skip_optimizer": {
+      if (result.recommendations.length === 0 && result.cannotSkip.length > 0) {
+        return `⚠️ Can't safely skip any classes right now.\nAt risk: ${result.cannotSkip.join(", ")}`;
+      }
+      if (result.recommendations.length === 0) {
+        return "⚠️ Can't safely skip any classes right now.";
+      }
+      const lines = result.recommendations.map((r: any) =>
+        `  ${r.subjectName}: skip ${r.skipsAllocated} → ${r.currentPct}% drops to ${r.newPct}% (${r.remainingBuffer} more skips left after)`
+      );
+      let msg = `🎯 Skip plan (${result.totalSkipsUsed} of ${result.totalRequested} skips allocated):\n\n${lines.join("\n")}`;
+      if (result.cannotSkip.length > 0) {
+        msg += `\n\n🚫 Don't skip: ${result.cannotSkip.join(", ")}`;
+      }
+      return msg;
+    }
+
+    case "schedule_override": {
+      if (result.action === "swap") {
+        return `📅 Swapped **${result.subject1}** and **${result.subject2}** on ${result.date}`;
+      }
+      const actionLabel = result.action === "cancel" ? "Cancelled" : result.action === "extra" ? "Added extra class for" : `Rescheduled`;
+      return `📅 ${actionLabel} **${result.subjectName}** on ${result.date}${result.newTime ? ` → new time: ${result.newTime}` : ""}`;
+    }
+
+    case "get_attendance_history": {
+      if (result.records.length === 0) return `📋 No attendance records found for the last ${result.days} days.`;
+      const lines = result.records.slice(0, 12).map((r: any) => {
+        const icon = r.status === "present" ? "✅" : r.status === "absent" ? "❌" : r.status === "late" ? "⏰" : "📝";
+        return `${icon} ${r.date}  ${r.subject} — ${r.status}`;
+      });
+      let msg = `📋 Last ${result.days} days (${result.total} records):\n\n${lines.join("\n")}`;
+      if (result.total > 12) msg += `\n... and ${result.total - 12} more`;
+      return msg;
+    }
+
     default:
       return "Done! Let me know if you need anything else.";
   }
