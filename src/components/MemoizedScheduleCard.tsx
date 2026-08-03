@@ -101,7 +101,7 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                     }
                     disabled={marking === `${cls.subjectId}-${status}`}
                     className={clsx(
-                      "flex-1 py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[9px] sm:text-xs font-bold flex flex-col xl:flex-row items-center justify-center gap-0.5 sm:gap-1.5 cursor-pointer transition-all min-w-0",
+                      "flex-1 py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold flex flex-col items-center justify-center gap-1 cursor-pointer transition-all min-w-0 leading-none",
                       status === "present"
                         ? "btn-3d-cyan"
                         : status === "absent"
@@ -112,15 +112,15 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                     )}
                   >
                     {status === "present" ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
                     ) : status === "absent" ? (
-                      <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                      <XCircle className="w-4 h-4 shrink-0" />
                     ) : status === "late" ? (
-                      <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                      <Timer className="w-4 h-4 shrink-0" />
                     ) : (
-                      <Ban className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                      <Ban className="w-4 h-4 shrink-0" />
                     )}
-                    <span className="truncate max-w-full">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                    <span className="text-center w-full overflow-visible break-words">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
                   </button>
                 )
               )}
