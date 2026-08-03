@@ -74,7 +74,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   function handleLogout() {
     setSigningOut(true);
-    setTimeout(() => signOut({ callbackUrl: "/" }), 800);
+    setTimeout(() => signOut({ callbackUrl: "/" }), 1800);
   }
 
   if (status === "loading" || !session?.user) {
@@ -91,12 +91,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProfileProvider>
     {signingOut && (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 dark:bg-[#0a0e1a]/90 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-4 animate-fade-in">
-          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4] border-2 border-[#0e7490] flex items-center justify-center shadow-[0_4px_0_0_#0e7490]">
-            <Loader2 className="w-8 h-8 text-white animate-spin" />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden">
+        {/* Animated gradient backdrop */}
+        <div className="absolute inset-0 signout-backdrop" />
+
+        {/* Floating particles */}
+        {Array.from({ length: 14 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1.5 h-1.5 rounded-full signout-particle"
+            style={{
+              left: `${8 + (i * 6.5) % 84}%`,
+              bottom: '-8px',
+              animationDelay: `${i * 0.12}s`,
+              animationDuration: `${1.4 + (i % 3) * 0.3}s`,
+              background: ['#06b6d4', '#a855f7', '#FF2D78', '#eab308'][i % 4],
+            }}
+          />
+        ))}
+
+        {/* Center content */}
+        <div className="relative flex flex-col items-center gap-5 signout-content-enter">
+          {/* Pulsing rings + logo */}
+          <div className="relative w-24 h-24 flex items-center justify-center">
+            <div className="absolute inset-[-12px] rounded-full border-2 border-[#06b6d4]/40 signout-ring-1" />
+            <div className="absolute inset-[-24px] rounded-full border-2 border-[#a855f7]/30 signout-ring-2" />
+            <div className="absolute inset-[-36px] rounded-full border border-[#FF2D78]/20 signout-ring-3" />
+
+            {/* Orbiting dot */}
+            <div className="absolute inset-[-24px] signout-orbit">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#06b6d4] shadow-[0_0_10px_#06b6d4]" />
+            </div>
+
+            {/* Logo block */}
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#06b6d4] via-[#7b2cbf] to-[#FF2D78] flex items-center justify-center signout-logo shadow-[0_0_30px_rgba(6,182,212,0.3),0_0_60px_rgba(123,44,191,0.15)]">
+              <GraduationCap className="w-10 h-10 text-white drop-shadow-lg" />
+            </div>
           </div>
-          <p className="text-lg font-bold text-[#0e7490] dark:text-[#67e8f9]">Signing out...</p>
+
+          {/* Text */}
+          <p className="text-xl font-black tracking-tight signout-text-reveal">
+            <span className="bg-gradient-to-r from-[#06b6d4] via-[#a855f7] to-[#FF2D78] bg-clip-text text-transparent">
+              Catch you later!
+            </span>
+          </p>
+
+          {/* Bouncing dots */}
+          <div className="flex gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#06b6d4] signout-dot" style={{ animationDelay: '0s' }} />
+            <div className="w-2 h-2 rounded-full bg-[#a855f7] signout-dot" style={{ animationDelay: '0.15s' }} />
+            <div className="w-2 h-2 rounded-full bg-[#FF2D78] signout-dot" style={{ animationDelay: '0.3s' }} />
+          </div>
         </div>
       </div>
     )}

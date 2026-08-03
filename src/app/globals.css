@@ -1318,3 +1318,86 @@ html.dark .feature-glass-card:hover {
     box-shadow: 0 3px 0 0 rgba(255, 45, 120, 0.2), 0 0 12px 3px rgba(255, 45, 120, 0.15);
   }
 }
+
+/* ===== Sign-out animation ===== */
+.signout-backdrop {
+  background: radial-gradient(ellipse at 30% 20%, rgba(6,182,212,0.12) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(168,85,247,0.1) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(255,45,120,0.06) 0%, transparent 60%);
+  background-color: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px) saturate(1.4);
+  animation: signoutBackdropIn 0.5s ease-out;
+}
+:where(.dark) .signout-backdrop {
+  background-color: rgba(10,14,26,0.94);
+}
+
+@keyframes signoutBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.signout-content-enter {
+  animation: signoutContentPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes signoutContentPop {
+  0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.signout-logo {
+  animation: signoutLogoFloat 1.8s ease-in-out infinite;
+}
+@keyframes signoutLogoFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.signout-ring-1 {
+  animation: signoutRingPulse 1.6s ease-in-out infinite;
+}
+.signout-ring-2 {
+  animation: signoutRingPulse 1.6s ease-in-out 0.3s infinite;
+}
+.signout-ring-3 {
+  animation: signoutRingPulse 1.6s ease-in-out 0.6s infinite;
+}
+@keyframes signoutRingPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+.signout-orbit {
+  animation: signoutOrbitSpin 2s linear infinite;
+}
+@keyframes signoutOrbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.signout-text-reveal {
+  animation: signoutTextIn 0.7s ease-out 0.3s both;
+}
+@keyframes signoutTextIn {
+  0% { opacity: 0; transform: translateY(12px); letter-spacing: 0.3em; }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: -0.02em; }
+}
+
+.signout-dot {
+  animation: signoutDotBounce 0.6s ease-in-out infinite alternate;
+}
+@keyframes signoutDotBounce {
+  0% { transform: translateY(0) scale(1); opacity: 0.5; }
+  100% { transform: translateY(-8px) scale(1.3); opacity: 1; }
+}
+
+.signout-particle {
+  animation: signoutParticleRise linear forwards;
+  opacity: 0;
+  border-radius: 50%;
+}
+@keyframes signoutParticleRise {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  15% { opacity: 0.8; transform: translateY(-10vh) scale(1); }
+  100% { transform: translateY(-105vh) scale(0.3); opacity: 0; }
+}
