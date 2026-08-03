@@ -73,7 +73,7 @@ export function SwipeableCard({
   const revealOpacity = Math.min(absOffset / threshold, 1);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl">
+    <div className="relative overflow-hidden rounded-2xl h-full">
       {/* Background reveal — shows Present/Absent label */}
       <div
         className={`absolute inset-0 flex items-center rounded-2xl transition-opacity ${
@@ -95,7 +95,7 @@ export function SwipeableCard({
       {/* Card content */}
       <div
         ref={cardRef}
-        className="relative z-10 transition-transform"
+        className="relative z-10 transition-transform h-full"
         style={{
           transform: `translateX(${offset}px)`,
           transition: swiping ? "none" : "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",

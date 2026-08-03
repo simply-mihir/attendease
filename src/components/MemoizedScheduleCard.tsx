@@ -25,14 +25,14 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
   const hasMarked = cls.attendanceMarked || (cls.attendance && cls.attendance.status);
 
   return (
-    <div data-schedule={cls.id || cls.scheduleId}>
+    <div data-schedule={cls.id || cls.scheduleId} className="h-full">
       <SwipeableCard
         onSwipeRight={() => onMark(cls.subjectId, cls.id || cls.scheduleId, "present")}
         onSwipeLeft={() => onMark(cls.subjectId, cls.id || cls.scheduleId, "absent")}
         disabled={!!hasMarked || !!marking}
       >
         <div 
-          className="relative rounded-2xl border-2 p-4 sm:p-5 transition-all duration-150 overflow-hidden"
+          className="relative rounded-2xl border-2 p-4 sm:p-5 transition-all duration-150 overflow-hidden flex flex-col h-full"
           style={{
             borderColor: `${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}40`,
             backgroundColor: `${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}0D`,
@@ -77,7 +77,7 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
           {hasMarked ? (
             <div
               className={clsx(
-                "flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)] w-full mt-3",
+                "flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)] w-full mt-auto",
                 (cls.attendanceStatus || cls.attendance?.status) === "present"
                   ? "bg-[#00f5d4]/15 text-[#00c4a7] border-[#00f5d4]/40 dark:text-[#00f5d4]"
                   : (cls.attendanceStatus || cls.attendance?.status) === "late"
@@ -91,7 +91,7 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
               Marked: {cls.attendanceStatus || cls.attendance?.status}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2 mt-3 w-full">
+            <div className="flex items-center gap-1.5 sm:gap-2 mt-auto pt-2 w-full">
               {(["present", "absent", "late", "cancelled"] as const).map(
                 (status) => (
                   <button
