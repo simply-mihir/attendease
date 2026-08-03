@@ -1151,21 +1151,20 @@ html.dark select option {
   padding: 0.6rem 1.5rem;
   font-size: 0.8rem;
   font-weight: 800;
-  color: #4a4a5a;
+  color: #ffffff;
   border-radius: 9999px;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  box-shadow: 0 4px 0 0 #d1d5db;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  background: linear-gradient(135deg, #7b2cbf, #6a1fb0);
+  border: 2px solid #5a189a;
+  box-shadow: 0 4px 0 0 #5a189a, 0 6px 16px rgba(123, 44, 191, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .nav-btn-secondary:hover {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 0 #d1d5db;
-  color: #1a1a2e;
+  box-shadow: 0 2px 0 0 #5a189a, 0 4px 10px rgba(123, 44, 191, 0.25);
 }
 .nav-btn-secondary:active {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 0 #d1d5db;
+  box-shadow: 0 1px 0 0 #5a189a;
 }
 
 html.dark .nav-btn-primary {
@@ -1177,15 +1176,13 @@ html.dark .nav-btn-primary:hover {
 }
 
 html.dark .nav-btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #c4c4d4;
-  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #7b2cbf, #6a1fb0);
+  border-color: #4a1186;
+  color: #ffffff;
+  box-shadow: 0 4px 0 0 #4a1186, 0 6px 16px rgba(123, 44, 191, 0.25);
 }
 html.dark .nav-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 0 0 #4a1186, 0 4px 10px rgba(123, 44, 191, 0.2);
 }
 
 /* Hero buttons — larger, pill-shaped, 3D with glow */
@@ -1225,21 +1222,20 @@ html.dark .nav-btn-secondary:hover {
   padding: 1rem 2rem;
   font-size: 1rem;
   font-weight: 800;
-  color: #4a4a5a;
+  color: #ffffff;
   border-radius: 9999px;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  box-shadow: 0 5px 0 0 #d1d5db;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  background: linear-gradient(135deg, #7b2cbf, #6a1fb0);
+  border: 2px solid #5a189a;
+  box-shadow: 0 5px 0 0 #5a189a, 0 8px 22px rgba(123, 44, 191, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .hero-btn-secondary:hover {
   transform: translateY(3px);
-  box-shadow: 0 2px 0 0 #d1d5db;
-  color: #1a1a2e;
+  box-shadow: 0 2px 0 0 #5a189a, 0 4px 12px rgba(123, 44, 191, 0.25);
 }
 .hero-btn-secondary:active {
   transform: translateY(4px);
-  box-shadow: 0 1px 0 0 #d1d5db;
+  box-shadow: 0 1px 0 0 #5a189a;
 }
 
 html.dark .hero-btn-primary {
@@ -1257,15 +1253,13 @@ html.dark .hero-btn-primary:hover {
 }
 
 html.dark .hero-btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #c4c4d4;
-  box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #7b2cbf, #6a1fb0);
+  border-color: #4a1186;
+  color: #ffffff;
+  box-shadow: 0 5px 0 0 #4a1186, 0 8px 22px rgba(123, 44, 191, 0.25);
 }
 html.dark .hero-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 0 0 #4a1186, 0 4px 12px rgba(123, 44, 191, 0.2);
 }
 
 /* Feature cards — colored glassmorphism */
