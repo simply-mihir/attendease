@@ -72,7 +72,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [status, router]);
 
   function handleLogout() {
-    signOut({ callbackUrl: "/login" });
+    signOut({ callbackUrl: "/" });
   }
 
   if (status === "loading" || !session?.user) {

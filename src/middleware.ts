@@ -13,6 +13,14 @@ export async function middleware(req: NextRequest) {
   // Check JWT token (lightweight — no DB call)
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
+  // Allow the landing page (/) without auth
+  if (pathname === "/") {
+    if (token) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+    return NextResponse.next();
+  }
+
   if (!token && pathname !== "/login") {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
