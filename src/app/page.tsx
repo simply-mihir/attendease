@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { GraduationCap, BarChart3, Bell, Shield, Flame, Calculator, ArrowRight, Sparkles } from "lucide-react";
 
