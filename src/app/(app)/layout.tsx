@@ -207,14 +207,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <p className="text-xs text-text-muted truncate">{user.email}</p>
                 </div>
               </div>
-              <button
-                onClick={handleLogout}
-                disabled={signingOut}
-                className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-[#06b6d4] text-white border-2 border-[#0e7490] shadow-[0_3px_0_0_#0e7490] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#0e7490] active:translate-y-[3px] active:shadow-none transition-all duration-150 cursor-pointer disabled:opacity-60"
-              >
-                {signingOut ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" /> : <LogOut className="w-4 h-4 shrink-0" />}
-                {signingOut ? "Signing out..." : "Sign out"}
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={handleLogout}
+                  disabled={signingOut}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#06b6d4] text-white border-2 border-[#0e7490] shadow-[0_3px_0_0_#0e7490] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#0e7490] active:translate-y-[3px] active:shadow-none transition-all duration-150 cursor-pointer disabled:opacity-60"
+                >
+                  {signingOut ? <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" /> : <LogOut className="w-3.5 h-3.5 shrink-0" />}
+                  {signingOut ? "Signing out..." : "Sign out"}
+                </button>
+              </div>
             </div>
           </div>
         </aside>
