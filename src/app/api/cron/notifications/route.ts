@@ -257,7 +257,7 @@ export async function GET(req: NextRequest) {
               if (s.emailEnabled && s.emailPreClass && user.email)
                 await retry(() => sendEmail(user.email!, `⏰ ${subject.name} in ${minsUntil} min`, html), `em-pre-${user.id}`, results);
               if (s.pushEnabled && s.pushPreClass && user.pushSubscriptions.length > 0) {
-                const qToken = await generateQuickMarkToken(user.id, schedule.id);
+                const qToken = generateQuickMarkToken(user.id, schedule.id, todayKey);
                 await pushAll(user.pushSubscriptions, {
                   title: `⏰ ${subject.name} in ${minsUntil} min`,
                   body: `${schedule.startTime} - ${schedule.endTime}${schedule.room ? ` • ${schedule.room}` : ""}`,
@@ -288,13 +288,13 @@ export async function GET(req: NextRequest) {
             results.skippedDuplicates++;
           } else {
             // Fetch today's attendance records for this user
-            const todayStart = getTodayStartInTimezone(now, tz);
-            const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+            // AttendanceRecord.date is @db.Date — use exact date match
+            const todayDateForReport = new Date(todayKey + "T00:00:00Z");
 
             const todayRecords = await prisma.attendanceRecord.findMany({
               where: {
                 subject: { userId: user.id, isArchived: false },
-                date: { gte: todayStart, lt: todayEnd },
+                date: todayDateForReport,
               },
               include: { subject: true },
             });
@@ -450,8 +450,9 @@ function getTimeInTimezone(date: Date, tz: string) {
   const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
   const dateKey = `${g("year")}-${g("month")}-${g("day")}`;
   const rf = new Intl.DateTimeFormat("en-US", { timeZone: tz, month: "short", day: "numeric", year: "numeric" });
+  const rawHour = g("hour");
   return {
-    hours: parseInt(g("hour")),
+    hours: rawHour === "24" ? 0 : parseInt(rawHour),
     minutes: parseInt(g("minute")),
     dayOfWeek: dayMap[g("weekday")] ?? date.getDay(),
     dateKey,
