@@ -120,8 +120,8 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                     ) : (
                       <Ban className="w-4 h-4 shrink-0" />
                     )}
-                    <span className="text-center w-full whitespace-nowrap tracking-tighter">
-                      {status === "cancelled" ? "Cancel" : status.charAt(0).toUpperCase() + status.slice(1)}
+                    <span className="text-center w-full whitespace-nowrap tracking-tighter" style={{ fontSize: status === 'cancelled' ? 'clamp(8px, 2.5vw, 11px)' : 'inherit' }}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
                     </span>
                   </button>
                 )
