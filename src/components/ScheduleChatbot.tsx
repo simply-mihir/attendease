@@ -80,7 +80,7 @@ export function ScheduleChatbot() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/schedule-override", {
+      const res = await fetch("/api/v1/schedule-override", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
