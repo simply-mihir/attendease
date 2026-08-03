@@ -6,165 +6,7 @@ import { calculateAttendance, simulateSkip } from "@/lib/attendance-calc";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-
-// ── Tool definitions for the LLM ────────────────────────────────
-const TOOLS = [
-  {
-    type: "function",
-    function: {
-      name: "get_todays_classes",
-      description:
-        "Get today's class schedule with attendance status. Use when user asks about today's classes, schedule, or what's happening today.",
-      parameters: { type: "object", properties: {}, required: [] },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "mark_attendance",
-      description:
-        "Mark attendance (present, absent, late, excused, cancelled) for a subject today. Use when user says things like 'mark me present for DBMS', 'I attended OS', 'I bunked math', 'absent for physics'.",
-      parameters: {
-        type: "object",
-        properties: {
-          subjectQuery: {
-            type: "string",
-            description: "Subject name, code, or abbreviation mentioned by the user",
-          },
-          status: {
-            type: "string",
-            enum: ["present", "absent", "late", "excused", "cancelled"],
-            description:
-              "Attendance status. Map 'bunked/skipped/missed' to absent, 'attended/went/was there' to present.",
-          },
-        },
-        required: ["subjectQuery", "status"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "get_analytics",
-      description:
-        "Get overall attendance analytics — percentage, streak, subject-wise breakdown, danger/warning subjects. Use when user asks about attendance percentage, stats, analytics, how they're doing, overall attendance.",
-      parameters: { type: "object", properties: {}, required: [] },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "get_subject_info",
-      description:
-        "Get detailed info about a specific subject — attendance %, streak, classes held, schedule. Use when user asks about a particular subject's stats.",
-      parameters: {
-        type: "object",
-        properties: {
-          subjectQuery: {
-            type: "string",
-            description: "Subject name, code, or abbreviation",
-          },
-        },
-        required: ["subjectQuery"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "skip_optimizer",
-      description:
-        "Calculate how many classes the user can safely skip/bunk across subjects without falling below minimum attendance. Use when user asks 'can I bunk?', 'how many classes can I skip?', 'which class to bunk?', 'is it safe to skip?'.",
-      parameters: {
-        type: "object",
-        properties: {
-          maxSkips: {
-            type: "number",
-            description: "Number of classes the user wants to skip. Default 3 if not specified.",
-          },
-        },
-        required: [],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "schedule_override",
-      description:
-        "Change class timings — reschedule, cancel, add extra class, or swap two classes for a specific date. Use when user talks about class timing changes, cancellations, swaps, or extra classes.",
-      parameters: {
-        type: "object",
-        properties: {
-          action: {
-            type: "string",
-            enum: ["reschedule", "cancel", "extra", "swap"],
-            description: "Type of schedule change",
-          },
-          subjectQuery: {
-            type: "string",
-            description: "Primary subject name/code",
-          },
-          date: {
-            type: "string",
-            description:
-              "Target date in YYYY-MM-DD format. Parse 'today', 'tomorrow', 'this Monday', 'Aug 5th' etc. into YYYY-MM-DD.",
-          },
-          newTime: {
-            type: "string",
-            description: "New time in HH:MM 24h format (e.g., '14:00' for 2pm). Required for reschedule/extra.",
-          },
-          swapSubjectQuery: {
-            type: "string",
-            description: "Second subject for swap operations",
-          },
-        },
-        required: ["action", "subjectQuery", "date"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "get_attendance_history",
-      description:
-        "Get recent attendance records for a subject or all subjects. Use when user asks 'when did I last attend X?', 'my attendance history', 'show my records'.",
-      parameters: {
-        type: "object",
-        properties: {
-          subjectQuery: {
-            type: "string",
-            description: "Subject name/code, or leave empty for all subjects",
-          },
-          days: {
-            type: "number",
-            description: "Number of past days to look at. Default 7.",
-          },
-        },
-        required: [],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "mark_bulk_attendance",
-      description:
-        "Mark attendance for ALL of today's classes at once with the same status. Use when user says 'mark all present', 'I attended everything today', 'bunked all classes'.",
-      parameters: {
-        type: "object",
-        properties: {
-          status: {
-            type: "string",
-            enum: ["present", "absent", "late"],
-            description: "Status to apply to all today's classes",
-          },
-        },
-        required: ["status"],
-      },
-    },
-  },
-];
+const MODEL = "google/gemma-4-26b-a4b-it:free";
 
 // ── Tool executor functions ─────────────────────────────────────
 
@@ -224,12 +66,11 @@ async function execMarkAttendance(userId: string, subjectQuery: string, status: 
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
 
-  // Find the schedule for today
   const schedule = await prisma.schedule.findFirst({
     where: { subjectId: subject.id, dayOfWeek: today.getDay(), isActive: true },
   });
 
-  const record = await prisma.attendanceRecord.upsert({
+  await prisma.attendanceRecord.upsert({
     where: {
       subjectId_userId_date_scheduleId: {
         subjectId: subject.id,
@@ -532,19 +373,15 @@ async function findSubject(userId: string, query: string) {
 
   const q = query.toLowerCase().trim();
 
-  // Exact name match
   let match = subjects.find((s) => s.name.toLowerCase() === q);
   if (match) return match;
 
-  // Code match
   match = subjects.find((s) => s.code?.toLowerCase() === q);
   if (match) return match;
 
-  // Contains match
   match = subjects.find((s) => s.name.toLowerCase().includes(q));
   if (match) return match;
 
-  // Abbreviation match (first letters)
   match = subjects.find((s) => {
     const words = s.name.toLowerCase().split(/\s+/);
     if (words.length > 1) {
@@ -555,7 +392,6 @@ async function findSubject(userId: string, query: string) {
   });
   if (match) return match;
 
-  // Partial word match
   match = subjects.find((s) => {
     const words = s.name.toLowerCase().split(/\s+/);
     return words.some((w) => w.length > 3 && (w.includes(q) || q.includes(w)));
@@ -572,7 +408,7 @@ export async function POST(req: NextRequest) {
 
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
-      { error: "Chatbot not configured. Set OPENROUTER_API_KEY." },
+      { error: "Chatbot not configured. Set OPENROUTER_API_KEY in .env" },
       { status: 503 }
     );
   }
@@ -592,44 +428,64 @@ export async function POST(req: NextRequest) {
   const now = new Date();
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-  const systemPrompt = `You are AttendEase Assistant — a helpful, concise attendance tracker chatbot for a college student.
+  const systemPrompt = `You are AttendEase Assistant — a concise attendance tracker chatbot.
 
-Current info:
-- Today: ${dayNames[now.getDay()]}, ${now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-- User's subjects: ${subjectList || "None enrolled"}
-- User's name: ${user.name || "Student"}
+Today: ${dayNames[now.getDay()]}, ${now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+Today's date (YYYY-MM-DD): ${now.toISOString().slice(0, 10)}
+User: ${user.name || "Student"}
+Subjects: ${subjectList || "None"}
 
-Your capabilities (use the provided tools):
-1. Show today's classes and attendance status
-2. Mark attendance (present/absent/late/excused/cancelled) for individual or all classes
-3. Show analytics — overall %, per-subject stats, streaks
-4. Skip/bunk optimizer — how many classes can be safely skipped
-5. Schedule changes — reschedule, cancel, add extra, swap classes
-6. Attendance history
-7. Subject-specific info
+You MUST respond with ONLY a JSON object (no markdown, no code fences, no extra text). The JSON must have this shape:
 
-Rules:
-- Be concise and friendly. Use short responses.
-- When marking attendance, map 'bunked/skipped/missed/didn't go' → absent, 'went/attended/was there' → present, 'was late/reached late' → late
-- For dates: parse 'today', 'tomorrow', 'this Monday', 'next Friday', 'Aug 5th' into YYYY-MM-DD
-- For times: parse '2pm' → '14:00', '9:30am' → '09:30', etc.
-- Always call the appropriate tool before responding about data
-- If user asks something you can't handle, say so briefly
-- Use emojis sparingly (✅ ❌ 📊 📅 🔥) to make responses scannable`;
+{"intent": "<intent_name>", "params": {<parameters>}}
 
-  // Build conversation for LLM
+Available intents and their params:
+
+1. "get_todays_classes" — params: {}
+   Use when: user asks about today's classes, schedule, what's on today
+
+2. "mark_attendance" — params: {"subject": "<name>", "status": "<present|absent|late|excused|cancelled>"}
+   Use when: user wants to mark attendance. Map: bunked/skipped/missed → absent, attended/went → present, late/reached late → late
+
+3. "mark_bulk_attendance" — params: {"status": "<present|absent|late>"}
+   Use when: user says "mark all present/absent", "attended everything", "bunked all"
+
+4. "get_analytics" — params: {}
+   Use when: user asks about overall stats, percentage, how they're doing
+
+5. "get_subject_info" — params: {"subject": "<name>"}
+   Use when: user asks about a specific subject's attendance/details
+
+6. "skip_optimizer" — params: {"maxSkips": <number, default 3>}
+   Use when: user asks "can I bunk?", "how many can I skip?", "safe to skip?"
+
+7. "schedule_override" — params: {"action": "<reschedule|cancel|extra|swap>", "subject": "<name>", "date": "<YYYY-MM-DD>", "newTime": "<HH:MM 24h>", "swapSubject": "<name>"}
+   Use when: user talks about timing changes, cancellations, extra classes, swaps
+   For dates: today=${now.toISOString().slice(0, 10)}, tomorrow=${new Date(now.getTime() + 86400000).toISOString().slice(0, 10)}
+   Convert day names to actual dates. Convert "2pm" to "14:00", "9:30am" to "09:30"
+
+8. "get_attendance_history" — params: {"subject": "<name or empty>", "days": <number, default 7>}
+   Use when: user asks about past records, history, when they last attended
+
+9. "chat" — params: {"message": "<your response>"}
+   Use when: user is chatting casually, greeting, or asking something you can answer without data
+
+CRITICAL RULES:
+- Output ONLY the JSON object. No other text before or after.
+- No markdown code fences. No \`\`\`json. Just raw JSON.
+- If unsure about intent, use "chat" with a helpful response asking for clarification.
+- Match subject names fuzzily — "dbms" matches "Database Management Systems", "os" matches "Operating Systems", etc.`;
+
+  // Build conversation
   const messages: any[] = [
     { role: "system", content: systemPrompt },
-    ...history.slice(-8).map((m: any) => ({
-      role: m.role,
-      content: m.content,
-    })),
+    ...history.slice(-6).map((m: any) => ({ role: m.role, content: m.content })),
     { role: "user", content: message },
   ];
 
   try {
-    // First LLM call — may return tool calls
-    const llmRes = await fetch(OPENROUTER_URL, {
+    // Step 1: Get intent from LLM
+    const intentRes = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -638,99 +494,127 @@ Rules:
         "X-Title": "AttendEase",
       },
       body: JSON.stringify({
-        model: "qwen/qwen3-235b-a22b:free",
+        model: MODEL,
         messages,
-        tools: TOOLS,
-        tool_choice: "auto",
-        temperature: 0.3,
-        max_tokens: 1024,
+        temperature: 0.1,
+        max_tokens: 512,
       }),
     });
 
-    if (!llmRes.ok) {
-      const err = await llmRes.json().catch(() => ({}));
+    if (!intentRes.ok) {
+      const err = await intentRes.json().catch(() => ({}));
       console.error("[Chatbot] LLM error:", err);
       return NextResponse.json({ error: "AI service temporarily unavailable." }, { status: 502 });
     }
 
-    const llmData = await llmRes.json();
-    const choice = llmData.choices?.[0];
+    const intentData = await intentRes.json();
+    const rawContent = intentData.choices?.[0]?.message?.content || "";
 
-    if (!choice) {
-      return NextResponse.json({ error: "No response from AI." }, { status: 502 });
-    }
+    // Parse intent JSON from response
+    let intent: string = "chat";
+    let params: any = {};
 
-    // If no tool calls, return the text directly
-    if (!choice.message.tool_calls || choice.message.tool_calls.length === 0) {
+    try {
+      // Strip thinking tags, code fences, and whitespace
+      let cleaned = rawContent
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/gi, "")
+        .trim();
+
+      // Find JSON object in the response
+      const jsonStart = cleaned.indexOf("{");
+      const jsonEnd = cleaned.lastIndexOf("}");
+      if (jsonStart !== -1 && jsonEnd > jsonStart) {
+        const jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
+        const parsed = JSON.parse(jsonStr);
+        intent = parsed.intent || "chat";
+        params = parsed.params || {};
+      }
+    } catch (e) {
+      console.error("[Chatbot] JSON parse error:", e, "Raw:", rawContent.substring(0, 300));
+      // If we can't parse, treat as chat and return the raw text
       return NextResponse.json({
-        reply: choice.message.content || "I'm not sure how to help with that. Try asking about your classes, attendance, or analytics!",
+        reply: rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() || "Sorry, I didn't understand that. Could you rephrase?",
         actions: [],
       });
     }
 
-    // Execute tool calls
-    const toolResults: any[] = [];
+    // Step 2: Execute the intent
+    let result: any;
     const actions: string[] = [];
 
-    for (const tc of choice.message.tool_calls) {
-      const fn = tc.function.name;
-      let args: any = {};
-      try {
-        args = JSON.parse(tc.function.arguments || "{}");
-      } catch {}
-
-      let result: any;
-
-      switch (fn) {
-        case "get_todays_classes":
-          result = await execGetTodaysClasses(user.id);
-          break;
-        case "mark_attendance":
-          result = await execMarkAttendance(user.id, args.subjectQuery, args.status);
+    switch (intent) {
+      case "get_todays_classes":
+        result = await execGetTodaysClasses(user.id);
+        break;
+      case "mark_attendance":
+        if (!params.subject || !params.status) {
+          result = { error: "Please specify which subject and status (present/absent/late)." };
+        } else {
+          result = await execMarkAttendance(user.id, params.subject, params.status);
           if (result.success) actions.push("attendance_marked");
-          break;
-        case "get_analytics":
-          result = await execGetAnalytics(user.id);
-          break;
-        case "get_subject_info":
-          result = await execGetSubjectInfo(user.id, args.subjectQuery);
-          break;
-        case "skip_optimizer":
-          result = await execSkipOptimizer(user.id, args.maxSkips || 3);
-          break;
-        case "schedule_override":
+        }
+        break;
+      case "mark_bulk_attendance":
+        if (!params.status) {
+          result = { error: "Please specify status: present, absent, or late." };
+        } else {
+          result = await execMarkBulkAttendance(user.id, params.status);
+          if (result.success) actions.push("attendance_marked");
+        }
+        break;
+      case "get_analytics":
+        result = await execGetAnalytics(user.id);
+        break;
+      case "get_subject_info":
+        if (!params.subject) {
+          result = { error: "Which subject? Please specify." };
+        } else {
+          result = await execGetSubjectInfo(user.id, params.subject);
+        }
+        break;
+      case "skip_optimizer":
+        result = await execSkipOptimizer(user.id, params.maxSkips || 3);
+        break;
+      case "schedule_override":
+        if (!params.subject || !params.action || !params.date) {
+          result = { error: "Please specify subject, action (cancel/reschedule/extra/swap), and date." };
+        } else {
           result = await execScheduleOverride(
-            user.id, args.action, args.subjectQuery, args.date,
-            args.newTime, args.swapSubjectQuery
+            user.id, params.action, params.subject, params.date,
+            params.newTime, params.swapSubject
           );
           if (result.success) actions.push("schedule_changed");
-          break;
-        case "get_attendance_history":
-          result = await execGetAttendanceHistory(user.id, args.subjectQuery, args.days || 7);
-          break;
-        case "mark_bulk_attendance":
-          result = await execMarkBulkAttendance(user.id, args.status);
-          if (result.success) actions.push("attendance_marked");
-          break;
-        default:
-          result = { error: "Unknown action" };
-      }
-
-      toolResults.push({
-        role: "tool",
-        tool_call_id: tc.id,
-        content: JSON.stringify(result),
-      });
+        }
+        break;
+      case "get_attendance_history":
+        result = await execGetAttendanceHistory(user.id, params.subject, params.days || 7);
+        break;
+      case "chat":
+        // Direct chat response — no data lookup needed
+        return NextResponse.json({
+          reply: params.message || "Hey! Ask me about your classes, attendance, analytics, or say 'can I bunk?' 😊",
+          actions: [],
+        });
+      default:
+        result = { error: "I'm not sure what you need. Try asking about your classes, attendance, or analytics!" };
     }
 
-    // Second LLM call — generate natural language response from tool results
-    const followUpMessages = [
-      ...messages,
-      choice.message,
-      ...toolResults,
+    // Step 3: Format the result with a second LLM call
+    const formatPrompt = `You are AttendEase Assistant. Given the user's question and the data below, write a concise, friendly response.
+Use emojis sparingly (✅ ❌ 📊 📅 🔥 ⚠️) to make it scannable.
+For tables of data, use simple line-by-line formatting — not markdown tables.
+Keep it SHORT — 2-5 lines max unless there's a lot of data.
+If there's an error, explain it helpfully.
+Do NOT output JSON. Write a natural human response.`;
+
+    const formatMessages = [
+      { role: "system", content: formatPrompt },
+      { role: "user", content: `User asked: "${message}"\n\nData:\n${JSON.stringify(result, null, 2)}` },
     ];
 
-    const followUpRes = await fetch(OPENROUTER_URL, {
+    const formatRes = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -739,33 +623,78 @@ Rules:
         "X-Title": "AttendEase",
       },
       body: JSON.stringify({
-        model: "qwen/qwen3-235b-a22b:free",
-        messages: followUpMessages,
-        temperature: 0.3,
-        max_tokens: 1024,
+        model: MODEL,
+        messages: formatMessages,
+        temperature: 0.4,
+        max_tokens: 512,
       }),
     });
 
-    if (!followUpRes.ok) {
-      // Fallback: return raw tool results as readable text
-      const fallback = toolResults.map((tr) => {
-        const data = JSON.parse(tr.content);
-        if (data.error) return `Error: ${data.error}`;
-        if (data.success && data.subjectName && data.status) {
-          return `✅ Marked ${data.status} for ${data.subjectName}. Attendance: ${data.newPercentage}%`;
-        }
-        return JSON.stringify(data, null, 2);
-      }).join("\n");
-
-      return NextResponse.json({ reply: fallback, actions });
+    if (!formatRes.ok) {
+      // Fallback: return a simple formatted response without LLM
+      return NextResponse.json({
+        reply: formatFallback(intent, result),
+        actions,
+      });
     }
 
-    const followUpData = await followUpRes.json();
-    const finalReply = followUpData.choices?.[0]?.message?.content || "Done! Let me know if you need anything else.";
+    const formatData = await formatRes.json();
+    let reply = formatData.choices?.[0]?.message?.content || formatFallback(intent, result);
 
-    return NextResponse.json({ reply: finalReply, actions });
+    // Strip thinking tags
+    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+    return NextResponse.json({ reply, actions });
   } catch (error) {
     console.error("[Chatbot] Error:", error);
     return NextResponse.json({ error: "Something went wrong. Try again." }, { status: 500 });
+  }
+}
+
+// ── Fallback formatter (no LLM needed) ──────────────────────────
+
+function formatFallback(intent: string, result: any): string {
+  if (result.error) return `⚠️ ${result.error}`;
+
+  switch (intent) {
+    case "get_todays_classes": {
+      if (result.classes.length === 0) return `📅 No classes today (${result.dayName})!`;
+      const lines = result.classes.map((c: any) =>
+        `${c.attendanceMarked ? (c.attendanceStatus === "present" ? "✅" : "❌") : "⬜"} ${c.startTime}–${c.endTime} ${c.subjectName} (${c.currentPct}%)`
+      );
+      return `📅 ${result.dayName} — ${result.totalClasses} classes:\n${lines.join("\n")}`;
+    }
+    case "mark_attendance":
+      return `✅ Marked ${result.status} for ${result.subjectName}. Attendance: ${result.newPercentage}%`;
+    case "mark_bulk_attendance":
+      return `✅ Marked ${result.status} for ${result.count} classes: ${result.subjects.join(", ")}`;
+    case "get_analytics": {
+      const lines = result.subjects.map((s: any) =>
+        `${s.status === "green" ? "🟢" : s.status === "yellow" ? "🟡" : "🔴"} ${s.name}: ${s.currentPct}% (can skip ${s.canSkip})`
+      );
+      return `📊 Overall: ${result.overallPct}% across ${result.totalSubjects} subjects\n${lines.join("\n")}`;
+    }
+    case "get_subject_info":
+      return `📚 ${result.name}: ${result.currentPct}% | Classes: ${result.totalClasses} | Streak: ${result.streak} 🔥\nCan skip: ${result.canSkip} | Must attend: ${result.needToAttend}`;
+    case "skip_optimizer": {
+      if (result.recommendations.length === 0) return "⚠️ Can't safely skip any classes right now.";
+      const lines = result.recommendations.map((r: any) =>
+        `${r.subjectName}: skip ${r.skipsAllocated} (${r.currentPct}% → ${r.newPct}%)`
+      );
+      let msg = `🎯 Skip plan (${result.totalSkipsUsed}/${result.totalRequested} allocated):\n${lines.join("\n")}`;
+      if (result.cannotSkip.length > 0) msg += `\n⚠️ Don't skip: ${result.cannotSkip.join(", ")}`;
+      return msg;
+    }
+    case "schedule_override":
+      return `📅 ${result.action === "swap" ? `Swapped ${result.subject1} and ${result.subject2}` : `${result.action} ${result.subjectName}`} on ${result.date}${result.newTime ? ` at ${result.newTime}` : ""}`;
+    case "get_attendance_history": {
+      if (result.records.length === 0) return "No attendance records found for that period.";
+      const lines = result.records.slice(0, 10).map((r: any) =>
+        `${r.status === "present" ? "✅" : r.status === "absent" ? "❌" : "⏰"} ${r.date} ${r.subject}: ${r.status}`
+      );
+      return `📋 Last ${result.days} days (${result.total} records):\n${lines.join("\n")}`;
+    }
+    default:
+      return "Done! Let me know if you need anything else.";
   }
 }
