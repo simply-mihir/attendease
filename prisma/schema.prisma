@@ -78,6 +78,7 @@ model User {
   friendGroupMemberships FriendGroupMember[]
   reminders           Reminder[]
   sentNotifications   SentNotification[]
+  scheduleOverrides   ScheduleOverride[]
 }
 
 model DegreeProfile {
@@ -149,8 +150,10 @@ model Subject {
   schedules         Schedule[]
   attendanceRecords AttendanceRecord[]
   achievements      Achievement[]
-  classExceptions   ClassException[]
-  reminders         Reminder[]
+  classExceptions     ClassException[]
+  reminders           Reminder[]
+  scheduleOverrides   ScheduleOverride[]
+  swappedOverrides    ScheduleOverride[] @relation("SwapSubject")
 
   @@index([userId])
   @@index([semesterId])
@@ -406,4 +409,24 @@ model ExamPeriod {
   semester   Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
 
   @@index([semesterId])
+}
+
+model ScheduleOverride {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime // The specific date this override applies to
+  subjectId       String
+  subject         Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  type            String   // "reschedule" | "cancel" | "extra" | "swap"
+  originalTime    String?  // Original time slot (e.g., "09:00")
+  newTime         String?  // New time slot (e.g., "14:00") — null if cancelled
+  swapSubjectId   String?  // For swaps: the other subject involved
+  swapSubject     Subject? @relation("SwapSubject", fields: [swapSubjectId], references: [id])
+  note            String?  // User's original message / note
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([subjectId])
 }

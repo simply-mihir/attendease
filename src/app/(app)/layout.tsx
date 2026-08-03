@@ -20,6 +20,7 @@ import { SWRPrefetcher } from "@/components/SWRPrefetcher";
 import { ReminderNotifier } from "@/components/ReminderNotifier";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { VibrantBackground } from "@/components/VibrantBackground";
+import { ScheduleChatbot } from "@/components/ScheduleChatbot";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, gradient: "from-purple-500 to-pink-500", prefetchKey: "/dashboard" },
@@ -229,6 +230,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+      <ScheduleChatbot />
     </div>
     </ProfileProvider>
   );

@@ -46,11 +46,13 @@ export default function CalendarPage() {
   const to = view === "week" ? formatDateLocal(weekDates[6]) : formatDateLocal(monthEnd);
   
   const { data: schedData, isLoading: schedLoading } = useSWRFetch<{ schedules: any[] }>("/schedules");
+  const { data: overData, isLoading: overLoading } = useSWRFetch<{ overrides: any[] }>(`/schedule-override?startDate=${from}&endDate=${to}`);
   const { data: recData, isLoading: recLoading } = useSWRFetch<{ records: any[] }>(`/attendance?from=${from}&to=${to}`);
 
   const schedules = schedData?.schedules || [];
+  const overrides = overData?.overrides || [];
   const records = recData?.records || [];
-  const pageLoading = schedLoading || recLoading;
+  const pageLoading = schedLoading || recLoading || overLoading;
 
 
   function navigate(dir: number) {
@@ -74,8 +76,73 @@ export default function CalendarPage() {
     recordMap.get(date)!.push(r);
   });
 
-  function getClassesForDay(dayOfWeek: number) {
-    return schedules.filter((s) => s.dayOfWeek === dayOfWeek);
+  function getClassesForDay(date: Date) {
+    const dayOfWeek = date.getDay();
+    const dateStr = date.toISOString().split("T")[0];
+
+    // Start with regular classes for this day
+    let classes = schedules
+      .filter((s: any) => s.dayOfWeek === dayOfWeek)
+      .map((s: any) => ({
+        id: s.id,
+        subjectId: s.subjectId,
+        subject: { name: s.subject?.name, colorHex: s.subject?.colorHex },
+        startTime: s.startTime,
+        endTime: s.endTime,
+        isOverride: false,
+        overrideType: null as string | null,
+        room: s.room,
+      }));
+
+    // Apply overrides for this date
+    const dayOverrides = overrides.filter(
+      (o: any) => new Date(o.date).toISOString().split("T")[0] === dateStr
+    );
+
+    for (const override of dayOverrides) {
+      switch (override.type) {
+        case "cancel":
+          // Remove the class
+          classes = classes.filter((c: any) => c.subjectId !== override.subjectId);
+          break;
+
+        case "reschedule":
+          // Update timing
+          classes = classes.map((c: any) =>
+            c.subjectId === override.subjectId
+              ? { ...c, startTime: override.newTime!, isOverride: true, overrideType: "rescheduled" }
+              : c
+          );
+          break;
+
+        case "extra":
+          // Add a new class
+          classes.push({
+            id: override.id,
+            subjectId: override.subjectId,
+            subject: { name: override.subject?.name, colorHex: override.subject?.colorHex },
+            startTime: override.newTime!,
+            endTime: "",
+            isOverride: true,
+            overrideType: "extra",
+            room: null
+          });
+          break;
+
+        case "swap":
+          classes = classes.map((c: any) => {
+            if (c.subjectId === override.subjectId && override.newTime) {
+              return { ...c, startTime: override.newTime, isOverride: true, overrideType: "swapped" };
+            }
+            return c;
+          });
+          break;
+      }
+    }
+
+    // Sort by start time
+    classes.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime));
+    return classes;
   }
 
   const isToday = (d: Date) => d.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
@@ -125,7 +192,7 @@ export default function CalendarPage() {
         /* Week View */
         <StaggerGrid className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {weekDates.map((date, i) => {
-            const dayClasses = getClassesForDay(date.getDay());
+            const dayClasses = getClassesForDay(date);
             const dateStr = date.toISOString().slice(0, 10);
             const dayRecords = recordMap.get(dateStr) || [];
             const today = isToday(date);
@@ -155,7 +222,18 @@ export default function CalendarPage() {
                       <div key={cls.id} className="rounded-lg border-2 px-2 py-1.5 mb-1 transition-all duration-150 cursor-pointer border-gray-200 bg-white shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: cls.subject?.colorHex || '#FF2D78' }}>
                         <p className="text-xs font-bold text-[#1a1a2e] dark:text-white break-words">{cls.subject?.name}</p>
                         <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80]">{cls.startTime}</p>
-                        {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full", STATUS_DOT[rec.status])} />}
+                        {cls.isOverride && (
+                          <span className={clsx("inline-block rounded px-1 py-0.5 text-[8px] font-bold uppercase mt-0.5",
+                            cls.overrideType === "extra"
+                              ? "bg-[#06d6a0]/20 text-[#06d6a0]"
+                              : cls.overrideType === "swapped"
+                              ? "bg-[#4361ee]/20 text-[#4361ee]"
+                              : "bg-[#ff6b35]/20 text-[#ff6b35]"
+                          )}>
+                            {cls.overrideType}
+                          </span>
+                        )}
+                        {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full block", STATUS_DOT[rec.status])} />}
                       </div>
                     );
                   })}
