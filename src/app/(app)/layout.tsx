@@ -229,7 +229,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="p-3 border-t-2 border-gray-200 dark:border-[#2a2a3d]">
             {sidebarCollapsed ? (
               <div className="hidden lg:flex flex-col items-center gap-2">
-                <UserAvatar user={user} size="sm" className="shadow-[0_2px_0_0_#cc1a5e]" />
+                <Link href="/settings" className="block hover:opacity-80 transition-opacity">
+                  <UserAvatar user={user} size="sm" className="shadow-[0_2px_0_0_#cc1a5e]" />
+                </Link>
                 <button
                   onClick={handleLogout}
                   disabled={signingOut}
