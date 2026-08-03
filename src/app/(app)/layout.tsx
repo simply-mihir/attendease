@@ -113,10 +113,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* ===== BODY: SIDEBAR + MAIN ===== */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 relative">
         {/* Sidebar */}
         <aside className={clsx(
-          "hidden md:flex flex-col transition-all duration-300 ease-in-out static h-[calc(100vh-4rem)] overflow-y-auto",
+          "hidden md:flex flex-col transition-all duration-300 ease-in-out sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto",
           "bg-gray-50/95 border-r-2 border-gray-200 dark:bg-[#070b14]/95 dark:border-[#2a2a3d] backdrop-blur-sm shrink-0 z-40",
           sidebarCollapsed ? "w-[88px]" : "w-[260px]"
         )}>
