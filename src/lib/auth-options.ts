@@ -56,10 +56,25 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       const userId = user?.id || (token.id as string) || token.sub;
       if (userId) {
         token.id = userId;
+        // On sign-in, store image from user object
+        if (user?.image) {
+          token.picture = user.image;
+        }
+        // On session update (e.g. avatar change), re-fetch from DB
+        if (trigger === "update" && userId) {
+          try {
+            const dbUser = await prisma.user.findUnique({ where: { id: userId }, select: { image: true, name: true, email: true } });
+            if (dbUser) {
+              if (dbUser.image) token.picture = dbUser.image;
+              if (dbUser.name) token.name = dbUser.name;
+              if (dbUser.email) token.email = dbUser.email;
+            }
+          } catch {}
+        }
         try {
           await prisma.notificationSetting.upsert({
             where: { userId },
@@ -76,6 +91,9 @@ export const authOptions: NextAuthOptions = {
       const userId = (token.id as string) || token.sub;
       if (session.user && userId) {
         (session.user as any).id = userId;
+        if (token.picture) {
+          session.user.image = token.picture as string;
+        }
       }
       return session;
     },

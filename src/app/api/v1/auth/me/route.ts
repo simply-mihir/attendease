@@ -21,6 +21,7 @@ export async function PUT(req: NextRequest) {
         name: body.name,
         email: body.email,
         ...(body.timezone ? { timezone: body.timezone } : {}),
+        ...(body.image !== undefined ? { image: body.image } : {}),
       }
     });
     

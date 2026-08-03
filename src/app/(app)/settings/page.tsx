@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Bell, Calendar, Download, Moon, ChevronRight, Trophy, Edit2, HeartPulse, Target } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserAvatar, AvatarPicker } from "@/components/UserAvatar";
 import { apiFetch } from "@/hooks/useApi";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -23,12 +24,14 @@ export default function SettingsPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
+  const [editImage, setEditImage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   function openEditModal() {
     setEditName(user?.name || "");
     setEditEmail(user?.email || "");
+    setEditImage(user?.image || null);
     setError("");
     setShowEditModal(true);
   }
@@ -39,12 +42,10 @@ export default function SettingsPage() {
     try {
       await apiFetch("/auth/me", {
         method: "PUT",
-        body: JSON.stringify({ name: editName, email: editEmail })
+        body: JSON.stringify({ name: editName, email: editEmail, image: editImage })
       });
-      // Force next-auth to update session if possible
       await update({ name: editName, email: editEmail });
       setShowEditModal(false);
-      // reload page to ensure new session reflects
       window.location.reload();
     } catch (err: any) {
       setError(err.message || "Failed to update profile");
@@ -62,9 +63,7 @@ export default function SettingsPage() {
         <div className="rounded-2xl border-2 border-[#FF2D78] p-5 mb-4 bg-white shadow-[0_6px_0_0_#cc1a5e] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#b81e56]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#FF2D78] border-2 border-[#d61b60] flex items-center justify-center text-white text-2xl font-black shadow-[0_4px_0_0_#d61b60]">
-                {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
-              </div>
+              <UserAvatar user={user || {}} size="lg" className="shadow-[0_4px_0_0_#cc1a5e]" />
               <div>
                 <h2 className="text-lg font-black text-text">{user?.name || "Student"}</h2>
                 <p className="text-sm font-bold text-text-muted">{user?.email}</p>
@@ -176,10 +175,19 @@ export default function SettingsPage() {
       {/* Edit Profile Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="rounded-2xl border-2 p-6 max-w-sm w-full shadow-2xl animate-fade-in space-y-4 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
+          <div className="rounded-2xl border-2 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in space-y-4 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
             <h3 className="text-xl font-black text-text mb-2">Edit Profile</h3>
             {error && <p className="text-[#ef476f] text-xs font-bold bg-[#ef476f]/10 p-2.5 rounded-xl border-2 border-[#ef476f]/30">{error}</p>}
             <div className="space-y-3">
+              {/* Avatar preview + picker */}
+              <div className="flex flex-col items-center gap-3 pb-2">
+                <UserAvatar user={{ ...user, image: editImage }} size="xl" className="shadow-[0_4px_0_0_#cc1a5e]" />
+              </div>
+              <AvatarPicker
+                seed={user?.email || user?.name || "default"}
+                currentImage={editImage}
+                onSelect={(url) => setEditImage(url)}
+              />
               <div>
                 <label className="block text-xs font-black text-text mb-1">Name</label>
                 <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="w-full rounded-xl border-2 px-4 py-3 text-sm font-bold transition-all duration-150 border-gray-200 bg-white text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] focus:border-[#4361ee] focus:outline-none focus:ring-4 focus:ring-[#4361ee]/20 dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a] dark:focus:border-[#4361ee]" />

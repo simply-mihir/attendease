@@ -386,14 +386,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold text-[#ef476f] uppercase tracking-wider">{isCurrent ? "In Danger" : "Failed"}</p>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${dangerCount > 0 ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" : "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"}`}>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30">
                   <AlertTriangle className="h-5 w-5" />
                 </div>
               </div>
               {loading ? (
                 <div className="flex items-center h-9 mt-1"><FieldLoader size="lg" /></div>
               ) : (
-                <p className={`text-3xl font-black tracking-tight mt-1 ${dangerCount > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}><AnimatedCounter value={dangerCount} /></p>
+                <p className="text-3xl font-black tracking-tight mt-1 text-[#ef476f]"><AnimatedCounter value={dangerCount} /></p>
               )}
             </div>
           </div>

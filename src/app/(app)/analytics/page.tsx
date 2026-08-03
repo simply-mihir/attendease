@@ -165,11 +165,11 @@ export default function AnalyticsPage() {
               <div className="relative">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-bold text-[#ef476f] uppercase tracking-wider">In Danger</p>
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${((dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects) ?? 0) > 0 ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" : "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"}`}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30">
                     <AlertTriangle className="h-5 w-5" />
                   </div>
                 </div>
-                <p className={`text-3xl font-black tracking-tight mt-1 ${((dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects) ?? 0) > 0 ? "text-[#ef476f]" : "text-[#1a1a2e] dark:text-white"}`}>
+                <p className="text-3xl font-black tracking-tight mt-1 text-[#ef476f]">
                   <AnimatedCounter value={dashboard.stats?.dangerCount ?? dashboard.dangerSubjects?.length ?? dashboard.dangerSubjects ?? 0} />
                 </p>
               </div>

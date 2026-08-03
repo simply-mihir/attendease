@@ -13,6 +13,7 @@ import {
   Sliders, Settings, LogOut, Menu, X, ChevronRight, ChevronLeft, Zap, TrendingUp, Users, Bell, Award, Loader2
 } from "lucide-react";
 import clsx from "clsx";
+import { UserAvatar } from "@/components/UserAvatar";
 import { preload } from "swr";
 import { apiFetch } from "@/hooks/useApi";
 
@@ -228,9 +229,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="p-3 border-t-2 border-gray-200 dark:border-[#2a2a3d]">
             {sidebarCollapsed ? (
               <div className="hidden lg:flex flex-col items-center gap-2">
-                <div className="w-9 h-9 rounded-xl bg-[#FF2D78] border border-[#cc1a5e] flex items-center justify-center text-white font-black text-sm shadow-[0_2px_0_0_#cc1a5e] shrink-0" title={user.name || user.email || ""}>
-                  {(user.name || user.email || "U").charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar user={user} size="sm" className="shadow-[0_2px_0_0_#cc1a5e]" />
                 <button
                   onClick={handleLogout}
                   disabled={signingOut}
@@ -244,9 +243,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             
             <div className={clsx(sidebarCollapsed ? "lg:hidden block" : "block")}>
               <div className="flex items-center gap-3 px-3 py-2 mb-1">
-                <div className="w-9 h-9 rounded-xl bg-[#FF2D78] border border-[#cc1a5e] flex items-center justify-center text-white font-black text-sm shadow-[0_2px_0_0_#cc1a5e] shrink-0">
-                  {(user.name || user.email || "U").charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar user={user} size="md" className="shadow-[0_2px_0_0_#cc1a5e]" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate text-text">{user.name || "Student"}</p>
                   <p className="text-xs text-text-muted truncate">{user.email}</p>
