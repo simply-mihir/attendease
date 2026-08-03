@@ -1118,6 +1118,199 @@ html.dark select option {
   animation: skeletonShimmer 1.8s ease-in-out infinite;
 }
 
+/* === LANDING PAGE — ROUNDED 3D BUTTONS === */
+
+/* Nav buttons — pill-shaped, compact */
+.nav-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #FF2D78, #e91e6b);
+  border: 2px solid #cc1a5e;
+  box-shadow: 0 4px 0 0 #cc1a5e, 0 6px 20px rgba(255, 45, 120, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-btn-primary:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #cc1a5e, 0 4px 12px rgba(255, 45, 120, 0.25);
+}
+.nav-btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #cc1a5e;
+}
+
+.nav-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #4a4a5a;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 4px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.nav-btn-secondary:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #d1d5db;
+  color: #1a1a2e;
+}
+.nav-btn-secondary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #d1d5db;
+}
+
+html.dark .nav-btn-primary {
+  border-color: #b81e56;
+  box-shadow: 0 4px 0 0 #b81e56, 0 6px 20px rgba(255, 45, 120, 0.25);
+}
+html.dark .nav-btn-primary:hover {
+  box-shadow: 0 2px 0 0 #b81e56, 0 4px 12px rgba(255, 45, 120, 0.2);
+}
+
+html.dark .nav-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #c4c4d4;
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.3);
+}
+html.dark .nav-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Hero buttons — larger, pill-shaped, 3D with glow */
+.hero-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #FF2D78, #d91a6a);
+  border: 2px solid #cc1a5e;
+  box-shadow:
+    0 5px 0 0 #a81550,
+    0 8px 25px rgba(255, 45, 120, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hero-btn-primary:hover {
+  transform: translateY(3px);
+  box-shadow:
+    0 2px 0 0 #a81550,
+    0 4px 15px rgba(255, 45, 120, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.hero-btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 0 #a81550, inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.hero-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #4a4a5a;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 5px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.hero-btn-secondary:hover {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 0 #d1d5db;
+  color: #1a1a2e;
+}
+.hero-btn-secondary:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 0 #d1d5db;
+}
+
+html.dark .hero-btn-primary {
+  border-color: #b81e56;
+  box-shadow:
+    0 5px 0 0 #8a1242,
+    0 8px 25px rgba(255, 45, 120, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+html.dark .hero-btn-primary:hover {
+  box-shadow:
+    0 2px 0 0 #8a1242,
+    0 4px 15px rgba(255, 45, 120, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+html.dark .hero-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #c4c4d4;
+  box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.35);
+}
+html.dark .hero-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Feature cards — colored glassmorphism */
+.feature-glass-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.75rem;
+  border-radius: 1.25rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 6px 0 0 rgba(0,0,0,0.04),
+    0 8px 32px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.feature-glass-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--feature-color, rgba(0,0,0,0.08));
+  box-shadow:
+    0 12px 0 0 rgba(0,0,0,0.03),
+    0 16px 48px var(--feature-glow, rgba(0,0,0,0.08)),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+html.dark .feature-glass-card {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(20,20,37,0.9), rgba(20,20,37,0.6));
+  box-shadow:
+    0 6px 0 0 rgba(0,0,0,0.2),
+    0 8px 32px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+html.dark .feature-glass-card:hover {
+  border-color: var(--feature-color, rgba(255,255,255,0.12));
+  box-shadow:
+    0 12px 0 0 rgba(0,0,0,0.15),
+    0 16px 48px var(--feature-glow, rgba(0,0,0,0.15)),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
 /* === SIDEBAR TOGGLE PULSE === */
 @keyframes sidebarTogglePulse {
   0%, 100% {

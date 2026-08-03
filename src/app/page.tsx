@@ -2,12 +2,12 @@ import Link from "next/link";
 import { GraduationCap, BarChart3, Bell, Shield, Flame, Calculator, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
-  { icon: GraduationCap, title: "Track Attendance", desc: "Mark present, absent, or late with one tap. Supports bulk marking for busy days.", gradient: "from-purple-500 to-pink-500" },
-  { icon: BarChart3, title: "Smart Analytics", desc: "Heatmaps, trend charts, and per-subject breakdowns so you always know where you stand.", gradient: "from-cyan-500 to-blue-500" },
-  { icon: Calculator, title: "Bunk Calculator", desc: "Know exactly how many classes you can skip — or how many you need to recover.", gradient: "from-orange-500 to-red-500" },
-  { icon: Bell, title: "Telegram & Email Alerts", desc: "Get pre-class reminders, daily briefs, and danger zone alerts via Telegram Bot or Email.", gradient: "from-green-500 to-emerald-500" },
-  { icon: Shield, title: "Danger Alerts", desc: "Instant warnings when your attendance drops near the minimum threshold.", gradient: "from-red-500 to-pink-500" },
-  { icon: Flame, title: "Streaks & Badges", desc: "Earn achievements for consistent attendance. Keep your streak alive!", gradient: "from-yellow-500 to-orange-500" },
+  { icon: GraduationCap, title: "Track Attendance", desc: "Mark present, absent, or late with one tap. Supports bulk marking for busy days.", color: "#a855f7", glow: "rgba(168,85,247,0.25)" },
+  { icon: BarChart3, title: "Smart Analytics", desc: "Heatmaps, trend charts, and per-subject breakdowns so you always know where you stand.", color: "#06b6d4", glow: "rgba(6,182,212,0.25)" },
+  { icon: Calculator, title: "Bunk Calculator", desc: "Know exactly how many classes you can skip — or how many you need to recover.", color: "#f97316", glow: "rgba(249,115,22,0.25)" },
+  { icon: Bell, title: "Telegram & Email Alerts", desc: "Get pre-class reminders, daily briefs, and danger zone alerts via Telegram Bot or Email.", color: "#10b981", glow: "rgba(16,185,129,0.25)" },
+  { icon: Shield, title: "Danger Alerts", desc: "Instant warnings when your attendance drops near the minimum threshold.", color: "#ef4444", glow: "rgba(239,68,68,0.25)" },
+  { icon: Flame, title: "Streaks & Badges", desc: "Earn achievements for consistent attendance. Keep your streak alive!", color: "#eab308", glow: "rgba(234,179,8,0.25)" },
 ];
 
 export default function LandingPage() {
@@ -31,10 +31,10 @@ export default function LandingPage() {
           </span>
         </div>
         <div className="flex gap-3 items-center">
-          <Link href="/login" className="btn-3d-secondary px-5 py-2.5 text-xs font-black">
+          <Link href="/login" className="nav-btn-secondary">
             Log in
           </Link>
-          <Link href="/register" className="btn-3d-primary px-5 py-2.5 text-xs font-black">
+          <Link href="/register" className="nav-btn-primary">
             Sign up free
           </Link>
         </div>
@@ -58,11 +58,11 @@ export default function LandingPage() {
           and sends reminders right to Telegram and Email. All in one powerful app.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
-          <Link href="/register" className="btn-3d-primary px-8 py-4 text-base font-black flex items-center gap-2 group w-full sm:w-auto justify-center">
+          <Link href="/register" className="hero-btn-primary group w-full sm:w-auto justify-center">
             Get Started — It&apos;s Free
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link href="/login" className="btn-3d-secondary px-8 py-4 text-base font-black w-full sm:w-auto text-center">
+          <Link href="/login" className="hero-btn-secondary w-full sm:w-auto text-center">
             Log in
           </Link>
         </div>
@@ -79,10 +79,28 @@ export default function LandingPage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
-              <div key={f.title} className="card-3d p-6 group cursor-default">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-4 border-2 border-white/20 shadow-md group-hover:scale-105 transition-transform`}>
-                  <f.icon className="w-6 h-6 text-white" />
+              <div
+                key={f.title}
+                className="feature-glass-card group cursor-default"
+                style={{ "--feature-color": f.color, "--feature-glow": f.glow } as React.CSSProperties}
+              >
+                {/* Gradient glow behind card on hover */}
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"
+                  style={{ background: f.glow }}
+                />
+
+                {/* Colored top accent bar */}
+                <div className="absolute top-0 left-6 right-6 h-[3px] rounded-b-full opacity-60 group-hover:opacity-100 transition-opacity" style={{ background: f.color }} />
+
+                {/* Icon */}
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 border border-white/20 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300"
+                  style={{ background: `linear-gradient(135deg, ${f.color}, ${f.color}cc)`, boxShadow: `0 4px 15px ${f.glow}` }}
+                >
+                  <f.icon className="w-7 h-7 text-white" />
                 </div>
+
                 <h3 className="text-lg font-black mb-2 text-[#1a1a2e] dark:text-white">{f.title}</h3>
                 <p className="text-[#4a4a5a] dark:text-[#a0a0b8] text-sm font-bold leading-relaxed">{f.desc}</p>
               </div>
