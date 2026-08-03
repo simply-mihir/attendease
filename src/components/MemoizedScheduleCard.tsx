@@ -77,21 +77,21 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
           {hasMarked ? (
             <div
               className={clsx(
-                "flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)] w-full mt-2",
+                "flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)] w-full mt-3",
                 (cls.attendanceStatus || cls.attendance?.status) === "present"
-                  ? "bg-[#06d6a0]/15 text-[#06d6a0] border-[#06d6a0]/40"
+                  ? "bg-[#00f5d4]/15 text-[#00c4a7] border-[#00f5d4]/40 dark:text-[#00f5d4]"
                   : (cls.attendanceStatus || cls.attendance?.status) === "late"
-                  ? "bg-[#ff6b35]/15 text-[#ff6b35] border-[#ff6b35]/40"
+                  ? "bg-[#facc15]/15 text-[#ca8a04] border-[#facc15]/40 dark:text-[#fef08a]"
                   : (cls.attendanceStatus || cls.attendance?.status) === "cancelled"
-                  ? "bg-gray-100 text-gray-700 border-gray-300 dark:bg-white/10 dark:text-gray-300 dark:border-white/20"
+                  ? "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/20"
                   : "bg-[#ef476f]/15 text-[#ef476f] border-[#ef476f]/40"
               )}
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
               Marked: {cls.attendanceStatus || cls.attendance?.status}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 mt-3 w-full">
               {(["present", "absent", "late", "cancelled"] as const).map(
                 (status) => (
                   <button
@@ -101,26 +101,26 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                     }
                     disabled={marking === `${cls.subjectId}-${status}`}
                     className={clsx(
-                      "py-2.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all",
+                      "flex-1 py-1.5 sm:py-2 px-1 sm:px-2 rounded-xl text-[9px] sm:text-xs font-bold flex flex-col xl:flex-row items-center justify-center gap-0.5 sm:gap-1.5 cursor-pointer transition-all min-w-0",
                       status === "present"
-                        ? "btn-3d-teal"
+                        ? "btn-3d-cyan"
                         : status === "absent"
                         ? "btn-3d-coral"
                         : status === "late"
-                        ? "btn-3d-orange"
-                        : "btn-3d-secondary"
+                        ? "btn-3d-yellow"
+                        : "btn-3d-truegray"
                     )}
                   >
                     {status === "present" ? (
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     ) : status === "absent" ? (
-                      <XCircle className="w-4 h-4 shrink-0" />
+                      <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     ) : status === "late" ? (
-                      <Timer className="w-4 h-4 shrink-0" />
+                      <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     ) : (
-                      <Ban className="w-4 h-4 shrink-0" />
+                      <Ban className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     )}
-                    <span className="truncate">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                    <span className="truncate max-w-full">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
                   </button>
                 )
               )}

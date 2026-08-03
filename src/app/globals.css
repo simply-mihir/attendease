@@ -283,6 +283,34 @@ html.dark .btn-3d-cyan:hover { box-shadow: 0 2px 0 0 #00a890; }
 html.dark .btn-3d-amber { border-color: #b84114; box-shadow: 0 4px 0 0 #b84114; }
 html.dark .btn-3d-amber:hover { box-shadow: 0 2px 0 0 #b84114; }
 
+.btn-3d-yellow {
+  background-color: #facc15;
+  color: #854d0e;
+  border-width: 2px;
+  border-color: #ca8a04;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #ca8a04;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-yellow:hover { transform: translateY(2px); box-shadow: 0 2px 0 0 #ca8a04; }
+.btn-3d-yellow:active { transform: translateY(4px); box-shadow: none; }
+html.dark .btn-3d-yellow { background-color: rgba(250, 204, 21, 0.15); color: #fef08a; border-color: rgba(250, 204, 21, 0.4); box-shadow: 0 4px 0 0 rgba(250, 204, 21, 0.3); }
+html.dark .btn-3d-yellow:hover { box-shadow: 0 2px 0 0 rgba(250, 204, 21, 0.3); }
+
+.btn-3d-truegray {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border-width: 2px;
+  border-color: #d1d5db;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 0 0 #d1d5db;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-3d-truegray:hover { transform: translateY(2px); box-shadow: 0 2px 0 0 #d1d5db; background-color: #e5e7eb; }
+.btn-3d-truegray:active { transform: translateY(4px); box-shadow: none; }
+html.dark .btn-3d-truegray { background-color: rgba(156, 163, 175, 0.15); color: #d1d5db; border-color: rgba(156, 163, 175, 0.3); box-shadow: 0 4px 0 0 rgba(156, 163, 175, 0.2); }
+html.dark .btn-3d-truegray:hover { box-shadow: 0 2px 0 0 rgba(156, 163, 175, 0.2); }
+
 /* ===== TEXT — Dual Mode ===== */
 .text-gradient {
   color: #FF2D78;
