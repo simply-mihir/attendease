@@ -2,12 +2,12 @@ import Link from "next/link";
 import { GraduationCap, BarChart3, Bell, Shield, Flame, Calculator, ArrowRight, Sparkles } from "lucide-react";
 
 const features = [
-  { icon: GraduationCap, title: "Track Attendance", desc: "Mark present, absent, or late with one tap. Supports bulk marking for busy days.", color: "#a855f7", glow: "rgba(168,85,247,0.25)" },
-  { icon: BarChart3, title: "Smart Analytics", desc: "Heatmaps, trend charts, and per-subject breakdowns so you always know where you stand.", color: "#06b6d4", glow: "rgba(6,182,212,0.25)" },
-  { icon: Calculator, title: "Bunk Calculator", desc: "Know exactly how many classes you can skip — or how many you need to recover.", color: "#f97316", glow: "rgba(249,115,22,0.25)" },
-  { icon: Bell, title: "Telegram & Email Alerts", desc: "Get pre-class reminders, daily briefs, and danger zone alerts via Telegram Bot or Email.", color: "#10b981", glow: "rgba(16,185,129,0.25)" },
-  { icon: Shield, title: "Danger Alerts", desc: "Instant warnings when your attendance drops near the minimum threshold.", color: "#ef4444", glow: "rgba(239,68,68,0.25)" },
-  { icon: Flame, title: "Streaks & Badges", desc: "Earn achievements for consistent attendance. Keep your streak alive!", color: "#eab308", glow: "rgba(234,179,8,0.25)" },
+  { icon: GraduationCap, title: "Track Attendance", desc: "Mark present, absent, or late with one tap. Supports bulk marking for busy days.", color: "#a855f7" },
+  { icon: BarChart3, title: "Smart Analytics", desc: "Heatmaps, trend charts, and per-subject breakdowns so you always know where you stand.", color: "#06b6d4" },
+  { icon: Calculator, title: "Bunk Calculator", desc: "Know exactly how many classes you can skip — or how many you need to recover.", color: "#f97316" },
+  { icon: Bell, title: "Telegram & Email Alerts", desc: "Get pre-class reminders, daily briefs, and danger zone alerts via Telegram Bot or Email.", color: "#10b981" },
+  { icon: Shield, title: "Danger Alerts", desc: "Instant warnings when your attendance drops near the minimum threshold.", color: "#ef4444" },
+  { icon: Flame, title: "Streaks & Badges", desc: "Earn achievements for consistent attendance. Keep your streak alive!", color: "#eab308" },
 ];
 
 export default function LandingPage() {
@@ -81,28 +81,73 @@ export default function LandingPage() {
             {features.map((f) => (
               <div
                 key={f.title}
-                className="feature-glass-card group cursor-default"
-                style={{ "--feature-color": f.color, "--feature-glow": f.glow } as React.CSSProperties}
+                className="group relative rounded-2xl border-2 p-6 cursor-default transition-all duration-150
+                  hover:translate-y-[2px] overflow-hidden"
+                style={{
+                  borderColor: `${f.color}40`,
+                  backgroundColor: `${f.color}0D`,
+                  boxShadow: `0 6px 0 0 ${f.color}30`,
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 0 0 ${f.color}30`;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 0 0 ${f.color}30`;
+                  (e.currentTarget as HTMLElement).style.transform = '';
+                }}
               >
-                {/* Gradient glow behind card on hover */}
+                {/* Shimmer on hover */}
                 <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"
-                  style={{ background: f.glow }}
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(135deg, ${f.color}08 0%, ${f.color}15 50%, ${f.color}08 100%)`,
+                    backgroundSize: "200% 200%",
+                    animation: "subjectCardShimmer 3s ease-in-out infinite",
+                  }}
                 />
 
-                {/* Colored top accent bar */}
-                <div className="absolute top-0 left-6 right-6 h-[3px] rounded-b-full opacity-60 group-hover:opacity-100 transition-opacity" style={{ background: f.color }} />
-
-                {/* Icon */}
+                {/* Top accent line */}
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 border border-white/20 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300"
-                  style={{ background: `linear-gradient(135deg, ${f.color}, ${f.color}cc)`, boxShadow: `0 4px 15px ${f.glow}` }}
-                >
-                  <f.icon className="w-7 h-7 text-white" />
-                </div>
+                  className="absolute inset-x-0 top-0 h-[2px]"
+                  style={{ background: `linear-gradient(to right, transparent, ${f.color}60, transparent)` }}
+                />
 
-                <h3 className="text-lg font-black mb-2 text-[#1a1a2e] dark:text-white">{f.title}</h3>
-                <p className="text-[#4a4a5a] dark:text-[#a0a0b8] text-sm font-bold leading-relaxed">{f.desc}</p>
+                <div className="relative">
+                  {/* Icon + Title row */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl group-hover:scale-110 transition-all duration-300"
+                      style={{ backgroundColor: `${f.color}1A`, color: f.color }}
+                    >
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <h3
+                      className="text-sm font-bold uppercase tracking-wider"
+                      style={{ color: f.color }}
+                    >
+                      {f.title}
+                    </h3>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-sm font-semibold leading-relaxed text-[#4a4a5a] dark:text-[#a0a0b8]">
+                    {f.desc}
+                  </p>
+
+                  {/* Bottom progress-style bar */}
+                  <div className="mt-4">
+                    <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: "100%",
+                          backgroundColor: f.color,
+                          boxShadow: `0 0 8px ${f.color}40`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
