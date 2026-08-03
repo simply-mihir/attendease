@@ -10,7 +10,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { NavigationProgress } from "@/components/NavigationProgress";
 import {
   GraduationCap, LayoutDashboard, BookOpen, Calendar, BarChart3,
-  Sliders, Settings, LogOut, Menu, X, ChevronRight, ChevronLeft, Zap, TrendingUp, Users, Bell, Award
+  Sliders, Settings, LogOut, Menu, X, ChevronRight, ChevronLeft, Zap, TrendingUp, Users, Bell, Award, Loader2
 } from "lucide-react";
 import clsx from "clsx";
 import { preload } from "swr";
@@ -48,6 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -72,7 +73,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [status, router]);
 
   function handleLogout() {
-    signOut({ callbackUrl: "/" });
+    setSigningOut(true);
+    setTimeout(() => signOut({ callbackUrl: "/" }), 800);
   }
 
   if (status === "loading" || !session?.user) {
@@ -88,6 +90,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProfileProvider>
+    {signingOut && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 dark:bg-[#0a0e1a]/90 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4 animate-fade-in">
+          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4] border-2 border-[#0e7490] flex items-center justify-center shadow-[0_4px_0_0_#0e7490]">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+          </div>
+          <p className="text-lg font-bold text-[#0e7490] dark:text-[#67e8f9]">Signing out...</p>
+        </div>
+      </div>
+    )}
     <NavigationProgress />
     <SWRPrefetcher />
     <div className="flex min-h-screen flex-col relative z-0">
@@ -174,8 +186,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <div className="w-9 h-9 rounded-xl bg-[#FF2D78] border border-[#cc1a5e] flex items-center justify-center text-white font-black text-sm shadow-[0_2px_0_0_#cc1a5e] shrink-0" title={user.name || user.email || ""}>
                   {(user.name || user.email || "U").charAt(0).toUpperCase()}
                 </div>
-                <button onClick={handleLogout} className="flex items-center justify-center w-9 h-9 rounded-xl text-gray-500 hover:bg-rose-50 hover:text-rose-600 dark:text-gray-400 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition cursor-pointer" title="Sign out">
-                  <LogOut className="w-4 h-4" />
+                <button
+                  onClick={handleLogout}
+                  disabled={signingOut}
+                  className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#06b6d4] border-2 border-[#0e7490] text-white shadow-[0_3px_0_0_#0e7490] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#0e7490] active:translate-y-[3px] active:shadow-none transition-all duration-150 cursor-pointer disabled:opacity-60"
+                  title="Sign out"
+                >
+                  {signingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
                 </button>
               </div>
             ) : null}
@@ -190,9 +207,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <p className="text-xs text-text-muted truncate">{user.email}</p>
                 </div>
               </div>
-              <button onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#4a4a5a] hover:bg-rose-50 hover:text-rose-600 dark:text-[#6b6b80] dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition cursor-pointer">
-                <LogOut className="w-4 h-4 shrink-0" /> Sign out
+              <button
+                onClick={handleLogout}
+                disabled={signingOut}
+                className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-[#06b6d4] text-white border-2 border-[#0e7490] shadow-[0_3px_0_0_#0e7490] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#0e7490] active:translate-y-[3px] active:shadow-none transition-all duration-150 cursor-pointer disabled:opacity-60"
+              >
+                {signingOut ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" /> : <LogOut className="w-4 h-4 shrink-0" />}
+                {signingOut ? "Signing out..." : "Sign out"}
               </button>
             </div>
           </div>
