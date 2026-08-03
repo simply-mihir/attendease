@@ -5,6 +5,7 @@ import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { generateRandomAvatar } from "@/lib/avatar-utils";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -96,6 +97,15 @@ export const authOptions: NextAuthOptions = {
         }
       }
       return session;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      // Assign a random DiceBear avatar if the OAuth provider didn't supply one
+      if (!user.image && user.id) {
+        const avatar = generateRandomAvatar(user.email || user.id);
+        await prisma.user.update({ where: { id: user.id }, data: { image: avatar } });
+      }
     },
   },
   pages: {

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { registerSchema } from "@/lib/validations/auth";
+import { generateRandomAvatar } from "@/lib/avatar-utils";
 
 export async function POST(req: Request) {
   try {
@@ -18,8 +19,9 @@ export async function POST(req: Request) {
     }
 
     const passwordHash = await hashPassword(password);
+    const avatarUrl = generateRandomAvatar(email);
     const user = await prisma.user.create({
-      data: { email, passwordHash, name, timezone },
+      data: { email, passwordHash, name, timezone, image: avatarUrl },
       select: { id: true, email: true, name: true, timezone: true, image: true },
     });
 
