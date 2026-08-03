@@ -15,29 +15,59 @@ export async function getUserTimezone(userId: string): Promise<string> {
  * Returns today's date info in the user's timezone:
  * - dayOfWeek (0=Sun … 6=Sat)
  * - startOfDay / endOfDay as UTC Date objects (for Prisma queries)
- * - todayDate as a Date representing the user's local date (for display)
+ * - todayDate as a Date representing the user's local date
  * - dateStr as "YYYY-MM-DD"
+ * - dayName as full weekday name
+ *
+ * Uses Intl.DateTimeFormat.formatToParts() for reliable cross-platform
+ * timezone conversion (avoids locale-string parsing which breaks on some
+ * Node.js versions / Vercel runtimes).
  */
 export function getUserToday(tz: string) {
   const now = new Date();
 
-  // Get the date string in the user's timezone → "2026-08-04"
-  const dateStr = new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(now);
+  // Extract individual date/time parts in the user's timezone
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 
-  // Get the day-of-week string → "Tuesday"
-  const dayName = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "long" }).format(now);
+  const partsArr = fmt.formatToParts(now);
+  const parts: Record<string, string> = {};
+  for (const p of partsArr) {
+    if (p.type !== "literal") parts[p.type] = p.value;
+  }
 
-  // Build a Date whose local-time fields match the user's timezone
-  const userNow = new Date(now.toLocaleString("en-US", { timeZone: tz }));
-  const dayOfWeek = userNow.getDay();
+  const year = parseInt(parts.year);
+  const month = parseInt(parts.month) - 1; // 0-indexed
+  const day = parseInt(parts.day);
+  // hour12:false can return "24" for midnight on some engines
+  const hour = parts.hour === "24" ? 0 : parseInt(parts.hour);
+  const minute = parseInt(parts.minute);
+  const second = parseInt(parts.second);
 
-  // Calculate the UTC offset for the user's timezone
-  const offsetMs = userNow.getTime() - now.getTime();
+  // Build UTC timestamps that represent the user's local time
+  const userLocalAsUtc = new Date(Date.UTC(year, month, day, hour, minute, second));
+  const dayOfWeek = userLocalAsUtc.getUTCDay();
 
-  // User's midnight (start of day) in UTC
-  const localMidnight = new Date(userNow.getFullYear(), userNow.getMonth(), userNow.getDate());
-  const startOfDay = new Date(localMidnight.getTime() - offsetMs);
+  // Offset = (user local time as UTC) - (actual UTC)
+  const offsetMs = userLocalAsUtc.getTime() - now.getTime();
+
+  // Midnight in user's timezone → converted to actual UTC for Prisma queries
+  const midnightUtc = new Date(Date.UTC(year, month, day, 0, 0, 0));
+  const startOfDay = new Date(midnightUtc.getTime() - offsetMs);
   const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000 - 1);
 
-  return { dayOfWeek, startOfDay, endOfDay, todayDate: userNow, dateStr, dayName };
+  const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dayName = dayNames[dayOfWeek];
+
+  return { dayOfWeek, startOfDay, endOfDay, todayDate: userLocalAsUtc, dateStr, dayName };
 }

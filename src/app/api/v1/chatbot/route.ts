@@ -3,6 +3,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { recalcSubjectStats } from "@/lib/subject-stats";
 import { calculateAttendance, simulateSkip } from "@/lib/attendance-calc";
+import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -11,9 +12,8 @@ const MODEL = "google/gemma-4-26b-a4b-it:free";
 // ── Tool executor functions ─────────────────────────────────────
 
 async function execGetTodaysClasses(userId: string) {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const todayStr = now.toISOString().slice(0, 10);
+  const tz = await getUserTimezone(userId);
+  const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
 
   const schedules = await prisma.schedule.findMany({
     where: { userId, dayOfWeek, isActive: true },
@@ -63,11 +63,11 @@ async function execMarkAttendance(userId: string, subjectQuery: string, status: 
   const subject = await findSubject(userId, subjectQuery);
   if (!subject) return { error: `Could not find subject matching "${subjectQuery}". Check spelling or use the full name.` };
 
-  const today = new Date();
-  const todayStr = today.toISOString().slice(0, 10);
+  const tz = await getUserTimezone(userId);
+  const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
 
   const schedule = await prisma.schedule.findFirst({
-    where: { subjectId: subject.id, dayOfWeek: today.getDay(), isActive: true },
+    where: { subjectId: subject.id, dayOfWeek, isActive: true },
   });
 
   await prisma.attendanceRecord.upsert({
@@ -330,11 +330,11 @@ async function execGetAttendanceHistory(userId: string, subjectQuery?: string, d
 }
 
 async function execMarkBulkAttendance(userId: string, status: string) {
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const tz = await getUserTimezone(userId);
+  const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
 
   const schedules = await prisma.schedule.findMany({
-    where: { userId, dayOfWeek: now.getDay(), isActive: true },
+    where: { userId, dayOfWeek, isActive: true },
     include: { subject: { select: { id: true, name: true } } },
   });
 
@@ -425,13 +425,13 @@ export async function POST(req: NextRequest) {
   });
   const subjectList = subjects.map((s) => `${s.name}${s.code ? ` (${s.code})` : ""}`).join(", ");
 
-  const now = new Date();
-  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const tz = await getUserTimezone(user.id);
+  const { dayOfWeek: todayDow, dateStr: todayDateStr, dayName: todayDayName } = getUserToday(tz);
 
   const systemPrompt = `You are AttendEase Assistant — a concise attendance tracker chatbot.
 
-Today: ${dayNames[now.getDay()]}, ${now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
-Today's date (YYYY-MM-DD): ${now.toISOString().slice(0, 10)}
+Today: ${todayDayName}, ${todayDateStr}
+Today's date (YYYY-MM-DD): ${todayDateStr}
 User: ${user.name || "Student"}
 Subjects: ${subjectList || "None"}
 
@@ -461,7 +461,7 @@ Available intents and their params:
 
 7. "schedule_override" — params: {"action": "<reschedule|cancel|extra|swap>", "subject": "<name>", "date": "<YYYY-MM-DD>", "newTime": "<HH:MM 24h>", "swapSubject": "<name>"}
    Use when: user talks about timing changes, cancellations, extra classes, swaps
-   For dates: today=${now.toISOString().slice(0, 10)}, tomorrow=${new Date(now.getTime() + 86400000).toISOString().slice(0, 10)}
+   For dates: today=${todayDateStr}, tomorrow=${(() => { const t = new Date(todayDateStr + "T12:00:00"); t.setDate(t.getDate() + 1); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; })()}
    Convert day names to actual dates. Convert "2pm" to "14:00", "9:30am" to "09:30"
 
 8. "get_attendance_history" — params: {"subject": "<name or empty>", "days": <number, default 7>}

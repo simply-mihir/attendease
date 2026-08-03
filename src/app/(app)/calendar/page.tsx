@@ -9,6 +9,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 import { getClassesForDay } from "@/lib/schedule-utils";
 import { invalidatePrefix } from "@/hooks/useSWRFetch";
+import { getLocalDateStr } from "@/lib/local-date";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const STATUS_DOT: Record<string, string> = {
@@ -37,15 +38,9 @@ export default function CalendarPage() {
   const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-  // Dynamic fetch bounds based on view
-  // Add timezone buffer to from/to by grabbing the local YYYY-MM-DD
-  const formatDateLocal = (d: Date) => {
-    const offset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() - offset).toISOString().slice(0, 10);
-  };
-
-  const from = view === "week" ? formatDateLocal(weekDates[0]) : formatDateLocal(monthStart);
-  const to = view === "week" ? formatDateLocal(weekDates[6]) : formatDateLocal(monthEnd);
+  // Dynamic fetch bounds based on view (using local dates, not UTC)
+  const from = view === "week" ? getLocalDateStr(weekDates[0]) : getLocalDateStr(monthStart);
+  const to = view === "week" ? getLocalDateStr(weekDates[6]) : getLocalDateStr(monthEnd);
   
   const { data: schedData, isLoading: schedLoading } = useSWRFetch<{ schedules: any[] }>("/schedules");
   const { data: overData, isLoading: overLoading } = useSWRFetch<{ overrides: any[] }>(`/schedule-override?startDate=${from}&endDate=${to}`);
@@ -73,7 +68,7 @@ export default function CalendarPage() {
 
   const recordMap = new Map<string, any[]>();
   records.forEach((r) => {
-    const date = new Date(r.date).toISOString().slice(0, 10);
+    const date = getLocalDateStr(new Date(r.date));
     if (!recordMap.has(date)) recordMap.set(date, []);
     recordMap.get(date)!.push(r);
   });
@@ -138,7 +133,7 @@ export default function CalendarPage() {
         <StaggerGrid className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {weekDates.map((date, i) => {
             const dayClasses = getClassesForDay(date, schedules, overrides);
-            const dateStr = date.toISOString().slice(0, 10);
+            const dateStr = getLocalDateStr(date);
             const dayRecords = recordMap.get(dateStr) || [];
             const today = isToday(date);
             return (
@@ -197,7 +192,7 @@ export default function CalendarPage() {
           <StaggerGrid className="grid grid-cols-7 gap-2" delay={200} staggerDelay={30} animation="scaleIn">
             {monthDays.map((date, i) => {
               if (!date) return <div key={i} />;
-              const dateStr = date.toISOString().slice(0, 10);
+              const dateStr = getLocalDateStr(date);
               const dayRecords = recordMap.get(dateStr) || [];
               const today = isToday(date);
               return (

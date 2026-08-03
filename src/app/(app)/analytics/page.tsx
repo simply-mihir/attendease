@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/Skeleton";
 import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert, AlertTriangle, BookOpen } from "lucide-react";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import clsx from "clsx";
+import { getLocalDateStr } from "@/lib/local-date";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 
@@ -63,7 +64,7 @@ export default function AnalyticsPage() {
   for (let i = 0; i < startDay; i++) currentWeek.push({ date: "", intensity: -1 });
 
   for (let d = new Date(startDate); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
-    const dateStr = d.toISOString().slice(0, 10);
+    const dateStr = getLocalDateStr(d);
     const entry = heatmapMap.get(dateStr);
     currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0 });
     if (currentWeek.length === 7) {
