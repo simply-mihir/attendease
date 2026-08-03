@@ -11,7 +11,9 @@ export async function GET(req: NextRequest) {
   const semesterId = searchParams.get("semesterId");
 
   const tz = await getUserTimezone(user.id);
-  const { dayOfWeek, startOfDay, endOfDay, dateStr: todayStr } = getUserToday(tz);
+  const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
+  // AttendanceRecord.date is @db.Date (no time component), so use exact date match
+  const todayDateForQuery = new Date(todayStr);
 
   const whereClause: any = { userId: user.id, dayOfWeek, isActive: true };
   if (semesterId) {
@@ -38,11 +40,11 @@ export async function GET(req: NextRequest) {
     orderBy: { startTime: "asc" },
   });
 
-  // Check which ones have attendance marked today (timezone-aware)
+  // Check which ones have attendance marked today (exact date match for @db.Date)
   const todayRecords = await prisma.attendanceRecord.findMany({
     where: {
       userId: user.id,
-      date: { gte: startOfDay, lte: endOfDay },
+      date: todayDateForQuery,
     },
   });
 

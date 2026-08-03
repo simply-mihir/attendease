@@ -242,13 +242,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             ) : null}
             
             <div className={clsx(sidebarCollapsed ? "lg:hidden block" : "block")}>
-              <div className="flex items-center gap-3 px-3 py-2 mb-1">
+              <Link href="/settings" className="flex items-center gap-3 px-3 py-2 mb-1 rounded-xl hover:bg-gray-200/60 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
                 <UserAvatar user={user} size="md" className="shadow-[0_2px_0_0_#cc1a5e]" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate text-text">{user.name || "Student"}</p>
                   <p className="text-xs text-text-muted truncate">{user.email}</p>
                 </div>
-              </div>
+              </Link>
               <div className="flex justify-center">
                 <button
                   onClick={handleLogout}

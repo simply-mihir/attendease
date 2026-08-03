@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
 
     // Get user's timezone for correct date handling
     const tz = await getUserTimezone(userId);
-    const { startOfDay, endOfDay, dateStr, todayDate } = getUserToday(tz);
+    const { dateStr } = getUserToday(tz);
+    // AttendanceRecord.date is @db.Date — use midnight UTC of local date
+    const todayDateForQuery = new Date(dateStr);
 
     // Verify token (prevents unauthorized marking)
     if (!verifyQuickMarkToken(userId, scheduleId, token, dateStr)) {
@@ -53,12 +55,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
-    // Check if already marked today (timezone-aware)
+    // Check if already marked today (exact date match for @db.Date)
     const existing = await prisma.attendanceRecord.findFirst({
       where: {
         subjectId: schedule.subjectId,
         userId: userId,
-        date: { gte: startOfDay, lte: endOfDay },
+        date: todayDateForQuery,
       },
     });
 
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
         data: {
           subjectId: schedule.subjectId,
           userId: userId,
-          date: todayDate,
+          date: todayDateForQuery,
           status,
         },
       });

@@ -13,7 +13,9 @@ export async function GET() {
 
   // Use user's timezone to determine "today" correctly
   const tz = await getUserTimezone(user.id);
-  const { dayOfWeek, startOfDay, endOfDay } = getUserToday(tz);
+  const { dayOfWeek, dateStr } = getUserToday(tz);
+  // AttendanceRecord.date is @db.Date (no time component), so use exact date match
+  const todayDateForQuery = new Date(dateStr);
 
   const activeSemester = await prisma.semester.findFirst({
     where: { userId: user.id, isCurrent: true },
@@ -50,7 +52,7 @@ export async function GET() {
     prisma.attendanceRecord.findMany({
       where: {
         subject: { userId: user.id },
-        date: { gte: startOfDay, lte: endOfDay },
+        date: todayDateForQuery,
       },
       select: { subjectId: true, status: true, id: true, scheduleId: true },
     }),
