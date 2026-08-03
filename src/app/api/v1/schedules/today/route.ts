@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -9,9 +10,8 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const semesterId = searchParams.get("semesterId");
 
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const todayStr = now.toISOString().slice(0, 10);
+  const tz = await getUserTimezone(user.id);
+  const { dayOfWeek, startOfDay, endOfDay, dateStr: todayStr } = getUserToday(tz);
 
   const whereClause: any = { userId: user.id, dayOfWeek, isActive: true };
   if (semesterId) {
@@ -38,11 +38,11 @@ export async function GET(req: NextRequest) {
     orderBy: { startTime: "asc" },
   });
 
-  // Check which ones have attendance marked today
+  // Check which ones have attendance marked today (timezone-aware)
   const todayRecords = await prisma.attendanceRecord.findMany({
     where: {
       userId: user.id,
-      date: new Date(todayStr),
+      date: { gte: startOfDay, lte: endOfDay },
     },
   });
 

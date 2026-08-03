@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
+import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
-// Verify the quick-mark token
+// Verify the quick-mark token (timezone-aware)
 function verifyQuickMarkToken(
   userId: string,
   scheduleId: string,
-  token: string
+  token: string,
+  dateStr: string
 ): boolean {
   const secret = process.env.NEXTAUTH_SECRET || "";
-  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   const expected = crypto
     .createHmac("sha256", secret)
-    .update(`${userId}:${scheduleId}:${today}`)
+    .update(`${userId}:${scheduleId}:${dateStr}`)
     .digest("hex")
     .substring(0, 32);
   return token === expected;
@@ -30,8 +31,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
+    // Get user's timezone for correct date handling
+    const tz = await getUserTimezone(userId);
+    const { startOfDay, endOfDay, dateStr, todayDate } = getUserToday(tz);
+
     // Verify token (prevents unauthorized marking)
-    if (!verifyQuickMarkToken(userId, scheduleId, token)) {
+    if (!verifyQuickMarkToken(userId, scheduleId, token, dateStr)) {
       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
 
@@ -48,11 +53,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
-
-    // Check if already marked today
+    // Check if already marked today (timezone-aware)
     const existing = await prisma.attendanceRecord.findFirst({
       where: {
         subjectId: schedule.subjectId,
@@ -62,18 +63,16 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      // Update existing record
       await prisma.attendanceRecord.update({
         where: { id: existing.id },
         data: { status },
       });
     } else {
-      // Create new record
       await prisma.attendanceRecord.create({
         data: {
           subjectId: schedule.subjectId,
           userId: userId,
-          date: today,
+          date: todayDate,
           status,
         },
       });

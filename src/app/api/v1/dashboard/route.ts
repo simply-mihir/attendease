@@ -3,6 +3,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cachedJson } from "@/lib/api-cache";
 import { calcOverallStreak } from "@/lib/streak-calc";
+import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -10,10 +11,9 @@ export async function GET() {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+  // Use user's timezone to determine "today" correctly
+  const tz = await getUserTimezone(user.id);
+  const { dayOfWeek, startOfDay, endOfDay } = getUserToday(tz);
 
   const activeSemester = await prisma.semester.findFirst({
     where: { userId: user.id, isCurrent: true },

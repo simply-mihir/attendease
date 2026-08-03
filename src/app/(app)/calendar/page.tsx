@@ -87,7 +87,10 @@ export default function CalendarPage() {
     return () => window.removeEventListener("scheduleOverrideChanged", handler);
   }, []);
 
-  const isToday = (d: Date) => d.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
+  const isToday = (d: Date) => {
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  };
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="space-y-6">

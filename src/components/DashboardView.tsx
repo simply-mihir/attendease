@@ -131,9 +131,12 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     }
 
     try {
+      // Use local date (not UTC) to avoid timezone mismatch after midnight
+      const now = new Date();
+      const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       await apiFetch("/attendance", {
         method: "POST",
-        body: JSON.stringify({ subjectId, scheduleId, date: new Date().toISOString().slice(0, 10), status, source: "quick_widget" }),
+        body: JSON.stringify({ subjectId, scheduleId, date: localDate, status, source: "quick_widget" }),
       });
       await invalidate(`/dashboard${qs}`);
       await invalidate("/analytics/goal-plan");

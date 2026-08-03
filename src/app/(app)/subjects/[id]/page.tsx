@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
+import { getLocalDateStr } from "@/lib/local-date";
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
   Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
@@ -66,7 +67,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   
   // Mark Attendance State
   const [marking, setMarking] = useState(false);
-  const [markDate, setMarkDate] = useState(new Date().toISOString().slice(0, 10));
+  const [markDate, setMarkDate] = useState(getLocalDateStr());
   const [markStatus, setMarkStatus] = useState("present");
   
   // Modals State
@@ -92,7 +93,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   // Extra Class State
   const [showExtraClassModal, setShowExtraClassModal] = useState(false);
   const [extraClassForm, setExtraClassForm] = useState({
-    date: new Date().toISOString().slice(0, 10),
+    date: getLocalDateStr(),
     startTime: "10:00",
     endTime: "11:00",
     room: "",
@@ -110,7 +111,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [subjectReminderForm, setSubjectReminderForm] = useState({
     title: "",
     category: "assignment",
-    dueDate: new Date().toISOString().slice(0, 10),
+    dueDate: getLocalDateStr(),
     dueTime: "12:00",
     priority: "medium",
     description: "",
@@ -250,7 +251,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
   function openAddExtraClassModal() {
     setExtraClassForm({
-      date: new Date().toISOString().slice(0, 10),
+      date: getLocalDateStr(),
       startTime: "10:00",
       endTime: "11:00",
       room: "",
@@ -347,7 +348,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       setSubjectReminderForm({
         title: "",
         category: "assignment",
-        dueDate: new Date().toISOString().slice(0, 10),
+        dueDate: getLocalDateStr(),
         dueTime: "12:00",
         priority: "medium",
         description: "",

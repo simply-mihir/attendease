@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
+import { getLocalDateStr } from "@/lib/local-date";
 import {
   Clock, MapPin, CheckCircle2, XCircle, Timer, Ban,
   AlertTriangle, ArrowRight, TrendingUp
@@ -82,7 +83,7 @@ export default function WidgetPage() {
         body: JSON.stringify({
           subjectId,
           scheduleId,
-          date: new Date().toISOString().slice(0, 10),
+          date: getLocalDateStr(),
           status,
           source: "widget",
         }),
