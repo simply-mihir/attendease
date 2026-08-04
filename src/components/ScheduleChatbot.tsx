@@ -49,7 +49,7 @@ export function ScheduleChatbot() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hey! I'm your AttendEase Assistant. I can help you with:\n\n📅 View & manage today's schedule\n✅ Mark attendance (voice or text)\n📊 Check analytics & streaks\n🎯 Skip/bunk optimizer\n🔄 Reschedule, cancel, or swap classes\n\nTry asking me anything:",
+        "Welcome to AttendEase Assistant.\n\nI can help you with:\n\n- View and manage today's schedule\n- Mark attendance via voice or text\n- Check analytics and streaks\n- Skip/bunk optimizer\n- Reschedule, cancel, or swap classes\n\nHow can I assist you?",
       timestamp: new Date(),
     },
   ]);

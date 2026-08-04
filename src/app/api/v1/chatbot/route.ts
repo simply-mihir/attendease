@@ -678,7 +678,7 @@ CRITICAL RULES:
       case "chat":
         // Direct chat response — no data lookup needed
         return NextResponse.json({
-          reply: params.message || "How can I help? You can ask about your classes, attendance, analytics, or skip availability.",
+          reply: params.message || "I'm here to help. You can ask about your schedule, mark attendance, view analytics, check skip availability, or manage schedule changes.",
           actions: [],
         });
       default:
@@ -694,95 +694,170 @@ CRITICAL RULES:
   }
 }
 
-// ── Fallback formatter (no LLM needed) ──────────────────────────
+// ── Deterministic response formatter ──────────────────────────
 
 function formatFallback(intent: string, result: any): string {
-  if (result.error) return result.error;
+  if (result.error) return `Unable to complete the request: ${result.error}`;
 
   switch (intent) {
     case "get_todays_classes": {
-      if (result.classes.length === 0) return `No classes scheduled for today (${result.dayName}).`;
-      const lines = result.classes.map((c: any) => {
-        const status = c.attendanceMarked ? `[${c.attendanceStatus}]` : "[not marked]";
-        return `- ${c.startTime}–${c.endTime}  ${c.subjectName}${c.room ? ` (${c.room})` : ""} — ${c.currentPct}% ${status}`;
-      });
+      if (result.classes.length === 0) {
+        return `Schedule for ${result.dayName}, ${result.date}:\n\nNo classes are scheduled for today. You have a free day.`;
+      }
+
       const marked = result.classes.filter((c: any) => c.attendanceMarked).length;
-      let msg = `${result.dayName} — ${result.totalClasses} class${result.totalClasses > 1 ? "es" : ""}:\n\n${lines.join("\n")}`;
-      if (marked > 0) msg += `\n\nAttendance marked: ${marked}/${result.totalClasses}`;
+      const unmarked = result.totalClasses - marked;
+
+      const lines = result.classes.map((c: any, i: number) => {
+        const idx = i + 1;
+        const status = c.attendanceMarked ? `Marked: ${c.attendanceStatus}` : "Not marked";
+        const pctLabel = c.currentPct >= c.minPct ? `${c.currentPct}% (safe)` : `${c.currentPct}% (below ${c.minPct}%)`;
+        return `${idx}. ${c.subjectName}\n   Time: ${c.startTime} - ${c.endTime}${c.room ? ` | Room: ${c.room}` : ""}\n   Attendance: ${pctLabel} | Status: ${status}`;
+      });
+
+      let msg = `Schedule for ${result.dayName}, ${result.date}\n${result.totalClasses} class${result.totalClasses > 1 ? "es" : ""} scheduled today.\n\n${lines.join("\n\n")}`;
+
+      msg += `\n\nSummary: ${marked} of ${result.totalClasses} marked`;
+      if (unmarked > 0) msg += ` | ${unmarked} pending`;
+
       return msg;
     }
 
-    case "mark_attendance":
-      return `Attendance recorded: ${result.status} for ${result.subjectName}.\nUpdated attendance: ${result.newPercentage}%`;
+    case "mark_attendance": {
+      const statusLabel = result.status.charAt(0).toUpperCase() + result.status.slice(1);
+      return `Attendance recorded successfully.\n\nSubject: ${result.subjectName}\nStatus: ${statusLabel}\nUpdated attendance: ${result.newPercentage}%\n\nYour dashboard has been refreshed to reflect this change.`;
+    }
 
-    case "mark_bulk_attendance":
-      return `Marked ${result.status} for all ${result.count} classes today:\n${result.subjects.join(", ")}`;
+    case "mark_bulk_attendance": {
+      const statusLabel = result.status.charAt(0).toUpperCase() + result.status.slice(1);
+      const subjectLines = result.subjects.map((s: string, i: number) => `${i + 1}. ${s}`).join("\n");
+      return `Bulk attendance recorded successfully.\n\nStatus: ${statusLabel}\nClasses updated: ${result.count}\n\n${subjectLines}\n\nAll records have been saved and your dashboard is updated.`;
+    }
 
     case "get_analytics": {
+      const safe = result.subjects.filter((s: any) => s.status === "green").length;
+      const warning = result.subjects.filter((s: any) => s.status === "yellow").length;
+      const danger = result.subjects.filter((s: any) => s.status === "red").length;
+
       const lines = result.subjects.map((s: any) => {
-        const status = s.status === "green" ? "Safe" : s.status === "yellow" ? "Warning" : "Danger";
-        const skipInfo = s.canSkip > 0 ? `${s.canSkip} skips available` : "no skips available";
-        return `- ${s.name}: ${s.currentPct}% [${status}] (${skipInfo})`;
+        const statusTag = s.status === "green" ? "Safe" : s.status === "yellow" ? "At Risk" : "Danger";
+        const skipInfo = s.canSkip > 0
+          ? `${s.canSkip} skip${s.canSkip > 1 ? "s" : ""} available`
+          : "no skips available";
+        return `- ${s.name}: ${s.currentPct}% [${statusTag}]\n  ${s.totalClasses} classes held | Streak: ${s.streak} days | ${skipInfo}`;
       });
-      return `Overall attendance: ${result.overallPct}% across ${result.totalSubjects} subjects\n\n${lines.join("\n")}`;
+
+      let msg = `Attendance Analytics Overview\n\nOverall attendance: ${result.overallPct}% across ${result.totalSubjects} subject${result.totalSubjects > 1 ? "s" : ""}`;
+      msg += `\nBreakdown: ${safe} safe, ${warning} at risk, ${danger} in danger`;
+      msg += `\n\nSubject-wise details:\n\n${lines.join("\n\n")}`;
+
+      if (danger > 0) {
+        const dangerNames = result.subjects.filter((s: any) => s.status === "red").map((s: any) => s.name).join(", ");
+        msg += `\n\nImmediate attention required for: ${dangerNames}. These subjects are below the minimum attendance threshold.`;
+      }
+
+      return msg;
     }
 
     case "get_subject_info": {
-      const status = result.status === "green" ? "Safe" : result.status === "yellow" ? "Warning" : "Danger";
-      let msg = `${result.name}${result.code ? ` (${result.code})` : ""}\n\n`;
-      msg += `Status: ${status}\n`;
-      msg += `Current: ${result.currentPct}% (minimum required: ${result.minRequired}%)\n`;
-      msg += `Classes attended: ${result.totalPresent} / ${result.totalClasses}\n`;
-      msg += `Current streak: ${result.streak} days\n`;
+      const statusTag = result.status === "green" ? "Safe" : result.status === "yellow" ? "At Risk" : "Danger";
+      let msg = `Subject Report: ${result.name}${result.code ? ` (${result.code})` : ""}\n`;
+      msg += `\nStatus: ${statusTag}`;
+      msg += `\nCurrent attendance: ${result.currentPct}%`;
+      msg += `\nMinimum required: ${result.minRequired}%`;
+      msg += `\nClasses attended: ${result.totalPresent} of ${result.totalClasses} held`;
+      msg += `\nClasses absent: ${result.totalAbsent}`;
+      msg += `\nCurrent streak: ${result.streak} day${result.streak !== 1 ? "s" : ""}`;
+
       if (result.canSkip > 0) {
-        msg += `Available skips: ${result.canSkip}`;
+        msg += `\n\nYou can safely skip up to ${result.canSkip} more class${result.canSkip > 1 ? "es" : ""} and remain above ${result.minRequired}%.`;
       } else if (result.needToAttend > 0) {
-        msg += `Recovery required: attend next ${result.needToAttend} class${result.needToAttend > 1 ? "es" : ""}`;
+        msg += `\n\nRecovery plan: You need to attend the next ${result.needToAttend} consecutive class${result.needToAttend > 1 ? "es" : ""} to reach ${result.minRequired}%.`;
       } else {
-        msg += `At threshold — no skips available.`;
+        msg += `\n\nYou are exactly at the threshold. No skips are available at this time.`;
       }
+
       if (result.schedule && result.schedule.length > 0) {
-        msg += `\n\nSchedule:\n${result.schedule.map((s: any) => `  ${s.day} ${s.time}${s.room ? ` (${s.room})` : ""}`).join("\n")}`;
+        const schedLines = result.schedule.map((s: any) => `- ${s.day}: ${s.time}${s.room ? ` (${s.room})` : ""}`).join("\n");
+        msg += `\n\nWeekly schedule:\n${schedLines}`;
       }
+
       return msg;
     }
 
     case "skip_optimizer": {
-      if (result.recommendations.length === 0 && result.cannotSkip.length > 0) {
-        return `No safe skips available at this time.\nAt risk: ${result.cannotSkip.join(", ")}`;
-      }
       if (result.recommendations.length === 0) {
-        return "No safe skips available at this time.";
+        let msg = "Skip Optimizer Result\n\nNo safe skips are available at this time.";
+        if (result.cannotSkip.length > 0) {
+          msg += ` The following subjects are at or below their minimum attendance threshold and require your attendance: ${result.cannotSkip.join(", ")}.`;
+        }
+        return msg;
       }
+
       const lines = result.recommendations.map((r: any) =>
-        `- ${r.subjectName}: skip ${r.skipsAllocated} — ${r.currentPct}% drops to ${r.newPct}% (${r.remainingBuffer} additional skips remaining)`
+        `- ${r.subjectName}: ${r.skipsAllocated} skip${r.skipsAllocated > 1 ? "s" : ""} allocated\n  Current: ${r.currentPct}% | After skipping: ${r.newPct}% | Remaining buffer: ${r.remainingBuffer} skip${r.remainingBuffer !== 1 ? "s" : ""}`
       );
-      let msg = `Skip allocation (${result.totalSkipsUsed} of ${result.totalRequested} used):\n\n${lines.join("\n")}`;
+
+      let msg = `Skip Optimizer Result\n\nRequested: ${result.totalRequested} skip${result.totalRequested > 1 ? "s" : ""} | Allocated: ${result.totalSkipsUsed}\n\nRecommended allocation:\n\n${lines.join("\n\n")}`;
+
       if (result.cannotSkip.length > 0) {
-        msg += `\n\nDo not skip: ${result.cannotSkip.join(", ")}`;
+        msg += `\n\nDo not skip: ${result.cannotSkip.join(", ")}. These subjects have no buffer remaining.`;
       }
+
+      if (result.safeToSkipAll) {
+        msg += `\n\nAll requested skips have been safely allocated without dropping below any threshold.`;
+      }
+
       return msg;
     }
 
     case "schedule_override": {
       if (result.action === "swap") {
-        return `Schedule updated: swapped ${result.subject1} and ${result.subject2} on ${result.date}.`;
+        return `Schedule Override Confirmed\n\nAction: Swap\nDate: ${result.date}\nSwapped: ${result.subject1} and ${result.subject2}\n\nBoth subjects will follow each other's original time slots for the specified date. Your dashboard and notifications will reflect this change.`;
       }
-      const actionLabel = result.action === "cancel" ? "Cancelled" : result.action === "extra" ? "Added extra class for" : "Rescheduled";
-      return `Schedule updated: ${actionLabel} ${result.subjectName} on ${result.date}${result.newTime ? `, new time: ${result.newTime}` : ""}.`;
+
+      const actionLabels: Record<string, string> = {
+        cancel: "Cancellation",
+        reschedule: "Reschedule",
+        extra: "Extra Class",
+      };
+      const actionLabel = actionLabels[result.action] || result.action;
+
+      let msg = `Schedule Override Confirmed\n\nAction: ${actionLabel}\nSubject: ${result.subjectName}\nDate: ${result.date}`;
+      if (result.newTime) msg += `\nNew time: ${result.newTime}`;
+
+      if (result.action === "cancel") {
+        msg += `\n\nThis class has been marked as cancelled. It will not appear in your schedule or notifications for this date.`;
+      } else if (result.action === "reschedule") {
+        msg += `\n\nThe class has been moved to the new time slot. Your schedule and reminders will update accordingly.`;
+      } else if (result.action === "extra") {
+        msg += `\n\nAn additional class session has been added. It will appear in your schedule for this date.`;
+      }
+
+      return msg;
     }
 
     case "get_attendance_history": {
-      if (result.records.length === 0) return `No attendance records found for the last ${result.days} days.`;
-      const lines = result.records.slice(0, 12).map((r: any) =>
-        `- ${r.date}  ${r.subject}: ${r.status}`
+      if (result.records.length === 0) return `Attendance History\n\nNo records found for the last ${result.days} day${result.days > 1 ? "s" : ""}. You can mark attendance from your dashboard or by asking me.`;
+
+      const statusCounts: Record<string, number> = {};
+      result.records.forEach((r: any) => {
+        statusCounts[r.status] = (statusCounts[r.status] || 0) + 1;
+      });
+      const countSummary = Object.entries(statusCounts).map(([s, c]) => `${s}: ${c}`).join(", ");
+
+      const lines = result.records.slice(0, 15).map((r: any) =>
+        `- ${r.date} | ${r.subject}: ${r.status}`
       );
-      let msg = `Attendance history — last ${result.days} days (${result.total} records):\n\n${lines.join("\n")}`;
-      if (result.total > 12) msg += `\n... and ${result.total - 12} more`;
+
+      let msg = `Attendance History (last ${result.days} days)\n\nTotal records: ${result.total}\nBreakdown: ${countSummary}\n\n${lines.join("\n")}`;
+
+      if (result.total > 15) msg += `\n\n${result.total - 15} additional record${result.total - 15 > 1 ? "s" : ""} not shown. View your full history on the Calendar page.`;
+
       return msg;
     }
 
     default:
-      return "Done. Let me know if you need anything else.";
+      return "The requested action has been completed. Let me know if there is anything else I can help with.";
   }
 }
