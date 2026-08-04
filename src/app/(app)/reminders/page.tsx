@@ -235,13 +235,13 @@ export default function RemindersPage() {
           </button>
         </div>
       ) : (
-        <StaggerGrid className="space-y-3" delay={100} staggerDelay={50} animation="fadeSlideUp">
+        <StaggerGrid className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" delay={100} staggerDelay={50} animation="fadeSlideUp">
           {filteredReminders.map((reminder) => {
             const color = reminder.subject?.colorHex || "#06b6d4";
             return (
               <div
                 key={reminder.id}
-                className={`group relative rounded-2xl border-2 p-5 flex items-center justify-between gap-4 transition-all duration-150 overflow-hidden hover:translate-y-[2px] ${
+                className={`group relative rounded-2xl border-2 p-5 flex flex-col justify-between gap-2 transition-all duration-150 overflow-hidden hover:translate-y-[2px] ${
                   reminder.isCompleted ? "opacity-60 grayscale-[50%]" : ""
                 }`}
                 style={{
@@ -269,89 +269,65 @@ export default function RemindersPage() {
                 <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
                   style={{ background: `linear-gradient(to right, transparent, ${color}60, transparent)` }} />
 
-                <div className="relative z-10 flex items-start gap-3.5 flex-1 min-w-0">
-                  <button
-                    onClick={() => handleToggleComplete(reminder)}
-                    className="mt-0.5 transition shrink-0 cursor-pointer"
-                    style={{ color: reminder.isCompleted ? "#06d6a0" : `${color}80` }}
-                  >
-                    {reminder.isCompleted ? (
-                      <CheckCircle2 className="w-6 h-6 text-[#06d6a0]" />
-                    ) : (
-                      <Circle className="w-6 h-6 hover:scale-110 transition-transform" style={{ color: color }} />
-                    )}
-                  </button>
-
-                  <div className="space-y-1 flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-extrabold text-text text-base leading-snug">
-                        {reminder.title}
-                      </span>
-                      {reminder.subject && (
-                        <span
-                          className="px-2.5 py-0.5 rounded-xl text-[11px] font-black border-2 shadow-[0_2px_0_0_currentColor]"
-                          style={{
-                            backgroundColor: `${reminder.subject.colorHex}15`,
-                            borderColor: `${reminder.subject.colorHex}50`,
-                            color: reminder.subject.colorHex,
-                          }}
-                        >
-                          {reminder.subject.name}
-                        </span>
-                      )}
-                      <span
-                        className={clsx(
-                          "px-2 py-0.5 rounded-xl text-[10px] font-black uppercase",
-                          PRIORITY_BADGES[reminder.priority]
-                        )}
-                      >
-                        {reminder.priority}
-                      </span>
-                    </div>
-
-                    {reminder.description && (
-                      <p className="text-xs font-bold text-text-muted line-clamp-2">{reminder.description}</p>
-                    )}
-
-                    <div className="flex items-center gap-3 text-[11px] font-bold flex-wrap pt-2" style={{ color: `${color}99` }}>
-                      <span className="flex items-center gap-1 font-mono">
-                        <Calendar className="w-3.5 h-3.5" style={{ color: color }} />
-                        {new Date(reminder.dueDate).toLocaleDateString("en-IN", {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                      {reminder.dueTime && (
-                        <span className="flex items-center gap-1 font-mono">
-                          <Clock className="w-3.5 h-3.5" style={{ color: color }} />
-                          {reminder.dueTime}
-                        </span>
-                      )}
-                      <span className="capitalize px-2 py-0.5 rounded-lg text-[10px] font-black border-2" style={{ borderColor: `${color}30`, backgroundColor: `${color}10`, color: color }}>
-                        {reminder.category.replace("_", " ")}
-                      </span>
-
-                      {/* Active Channels Icons */}
-                      <div className="flex items-center gap-1.5 ml-auto px-2.5 py-0.5 rounded-xl border-2" style={{ borderColor: `${color}30`, backgroundColor: `${color}10`, color: color }}>
-                        <span className="text-[10px] font-black opacity-70">Channels:</span>
-                        {reminder.notifyPush && <span title="Browser Push Notification"><Bell className="w-3.5 h-3.5" /></span>}
-                        {reminder.notifyAlarm && <span title="Alarm Sound"><Volume2 className="w-3.5 h-3.5" /></span>}
-                        {reminder.notifyEmail && <span title="Email Alert"><Mail className="w-3.5 h-3.5" /></span>}
-                        {reminder.notifyTelegram && <span title="Telegram Message"><MessageSquare className="w-3.5 h-3.5" /></span>}
-                      </div>
-                    </div>
+                <div className="relative z-10 flex-1 flex flex-col">
+                  {/* Row 1: Label + Checkbox */}
+                  <div className="flex items-start justify-between mb-3">
+                    <p className="text-[10px] font-bold uppercase tracking-wider break-words pr-2 line-clamp-1"
+                      style={{ color: color }}>
+                      {reminder.subject ? reminder.subject.name : reminder.category.replace("_", " ")}
+                    </p>
+                    <button
+                      onClick={(e) => { e.preventDefault(); handleToggleComplete(reminder); }}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg hover:scale-110 transition-all duration-300 cursor-pointer shadow-sm"
+                      style={{ backgroundColor: reminder.isCompleted ? "#06d6a020" : `${color}1A`, color: reminder.isCompleted ? "#06d6a0" : color }}
+                    >
+                      {reminder.isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                    </button>
                   </div>
+
+                  {/* Row 2: Title */}
+                  <h3 className="text-lg font-extrabold text-text leading-tight mb-2 line-clamp-2">
+                    {reminder.title}
+                  </h3>
+
+                  {/* Row 3: Priority */}
+                  <div className="flex items-center gap-2 mb-2">
+                     <span className={clsx("px-2 py-0.5 rounded-xl text-[9px] font-black uppercase tracking-wider", PRIORITY_BADGES[reminder.priority])}>
+                       {reminder.priority} Priority
+                     </span>
+                  </div>
+
+                  {/* Row 4: Description */}
+                  {reminder.description && (
+                    <p className="text-xs font-semibold text-text-muted line-clamp-2 mt-auto">
+                      {reminder.description}
+                    </p>
+                  )}
                 </div>
 
-                <button
-                  onClick={() => handleDelete(reminder.id)}
-                  className="relative z-10 p-2 rounded-xl transition shrink-0 opacity-80 group-hover:opacity-100 cursor-pointer shadow-sm hover:shadow-md"
-                  style={{ color: "#ef476f", backgroundColor: "#ef476f15" }}
-                  title="Delete Reminder"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Bottom line: Date & Actions */}
+                <div className="relative z-10 flex items-center justify-between pt-3 mt-4 border-t-2" style={{ borderColor: `${color}20` }}>
+                  <div className="flex items-center gap-2.5 text-[10px] font-bold" style={{ color: `${color}99` }}>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {new Date(reminder.dueDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                    </span>
+                    {reminder.dueTime && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {reminder.dueTime}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={(e) => { e.preventDefault(); handleDelete(reminder.id); }}
+                    className="p-1.5 transition rounded-lg hover:bg-rose-500/10 cursor-pointer text-rose-500 opacity-60 hover:opacity-100"
+                    title="Delete Reminder"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             );
           })}
