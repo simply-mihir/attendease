@@ -11,33 +11,65 @@ const MODEL = "google/gemma-4-26b-a4b-it:free";
 
 // ── Tool executor functions ─────────────────────────────────────
 
+/** Parse "HH:MM" to total minutes */
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+/** Convert total minutes to "HH:MM" */
+function minutesToTime(mins: number): string {
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 async function execGetTodaysClasses(userId: string) {
   const tz = await getUserTimezone(userId);
   const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
 
-  const schedules = await prisma.schedule.findMany({
-    where: { userId, dayOfWeek, isActive: true },
-    include: {
-      subject: {
-        select: {
-          id: true, name: true, colorHex: true, currentPercentage: true,
-          minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
-          totalLate: true, streakCount: true,
+  const [schedules, overrides, todayRecords] = await Promise.all([
+    prisma.schedule.findMany({
+      where: { userId, dayOfWeek, isActive: true },
+      include: {
+        subject: {
+          select: {
+            id: true, name: true, colorHex: true, currentPercentage: true,
+            minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
+            totalLate: true, streakCount: true,
+          },
         },
       },
-    },
-    orderBy: { startTime: "asc" },
-  });
+      orderBy: { startTime: "asc" },
+    }),
+    prisma.scheduleOverride.findMany({
+      where: { userId, date: new Date(todayStr + "T00:00:00Z") },
+      include: {
+        subject: {
+          select: {
+            id: true, name: true, colorHex: true, currentPercentage: true,
+            minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
+            totalLate: true, streakCount: true,
+          },
+        },
+      },
+    }),
+    prisma.attendanceRecord.findMany({
+      where: { userId, date: new Date(todayStr) },
+    }),
+  ]);
 
-  const todayRecords = await prisma.attendanceRecord.findMany({
-    where: { userId, date: new Date(todayStr) },
-  });
+  // Build original time lookup for swap endTime resolution
+  const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
+  for (const s of schedules) {
+    originalBySubject.set(s.subject.id, { startTime: s.startTime, endTime: s.endTime });
+  }
 
   const markedMap = new Map(
     todayRecords.map((r) => [`${r.subjectId}-${r.scheduleId || ""}`, r])
   );
 
-  const classes = schedules.map((s) => {
+  // Start with regular classes
+  let classes = schedules.map((s) => {
     const key = `${s.subjectId}-${s.id}`;
     const record = markedMap.get(key);
     return {
@@ -54,6 +86,58 @@ async function execGetTodaysClasses(userId: string) {
       attendanceStatus: record?.status || null,
     };
   });
+
+  // Apply overrides
+  for (const ov of overrides) {
+    switch (ov.type) {
+      case "cancel":
+        classes = classes.filter((c) => c.subjectId !== ov.subjectId);
+        break;
+      case "reschedule": {
+        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+        if (idx !== -1 && ov.newTime) {
+          const orig = classes[idx];
+          const duration = timeToMinutes(orig.endTime) - timeToMinutes(orig.startTime);
+          const newEnd = duration > 0 ? minutesToTime(timeToMinutes(ov.newTime) + duration) : orig.endTime;
+          classes[idx] = { ...orig, startTime: ov.newTime, endTime: newEnd };
+        } else if (idx === -1 && ov.subject && ov.newTime) {
+          classes.push({
+            scheduleId: ov.id, subjectId: ov.subjectId,
+            subjectName: ov.subject.name, startTime: ov.newTime, endTime: "",
+            room: null, currentPct: ov.subject.currentPercentage,
+            minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
+            attendanceMarked: false, attendanceStatus: null,
+          });
+        }
+        break;
+      }
+      case "extra":
+        if (ov.subject) {
+          classes.push({
+            scheduleId: ov.id, subjectId: ov.subjectId,
+            subjectName: ov.subject.name, startTime: ov.newTime || "09:00", endTime: "",
+            room: null, currentPct: ov.subject.currentPercentage,
+            minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
+            attendanceMarked: false, attendanceStatus: null,
+          });
+        }
+        break;
+      case "swap": {
+        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+        if (idx !== -1 && ov.newTime) {
+          const swapPartnerOrig = ov.swapSubjectId ? originalBySubject.get(ov.swapSubjectId) : null;
+          classes[idx] = {
+            ...classes[idx],
+            startTime: ov.newTime,
+            endTime: swapPartnerOrig?.endTime || classes[idx].endTime,
+          };
+        }
+        break;
+      }
+    }
+  }
+
+  classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   return { date: todayStr, dayName: dayNames[dayOfWeek], classes, totalClasses: classes.length };

@@ -30,6 +30,19 @@ function formatDateToYMD(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+/** Parse "HH:MM" to total minutes since midnight */
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+/** Convert total minutes to "HH:MM" */
+function minutesToTime(mins: number): string {
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 export function getClassesForDay(
   date: Date,
   regularSchedules: any[],
@@ -37,6 +50,15 @@ export function getClassesForDay(
 ): MergedClass[] {
   const dayOfWeek = date.getDay();
   const dateStr = formatDateToYMD(date);
+
+  // Build a lookup of original schedules by subjectId (before any mutations)
+  const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
+  for (const s of regularSchedules) {
+    const sid = s.subjectId || s.subject?.id;
+    if (sid && (s.dayOfWeek === dayOfWeek || s.dayOfWeek === undefined)) {
+      originalBySubject.set(sid, { startTime: s.startTime || "", endTime: s.endTime || "" });
+    }
+  }
 
   // Start with regular classes for this weekday
   let classes: MergedClass[] = regularSchedules
@@ -68,14 +90,19 @@ export function getClassesForDay(
 
       case "reschedule": {
         const idx = classes.findIndex((c) => c.subjectId === override.subjectId);
-        if (idx !== -1) {
+        if (idx !== -1 && override.newTime) {
+          // Preserve class duration: compute new endTime
+          const orig = classes[idx];
+          const duration = timeToMinutes(orig.endTime) - timeToMinutes(orig.startTime);
+          const newEnd = duration > 0 ? minutesToTime(timeToMinutes(override.newTime) + duration) : orig.endTime;
           classes[idx] = {
             ...classes[idx],
-            startTime: override.newTime || classes[idx].startTime,
+            startTime: override.newTime,
+            endTime: newEnd,
             isOverride: true,
             overrideType: "rescheduled",
           };
-        } else {
+        } else if (idx === -1) {
           // Class not normally on this day — add it
           classes.push({
             id: override.id,
@@ -121,9 +148,14 @@ export function getClassesForDay(
       case "swap": {
         const swapIdx = classes.findIndex((c) => c.subjectId === override.subjectId);
         if (swapIdx !== -1 && override.newTime) {
+          // Look up the swap partner's ORIGINAL endTime to get the full time slot
+          const swapPartnerOrig = override.swapSubjectId
+            ? originalBySubject.get(override.swapSubjectId)
+            : null;
           classes[swapIdx] = {
             ...classes[swapIdx],
             startTime: override.newTime,
+            endTime: swapPartnerOrig?.endTime || classes[swapIdx].endTime,
             isOverride: true,
             overrideType: "swapped",
           };
