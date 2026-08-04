@@ -45,22 +45,9 @@ export default function SemestersPage() {
       {/* List */}
       <StaggerGrid className="space-y-4" delay={100} staggerDelay={80} animation="fadeSlideUp">
         {isLoading ? (
-          [1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="group rounded-2xl border-2 p-5 transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 mb-3" />
-              <div className="space-y-2">
-                <div className="h-6 w-32 bg-gray-200 dark:bg-white/5 rounded-md" />
-                <div className="h-4 w-48 bg-gray-100 dark:bg-white/5 rounded-md" />
-                <div className="flex gap-2 pt-2">
-                  <div className="h-6 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
-                  <div className="h-6 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
-                </div>
-              </div>
-            </div>
-          ))
+          <div className="py-16">
+            <FuturisticLoader variant="section" title="Loading Semesters..." Icon={Calendar} />
+          </div>
         ) : semesters?.map((sem) => {
           const isEnded = new Date(sem.endDate) < new Date();
           const color = "#06b6d4"; // Cyan color for all cards
