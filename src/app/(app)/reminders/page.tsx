@@ -157,8 +157,9 @@ export default function RemindersPage() {
   }
 
   return (
-    <PageTransition direction="right" staggerChildren={false} className="max-w-5xl mx-auto space-y-6 pb-12">
-      {/* Header */}
+    <>
+      <PageTransition direction="right" staggerChildren={false} className="max-w-5xl mx-auto space-y-6 pb-12">
+        {/* Header */}
       <div className="flex items-center justify-between mb-6" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ff6b35]/10">
@@ -220,30 +221,30 @@ export default function RemindersPage() {
           style={{ 
             opacity: 0, 
             animation: "fadeSlideUp 0.5s ease-out 100ms forwards",
-            borderColor: "#ff6b3540",
-            backgroundColor: "#ff6b350D",
-            boxShadow: "0 6px 0 0 #ff6b3530"
+            borderColor: "#ff6b3580",
+            backgroundColor: "#ff6b3520",
+            boxShadow: "0 6px 0 0 #ff6b3560"
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = `0 4px 0 0 #ff6b3530`;
+            e.currentTarget.style.boxShadow = `0 4px 0 0 #ff6b3560`;
             e.currentTarget.style.transform = `translateY(2px)`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = `0 6px 0 0 #ff6b3530`;
+            e.currentTarget.style.boxShadow = `0 6px 0 0 #ff6b3560`;
             e.currentTarget.style.transform = '';
           }}
         >
           {/* Shimmer */}
           <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
             style={{
-              background: `linear-gradient(135deg, #ff6b3508 0%, #ff6b3515 50%, #ff6b3508 100%)`,
+              background: `linear-gradient(135deg, #ff6b351A 0%, #ff6b3530 50%, #ff6b351A 100%)`,
               backgroundSize: "200% 200%",
               animation: "subjectCardShimmer 3s ease-in-out infinite",
             }} />
 
           {/* Top accent line */}
-          <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
-            style={{ background: `linear-gradient(to right, transparent, #ff6b3560, transparent)` }} />
+          <div className="absolute inset-x-0 top-0 h-[3px] pointer-events-none"
+            style={{ background: `linear-gradient(to right, transparent, #ff6b3599, transparent)` }} />
             
           <div className="relative z-10">
             <div className="flex justify-center mb-5">
@@ -380,6 +381,8 @@ export default function RemindersPage() {
           })}
         </StaggerGrid>
       )}
+
+      </PageTransition>
 
       {/* New Reminder Modal */}
       {showModal && (
@@ -570,6 +573,6 @@ export default function RemindersPage() {
           </form>
         </div>
       )}
-    </PageTransition>
+    </>
   );
 }
