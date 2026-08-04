@@ -36,7 +36,7 @@ import { AutoResubscribe } from "@/components/AutoResubscribe";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
-      <body className="min-h-full bg-white dark:bg-[#0a0e1a] text-gray-900 dark:text-gray-100">
+      <body className="min-h-full bg-white dark:bg-[#0a0e1a] text-gray-900 dark:text-gray-100 overflow-x-hidden">
         <Providers>
           {children}
           <ServiceWorkerRegistration />

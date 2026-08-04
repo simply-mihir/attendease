@@ -155,7 +155,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <OnboardingModal />
 
       {/* ===== FIXED TOP HEADER — ALWAYS VISIBLE ===== */}
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b-2 border-gray-200 bg-white/80 backdrop-blur-sm px-4 sm:px-6 dark:border-[#2a2a3d] dark:bg-[#0a0e1a]/80 shrink-0">
+      <header className="sticky top-0 z-50 w-full flex h-16 items-center justify-between border-b-2 border-gray-200 bg-white/80 backdrop-blur-sm px-4 sm:px-6 dark:border-[#2a2a3d] dark:bg-[#0a0e1a]/80 shrink-0">
         <div className="flex items-center gap-3 sm:gap-4">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shrink-0 shadow-[0_3px_0_0_#cc1a5e]">

@@ -88,7 +88,7 @@ export function ProfileSwitcher() {
         <div className="w-5 h-5 rounded-lg bg-[#FF2D78] border border-[#cc1a5e] flex items-center justify-center text-white shrink-0 shadow-sm">
           <GraduationCap className="w-3 h-3" />
         </div>
-        <span className="max-w-[130px] truncate text-[#1a1a2e] dark:text-white">
+        <span className="max-w-[90px] sm:max-w-[130px] truncate text-[#1a1a2e] dark:text-white">
           {currentProfile?.name || "Select Profile"}
         </span>
         <ChevronDown className={clsx("w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-200", open && "rotate-180")} />
