@@ -410,17 +410,17 @@ export default function RemindersPage() {
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. Mathematics Assignment Submission"
                   required
-                  className="input-3d"
+                  className="input-3d w-full min-w-0"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
+              <div className="grid grid-cols-2 gap-3 min-w-0">
+                <div className="min-w-0">
                   <label className="block text-xs font-black text-text mb-1">Category</label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="input-3d"
+                    className="input-3d w-full min-w-0"
                   >
                     <option value="assignment">Assignment</option>
                     <option value="extra_class">Extra Class</option>
@@ -429,14 +429,14 @@ export default function RemindersPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-black text-text mb-1">Subject (Optional)</label>
+                <div className="min-w-0">
+                  <label className="block text-xs font-black text-text mb-1 truncate">Subject (Optional)</label>
                   <select
                     value={form.subjectId}
                     onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-                    className="input-3d"
+                    className="input-3d w-full min-w-0"
                   >
-                    <option value="">-- General / None --</option>
+                    <option value="">-- None --</option>
                     {subjects.map((sub) => (
                       <option key={sub.id} value={sub.id}>
                         {sub.name}
@@ -446,25 +446,25 @@ export default function RemindersPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
+              <div className="grid grid-cols-2 gap-3 min-w-0">
+                <div className="min-w-0">
                   <label className="block text-xs font-black text-text mb-1">Due Date *</label>
                   <input
                     type="date"
                     value={form.dueDate}
                     onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
                     required
-                    className="input-3d"
+                    className="input-3d w-full min-w-0"
                   />
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <label className="block text-xs font-black text-text mb-1">Due Time</label>
                   <input
                     type="time"
                     value={form.dueTime}
                     onChange={(e) => setForm({ ...form, dueTime: e.target.value })}
-                    className="input-3d font-mono"
+                    className="input-3d w-full min-w-0 font-mono"
                   />
                 </div>
               </div>
@@ -548,8 +548,8 @@ export default function RemindersPage() {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="Additional details, room location, or requirements..."
-                  rows={2}
-                  className="input-3d"
+                  rows={3}
+                  className="input-3d w-full min-w-0"
                 />
               </div>
             </div>
