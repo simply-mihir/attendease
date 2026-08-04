@@ -90,23 +90,9 @@ export default function SubjectsPage() {
       )}
 
       {loading ? (
-        <StaggerGrid className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" delay={150} staggerDelay={80} animation="scaleIn">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="rounded-2xl border-2 p-5 border-gray-200 bg-white/50 shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425]/50 dark:shadow-[0_6px_0_0_#0d0d1a] flex flex-col justify-between h-[160px]">
-              <div className="flex justify-between items-start mb-2">
-                <div className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-white/5" />
-                <div className="h-8 w-12 rounded-lg bg-gray-200 dark:bg-white/5" />
-              </div>
-              <div className="flex-1 flex flex-col justify-end">
-                <div className="h-4 w-3/4 bg-gray-200 dark:bg-white/5 rounded-md mb-2" />
-                <div className="h-3 w-1/2 bg-gray-200 dark:bg-white/5 rounded-md" />
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <FieldLoader size="lg" />
-              </div>
-            </div>
-          ))}
-        </StaggerGrid>
+        <div className="py-16">
+          <FuturisticLoader variant="section" title="Loading Subjects..." Icon={BookOpen} />
+        </div>
       ) : subjects.length === 0 ? (
         <div className="text-center py-16 rounded-2xl bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 150ms forwards" }}>
           <div className="w-16 h-16 rounded-2xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#cc1a5e]">
