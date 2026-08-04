@@ -1429,3 +1429,109 @@ html.dark .feature-glass-card:hover {
   15% { opacity: 0.8; transform: translateY(-10vh) scale(1); }
   100% { transform: translateY(-105vh) scale(0.3); opacity: 0; }
 }
+
+/* ═══════════════════════════════════════════
+   Attendance Marking Animations
+   ═══════════════════════════════════════════ */
+
+/* Pulsing glow while API is in-flight */
+.mark-pulse-bar {
+  animation: markPulse 1s ease-in-out infinite;
+}
+@keyframes markPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  50%      { opacity: 0.75; box-shadow: 0 0 12px 2px rgba(255,255,255,0.06); }
+}
+
+/* Tiny spinner inside the "Marking…" bar */
+.mark-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: markSpin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes markSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* "Marked" bar bounces in */
+.mark-success-enter {
+  animation: markBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes markBounceIn {
+  0%   { transform: scale(0.75); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Checkmark icon pops */
+.mark-checkmark-pop {
+  display: inline-flex;
+  animation: markCheckPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes markCheckPop {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  50%  { transform: scale(1.35) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* Ripple from click point */
+.mark-ripple {
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(255, 255, 255, 0.35);
+  animation: markRippleExpand 0.5s ease-out forwards;
+}
+@keyframes markRippleExpand {
+  to { transform: translate(-50%, -50%) scale(35); opacity: 0; }
+}
+
+/* Subject detail page — per-status flash on mark button */
+.mark-btn-flash-present {
+  animation: markFlashPresent 0.6s ease-out;
+}
+@keyframes markFlashPresent {
+  0%   { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.7); }
+  40%  { box-shadow: 0 0 24px 10px rgba(6, 214, 160, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
+}
+
+.mark-btn-flash-absent {
+  animation: markFlashAbsent 0.6s ease-out;
+}
+@keyframes markFlashAbsent {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 71, 111, 0.7); }
+  40%  { box-shadow: 0 0 24px 10px rgba(239, 71, 111, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 71, 111, 0); }
+}
+
+.mark-btn-flash-late {
+  animation: markFlashLate 0.6s ease-out;
+}
+@keyframes markFlashLate {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
+  40%  { box-shadow: 0 0 24px 10px rgba(255, 107, 53, 0.25); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
+}
+
+.mark-btn-flash-cancelled {
+  animation: markFlashCancelled 0.6s ease-out;
+}
+@keyframes markFlashCancelled {
+  0%   { box-shadow: 0 0 0 0 rgba(156, 163, 175, 0.7); }
+  40%  { box-shadow: 0 0 24px 10px rgba(156, 163, 175, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(156, 163, 175, 0); }
+}
+
+/* Subject detail — checkmark draw */
+.mark-btn-check-enter {
+  animation: markBtnCheckEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes markBtnCheckEnter {
+  0%   { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

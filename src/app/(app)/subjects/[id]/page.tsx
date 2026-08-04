@@ -8,7 +8,7 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import { getLocalDateStr } from "@/lib/local-date";
 import {
-  ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer,
+  ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer, Ban,
   Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
   Mail, MessageSquare, Volume2, BookOpen
 } from "lucide-react";
@@ -69,6 +69,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [marking, setMarking] = useState(false);
   const [markDate, setMarkDate] = useState(getLocalDateStr());
   const [markStatus, setMarkStatus] = useState("present");
+  const [markSuccess, setMarkSuccess] = useState(false);
   
   // Modals State
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -140,12 +141,16 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
   async function handleMark() {
     setMarking(true);
+    setMarkSuccess(false);
     try {
       await apiFetch("/attendance", {
         method: "POST",
         body: JSON.stringify({ subjectId: id, date: markDate, status: markStatus }),
       });
       await invalidate(`/subjects/${id}`);
+      setMarkSuccess(true);
+      if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+      setTimeout(() => setMarkSuccess(false), 1800);
     } catch (err) { console.error(err); }
     finally { setMarking(false); }
   }
@@ -595,9 +600,45 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           <button
             onClick={handleMark}
             disabled={marking}
-            className="w-full sm:w-auto px-6 py-2.5 btn-3d-primary text-sm font-black h-[46px] flex items-center justify-center shrink-0 disabled:opacity-50"
+            className={clsx(
+              "w-full sm:w-auto px-6 py-2.5 text-sm font-black h-[46px] flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 transition-all duration-300",
+              markSuccess
+                ? clsx(
+                    markStatus === "present" || markStatus === "excused"
+                      ? "btn-3d-cyan mark-btn-flash-present"
+                      : markStatus === "absent"
+                      ? "btn-3d-coral mark-btn-flash-absent"
+                      : markStatus === "late"
+                      ? "btn-3d-yellow mark-btn-flash-late"
+                      : "btn-3d-truegray mark-btn-flash-cancelled"
+                  )
+                : "btn-3d-primary"
+            )}
           >
-            {marking ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Attendance"}
+            {marking ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : markSuccess ? (
+              <>
+                {markStatus === "present" || markStatus === "excused" ? (
+                  <CheckCircle2 className="w-4 h-4 mark-btn-check-enter" />
+                ) : markStatus === "absent" ? (
+                  <XCircle className="w-4 h-4 mark-btn-check-enter" />
+                ) : markStatus === "late" ? (
+                  <Timer className="w-4 h-4 mark-btn-check-enter" />
+                ) : (
+                  <Ban className="w-4 h-4 mark-btn-check-enter" />
+                )}
+                <span className="mark-btn-check-enter">
+                  {markStatus === "present" ? "Marked Present!"
+                    : markStatus === "absent" ? "Marked Absent!"
+                    : markStatus === "late" ? "Marked Late!"
+                    : markStatus === "excused" ? "Marked Excused!"
+                    : "Marked Cancelled!"}
+                </span>
+              </>
+            ) : (
+              "Mark Attendance"
+            )}
           </button>
         </div>
       </div>

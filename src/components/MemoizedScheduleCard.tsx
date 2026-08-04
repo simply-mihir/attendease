@@ -1,8 +1,8 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState, useEffect, useRef } from "react";
 import {
-  Clock, MapPin, CheckCircle2, XCircle, Timer, Ban,
+  Clock, MapPin, CheckCircle2, XCircle, Timer, Ban, Check,
 } from "lucide-react";
 import clsx from "clsx";
 import { SwipeableCard } from "@/components/SwipeableCard";
@@ -20,19 +20,80 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
       : 100
   );
   const minPct = cls.minPct ?? cls.subject?.minAttendancePct ?? 75;
-  const statusColor = cls.statusColor ?? (currentPct >= minPct ? "green" : (currentPct >= minPct - 10 ? "yellow" : "red"));
-  
+
   const hasMarked = cls.attendanceMarked || (cls.attendance && cls.attendance.status);
+
+  // Optimistic animation state
+  const [optimisticStatus, setOptimisticStatus] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [ripple, setRipple] = useState<{ x: number; y: number; status: string } | null>(null);
+  const prevMarking = useRef(marking);
+
+  // Detect when marking completes (marking goes from truthy to null) → show success
+  useEffect(() => {
+    if (prevMarking.current && !marking && optimisticStatus) {
+      setShowSuccess(true);
+      const t = setTimeout(() => {
+        setShowSuccess(false);
+        setOptimisticStatus(null);
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+    prevMarking.current = marking;
+  }, [marking, optimisticStatus]);
+
+  // Clear optimistic state when real data arrives
+  useEffect(() => {
+    if (hasMarked) {
+      setOptimisticStatus(null);
+      setShowSuccess(false);
+    }
+  }, [hasMarked]);
+
+  function handleClick(e: React.MouseEvent, status: string) {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    setRipple({ x: e.clientX - rect.left, y: e.clientY - rect.top, status });
+    setTimeout(() => setRipple(null), 600);
+
+    setOptimisticStatus(status);
+    if (navigator.vibrate) navigator.vibrate(30);
+    onMark(cls.subjectId, cls.id || cls.scheduleId, status);
+  }
+
+  function handleSwipe(status: string) {
+    setOptimisticStatus(status);
+    onMark(cls.subjectId, cls.id || cls.scheduleId, status);
+  }
+
+  const isMarking = !!optimisticStatus && !!marking;
+  const displayStatus = hasMarked
+    ? (cls.attendanceStatus || cls.attendance?.status)
+    : showSuccess ? optimisticStatus : null;
+
+  // Color map for statuses
+  const statusStyles: Record<string, { border: string; bg: string; text: string; darkText?: string }> = {
+    present:   { border: "rgba(0,245,212,0.4)", bg: "rgba(0,245,212,0.12)", text: "#00c4a7", darkText: "#00f5d4" },
+    absent:    { border: "rgba(239,71,111,0.4)", bg: "rgba(239,71,111,0.12)", text: "#ef476f" },
+    late:      { border: "rgba(250,204,21,0.4)", bg: "rgba(250,204,21,0.12)", text: "#ca8a04", darkText: "#fef08a" },
+    cancelled: { border: "rgba(156,163,175,0.3)", bg: "rgba(156,163,175,0.08)", text: "#6b7280", darkText: "#9ca3af" },
+  };
+
+  const activeStyle = statusStyles[displayStatus || optimisticStatus || "present"];
 
   return (
     <div data-schedule={cls.id || cls.scheduleId} className="h-full">
       <SwipeableCard
-        onSwipeRight={() => onMark(cls.subjectId, cls.id || cls.scheduleId, "present")}
-        onSwipeLeft={() => onMark(cls.subjectId, cls.id || cls.scheduleId, "absent")}
-        disabled={!!hasMarked || !!marking}
+        onSwipeRight={() => handleSwipe("present")}
+        onSwipeLeft={() => handleSwipe("absent")}
+        disabled={!!hasMarked || !!marking || !!optimisticStatus}
       >
-        <div 
-          className="relative rounded-2xl border-2 p-4 sm:p-5 transition-all duration-150 overflow-hidden flex flex-col h-full"
+        <div
+          className={clsx(
+            "relative rounded-2xl border-2 p-4 sm:p-5 overflow-hidden flex flex-col h-full",
+            "transition-all duration-300 ease-out",
+            isMarking && "scale-[0.98]",
+          )}
           style={{
             borderColor: `${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}40`,
             backgroundColor: `${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}0D`,
@@ -43,9 +104,10 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
           <div className="absolute inset-x-0 top-0 h-[2px]"
             style={{ background: `linear-gradient(to right, transparent, ${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}60, transparent)` }} />
 
+          {/* Card header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0 pr-3">
-              <h3 
+              <h3
                 className="text-xs font-bold uppercase tracking-wider break-words"
                 style={{ color: cls.colorHex || cls.subject?.colorHex || "#FF2D78" }}
               >
@@ -74,60 +136,87 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
             </div>
           </div>
 
-          {hasMarked ? (
-            <div
-              className={clsx(
-                "flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.1)] w-full mt-auto",
-                (cls.attendanceStatus || cls.attendance?.status) === "present"
-                  ? "bg-[#00f5d4]/15 text-[#00c4a7] border-[#00f5d4]/40 dark:text-[#00f5d4]"
-                  : (cls.attendanceStatus || cls.attendance?.status) === "late"
-                  ? "bg-[#facc15]/15 text-[#ca8a04] border-[#facc15]/40 dark:text-[#fef08a]"
-                  : (cls.attendanceStatus || cls.attendance?.status) === "cancelled"
-                  ? "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/20"
-                  : "bg-[#ef476f]/15 text-[#ef476f] border-[#ef476f]/40"
-              )}
-            >
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              Marked: {cls.attendanceStatus || cls.attendance?.status}
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2 mt-auto pt-2 w-full">
-              {(["present", "absent", "late", "cancelled"] as const).map(
-                (status) => (
-                  <button
-                    key={status}
-                    onClick={() =>
-                      onMark(cls.subjectId, cls.id || cls.scheduleId, status)
-                    }
-                    disabled={marking === `${cls.subjectId}-${status}`}
-                    className={clsx(
-                      "flex-1 py-2 px-0.5 sm:px-1 rounded-xl text-[9px] sm:text-[11px] font-bold flex flex-col items-center justify-center gap-1 cursor-pointer transition-all min-w-0 leading-none",
-                      status === "present"
-                        ? "btn-3d-cyan"
-                        : status === "absent"
-                        ? "btn-3d-coral"
-                        : status === "late"
-                        ? "btn-3d-yellow"
-                        : "btn-3d-truegray"
-                    )}
-                  >
-                    {status === "present" ? (
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    ) : status === "absent" ? (
-                      <XCircle className="w-4 h-4 shrink-0" />
-                    ) : status === "late" ? (
-                      <Timer className="w-4 h-4 shrink-0" />
-                    ) : (
-                      <Ban className="w-4 h-4 shrink-0" />
-                    )}
-                    <span className="text-center w-full whitespace-nowrap tracking-tighter" style={{ fontSize: status === 'cancelled' ? 'clamp(8px, 2.5vw, 11px)' : 'inherit' }}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </span>
-                  </button>
-                )
-              )}
-            </div>
-          )}
+          {/* Bottom action area — 3 states */}
+          <div className="mt-auto pt-2 w-full">
+            {(hasMarked || displayStatus) ? (
+              /* ── STATE 3: Marked (real or optimistic success) ── */
+              <div
+                className={clsx(
+                  "flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-black border-2 w-full transition-all duration-300",
+                  showSuccess && !hasMarked && "mark-success-enter",
+                )}
+                style={{
+                  borderColor: activeStyle.border,
+                  backgroundColor: activeStyle.bg,
+                  color: activeStyle.text,
+                }}
+              >
+                {showSuccess && !hasMarked ? (
+                  <span className="mark-checkmark-pop"><Check className="w-4 h-4" /></span>
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                )}
+                Marked: {displayStatus}
+              </div>
+            ) : isMarking ? (
+              /* ── STATE 2: Marking in progress ── */
+              <div
+                className="flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-black border-2 w-full mark-pulse-bar"
+                style={{
+                  borderColor: activeStyle.border,
+                  backgroundColor: activeStyle.bg,
+                  color: activeStyle.text,
+                }}
+              >
+                <span className="mark-spinner" />
+                Marking {optimisticStatus}…
+              </div>
+            ) : (
+              /* ── STATE 1: Unmarked — show buttons ── */
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full">
+                {(["present", "absent", "late", "cancelled"] as const).map(
+                  (status) => (
+                    <button
+                      key={status}
+                      onClick={(e) => handleClick(e, status)}
+                      disabled={!!marking || !!optimisticStatus}
+                      className={clsx(
+                        "flex-1 py-2 px-0.5 sm:px-1 rounded-xl text-[9px] sm:text-[11px] font-bold flex flex-col items-center justify-center gap-1 cursor-pointer min-w-0 leading-none relative overflow-hidden",
+                        "transition-all duration-200 active:scale-90",
+                        status === "present"
+                          ? "btn-3d-cyan"
+                          : status === "absent"
+                          ? "btn-3d-coral"
+                          : status === "late"
+                          ? "btn-3d-yellow"
+                          : "btn-3d-truegray"
+                      )}
+                    >
+                      {/* Ripple */}
+                      {ripple && ripple.status === status && (
+                        <span
+                          className="mark-ripple absolute rounded-full pointer-events-none"
+                          style={{ left: ripple.x, top: ripple.y }}
+                        />
+                      )}
+                      {status === "present" ? (
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      ) : status === "absent" ? (
+                        <XCircle className="w-4 h-4 shrink-0" />
+                      ) : status === "late" ? (
+                        <Timer className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <Ban className="w-4 h-4 shrink-0" />
+                      )}
+                      <span className="text-center w-full whitespace-nowrap tracking-tighter" style={{ fontSize: status === 'cancelled' ? 'clamp(8px, 2.5vw, 11px)' : 'inherit' }}>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </span>
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </SwipeableCard>
     </div>

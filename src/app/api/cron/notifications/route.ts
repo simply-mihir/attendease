@@ -16,6 +16,126 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
+// ===== TIME HELPERS =====
+
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function minutesToTime(mins: number): string {
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+// ===== MERGED CLASS TYPE =====
+
+interface MergedCronClass {
+  subjectId: string;
+  subjectName: string;
+  code: string;
+  startTime: string;
+  endTime: string;
+  room: string | null;
+  scheduleId: string;
+}
+
+/**
+ * Build today's class list with overrides applied.
+ * Returns the merged, sorted list of classes for the given user and day.
+ */
+async function buildMergedClasses(
+  userId: string,
+  subjects: any[],
+  dayOfWeek: number,
+  todayKey: string
+): Promise<MergedCronClass[]> {
+  // Fetch today's overrides
+  const overrides = await prisma.scheduleOverride.findMany({
+    where: { userId, date: new Date(todayKey + "T00:00:00Z") },
+  });
+
+  // Build original time lookup for swap endTime resolution
+  const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
+
+  // Start with regular schedules
+  let classes: MergedCronClass[] = [];
+  for (const sub of subjects) {
+    for (const sc of sub.schedules) {
+      if (sc.dayOfWeek === dayOfWeek) {
+        originalBySubject.set(sub.id, { startTime: sc.startTime, endTime: sc.endTime });
+        classes.push({
+          subjectId: sub.id,
+          subjectName: sub.name,
+          code: sub.code,
+          startTime: sc.startTime,
+          endTime: sc.endTime,
+          room: sc.room,
+          scheduleId: sc.id,
+        });
+      }
+    }
+  }
+
+  // Apply overrides
+  for (const ov of overrides) {
+    switch (ov.type) {
+      case "cancel":
+        classes = classes.filter((c) => c.subjectId !== ov.subjectId);
+        break;
+
+      case "reschedule": {
+        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+        if (idx !== -1 && ov.newTime) {
+          const orig = classes[idx];
+          const duration = timeToMinutes(orig.endTime) - timeToMinutes(orig.startTime);
+          const newEnd = duration > 0 ? minutesToTime(timeToMinutes(ov.newTime) + duration) : orig.endTime;
+          classes[idx] = { ...orig, startTime: ov.newTime, endTime: newEnd };
+        } else if (idx === -1 && ov.newTime) {
+          const sub = subjects.find((s: any) => s.id === ov.subjectId);
+          if (sub) {
+            classes.push({
+              subjectId: sub.id, subjectName: sub.name, code: sub.code,
+              startTime: ov.newTime, endTime: "", room: null, scheduleId: ov.id,
+            });
+          }
+        }
+        break;
+      }
+
+      case "extra": {
+        const sub = subjects.find((s: any) => s.id === ov.subjectId);
+        if (sub) {
+          classes.push({
+            subjectId: sub.id, subjectName: sub.name, code: sub.code,
+            startTime: ov.newTime || "09:00", endTime: "", room: null, scheduleId: ov.id,
+          });
+        }
+        break;
+      }
+
+      case "swap": {
+        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+        if (idx !== -1 && ov.newTime) {
+          const swapPartnerOrig = ov.swapSubjectId ? originalBySubject.get(ov.swapSubjectId) : null;
+          classes[idx] = {
+            ...classes[idx],
+            startTime: ov.newTime,
+            endTime: swapPartnerOrig?.endTime || classes[idx].endTime,
+          };
+        }
+        break;
+      }
+    }
+  }
+
+  classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  return classes;
+}
+
+// ===== MAIN HANDLER =====
+
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
@@ -73,22 +193,26 @@ export async function GET(req: NextRequest) {
         // ---- SEMESTER / HOLIDAY / EXAM PERIOD LOGIC ----
         const activeSemester = user.semesters?.[0];
         const todayStart = getTodayStartInTimezone(now, tz);
-        
-        // If no active semester or semester ended, skip ALL notifications
+
         if (!activeSemester || new Date(activeSemester.endDate) < todayStart) {
           continue;
         }
 
-        const todayHoliday = activeSemester.holidays.find(h => {
+        const todayHoliday = activeSemester.holidays.find((h) => {
           const hDate = new Date(h.date);
           return hDate.getTime() === todayStart.getTime();
         });
 
-        const currentExam = activeSemester.examPeriods.find(ep => {
+        const currentExam = activeSemester.examPeriods.find((ep) => {
           return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
         });
 
         const isSpecialDay = !!todayHoliday || !!currentExam;
+
+        // ---- BUILD MERGED CLASS LIST (overrides applied) ----
+        const mergedClasses = isSpecialDay
+          ? []
+          : await buildMergedClasses(user.id, user.subjects, uNow.dayOfWeek, todayKey);
 
         // ==========================================
         // 1. DAILY MORNING BRIEF
@@ -102,15 +226,15 @@ export async function GET(req: NextRequest) {
           if (await wasSent(user.id, bKey)) {
             results.skippedDuplicates++;
           } else {
-            const todaySch = isSpecialDay ? [] : user.subjects.flatMap((sub) =>
-              sub.schedules
-                .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
-                .map((sc) => ({ subject: sub.name, code: sub.code, startTime: sc.startTime, endTime: sc.endTime, room: sc.room }))
-            ).sort((a, b) => a.startTime.localeCompare(b.startTime));
+            // Convert merged classes to brief format
+            const todaySch = mergedClasses.map((c) => ({
+              subject: c.subjectName, code: c.code,
+              startTime: c.startTime, endTime: c.endTime, room: c.room,
+            }));
 
             if (isSpecialDay || todaySch.length === 0) {
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
-              
+
               let title = "☀️ No Classes Today!";
               let body = `It's ${dayName} — no classes scheduled. Enjoy your day off!`;
               let emoji = "☀️";
@@ -142,10 +266,7 @@ export async function GET(req: NextRequest) {
                 await retry(() => sendEmail(user.email!, `${title} — AttendEase`, html), `em-brief-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
-                  title,
-                  body,
-                  tag: "daily-brief",
-                  data: { url: "/dashboard" },
+                  title, body, tag: "daily-brief", data: { url: "/dashboard" },
                 });
 
               await markSent(user.id, bKey, "daily-brief");
@@ -232,39 +353,36 @@ export async function GET(req: NextRequest) {
         }
 
         // ==========================================
-        // 2. PRE-CLASS REMINDERS
+        // 2. PRE-CLASS REMINDERS (using merged/overridden schedule)
         // ==========================================
         const preMin = s.preClassMinutes ?? 15;
 
         if (!isSpecialDay) {
-          for (const subject of user.subjects) {
-          for (const schedule of subject.schedules) {
-            if (schedule.dayOfWeek !== uNow.dayOfWeek) continue;
-
-            const [sH, sM] = schedule.startTime.split(":").map(Number);
+          for (const cls of mergedClasses) {
+            const [sH, sM] = cls.startTime.split(":").map(Number);
             if (isNaN(sH) || isNaN(sM)) continue;
             const minsUntil = (sH - uNow.hours) * 60 + (sM - uNow.minutes);
 
             if (minsUntil > 0 && minsUntil <= preMin && minsUntil > preMin - 5) {
-              const rKey = `pre-class:${schedule.id}:${todayKey}`;
+              const rKey = `pre-class:${cls.scheduleId}:${todayKey}`;
               if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
 
-              const txt = `⏰ *${subject.name}* starts in ${minsUntil} min\n📍 ${schedule.room || "No room"} | ${schedule.startTime} - ${schedule.endTime}`;
-              const html = formatPreClassHTML(subject.name, minsUntil, schedule);
+              const txt = `⏰ *${cls.subjectName}* starts in ${minsUntil} min\n📍 ${cls.room || "No room"} | ${cls.startTime} - ${cls.endTime}`;
+              const html = formatPreClassHTML(cls.subjectName, minsUntil, cls);
 
               if (s.telegramEnabled && s.telegramPreClass && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-pre-${user.id}`, results);
               if (s.emailEnabled && s.emailPreClass && user.email)
-                await retry(() => sendEmail(user.email!, `⏰ ${subject.name} in ${minsUntil} min`, html), `em-pre-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, `⏰ ${cls.subjectName} in ${minsUntil} min`, html), `em-pre-${user.id}`, results);
               if (s.pushEnabled && s.pushPreClass && user.pushSubscriptions.length > 0) {
-                const qToken = generateQuickMarkToken(user.id, schedule.id, todayKey);
+                const qToken = generateQuickMarkToken(user.id, cls.scheduleId, todayKey);
                 await pushAll(user.pushSubscriptions, {
-                  title: `⏰ ${subject.name} in ${minsUntil} min`,
-                  body: `${schedule.startTime} - ${schedule.endTime}${schedule.room ? ` • ${schedule.room}` : ""}`,
-                  tag: `pre-class-${schedule.id}`,
+                  title: `⏰ ${cls.subjectName} in ${minsUntil} min`,
+                  body: `${cls.startTime} - ${cls.endTime}${cls.room ? ` • ${cls.room}` : ""}`,
+                  tag: `pre-class-${cls.scheduleId}`,
                   requireInteraction: true,
                   vibrate: [200, 100, 200, 100, 200, 100, 200],
-                  data: { scheduleId: schedule.id, subjectId: subject.id, subjectName: subject.name, userId: user.id, quickMarkToken: qToken, url: "/dashboard" },
+                  data: { scheduleId: cls.scheduleId, subjectId: cls.subjectId, subjectName: cls.subjectName, userId: user.id, quickMarkToken: qToken, url: "/dashboard" },
                 });
               }
 
@@ -272,7 +390,6 @@ export async function GET(req: NextRequest) {
               results.preClassReminders++;
             }
           }
-        }
         }
 
         // ==========================================
@@ -287,10 +404,8 @@ export async function GET(req: NextRequest) {
           if (await wasSent(user.id, rpKey)) {
             results.skippedDuplicates++;
           } else {
-            // Fetch today's attendance records for this user
-            // AttendanceRecord.date is @db.Date — use exact date match
+            // Fetch today's attendance records
             const todayDateForReport = new Date(todayKey + "T00:00:00Z");
-
             const todayRecords = await prisma.attendanceRecord.findMany({
               where: {
                 subject: { userId: user.id, isArchived: false },
@@ -299,27 +414,23 @@ export async function GET(req: NextRequest) {
               include: { subject: true },
             });
 
-            // Get today's scheduled classes
-            const todayClasses = isSpecialDay ? [] : user.subjects.flatMap((sub) =>
-              sub.schedules
-                .filter((sc) => sc.dayOfWeek === uNow.dayOfWeek)
-                .map((sc) => ({
-                  subjectId: sub.id,
-                  subjectName: sub.name,
-                  code: sub.code,
-                  startTime: sc.startTime,
-                  endTime: sc.endTime,
-                  room: sc.room,
-                  status: todayRecords.find((r) => r.subjectId === sub.id && r.scheduleId === sc.id)?.status || "UNMARKED",
-                }))
-            ).sort((a, b) => a.startTime.localeCompare(b.startTime));
+            // Use merged classes (overrides applied) for the report
+            const todayClasses = isSpecialDay ? [] : mergedClasses.map((cls) => ({
+              subjectId: cls.subjectId,
+              subjectName: cls.subjectName,
+              code: cls.code,
+              startTime: cls.startTime,
+              endTime: cls.endTime,
+              room: cls.room,
+              status: todayRecords.find((r) => r.subjectId === cls.subjectId && (r.scheduleId === cls.scheduleId || !r.scheduleId))?.status || "UNMARKED",
+            }));
 
             if (isSpecialDay || todayClasses.length === 0) {
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
               let title = "📊 Daily Report — Day Off";
               let body = `No classes were scheduled today (${dayName}). No attendance to report!`;
               let msg = `No classes were scheduled today (<strong>${dayName}</strong>).`;
-              
+
               if (todayHoliday) {
                 title = `🎉 Daily Report — ${todayHoliday.name}`;
                 body = `It was ${todayHoliday.name} today. No attendance to report!`;
@@ -345,10 +456,7 @@ export async function GET(req: NextRequest) {
                 await retry(() => sendEmail(user.email!, "📊 Daily Report — Day Off — AttendEase", html), `em-report-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
-                  title,
-                  body,
-                  tag: "daily-report",
-                  data: { url: "/dashboard" },
+                  title, body, tag: "daily-report", data: { url: "/dashboard" },
                 });
 
               await markSent(user.id, rpKey, "daily-report");
@@ -462,7 +570,7 @@ function getTimeInTimezone(date: Date, tz: string) {
 
 function getTodayStartInTimezone(date: Date, tz: string): Date {
   const f = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" });
-  const dateStr = f.format(date); // YYYY-MM-DD
+  const dateStr = f.format(date);
   return new Date(dateStr + "T00:00:00Z");
 }
 
