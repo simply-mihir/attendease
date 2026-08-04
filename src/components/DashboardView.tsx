@@ -443,9 +443,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       key={cls.scheduleId}
                       className={clsx(
                         "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
-                        cls.priority === "mandatory" ? "border-[#ef476f]/30 bg-[#ef476f]/[0.06]" :
-                        cls.priority === "recommended" ? "border-[#ff6b35]/30 bg-[#ff6b35]/[0.06]" :
-                        "border-[#06d6a0]/30 bg-[#06d6a0]/[0.06]"
+                        cls.priority === "mandatory" ? "border-[#ef476f]/60 bg-[#ef476f]/[0.15]" :
+                        cls.priority === "recommended" ? "border-[#ff6b35]/60 bg-[#ff6b35]/[0.15]" :
+                        "border-[#06d6a0]/60 bg-[#06d6a0]/[0.15]"
                       )}
                     >
                       <div className="w-2 h-10 rounded-full shadow-sm" style={{ backgroundColor: cls.colorHex }} />
@@ -459,9 +459,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       <div className="text-right shrink-0">
                         <span className={clsx(
                           "text-xs font-bold px-2.5 py-1 rounded-lg border",
-                          cls.priority === "mandatory" ? "bg-[#ef476f]/20 text-[#ef476f] border-[#ef476f]/30" :
-                          cls.priority === "recommended" ? "bg-[#ff6b35]/20 text-[#ff6b35] border-[#ff6b35]/30" :
-                          "bg-[#06d6a0]/20 text-[#06d6a0] border-[#06d6a0]/30"
+                          cls.priority === "mandatory" ? "bg-[#ef476f]/30 text-[#ef476f] border-[#ef476f]/50" :
+                          cls.priority === "recommended" ? "bg-[#ff6b35]/30 text-[#ff6b35] border-[#ff6b35]/50" :
+                          "bg-[#06d6a0]/30 text-[#06d6a0] border-[#06d6a0]/50"
                         )}>
                           {cls.priority === "mandatory" ? "🔴 Must attend" :
                            cls.priority === "recommended" ? "🟡 Should attend" :
