@@ -128,7 +128,11 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      {view === "week" ? (
+      {!schedData && schedLoading ? (
+        <div className="py-20 flex justify-center">
+          <FuturisticLoader variant="section" title="Loading Calendar..." Icon={Calendar} />
+        </div>
+      ) : view === "week" ? (
         /* Week View */
         <StaggerGrid className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3" delay={150} staggerDelay={80} animation="fadeSlideUp">
           {weekDates.map((date, i) => {
@@ -143,37 +147,68 @@ export default function CalendarPage() {
                   today ? "border-[#FF2D78] shadow-[0_6px_0_0_#cc1a5e] bg-[#FF2D78]/5" : ""
                 }`}
               >
-                <div className="text-center mb-2.5 pb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#9ca3af] dark:text-[#6b6b80]">{DAYS[date.getDay()]}</p>
-                  <p className={clsx("mt-1", today ? "text-[#FF2D78] font-extrabold text-lg" : "text-[#1a1a2e] dark:text-white font-bold text-lg")}>{date.getDate()}</p>
+                <div className="text-center mb-3 pb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#9ca3af] dark:text-[#6b6b80]">{DAYS[date.getDay()]}</p>
+                  <p className={clsx("mt-1", today ? "text-[#FF2D78] font-extrabold text-xl" : "text-[#1a1a2e] dark:text-white font-bold text-lg")}>{date.getDate()}</p>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {pageLoading ? (
                     <div className="py-8 flex justify-center">
                       <FieldLoader size="md" />
                     </div>
                   ) : dayClasses.length === 0 ? (
-                    <div className="py-4 text-center">
+                    <div className="py-6 text-center">
                       <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
                     </div>
                   ) : dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
+                    const color = cls.subject?.colorHex || cls.colorHex || '#FF2D78';
                     return (
-                      <div key={cls.id || cls.subjectId + cls.startTime} className="rounded-lg border-2 px-2 py-1.5 mb-1 transition-all duration-150 cursor-pointer border-gray-200 bg-white shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: cls.subject?.colorHex || cls.colorHex || '#FF2D78' }}>
-                        <p className="text-xs font-bold text-[#1a1a2e] dark:text-white break-words">{cls.subjectName}</p>
-                        <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80]">{cls.startTime}</p>
-                        {cls.isOverride && (
-                          <span className={clsx("inline-block rounded px-1 py-0.5 text-[8px] font-bold uppercase mt-0.5",
-                            cls.overrideType === "extra"
-                              ? "bg-[#06d6a0]/20 text-[#06d6a0]"
-                              : cls.overrideType === "swapped"
-                              ? "bg-[#4361ee]/20 text-[#4361ee]"
-                              : "bg-[#ff6b35]/20 text-[#ff6b35]"
-                          )}>
-                            {cls.overrideType}
-                          </span>
-                        )}
-                        {rec && <span className={clsx("inline-block mt-1 w-2.5 h-2.5 rounded-full block", STATUS_DOT[rec.status])} />}
+                      <div 
+                        key={cls.id || cls.subjectId + cls.startTime} 
+                        className="group relative rounded-xl border-2 px-2.5 py-2 transition-all duration-300 cursor-pointer overflow-hidden" 
+                        style={{ 
+                          borderLeftWidth: "4px", 
+                          borderLeftColor: color,
+                          borderColor: `${color}40`,
+                          backgroundColor: `${color}0D`,
+                          boxShadow: `0 3px 0 0 ${color}30`
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.boxShadow = `0 1px 0 0 ${color}30`;
+                          e.currentTarget.style.transform = `translateY(2px)`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.boxShadow = `0 3px 0 0 ${color}30`;
+                          e.currentTarget.style.transform = '';
+                        }}
+                      >
+                        {/* Shimmer */}
+                        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                          style={{
+                            background: `linear-gradient(135deg, ${color}08 0%, ${color}15 50%, ${color}08 100%)`,
+                            backgroundSize: "200% 200%",
+                            animation: "subjectCardShimmer 3s ease-in-out infinite",
+                          }} />
+                          
+                        <div className="relative z-10">
+                          <p className="text-xs font-black text-[#1a1a2e] dark:text-white break-words leading-tight">{cls.subjectName}</p>
+                          <p className="text-[10px] font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1 flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> {cls.startTime}
+                          </p>
+                          {cls.isOverride && (
+                            <span className={clsx("inline-block rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider mt-1.5",
+                              cls.overrideType === "extra"
+                                ? "bg-[#06d6a0]/20 text-[#06d6a0]"
+                                : cls.overrideType === "swapped"
+                                ? "bg-[#4361ee]/20 text-[#4361ee]"
+                                : "bg-[#ff6b35]/20 text-[#ff6b35]"
+                            )}>
+                              {cls.overrideType}
+                            </span>
+                          )}
+                          {rec && <span className={clsx("inline-block mt-2 w-3 h-3 rounded-full block shadow-sm border border-black/10 dark:border-white/10", STATUS_DOT[rec.status])} />}
+                        </div>
                       </div>
                     );
                   })}
