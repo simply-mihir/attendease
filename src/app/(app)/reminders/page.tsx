@@ -215,24 +215,53 @@ export default function RemindersPage() {
           <FuturisticLoader variant="section" title="Loading Reminders..." Icon={Bell} />
         </div>
       ) : filteredReminders.length === 0 ? (
-        <div className="rounded-2xl border-2 p-12 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="flex justify-center mb-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ff6b35]/10">
-              <Bell className="h-8 w-8 text-[#ff6b35]" />
+        <div 
+          className="group relative rounded-2xl border-2 p-12 text-center transition-all duration-300 overflow-hidden" 
+          style={{ 
+            opacity: 0, 
+            animation: "fadeSlideUp 0.5s ease-out 100ms forwards",
+            borderColor: "#ff6b3540",
+            backgroundColor: "#ff6b350D",
+            boxShadow: "0 6px 0 0 #ff6b3530"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = `0 4px 0 0 #ff6b3530`;
+            e.currentTarget.style.transform = `translateY(2px)`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = `0 6px 0 0 #ff6b3530`;
+            e.currentTarget.style.transform = '';
+          }}
+        >
+          {/* Shimmer */}
+          <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg, #ff6b3508 0%, #ff6b3515 50%, #ff6b3508 100%)`,
+              backgroundSize: "200% 200%",
+              animation: "subjectCardShimmer 3s ease-in-out infinite",
+            }} />
+
+          {/* Top accent line */}
+          <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
+            style={{ background: `linear-gradient(to right, transparent, #ff6b3560, transparent)` }} />
+            
+          <div className="relative z-10">
+            <div className="flex justify-center mb-5">
+              <div className="w-20 h-20 rounded-3xl bg-[#ff6b35] border-2 border-[#cc5529] shadow-[0_6px_0_0_#cc5529] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300">
+                <Bell className="w-10 h-10 text-white drop-shadow-md" />
+              </div>
             </div>
+            <h3 className="text-2xl font-black text-text mb-3 tracking-tight">No Reminders Found</h3>
+            <p className="text-text-muted font-bold mb-8 max-w-md mx-auto text-sm leading-relaxed">
+              You don't have any pending reminders. Click below to add one!
+            </p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="rounded-xl border-2 border-[#cc1a5e] bg-[#FF2D78] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_0_0_#cc1a5e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#cc1a5e] active:translate-y-[3px] active:shadow-none dark:border-[#b81e56] dark:shadow-[0_4px_0_0_#b81e56] dark:hover:shadow-[0_2px_0_0_#b81e56] transition-all duration-150 inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Add Reminder
+            </button>
           </div>
-          <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-2">No Reminders Found</h3>
-          <p className="text-sm text-[#9ca3af] dark:text-[#6b6b80] mb-6">
-            {activeCategory !== "all"
-              ? `No reminders listed under ${activeCategory.replace("_", " ")}.`
-              : "You don't have any pending reminders. Click below to add one!"}
-          </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="rounded-xl border-2 border-[#cc1a5e] bg-[#FF2D78] px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_0_0_#cc1a5e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#cc1a5e] active:translate-y-[3px] active:shadow-none dark:border-[#b81e56] dark:shadow-[0_4px_0_0_#b81e56] dark:hover:shadow-[0_2px_0_0_#b81e56] transition-all duration-150 inline-flex items-center gap-1.5 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Add Reminder
-          </button>
         </div>
       ) : (
         <StaggerGrid className="space-y-4" delay={100} staggerDelay={50} animation="fadeSlideUp">
