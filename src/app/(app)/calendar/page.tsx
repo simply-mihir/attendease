@@ -262,10 +262,11 @@ export default function CalendarPage() {
             {monthDays.map((date, i) => {
               if (!date) return <div key={i} />;
               const dateStr = getLocalDateStr(date);
+              const dayClasses = getClassesForDay(date, schedules, overrides);
               const dayRecords = recordMap.get(dateStr) || [];
               const today = isToday(date);
               return (
-                <div key={i} className={clsx("p-2 rounded-xl text-center min-h-[64px] border-2 transition",
+                <div key={i} className={clsx("group relative p-2 rounded-xl text-center min-h-[64px] border-2 transition cursor-pointer",
                   today
                     ? "bg-[#FF2D78]/10 border-[#FF2D78] shadow-[0_3px_0_0_#FF2D78]"
                     : "bg-gray-50 dark:bg-[#0d0d1a] border-gray-200 dark:border-[#2a2a3d]/50 hover:border-gray-400 dark:hover:border-gray-600"
@@ -281,6 +282,32 @@ export default function CalendarPage() {
                         <div key={ri} className={clsx("w-2 h-2 rounded-full", STATUS_DOT[r.status])}
                           title={`${r.subject?.name}: ${r.status}`} />
                       ))}
+                    </div>
+                  )}
+
+                  {/* Tooltip */}
+                  {dayClasses.length > 0 && !pageLoading && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.3)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] scale-95 group-hover:scale-100 pointer-events-none">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#9ca3af] dark:text-[#6b6b80] mb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d] pb-1.5">
+                        {date.toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                      </p>
+                      <div className="space-y-2 text-left max-h-[150px] overflow-y-auto scrollbar-none">
+                        {dayClasses.map((cls: any, ci: number) => {
+                           const color = cls.subject?.colorHex || cls.colorHex || '#FF2D78';
+                           return (
+                             <div key={ci} className="flex items-start gap-2">
+                               <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 shadow-sm" style={{ backgroundColor: color }} />
+                               <div>
+                                 <p className="text-xs font-bold text-[#1a1a2e] dark:text-white leading-tight line-clamp-2">{cls.subjectName}</p>
+                                 <p className="text-[10px] font-semibold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">{cls.startTime}</p>
+                               </div>
+                             </div>
+                           )
+                        })}
+                      </div>
+                      
+                      {/* Triangle pointer */}
+                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white dark:bg-[#141425] border-b-2 border-r-2 border-gray-200 dark:border-[#2a2a3d] rotate-45" />
                     </div>
                   )}
                 </div>
