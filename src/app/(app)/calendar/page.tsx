@@ -140,6 +140,12 @@ export default function CalendarPage() {
             const dateStr = getLocalDateStr(date);
             const dayRecords = recordMap.get(dateStr) || [];
             const today = isToday(date);
+            
+            const FALLBACK_COLORS = ["#FF2D78", "#00f5d4", "#ff6b35", "#4361ee", "#7b2cbf", "#f15bb5"];
+            let prevColor: string | null = null;
+            let prevSubjectId: string | null = null;
+            let prevSubjectName: string | null = null;
+
             return (
               <div
                 key={i}
@@ -162,7 +168,35 @@ export default function CalendarPage() {
                     </div>
                   ) : dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
-                    const color = cls.subject?.colorHex || cls.colorHex || '#FF2D78';
+                    let color = cls.subject?.colorHex || cls.colorHex;
+                    const currentSubjectId = cls.subject?.id || cls.subjectId || null;
+                    const currentSubjectName = cls.subjectName;
+
+                    const isSameSubject = (currentSubjectId && currentSubjectId === prevSubjectId) || (!currentSubjectId && currentSubjectName === prevSubjectName);
+
+                    if (!color) {
+                      let hash = 0;
+                      const name = currentSubjectName || "unknown";
+                      for (let j = 0; j < name.length; j++) hash = name.charCodeAt(j) + ((hash << 5) - hash);
+                      color = FALLBACK_COLORS[Math.abs(hash) % FALLBACK_COLORS.length];
+                    }
+
+                    if (!isSameSubject && color === prevColor) {
+                      let hash = 0;
+                      const name = currentSubjectName || "unknown";
+                      for (let j = 0; j < name.length; j++) hash = name.charCodeAt(j) + ((hash << 5) - hash);
+                      let index = Math.abs(hash) % FALLBACK_COLORS.length;
+                      
+                      while (FALLBACK_COLORS[index] === prevColor || (FALLBACK_COLORS[index] === color && FALLBACK_COLORS.length > 1)) {
+                        index = (index + 1) % FALLBACK_COLORS.length;
+                      }
+                      color = FALLBACK_COLORS[index];
+                    }
+
+                    prevColor = color;
+                    prevSubjectId = currentSubjectId;
+                    prevSubjectName = currentSubjectName;
+
                     return (
                       <div 
                         key={cls.id || cls.subjectId + cls.startTime} 
@@ -170,23 +204,23 @@ export default function CalendarPage() {
                         style={{ 
                           borderLeftWidth: "4px", 
                           borderLeftColor: color,
-                          borderColor: `${color}40`,
-                          backgroundColor: `${color}0D`,
-                          boxShadow: `0 3px 0 0 ${color}30`
+                          borderColor: `${color}80`,
+                          backgroundColor: `${color}25`,
+                          boxShadow: `0 3px 0 0 ${color}60`
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = `0 1px 0 0 ${color}30`;
+                          e.currentTarget.style.boxShadow = `0 1px 0 0 ${color}60`;
                           e.currentTarget.style.transform = `translateY(2px)`;
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = `0 3px 0 0 ${color}30`;
+                          e.currentTarget.style.boxShadow = `0 3px 0 0 ${color}60`;
                           e.currentTarget.style.transform = '';
                         }}
                       >
                         {/* Shimmer */}
                         <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                           style={{
-                            background: `linear-gradient(135deg, ${color}08 0%, ${color}15 50%, ${color}08 100%)`,
+                            background: `linear-gradient(135deg, ${color}1A 0%, ${color}30 50%, ${color}1A 100%)`,
                             backgroundSize: "200% 200%",
                             animation: "subjectCardShimmer 3s ease-in-out infinite",
                           }} />
