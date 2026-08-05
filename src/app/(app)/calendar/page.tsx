@@ -113,18 +113,47 @@ export default function CalendarPage() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between mb-6 rounded-2xl border-2 p-3.5 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
-        <button onClick={() => navigate(-1)} className="flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-150 border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a] cursor-pointer">
-          <ChevronLeft className="w-5 h-5" />
+      <div 
+        className="group relative flex items-center justify-between mb-6 rounded-2xl border-2 p-3.5 transition-all duration-300 overflow-hidden" 
+        style={{ 
+          opacity: 0, 
+          animation: "fadeSlideLeft 0.5s ease-out 100ms forwards",
+          borderColor: "#4361ee80",
+          backgroundColor: "#4361ee20",
+          boxShadow: "0 6px 0 0 #4361ee60"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = `0 4px 0 0 #4361ee60`;
+          e.currentTarget.style.transform = `translateY(2px)`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = `0 6px 0 0 #4361ee60`;
+          e.currentTarget.style.transform = '';
+        }}
+      >
+        {/* Shimmer */}
+        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: `linear-gradient(135deg, #4361ee1A 0%, #4361ee30 50%, #4361ee1A 100%)`,
+            backgroundSize: "200% 200%",
+            animation: "subjectCardShimmer 3s ease-in-out infinite",
+          }} />
+
+        {/* Top accent line */}
+        <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
+          style={{ background: `linear-gradient(to right, transparent, #4361ee99, transparent)` }} />
+
+        <button onClick={() => navigate(-1)} className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-150 border-[#324dc7] bg-[#4361ee] text-white shadow-[0_3px_0_0_#324dc7] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#324dc7] active:translate-y-[3px] active:shadow-none cursor-pointer">
+          <ChevronLeft className="w-5 h-5 drop-shadow-md" />
         </button>
-        <span className="text-lg font-extrabold text-[#1a1a2e] dark:text-white">
+        <span className="relative z-10 text-lg font-black text-[#1a1a2e] dark:text-white drop-shadow-sm tracking-wide">
           {view === "week"
             ? `${weekDates[0].toLocaleDateString("en-IN", { month: "short", day: "numeric" })} — ${weekDates[6].toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}`
             : currentDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })
           }
         </span>
-        <button onClick={() => navigate(1)} className="flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-150 border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a] cursor-pointer">
-          <ChevronRight className="w-5 h-5" />
+        <button onClick={() => navigate(1)} className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-150 border-[#324dc7] bg-[#4361ee] text-white shadow-[0_3px_0_0_#324dc7] hover:translate-y-[1px] hover:shadow-[0_2px_0_0_#324dc7] active:translate-y-[3px] active:shadow-none cursor-pointer">
+          <ChevronRight className="w-5 h-5 drop-shadow-md" />
         </button>
       </div>
 
