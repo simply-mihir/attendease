@@ -77,7 +77,7 @@ function FuturisticBarChart({
       {/* Scanline texture */}
       <div
         className="absolute inset-0 pointer-events-none futuristic-scanline-bg"
-        style={{ opacity: 0.015 }}
+        style={{ opacity: 0.012 }}
       />
 
       <h3 className="font-black mb-5 flex items-center gap-2 text-[#1a1a2e] dark:text-white relative z-10">
@@ -87,39 +87,43 @@ function FuturisticBarChart({
         Subject Comparison
       </h3>
 
-      <div className="space-y-4 relative z-10 max-h-[440px] overflow-y-auto custom-scrollbar pr-1">
+      <div className="space-y-5 relative z-10 max-h-[440px] overflow-y-auto custom-scrollbar pr-1">
         {data.map((d, i) => {
           const isHover = hoveredIdx === i;
           return (
             <div
               key={i}
-              className="cursor-pointer"
+              className="cursor-pointer group"
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
             >
               {/* Label row */}
-              <div className="flex items-center justify-between mb-1.5 gap-3">
+              <div className="flex items-center justify-between mb-2 gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  {/* Status indicator dot — matches donut colors */}
+                  {/* Status color accent bar */}
                   <div
-                    className="w-2 h-2 rounded-full shrink-0"
+                    className="w-1 h-4 rounded-full shrink-0 transition-all duration-300"
                     style={{
                       backgroundColor: d.fill,
                       boxShadow: isHover
                         ? `0 0 8px ${d.fill}80`
-                        : `0 0 4px ${d.fill}40`,
-                      transition: "box-shadow 0.3s",
+                        : "none",
+                      transform: isHover
+                        ? "scaleY(1.3)"
+                        : "scaleY(1)",
                     }}
                   />
                   <span
-                    className="text-[11px] font-bold leading-tight transition-colors duration-200 truncate"
-                    style={{ color: isHover ? d.fill : undefined }}
+                    className="text-[12px] font-bold leading-tight transition-colors duration-200"
+                    style={{
+                      color: isHover ? d.fill : undefined,
+                    }}
                   >
                     <span
                       className={
                         isHover
                           ? ""
-                          : "text-[#4a4a5a] dark:text-[#9ca3af]"
+                          : "text-[#3a3a4a] dark:text-[#b0b0c0]"
                       }
                     >
                       {d.name}
@@ -127,13 +131,12 @@ function FuturisticBarChart({
                   </span>
                 </div>
                 <span
-                  className="text-[11px] font-extrabold tabular-nums shrink-0"
+                  className="text-[12px] font-extrabold tabular-nums shrink-0 transition-all duration-300"
                   style={{
                     color: d.fill,
                     textShadow: isHover
-                      ? `0 0 10px ${d.fill}80`
+                      ? `0 0 12px ${d.fill}90`
                       : "none",
-                    transition: "text-shadow 0.3s",
                   }}
                 >
                   {d.percentage}%
@@ -142,46 +145,65 @@ function FuturisticBarChart({
 
               {/* Bar track */}
               <div
-                className="relative h-2.5 rounded-full"
-                style={{ background: "rgba(128,128,128,0.07)" }}
+                className="relative h-3 rounded-lg overflow-hidden transition-all duration-300"
+                style={{
+                  background: isHover
+                    ? `${d.fill}08`
+                    : "rgba(128,128,128,0.06)",
+                  boxShadow: `inset 0 1px 2px rgba(0,0,0,0.04)`,
+                }}
               >
-                {/* Fill */}
+                {/* Percentage grid ticks inside track */}
+                {[25, 50, 75].map((tick) => (
+                  <div
+                    key={tick}
+                    className="absolute top-0 bottom-0 w-px"
+                    style={{
+                      left: `${tick}%`,
+                      background:
+                        tick === 75
+                          ? "rgba(128,128,128,0.12)"
+                          : "rgba(128,128,128,0.06)",
+                    }}
+                  />
+                ))}
+
+                {/* Fill bar */}
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full overflow-hidden"
+                  className="absolute inset-y-0 left-0 rounded-lg overflow-hidden transition-[width,box-shadow] duration-300"
                   style={{
                     width: mounted
                       ? `${d.percentage}%`
                       : "0%",
-                    background: `linear-gradient(90deg, ${d.fill}55, ${d.fill}BB, ${d.fill})`,
+                    background: `linear-gradient(90deg, ${d.fill}40, ${d.fill}99, ${d.fill})`,
                     boxShadow: isHover
-                      ? `0 0 16px ${d.fill}45, inset 0 1px 0 rgba(255,255,255,0.2)`
-                      : `0 0 4px ${d.fill}12`,
-                    transition: `width 1s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.1}s, box-shadow 0.3s`,
+                      ? `0 0 20px ${d.fill}40, 0 2px 8px ${d.fill}25`
+                      : `0 0 6px ${d.fill}10`,
+                    transitionTimingFunction: `cubic-bezier(0.34,1.56,0.64,1)`,
+                    transitionDelay: `${i * 0.1}s`,
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.12] to-transparent" />
+                  {/* Glass highlight */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/[0.18] via-white/[0.05] to-transparent" />
+
+                  {/* Shimmer animation */}
                   <div
-                    className="absolute inset-y-0 w-[35%] futuristic-bar-shimmer"
+                    className="absolute inset-y-0 w-[30%] futuristic-bar-shimmer"
                     style={{
                       background:
-                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)",
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
+                    }}
+                  />
+
+                  {/* Bright leading edge — colored, not white */}
+                  <div
+                    className="absolute top-0 bottom-0 right-0 w-[3px] rounded-r-lg"
+                    style={{
+                      background: `linear-gradient(to bottom, ${d.fill}, ${d.fill}DD)`,
+                      boxShadow: `2px 0 10px ${d.fill}70, 0 0 4px ${d.fill}50`,
                     }}
                   />
                 </div>
-
-                {/* Glowing tip */}
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full z-10"
-                  style={{
-                    left: mounted
-                      ? `calc(${d.percentage}% - 2.5px)`
-                      : "-3px",
-                    background: "white",
-                    boxShadow: `0 0 6px ${d.fill}, 0 0 14px ${d.fill}90`,
-                    opacity: mounted ? 1 : 0,
-                    transition: `left 1s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.1}s, opacity 0.4s ${i * 0.1 + 0.5}s`,
-                  }}
-                />
               </div>
             </div>
           );
