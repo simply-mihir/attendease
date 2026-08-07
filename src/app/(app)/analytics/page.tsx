@@ -64,13 +64,10 @@ export default function AnalyticsPage() {
     if (!isNaN(y)) earliestYear = Math.min(y, currentYear);
   }
   
-  // Guarantee at least one past year for scrolling purposes
-  if (earliestYear === currentYear) {
-    earliestYear = currentYear - 1;
-  }
-
-  type YearData = { year: number; weeks: { date: string; intensity: number; stats?: any }[][]; hasData: boolean };
+  type YearData = { year: number; weeks: { date: string; intensity: number; stats?: any }[][]; hasData: boolean; isHistoryPlaceholder?: boolean };
   const yearsData: YearData[] = [];
+  
+  yearsData.push({ year: earliestYear - 1, weeks: [], hasData: false, isHistoryPlaceholder: true });
 
   for (let y = earliestYear; y <= currentYear; y++) {
     const hasData = heatmap.some((d: any) => d.date.startsWith(y.toString()));
@@ -213,10 +210,14 @@ export default function AnalyticsPage() {
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap</h3>
         <div className="overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory scroll-smooth" dir="rtl">
-          <div className="flex" style={{ direction: 'ltr', width: `${(currentYear - earliestYear + 1) * 100}%`, minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+          <div className="flex" style={{ direction: 'ltr', width: `${yearsData.length * 100}%`, minWidth: `${yearsData.length * 700}px` }}>
             {yearsData.map((yData) => (
               <div key={yData.year} className="flex-1 flex flex-col snap-start">
-                {yData.hasData ? (
+                {yData.isHistoryPlaceholder ? (
+                  <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-[#2a2a3d] rounded-2xl mx-2 bg-gray-50/50 dark:bg-[#1f1f35]/50 h-full min-h-[120px]">
+                    <p className="text-sm font-bold text-[#9ca3af] dark:text-[#6b6b80]">No previous data found</p>
+                  </div>
+                ) : yData.hasData ? (
                   <div className="flex justify-between w-full h-full px-1">
                     {yData.weeks.map((week, wi) => (
                       <div key={wi} className="flex flex-col gap-1">
@@ -261,18 +262,22 @@ export default function AnalyticsPage() {
   </div>
           
           {/* Month & Year Timeline */}
-          <div className="flex mt-4 mb-2" style={{ direction: 'ltr', width: `${(currentYear - earliestYear + 1) * 100}%`, minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+          <div className="flex mt-4 mb-2" style={{ direction: 'ltr', width: `${yearsData.length * 100}%`, minWidth: `${yearsData.length * 700}px` }}>
             {yearsData.map((yData) => (
               <div key={yData.year} className="flex-1 flex flex-col px-1 snap-start">
                 <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
-                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => (
-                    <span key={m}>{m}</span>
-                  ))}
+                  {yData.isHistoryPlaceholder ? (
+                    <span className="w-full text-center">History</span>
+                  ) : (
+                    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => (
+                      <span key={m}>{m}</span>
+                    ))
+                  )}
                 </div>
                 <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 relative border-l border-r border-transparent">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
-                      {yData.year}
+                      {yData.isHistoryPlaceholder ? "END" : yData.year}
                     </span>
                   </div>
                 </div>
