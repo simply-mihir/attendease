@@ -185,8 +185,8 @@ export default function AnalyticsPage() {
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap — {year}</h3>
-        <div className="overflow-x-auto">
-          <div className="flex gap-1" style={{ minWidth: "700px" }}>
+        <div className="overflow-x-auto pt-[280px] -mt-[280px] relative z-10">
+          <div className="flex justify-between w-full min-w-[700px] mt-[280px]">
             {weeks.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-1">
                 {week.map((day, di) => (
@@ -216,33 +216,68 @@ export default function AnalyticsPage() {
                               <span className="font-bold text-[#1a1a2e] dark:text-white">{day.stats.count}</span>
                             </div>
                             {day.stats.present > 0 && (
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#06d6a0] shadow-[0_1px_0_0_#038c67]" /> Present</span>
-                                <span className="font-bold text-[#06d6a0]">{day.stats.present}</span>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#06d6a0] shadow-[0_1px_0_0_#038c67]" /> Present</span>
+                                  <span className="font-bold text-[#06d6a0]">{day.stats.present}</span>
+                                </div>
+                                {day.stats.presentSubjects?.length > 0 && (
+                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                                    {Array.from(new Set(day.stats.presentSubjects as string[])).join(", ")}
+                                  </p>
+                                )}
                               </div>
                             )}
                             {day.stats.absent > 0 && (
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ef476f] shadow-[0_1px_0_0_#cc1a42]" /> Absent</span>
-                                <span className="font-bold text-[#ef476f]">{day.stats.absent}</span>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ef476f] shadow-[0_1px_0_0_#cc1a42]" /> Absent</span>
+                                  <span className="font-bold text-[#ef476f]">{day.stats.absent}</span>
+                                </div>
+                                {day.stats.absentSubjects?.length > 0 && (
+                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                                    {Array.from(new Set(day.stats.absentSubjects as string[])).join(", ")}
+                                  </p>
+                                )}
                               </div>
                             )}
                             {day.stats.late > 0 && (
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ff6b35] shadow-[0_1px_0_0_#d95220]" /> Late</span>
-                                <span className="font-bold text-[#ff6b35]">{day.stats.late}</span>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ff6b35] shadow-[0_1px_0_0_#d95220]" /> Late</span>
+                                  <span className="font-bold text-[#ff6b35]">{day.stats.late}</span>
+                                </div>
+                                {day.stats.lateSubjects?.length > 0 && (
+                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                                    {Array.from(new Set(day.stats.lateSubjects as string[])).join(", ")}
+                                  </p>
+                                )}
                               </div>
                             )}
                             {day.stats.excused > 0 && (
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#7b2cbf] shadow-[0_1px_0_0_#5a189a]" /> Excused</span>
-                                <span className="font-bold text-[#7b2cbf]">{day.stats.excused}</span>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#7b2cbf] shadow-[0_1px_0_0_#5a189a]" /> Excused</span>
+                                  <span className="font-bold text-[#7b2cbf]">{day.stats.excused}</span>
+                                </div>
+                                {day.stats.excusedSubjects?.length > 0 && (
+                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                                    {Array.from(new Set(day.stats.excusedSubjects as string[])).join(", ")}
+                                  </p>
+                                )}
                               </div>
                             )}
                             {day.stats.cancelled > 0 && (
-                              <div className="flex justify-between items-center text-xs">
-                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9ca3af] shadow-[0_1px_0_0_#6b7280]" /> Cancelled</span>
-                                <span className="font-bold text-[#9ca3af]">{day.stats.cancelled}</span>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9ca3af] shadow-[0_1px_0_0_#6b7280]" /> Cancelled</span>
+                                  <span className="font-bold text-[#9ca3af]">{day.stats.cancelled}</span>
+                                </div>
+                                {day.stats.cancelledSubjects?.length > 0 && (
+                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                                    {Array.from(new Set(day.stats.cancelledSubjects as string[])).join(", ")}
+                                  </p>
+                                )}
                               </div>
                             )}
                           </div>
@@ -260,7 +295,24 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 mt-5 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap justify-center md:justify-start">
+          
+          {/* Month & Year Timeline */}
+          <div className="w-full min-w-[700px] mt-4 mb-2">
+            <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
+              {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(month => (
+                <span key={month}>{month}</span>
+              ))}
+            </div>
+            <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
+                  {year}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4 mt-6 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap justify-center md:justify-start">
             <div className="flex items-center gap-1.5">
               <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
               <span>No class</span>

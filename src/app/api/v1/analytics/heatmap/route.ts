@@ -20,39 +20,50 @@ export async function GET(req: NextRequest) {
         lte: new Date(`${year}-12-31`),
       },
     },
-    select: { date: true, status: true },
+    select: { date: true, status: true, subject: { select: { name: true } } },
     orderBy: { date: "asc" },
   });
 
   // Group by date
-  const byDate = new Map<string, { present: number; absent: number; late: number; excused: number; cancelled: number; total: number }>();
+  type DayStats = {
+    total: number;
+    present: string[];
+    absent: string[];
+    late: string[];
+    excused: string[];
+    cancelled: string[];
+  };
+  
+  const byDate = new Map<string, DayStats>();
   for (const r of records) {
     const dateStr = new Date(r.date).toISOString().slice(0, 10);
     if (!byDate.has(dateStr)) {
-      byDate.set(dateStr, { present: 0, absent: 0, late: 0, excused: 0, cancelled: 0, total: 0 });
+      byDate.set(dateStr, { present: [], absent: [], late: [], excused: [], cancelled: [], total: 0 });
     }
     const entry = byDate.get(dateStr)!;
     entry.total++;
-    if (r.status === "present") entry.present++;
-    else if (r.status === "absent") entry.absent++;
-    else if (r.status === "late") entry.late++;
-    else if (r.status === "excused") entry.excused++;
-    else if (r.status === "cancelled" || r.status === "holiday") entry.cancelled++;
+    
+    const subjectName = r.subject?.name || "Unknown";
+    if (r.status === "present") entry.present.push(subjectName);
+    else if (r.status === "absent") entry.absent.push(subjectName);
+    else if (r.status === "late") entry.late.push(subjectName);
+    else if (r.status === "excused") entry.excused.push(subjectName);
+    else if (r.status === "cancelled" || r.status === "holiday") entry.cancelled.push(subjectName);
   }
 
   const data = Array.from(byDate.entries()).map(([date, stats]) => {
     let intensity = 0;
     if (stats.total === 0) {
       intensity = 0;
-    } else if (stats.cancelled === stats.total) {
+    } else if (stats.cancelled.length === stats.total) {
       intensity = 5; // Full day cancelled
-    } else if (stats.cancelled > 0) {
+    } else if (stats.cancelled.length > 0) {
       intensity = 6; // Partial cancelled
-    } else if (stats.present + stats.late === stats.total) {
+    } else if (stats.present.length + stats.late.length === stats.total) {
       intensity = 4;
-    } else if (stats.present + stats.late > stats.absent) {
+    } else if (stats.present.length + stats.late.length > stats.absent.length) {
       intensity = 3;
-    } else if (stats.present + stats.late > 0) {
+    } else if (stats.present.length + stats.late.length > 0) {
       intensity = 2;
     } else {
       intensity = 1;
@@ -61,10 +72,16 @@ export async function GET(req: NextRequest) {
     return {
       date,
       count: stats.total,
-      present: stats.present,
-      absent: stats.absent,
-      late: stats.late,
-      cancelled: stats.cancelled,
+      present: stats.present.length,
+      absent: stats.absent.length,
+      late: stats.late.length,
+      cancelled: stats.cancelled.length,
+      excused: stats.excused.length,
+      presentSubjects: stats.present,
+      absentSubjects: stats.absent,
+      lateSubjects: stats.late,
+      cancelledSubjects: stats.cancelled,
+      excusedSubjects: stats.excused,
       intensity,
     };
   });
