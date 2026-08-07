@@ -246,26 +246,54 @@ export default function AnalyticsPage() {
           <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 300ms forwards" }}>
             <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Subject Breakdown</h3>
           <StaggerGrid className="space-y-3" delay={350} staggerDelay={50} animation="fadeSlideLeft">
-            {(dashboard.subjectsSummary || dashboard.subjects || []).map((s: any) => (
-              <div key={s.id} className="rounded-2xl border-2 p-4 flex items-center gap-4 group transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: s.colorHex || "#FF2D78" }}>
-                <div className="flex-1 min-w-0">
+            {(dashboard.subjectsSummary || dashboard.subjects || []).map((s: any) => {
+              const color = s.colorHex || "#FF2D78";
+              return (
+              <div 
+                key={s.id} 
+                className="group relative overflow-hidden rounded-2xl border-2 p-4 flex items-center gap-4 transition-all duration-300"
+                style={{ 
+                  borderLeftWidth: "4px", 
+                  borderLeftColor: color,
+                  borderColor: `${color}80`,
+                  backgroundColor: `${color}1A`,
+                  boxShadow: `0 4px 0 0 ${color}60`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 2px 0 0 ${color}60`;
+                  e.currentTarget.style.transform = `translateY(2px)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = `0 4px 0 0 ${color}60`;
+                  e.currentTarget.style.transform = '';
+                }}
+              >
+                {/* Shimmer */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: `linear-gradient(135deg, ${color}1A 0%, ${color}30 50%, ${color}1A 100%)`,
+                    backgroundSize: "200% 200%",
+                    animation: "subjectCardShimmer 3s ease-in-out infinite",
+                  }} />
+                  
+                <div className="relative z-10 flex-1 min-w-0">
                   <p className="font-bold text-sm text-[#1a1a2e] dark:text-white break-words">{s.name}</p>
-                  <div className="h-2 w-full rounded-full bg-gray-200 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35] mt-2">
+                  <div className="h-2 w-full rounded-full bg-gray-200/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] dark:bg-[#1f1f35]/50 mt-2">
                     <div className={clsx("h-full rounded-full transition-all duration-500 shadow-[0_2px_0_0_rgba(0,0,0,0.2)]",
                       s.statusColor === "green" ? "bg-[#06d6a0]" : s.statusColor === "yellow" ? "bg-[#ff6b35]" : "bg-[#ef476f]"
                     )} style={{ width: `${Math.min(100, s.currentPercentage)}%` }} />
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className={clsx("text-lg font-extrabold tracking-tight",
+                <div className="relative z-10 text-right shrink-0">
+                  <span className={clsx("text-lg font-extrabold tracking-tight drop-shadow-sm",
                     s.statusColor === "green" ? "text-[#06d6a0]" : s.statusColor === "yellow" ? "text-[#ff6b35]" : "text-[#ef476f]"
                   )}>{s.currentPercentage}%</span>
-                  <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">
                     {s.statusColor === "red" ? `Need ${s.mustAttendCount}` : `Skip ${s.canSkipCount}`}
                   </p>
                 </div>
               </div>
-            ))}
+            )})}
             </StaggerGrid>
           </div>
         </>

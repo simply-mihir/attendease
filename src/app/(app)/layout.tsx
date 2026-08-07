@@ -268,7 +268,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto bg-transparent relative">
-          <div className="p-4 sm:p-6 lg:p-8 min-h-full pb-20 md:pb-8">
+          <div className="p-4 sm:p-6 lg:p-8 min-h-full pb-28 lg:pb-24">
             <ReminderNotifier />
             <div key={pathname} className="animate-fade-in">
               {children}
