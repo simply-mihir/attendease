@@ -102,7 +102,15 @@ export default function AnalyticsPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (scrollRef.current && yearsData.length > 0) {
-      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+      const timeoutId = setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            left: scrollRef.current.scrollWidth,
+            behavior: 'instant'
+          });
+        }
+      }, 50);
+      return () => clearTimeout(timeoutId);
     }
   }, [yearsData.length]);
 
