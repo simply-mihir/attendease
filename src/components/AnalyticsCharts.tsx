@@ -305,6 +305,30 @@ function FuturisticDonut({
       <div className="relative z-10 flex justify-center py-1">
         <svg viewBox="0 0 180 180" className="w-[200px] h-[200px]">
           <defs>
+            {/* Scanner sweep gradient */}
+            <linearGradient
+              id="scannerGrad"
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="0"
+            >
+              <stop
+                offset="0%"
+                stopColor="white"
+                stopOpacity="0"
+              />
+              <stop
+                offset="40%"
+                stopColor="white"
+                stopOpacity="1"
+              />
+              <stop
+                offset="100%"
+                stopColor="white"
+                stopOpacity="0"
+              />
+            </linearGradient>
             {segments.map((seg, i) => (
               <filter
                 key={`f-${i}`}
@@ -463,39 +487,77 @@ function FuturisticDonut({
               );
             })}
 
-          {/* ─── Orbiting accent dot ─── */}
-          <circle
-            cx={cx + (outerR + innerR) / 2}
-            cy={cy}
-            r="1.8"
-            fill="white"
-            opacity="0.4"
+          {/* ─── Rotating scanner sweep ─── */}
+          <path
+            d={arcPath(cx, cy, outerR + 1, innerR - 1, -90, 65)}
+            fill="url(#scannerGrad)"
+            opacity="0.1"
           >
             <animateTransform
               attributeName="transform"
               type="rotate"
               from={`0 ${cx} ${cy}`}
               to={`360 ${cx} ${cy}`}
-              dur="9s"
+              dur="4.5s"
               repeatCount="indefinite"
             />
-          </circle>
-          <circle
-            cx={cx + (outerR + innerR) / 2}
-            cy={cy}
-            r="1.2"
-            fill="white"
-            opacity="0.25"
-          >
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              from={`180 ${cx} ${cy}`}
-              to={`540 ${cx} ${cy}`}
-              dur="9s"
-              repeatCount="indefinite"
-            />
-          </circle>
+          </path>
+
+          {/* ─── Per-segment energy particles ─── */}
+          {progress > 0.9 &&
+            segments.map((seg, i) => {
+              const midR = (outerR + innerR) / 2;
+              const startPt = toXY(
+                cx,
+                cy,
+                seg.startDeg,
+                midR
+              );
+              return (
+                <g key={`energy-${i}`}>
+                  {/* Particle glow trail */}
+                  <circle
+                    cx={startPt.x}
+                    cy={startPt.y}
+                    r="4"
+                    fill={seg.color}
+                    opacity="0.15"
+                    style={{
+                      filter: `blur(3px)`,
+                    }}
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from={`0 ${cx} ${cy}`}
+                      to={`${seg.deg} ${cx} ${cy}`}
+                      dur={`${2.5 + i * 0.8}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                  {/* Particle core */}
+                  <circle
+                    cx={startPt.x}
+                    cy={startPt.y}
+                    r="1.8"
+                    fill={seg.color}
+                    opacity="0.75"
+                    style={{
+                      filter: `drop-shadow(0 0 3px ${seg.color})`,
+                    }}
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from={`0 ${cx} ${cy}`}
+                      to={`${seg.deg} ${cx} ${cy}`}
+                      dur={`${2.5 + i * 0.8}s`}
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+              );
+            })}
 
           {/* ─── Inner spinning dashed ring ─── */}
           <circle
@@ -517,26 +579,6 @@ function FuturisticDonut({
               repeatCount="indefinite"
             />
           </circle>
-
-          {/* ─── Segment boundary pulse dots ─── */}
-          {progress > 0.85 &&
-            segments.map((seg, i) => {
-              const midR = (outerR + innerR) / 2;
-              const pt = toXY(cx, cy, seg.startDeg, midR);
-              return (
-                <circle
-                  key={`bdot-${i}`}
-                  cx={pt.x}
-                  cy={pt.y}
-                  r="1.8"
-                  fill="white"
-                  className="futuristic-dot-pulse"
-                  style={{
-                    animationDelay: `${i * 0.35}s`,
-                  }}
-                />
-              );
-            })}
 
           {/* ─── Center ─── */}
           <text
