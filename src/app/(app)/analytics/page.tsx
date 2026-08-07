@@ -185,8 +185,8 @@ export default function AnalyticsPage() {
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap — {year}</h3>
-        <div className="overflow-x-auto pt-[280px] -mt-[280px] relative z-10">
-          <div className="flex justify-between w-full min-w-[700px] mt-[280px]">
+        <div className="overflow-x-auto pb-4">
+          <div className="flex justify-between w-full min-w-[700px]">
             {weeks.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-1">
                 {week.map((day, di) => (
@@ -207,7 +207,10 @@ export default function AnalyticsPage() {
                     
                     {/* Tooltip */}
                     {day.date && day.intensity !== -1 && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 rounded-xl border border-gray-200 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 dark:border-[#2a2a3d] dark:bg-[#1a1a2e] scale-95 group-hover:scale-100 pointer-events-none">
+                      <div className={clsx(
+                        "absolute left-1/2 -translate-x-1/2 w-48 p-3 rounded-xl border border-gray-200 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 dark:border-[#2a2a3d] dark:bg-[#1a1a2e] scale-95 group-hover:scale-100 pointer-events-none",
+                        di < 3 ? "top-full mt-2" : "bottom-full mb-2"
+                      )}>
                         <p className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">{day.date}</p>
                         {day.stats && day.stats.count > 0 ? (
                           <div className="space-y-1.5">
@@ -286,8 +289,17 @@ export default function AnalyticsPage() {
                         )}
                         
                         {/* Triangle pointers */}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-white dark:border-t-[#1a1a2e] z-10" />
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-[1px] border-[6px] border-transparent border-t-gray-200 dark:border-t-[#2a2a3d] -z-10" />
+                        {di < 3 ? (
+                          <>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-[6px] border-transparent border-b-white dark:border-b-[#1a1a2e] z-10" />
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[1px] border-[6px] border-transparent border-b-gray-200 dark:border-b-[#2a2a3d] -z-10" />
+                          </>
+                        ) : (
+                          <>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-white dark:border-t-[#1a1a2e] z-10" />
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-[1px] border-[6px] border-transparent border-t-gray-200 dark:border-t-[#2a2a3d] -z-10" />
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
