@@ -198,22 +198,31 @@ export default function AnalyticsPage() {
                       day.intensity === 1 ? "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" :
                       day.intensity === 2 ? "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" :
                       day.intensity === 3 ? "bg-[#00f5d4] shadow-[0_2px_0_0_#00c4a7]" :
-                      day.intensity === 4 ? "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" : "transparent"
+                      day.intensity === 4 ? "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" :
+                      day.intensity === 5 ? "bg-[#9ca3af] shadow-[0_2px_0_0_#6b7280] dark:bg-[#6b7280] dark:shadow-[0_2px_0_0_#4b5563]" :
+                      day.intensity === 6 ? "bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" : "transparent"
                     )}
-                    title={day.date ? `${day.date}: ${["No class","Missed","Mixed","Mostly present","Perfect"][day.intensity] || ""}` : ""}
+                    title={day.date ? `${day.date}: ${["No class","Missed","Mixed","Mostly present","Perfect","Full day cancelled","Partial cancelled"][day.intensity] || ""}` : ""}
                   />
                 ))}
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">
+          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap">
             <span>Less</span>
-            <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#ff6b35]" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#00f5d4]" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#06d6a0]" />
+            <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" title="No class" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" title="Missed" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#ff6b35]" title="Mixed" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#00f5d4]" title="Mostly present" />
+            <div className="w-3.5 h-3.5 rounded-md bg-[#06d6a0]" title="Perfect" />
             <span>More</span>
+            
+            <div className="w-[1px] h-4 bg-gray-300 dark:bg-gray-700 mx-2" />
+            
+            <div className="w-3.5 h-3.5 rounded-md bg-[#9ca3af] dark:bg-[#6b7280]" title="Full day cancelled" />
+            <span>Cancelled</span>
+            <div className="w-3.5 h-3.5 rounded-md bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" title="Partial cancelled" />
+            <span>Partial</span>
           </div>
         </div>
       </div>
