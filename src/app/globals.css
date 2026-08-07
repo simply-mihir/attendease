@@ -1547,14 +1547,14 @@ html.dark .feature-glass-card:hover {
   );
 }
 
-.futuristic-bar-scan {
-  animation: futuristicBarScan 2.8s linear infinite;
+.futuristic-bar-shimmer {
+  animation: futuristicBarShimmer 2.4s ease-in-out infinite;
 }
-@keyframes futuristicBarScan {
-  0%   { top: 100%; opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { top: -2px; opacity: 0; }
+@keyframes futuristicBarShimmer {
+  0%   { left: -35%; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
 }
 
 .futuristic-glow-pulse {

@@ -208,21 +208,36 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-4 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap">
-            <span>Less</span>
-            <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" title="No class" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f]" title="Missed" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#ff6b35]" title="Mixed" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#00f5d4]" title="Mostly present" />
-            <div className="w-3.5 h-3.5 rounded-md bg-[#06d6a0]" title="Perfect" />
-            <span>More</span>
-            
-            <div className="w-[1px] h-4 bg-gray-300 dark:bg-gray-700 mx-2" />
-            
-            <div className="w-3.5 h-3.5 rounded-md bg-[#9ca3af] dark:bg-[#6b7280]" title="Full day cancelled" />
-            <span>Cancelled</span>
-            <div className="w-3.5 h-3.5 rounded-md bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" title="Partial cancelled" />
-            <span>Partial</span>
+          <div className="flex items-center gap-4 mt-5 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap justify-center md:justify-start">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-gray-200 dark:bg-[#1f1f35]" />
+              <span>No class</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" />
+              <span>Missed</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" />
+              <span>Mixed</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#00f5d4] shadow-[0_2px_0_0_#00c4a7]" />
+              <span>Mostly present</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" />
+              <span>Perfect</span>
+            </div>
+            <div className="w-[1px] h-4 bg-gray-300 dark:bg-gray-700 mx-0.5 hidden lg:block" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#9ca3af] shadow-[0_2px_0_0_#6b7280] dark:bg-[#6b7280] dark:shadow-[0_2px_0_0_#4b5563]" />
+              <span>Cancelled</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3.5 h-3.5 rounded-md bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" />
+              <span>Partial Cancelled</span>
+            </div>
           </div>
         </div>
       </div>
