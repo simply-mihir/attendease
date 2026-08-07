@@ -1572,3 +1572,11 @@ html.dark .feature-glass-card:hover {
   0%   { opacity: 0.3; }
   100% { opacity: 1; }
 }
+
+.futuristic-status-dot-pulse {
+  animation: futuristicStatusDotPulse 2.5s ease-in-out infinite alternate;
+}
+@keyframes futuristicStatusDotPulse {
+  0%   { box-shadow: 0 0 4px currentColor; }
+  100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+}

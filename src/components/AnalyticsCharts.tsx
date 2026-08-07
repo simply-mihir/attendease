@@ -8,6 +8,8 @@ import {
   AlertOctagon,
 } from "lucide-react";
 
+/* ─── Types ─── */
+
 interface AnalyticsChartsProps {
   barData: { name: string; percentage: number; fill: string }[];
   pieData: {
@@ -17,6 +19,8 @@ interface AnalyticsChartsProps {
     subjects?: string[];
   }[];
 }
+
+/* ─── Root ─── */
 
 export default function AnalyticsCharts({
   barData,
@@ -39,9 +43,9 @@ export default function AnalyticsCharts({
   );
 }
 
-/* ───────────────────────────────────────────────
-   Horizontal Bar Chart — full subject names
-   ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   Horizontal Bar Chart
+   ═══════════════════════════════════════════════ */
 
 function FuturisticBarChart({
   data,
@@ -94,25 +98,36 @@ function FuturisticBarChart({
               onMouseLeave={() => setHoveredIdx(null)}
             >
               {/* Label row */}
-              <div className="flex items-baseline justify-between mb-1.5 gap-3">
-                <span
-                  className="text-[11px] font-bold leading-tight transition-colors duration-200"
-                  style={{
-                    color: isHover ? d.fill : undefined,
-                  }}
-                >
+              <div className="flex items-center justify-between mb-1.5 gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  {/* Status indicator dot — matches donut colors */}
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: d.fill,
+                      boxShadow: isHover
+                        ? `0 0 8px ${d.fill}80`
+                        : `0 0 4px ${d.fill}40`,
+                      transition: "box-shadow 0.3s",
+                    }}
+                  />
                   <span
-                    className={
-                      isHover
-                        ? ""
-                        : "text-[#4a4a5a] dark:text-[#9ca3af]"
-                    }
+                    className="text-[11px] font-bold leading-tight transition-colors duration-200 truncate"
+                    style={{ color: isHover ? d.fill : undefined }}
                   >
-                    {d.name}
+                    <span
+                      className={
+                        isHover
+                          ? ""
+                          : "text-[#4a4a5a] dark:text-[#9ca3af]"
+                      }
+                    >
+                      {d.name}
+                    </span>
                   </span>
-                </span>
+                </div>
                 <span
-                  className="text-[11px] font-extrabold tabular-nums ml-2 shrink-0"
+                  className="text-[11px] font-extrabold tabular-nums shrink-0"
                   style={{
                     color: d.fill,
                     textShadow: isHover
@@ -128,15 +143,15 @@ function FuturisticBarChart({
               {/* Bar track */}
               <div
                 className="relative h-2.5 rounded-full"
-                style={{
-                  background: "rgba(128,128,128,0.07)",
-                }}
+                style={{ background: "rgba(128,128,128,0.07)" }}
               >
                 {/* Fill */}
                 <div
                   className="absolute inset-y-0 left-0 rounded-full overflow-hidden"
                   style={{
-                    width: mounted ? `${d.percentage}%` : "0%",
+                    width: mounted
+                      ? `${d.percentage}%`
+                      : "0%",
                     background: `linear-gradient(90deg, ${d.fill}55, ${d.fill}BB, ${d.fill})`,
                     boxShadow: isHover
                       ? `0 0 16px ${d.fill}45, inset 0 1px 0 rgba(255,255,255,0.2)`
@@ -144,9 +159,7 @@ function FuturisticBarChart({
                     transition: `width 1s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.1}s, box-shadow 0.3s`,
                   }}
                 >
-                  {/* Glass highlight */}
                   <div className="absolute inset-0 bg-gradient-to-b from-white/[0.12] to-transparent" />
-                  {/* Travelling shimmer */}
                   <div
                     className="absolute inset-y-0 w-[35%] futuristic-bar-shimmer"
                     style={{
@@ -174,34 +187,13 @@ function FuturisticBarChart({
           );
         })}
       </div>
-
-      {/* Hover detail chip */}
-      {hoveredIdx !== null && (
-        <div
-          className="absolute top-4 right-4 px-3 py-1.5 rounded-xl text-[10px] font-bold z-20 border backdrop-blur-sm"
-          style={{
-            background: "rgba(20,20,37,0.88)",
-            borderColor: `${data[hoveredIdx].fill}40`,
-            color: "#fff",
-            boxShadow: `0 4px 20px rgba(0,0,0,0.25), 0 0 10px ${data[hoveredIdx].fill}15`,
-          }}
-        >
-          <span style={{ color: data[hoveredIdx].fill }}>
-            {data[hoveredIdx].name}
-          </span>
-          <span className="text-[#6b7280] mx-1.5">&middot;</span>
-          <span className="tabular-nums">
-            {data[hoveredIdx].percentage}%
-          </span>
-        </div>
-      )}
     </div>
   );
 }
 
-/* ───────────────────────────────────────────────
-   Donut Chart — animated arcs with gaps
-   ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   Status Distribution — Animated Ring Donut
+   ═══════════════════════════════════════════════ */
 
 function toXY(cx: number, cy: number, deg: number, r: number) {
   const rad = (deg * Math.PI) / 180;
@@ -226,7 +218,7 @@ function arcPath(
   return `M${os.x},${os.y} A${outerR},${outerR} 0 ${lg} 1 ${oe.x},${oe.y} L${is_.x},${is_.y} A${innerR},${innerR} 0 ${lg} 0 ${ie.x},${ie.y} Z`;
 }
 
-const iconMap: Record<string, typeof Shield> = {
+const ICON_MAP: Record<string, typeof Shield> = {
   Safe: Shield,
   Warning: AlertTriangle,
   Danger: AlertOctagon,
@@ -246,7 +238,7 @@ function FuturisticDonut({
   useEffect(() => {
     if (!mounted) return;
     let start = 0;
-    const dur = 1400;
+    const dur = 1500;
     function tick(ts: number) {
       if (!start) start = ts;
       const t = Math.min((ts - start) / dur, 1);
@@ -272,32 +264,35 @@ function FuturisticDonut({
 
   const cx = 90,
     cy = 90,
-    outerR = 72,
-    innerR = 48;
-  const gapDeg = data.length > 1 ? 3 : 0;
+    outerR = 74,
+    innerR = 50;
+  const gapDeg = data.length > 1 ? 4 : 0;
 
   let cumDeg = -90;
   const segments = data.map((d) => {
     const rawDeg = (d.value / total) * 360;
     const deg = Math.max(rawDeg - gapDeg, 0.5);
-    const seg = { ...d, startDeg: cumDeg + gapDeg / 2, deg };
+    const startDeg = cumDeg + gapDeg / 2;
+    const midDeg = startDeg + deg / 2;
+    const proportion = d.value / total;
+    const seg = { ...d, startDeg, deg, midDeg, proportion };
     cumDeg += rawDeg;
     return seg;
   });
 
   return (
     <div className="card-3d p-6 relative overflow-hidden">
-      {/* Ambient conic glow */}
+      {/* Ambient rotating conic glow */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full blur-3xl futuristic-glow-pulse"
+          className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full blur-3xl futuristic-glow-pulse"
           style={{
             background: `conic-gradient(from 0deg, ${data
               .map(
                 (d, i) =>
-                  `${d.color}20 ${(i / data.length) * 100}%`
+                  `${d.color}18 ${(i / data.length) * 100}%`
               )
-              .join(", ")}, ${data[0]?.color}20 100%)`,
+              .join(", ")}, ${data[0]?.color}18 100%)`,
           }}
         />
       </div>
@@ -306,26 +301,27 @@ function FuturisticDonut({
         Status Distribution
       </h3>
 
-      <div className="relative z-10 flex justify-center py-2">
-        <svg viewBox="0 0 180 180" className="w-44 h-44">
+      {/* Donut SVG */}
+      <div className="relative z-10 flex justify-center py-1">
+        <svg viewBox="0 0 180 180" className="w-[200px] h-[200px]">
           <defs>
-            {data.map((d, i) => (
+            {segments.map((seg, i) => (
               <filter
-                key={i}
-                id={`aG2-${i}`}
-                x="-25%"
-                y="-25%"
-                width="150%"
-                height="150%"
+                key={`f-${i}`}
+                id={`segGlow-${i}`}
+                x="-30%"
+                y="-30%"
+                width="160%"
+                height="160%"
               >
                 <feGaussianBlur
                   in="SourceGraphic"
-                  stdDeviation="2.5"
+                  stdDeviation="3"
                   result="blur"
                 />
                 <feFlood
-                  floodColor={d.color}
-                  floodOpacity="0.4"
+                  floodColor={seg.color}
+                  floodOpacity="0.5"
                 />
                 <feComposite in2="blur" operator="in" />
                 <feMerge>
@@ -347,49 +343,49 @@ function FuturisticDonut({
             strokeWidth={outerR - innerR}
           />
 
-          {/* Outer decorative ring */}
+          {/* Outer decorative dashed ring — counter-rotates */}
           <circle
             cx={cx}
             cy={cy}
-            r={outerR + 5}
+            r={outerR + 6}
             fill="none"
             stroke="currentColor"
             strokeOpacity="0.04"
             strokeWidth="0.5"
-            strokeDasharray="2 6"
+            strokeDasharray="2 7"
           >
             <animateTransform
               attributeName="transform"
               type="rotate"
               from={`0 ${cx} ${cy}`}
               to={`-360 ${cx} ${cy}`}
-              dur="30s"
+              dur="35s"
               repeatCount="indefinite"
             />
           </circle>
 
-          {/* Arc segments */}
+          {/* ─── Arc segments ─── */}
           {segments.map((seg, i) => {
             const animDeg = seg.deg * progress;
             if (animDeg < 0.3) return null;
             const isHover = hoveredIdx === i;
             const oR = isHover ? outerR + 4 : outerR;
-            const iR = isHover ? innerR - 2 : innerR;
+            const iR = isHover ? innerR - 3 : innerR;
 
             return (
               <g key={i}>
-                {/* Glow behind */}
+                {/* Soft glow behind */}
                 <path
                   d={arcPath(
                     cx,
                     cy,
-                    oR + 3,
-                    iR - 3,
+                    oR + 4,
+                    iR - 4,
                     seg.startDeg,
                     animDeg
                   )}
                   fill={seg.color}
-                  opacity={isHover ? 0.2 : 0.06}
+                  opacity={isHover ? 0.22 : 0.07}
                   style={{ filter: "blur(6px)" }}
                 />
                 {/* Main arc */}
@@ -405,7 +401,9 @@ function FuturisticDonut({
                   fill={seg.color}
                   opacity={isHover ? 1 : 0.82}
                   filter={
-                    isHover ? `url(#aG2-${i})` : undefined
+                    isHover
+                      ? `url(#segGlow-${i})`
+                      : undefined
                   }
                   onMouseEnter={() => setHoveredIdx(i)}
                   onMouseLeave={() => setHoveredIdx(null)}
@@ -414,18 +412,99 @@ function FuturisticDonut({
                     transition: "opacity 0.25s",
                   }}
                 />
+                {/* Bright outer edge highlight */}
+                {animDeg > 2 && (
+                  <path
+                    d={arcPath(
+                      cx,
+                      cy,
+                      oR,
+                      oR - 1.5,
+                      seg.startDeg,
+                      animDeg
+                    )}
+                    fill={seg.color}
+                    opacity={isHover ? 0.7 : 0.35}
+                    style={{ transition: "opacity 0.3s" }}
+                  />
+                )}
               </g>
             );
           })}
 
-          {/* Inner spinning dashed ring */}
+          {/* ─── Percentage labels at segment midpoints ─── */}
+          {progress > 0.88 &&
+            segments.map((seg, i) => {
+              const pct = Math.round(seg.proportion * 100);
+              if (pct < 8) return null;
+              const labelR = outerR + 14;
+              const midRad =
+                (seg.midDeg * Math.PI) / 180;
+              const lx = cx + labelR * Math.cos(midRad);
+              const ly = cy + labelR * Math.sin(midRad);
+              return (
+                <text
+                  key={`pct-${i}`}
+                  x={lx}
+                  y={ly}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={seg.color}
+                  fontSize="8"
+                  fontWeight="800"
+                  style={{
+                    opacity: mounted ? 1 : 0,
+                    transition: `opacity 0.5s ${i * 0.15 + 1.1}s`,
+                    filter: `drop-shadow(0 0 3px ${seg.color}60)`,
+                  }}
+                >
+                  {pct}%
+                </text>
+              );
+            })}
+
+          {/* ─── Orbiting accent dot ─── */}
+          <circle
+            cx={cx + (outerR + innerR) / 2}
+            cy={cy}
+            r="1.8"
+            fill="white"
+            opacity="0.4"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from={`0 ${cx} ${cy}`}
+              to={`360 ${cx} ${cy}`}
+              dur="9s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle
+            cx={cx + (outerR + innerR) / 2}
+            cy={cy}
+            r="1.2"
+            fill="white"
+            opacity="0.25"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from={`180 ${cx} ${cy}`}
+              to={`540 ${cx} ${cy}`}
+              dur="9s"
+              repeatCount="indefinite"
+            />
+          </circle>
+
+          {/* ─── Inner spinning dashed ring ─── */}
           <circle
             cx={cx}
             cy={cy}
-            r={innerR - 6}
+            r={innerR - 7}
             fill="none"
             stroke="currentColor"
-            strokeOpacity="0.06"
+            strokeOpacity="0.05"
             strokeWidth="0.8"
             strokeDasharray="3 5"
           >
@@ -434,37 +513,39 @@ function FuturisticDonut({
               type="rotate"
               from={`0 ${cx} ${cy}`}
               to={`360 ${cx} ${cy}`}
-              dur="20s"
+              dur="22s"
               repeatCount="indefinite"
             />
           </circle>
 
-          {/* Boundary dots */}
+          {/* ─── Segment boundary pulse dots ─── */}
           {progress > 0.85 &&
             segments.map((seg, i) => {
               const midR = (outerR + innerR) / 2;
               const pt = toXY(cx, cy, seg.startDeg, midR);
               return (
                 <circle
-                  key={`dot-${i}`}
+                  key={`bdot-${i}`}
                   cx={pt.x}
                   cy={pt.y}
                   r="1.8"
                   fill="white"
                   className="futuristic-dot-pulse"
-                  style={{ animationDelay: `${i * 0.4}s` }}
+                  style={{
+                    animationDelay: `${i * 0.35}s`,
+                  }}
                 />
               );
             })}
 
-          {/* Center counter */}
+          {/* ─── Center ─── */}
           <text
             x={cx}
-            y={cy - 3}
+            y={cy - 4}
             textAnchor="middle"
             dominantBaseline="central"
             className="fill-[#1a1a2e] dark:fill-white"
-            fontSize="22"
+            fontSize="24"
             fontWeight="900"
           >
             {Math.round(total * progress)}
@@ -483,59 +564,78 @@ function FuturisticDonut({
         </svg>
       </div>
 
-      {/* Hover tooltip */}
-      {hoveredIdx !== null && (
-        <div
-          className="absolute top-3 right-3 px-2.5 py-1.5 rounded-lg text-[10px] font-bold z-20 border"
-          style={{
-            background: "rgba(20,20,37,0.9)",
-            borderColor: `${data[hoveredIdx].color}40`,
-            color: data[hoveredIdx].color,
-            boxShadow: `0 0 12px ${data[hoveredIdx].color}15`,
-          }}
-        >
-          {data[hoveredIdx].name}: {data[hoveredIdx].value}
-        </div>
-      )}
-
-      {/* Legend */}
-      <div className="mt-2 space-y-2.5 px-1 max-h-36 overflow-y-auto custom-scrollbar relative z-10">
+      {/* ─── Legend with proportion mini-bars ─── */}
+      <div className="mt-1 space-y-3 px-1 relative z-10">
         {data.map((group, i) => {
-          const Icon = iconMap[group.name];
+          const Icon = ICON_MAP[group.name];
+          const pct =
+            total > 0
+              ? Math.round((group.value / total) * 100)
+              : 0;
           return (
             <div
               key={i}
-              className="text-sm"
               style={{
                 opacity: mounted ? 1 : 0,
                 transform: mounted
-                  ? "translateX(0)"
-                  : "translateX(-10px)",
-                transition: `all 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.12 + 0.9}s`,
+                  ? "translateY(0)"
+                  : "translateY(8px)",
+                transition: `all 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.12 + 1}s`,
               }}
             >
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{
-                    backgroundColor: group.color,
-                    boxShadow: `0 0 6px ${group.color}60`,
-                  }}
-                />
-                {Icon && (
-                  <Icon
-                    className="w-3.5 h-3.5 shrink-0"
-                    style={{ color: group.color }}
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full shrink-0 futuristic-status-dot-pulse"
+                    style={{
+                      backgroundColor: group.color,
+                      boxShadow: `0 0 6px ${group.color}50`,
+                      animationDelay: `${i * 0.5}s`,
+                    }}
                   />
-                )}
+                  {Icon && (
+                    <Icon
+                      className="w-3.5 h-3.5 shrink-0"
+                      style={{ color: group.color }}
+                    />
+                  )}
+                  <span
+                    className="text-[11px] font-black"
+                    style={{ color: group.color }}
+                  >
+                    {group.name}
+                  </span>
+                </div>
                 <span
-                  className="font-black"
+                  className="text-[10px] font-extrabold tabular-nums"
                   style={{ color: group.color }}
                 >
-                  {group.name}: {group.value}
+                  {group.value}{" "}
+                  <span className="opacity-60">({pct}%)</span>
                 </span>
               </div>
-              <p className="text-[#4a4a5a] dark:text-[#6b6b80] mt-0.5 text-xs leading-relaxed font-semibold pl-5">
+
+              {/* Mini proportion bar */}
+              <div
+                className="h-1 rounded-full ml-[18px]"
+                style={{
+                  background: "rgba(128,128,128,0.07)",
+                }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: mounted ? `${pct}%` : "0%",
+                    background: `linear-gradient(90deg, ${group.color}80, ${group.color})`,
+                    boxShadow: `0 0 6px ${group.color}30`,
+                    transition: `width 0.9s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.12 + 1.2}s`,
+                  }}
+                />
+              </div>
+
+              {/* Subject names */}
+              <p className="text-[#4a4a5a] dark:text-[#6b6b80] mt-1 text-[10px] leading-relaxed font-semibold ml-[18px]">
                 {group.subjects && group.subjects.length > 0
                   ? group.subjects.join(", ")
                   : "None"}
