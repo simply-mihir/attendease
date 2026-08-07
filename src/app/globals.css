@@ -1535,3 +1535,40 @@ html.dark .feature-glass-card:hover {
   0%   { transform: scale(0); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* ── Futuristic Analytics Chart Animations ── */
+.futuristic-scanline-bg {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    currentColor 2px,
+    currentColor 3px
+  );
+}
+
+.futuristic-bar-scan {
+  animation: futuristicBarScan 2.8s linear infinite;
+}
+@keyframes futuristicBarScan {
+  0%   { top: 100%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: -2px; opacity: 0; }
+}
+
+.futuristic-glow-pulse {
+  animation: futuristicGlowPulse 3.5s ease-in-out infinite alternate;
+}
+@keyframes futuristicGlowPulse {
+  0%   { opacity: 0.15; }
+  100% { opacity: 0.4; }
+}
+
+.futuristic-dot-pulse {
+  animation: futuristicDotPulse 2s ease-in-out infinite alternate;
+}
+@keyframes futuristicDotPulse {
+  0%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
