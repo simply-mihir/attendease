@@ -101,6 +101,7 @@ export default function AnalyticsPage() {
   }
 
   return (
+    <>
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 0ms forwards" }}>
