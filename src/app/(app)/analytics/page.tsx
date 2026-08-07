@@ -62,41 +62,49 @@ export default function AnalyticsPage() {
     const y = firstDate.getFullYear();
     if (!isNaN(y)) earliestYear = Math.min(y, currentYear);
   }
-
-  const startDate = new Date(earliestYear, 0, 1);
-  const endDate = new Date(currentYear, 11, 31);
-  const startDay = startDate.getDay();
-  const weeks: { date: string; intensity: number; stats?: any }[][] = [];
-  let currentWeek: { date: string; intensity: number; stats?: any }[] = [];
-
-  // Pad first week
-  for (let i = 0; i < startDay; i++) currentWeek.push({ date: "", intensity: -1 });
-
-  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-    const dateStr = getLocalDateStr(d);
-    const entry = heatmapMap.get(dateStr);
-    currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0, stats: entry });
-    if (currentWeek.length === 7) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
+  
+  // Guarantee at least one past year for scrolling purposes
+  if (earliestYear === currentYear) {
+    earliestYear = currentYear - 1;
   }
-  if (currentWeek.length > 0) weeks.push(currentWeek);
+
+  type YearData = { year: number; weeks: { date: string; intensity: number; stats?: any }[][]; hasData: boolean };
+  const yearsData: YearData[] = [];
+
+  for (let y = earliestYear; y <= currentYear; y++) {
+    const hasData = heatmap.some((d: any) => d.date.startsWith(y.toString()));
+    const weeks: { date: string; intensity: number; stats?: any }[][] = [];
+    
+    if (hasData) {
+      let currentWeek: { date: string; intensity: number; stats?: any }[] = [];
+      const startDate = new Date(y, 0, 1);
+      const endDate = new Date(y, 11, 31);
+      const startDay = startDate.getDay();
+      
+      // Pad first week
+      for (let i = 0; i < startDay; i++) currentWeek.push({ date: "", intensity: -1 });
+
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const dateStr = getLocalDateStr(d);
+        const entry = heatmapMap.get(dateStr);
+        currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0, stats: entry });
+        if (currentWeek.length === 7) {
+          weeks.push(currentWeek);
+          currentWeek = [];
+        }
+      }
+      if (currentWeek.length > 0) weeks.push(currentWeek);
+    }
+    
+    yearsData.push({ year: y, weeks, hasData });
+  }
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (scrollRef.current && weeks.length > 0) {
+    if (scrollRef.current && yearsData.length > 0) {
       scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
     }
-  }, [weeks.length]);
-
-  const timelineMonths: { label: string, year: number }[] = [];
-  for (let y = earliestYear; y <= currentYear; y++) {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    for (const m of months) {
-      timelineMonths.push({ label: m, year: y });
-    }
-  }
+  }, [yearsData.length]);
 
   return (
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
@@ -209,12 +217,16 @@ export default function AnalyticsPage() {
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap</h3>
-        <div className="overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden" ref={scrollRef}>
-          <div className="flex justify-between w-full" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
-            {weeks.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-1">
-                {week.map((day, di) => (
-                  <div key={di} className="relative group">
+        <div className="overflow-x-auto overflow-y-hidden pb-4 [&::-webkit-scrollbar]:hidden" ref={scrollRef}>
+          <div className="flex w-full" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+            {yearsData.map((yData) => (
+              <div key={yData.year} className="flex-1 flex flex-col">
+                {yData.hasData ? (
+                  <div className="flex justify-between w-full h-full px-1">
+                    {yData.weeks.map((week, wi) => (
+                      <div key={wi} className="flex flex-col gap-1">
+                        {week.map((day, di) => (
+                          <div key={di} className="relative group">
                     <div
                       className={clsx(
                         "w-3.5 h-3.5 rounded-md transition-all",
@@ -331,28 +343,33 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-[#2a2a3d] rounded-2xl mx-2 bg-gray-50/50 dark:bg-[#1f1f35]/50 h-full min-h-[120px]">
+            <p className="text-sm font-bold text-[#9ca3af] dark:text-[#6b6b80]">No data found for {yData.year}</p>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
           
           {/* Month & Year Timeline */}
-          <div className="w-full mt-4 mb-2" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
-            <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
-              {timelineMonths.map((m, i) => (
-                <span key={`${m.year}-${i}`}>{m.label}</span>
-              ))}
-            </div>
-            <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 flex">
-              {Array.from({ length: currentYear - earliestYear + 1 }).map((_, i) => {
-                const y = earliestYear + i;
-                return (
-                  <div key={y} className="flex-1 relative border-l border-r border-transparent">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
-                        {y}
-                      </span>
-                    </div>
+          <div className="flex w-full mt-4 mb-2" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+            {yearsData.map((yData) => (
+              <div key={yData.year} className="flex-1 flex flex-col px-1">
+                <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
+                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => (
+                    <span key={m}>{m}</span>
+                  ))}
+                </div>
+                <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 relative border-l border-r border-transparent">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
+                      {yData.year}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
           
           <div className="flex items-center gap-4 mt-6 text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] flex-wrap justify-center md:justify-start">
