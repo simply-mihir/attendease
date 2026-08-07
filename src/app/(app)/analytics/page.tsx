@@ -217,10 +217,10 @@ export default function AnalyticsPage() {
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap</h3>
-        <div className="overflow-x-auto overflow-y-hidden pb-4 [&::-webkit-scrollbar]:hidden" ref={scrollRef}>
-          <div className="flex w-full" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+        <div className="overflow-x-auto overflow-y-hidden pb-4 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory scroll-smooth" ref={scrollRef}>
+          <div className="flex" style={{ width: `${(currentYear - earliestYear + 1) * 100}%`, minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
             {yearsData.map((yData) => (
-              <div key={yData.year} className="flex-1 flex flex-col">
+              <div key={yData.year} className="flex-1 flex flex-col snap-start">
                 {yData.hasData ? (
                   <div className="flex justify-between w-full h-full px-1">
                     {yData.weeks.map((week, wi) => (
@@ -353,9 +353,9 @@ export default function AnalyticsPage() {
   </div>
           
           {/* Month & Year Timeline */}
-          <div className="flex w-full mt-4 mb-2" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
+          <div className="flex mt-4 mb-2" style={{ width: `${(currentYear - earliestYear + 1) * 100}%`, minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
             {yearsData.map((yData) => (
-              <div key={yData.year} className="flex-1 flex flex-col px-1">
+              <div key={yData.year} className="flex-1 flex flex-col px-1 snap-start">
                 <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
                   {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(m => (
                     <span key={m}>{m}</span>
