@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { FieldLoader } from "@/components/FieldLoader";
 import dynamic from "next/dynamic";
@@ -27,10 +27,10 @@ const AnalyticsCharts = dynamic(
 const INTENSITY_COLORS = ["#1e293b", "#ef4444", "#f59e0b", "#86efac", "#22c55e"];
 
 export default function AnalyticsPage() {
-  const [year] = useState(new Date().getFullYear());
+  const [currentYear] = useState(new Date().getFullYear());
   
   const { data: dashboard, isLoading: dashLoading } = useSWRFetch<any>("/analytics/dashboard");
-  const { data: heatmapData, isLoading: heatLoading } = useSWRFetch<any>(`/analytics/heatmap?year=${year}`);
+  const { data: heatmapData, isLoading: heatLoading } = useSWRFetch<any>(`/analytics/heatmap`);
   
   const heatmap = heatmapData?.data || [];
   const loading = dashLoading || heatLoading;
@@ -55,7 +55,16 @@ export default function AnalyticsPage() {
   const heatmapMap = new Map<string, any>(
     heatmap.map((d: any) => [d.date, d])
   );
-  const startDate = new Date(year, 0, 1);
+  
+  let earliestYear = currentYear;
+  if (heatmap.length > 0) {
+    const firstDate = new Date(heatmap[0].date);
+    const y = firstDate.getFullYear();
+    if (!isNaN(y)) earliestYear = Math.min(y, currentYear);
+  }
+
+  const startDate = new Date(earliestYear, 0, 1);
+  const endDate = new Date(currentYear, 11, 31);
   const startDay = startDate.getDay();
   const weeks: { date: string; intensity: number; stats?: any }[][] = [];
   let currentWeek: { date: string; intensity: number; stats?: any }[] = [];
@@ -63,7 +72,7 @@ export default function AnalyticsPage() {
   // Pad first week
   for (let i = 0; i < startDay; i++) currentWeek.push({ date: "", intensity: -1 });
 
-  for (let d = new Date(startDate); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
     const dateStr = getLocalDateStr(d);
     const entry = heatmapMap.get(dateStr);
     currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0, stats: entry });
@@ -73,6 +82,21 @@ export default function AnalyticsPage() {
     }
   }
   if (currentWeek.length > 0) weeks.push(currentWeek);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollRef.current && weeks.length > 0) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    }
+  }, [weeks.length]);
+
+  const timelineMonths: { label: string, year: number }[] = [];
+  for (let y = earliestYear; y <= currentYear; y++) {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    for (const m of months) {
+      timelineMonths.push({ label: m, year: y });
+    }
+  }
 
   return (
     <PageTransition direction="scale" staggerChildren={false} className="space-y-6">
@@ -184,9 +208,9 @@ export default function AnalyticsPage() {
 
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
-        <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap — {year}</h3>
-        <div className="overflow-x-auto pb-4">
-          <div className="flex justify-between w-full min-w-[700px]">
+        <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap</h3>
+        <div className="overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden" ref={scrollRef}>
+          <div className="flex justify-between w-full" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
             {weeks.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-1">
                 {week.map((day, di) => (
@@ -309,18 +333,25 @@ export default function AnalyticsPage() {
           </div>
           
           {/* Month & Year Timeline */}
-          <div className="w-full min-w-[700px] mt-4 mb-2">
+          <div className="w-full mt-4 mb-2" style={{ minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
             <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] px-2">
-              {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(month => (
-                <span key={month}>{month}</span>
+              {timelineMonths.map((m, i) => (
+                <span key={`${m.year}-${i}`}>{m.label}</span>
               ))}
             </div>
-            <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
-                  {year}
-                </span>
-              </div>
+            <div className="w-full h-1 bg-gray-200 dark:bg-[#1f1f35] rounded-full mt-2 flex">
+              {Array.from({ length: currentYear - earliestYear + 1 }).map((_, i) => {
+                const y = earliestYear + i;
+                return (
+                  <div key={y} className="flex-1 relative border-l border-r border-transparent">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="bg-white dark:bg-[#141425] px-3 text-[10px] font-black tracking-widest text-[#1a1a2e] dark:text-white uppercase">
+                        {y}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
           

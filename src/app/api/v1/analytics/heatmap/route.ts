@@ -9,16 +9,9 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
-  const url = new URL(req.url);
-  const year = parseInt(url.searchParams.get("year") || new Date().getFullYear().toString());
-
   const records = await prisma.attendanceRecord.findMany({
     where: {
       userId: user.id,
-      date: {
-        gte: new Date(`${year}-01-01`),
-        lte: new Date(`${year}-12-31`),
-      },
     },
     select: { date: true, status: true, subject: { select: { name: true } } },
     orderBy: { date: "asc" },
@@ -86,5 +79,5 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return cachedJson({ year, data }, 120);
+  return cachedJson({ data }, 120);
 }
