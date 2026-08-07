@@ -52,13 +52,13 @@ export default function AnalyticsPage() {
   ].filter((d) => d.value > 0) : [];
 
   // Build heatmap grid (GitHub-style)
-  const heatmapMap = new Map<string, { date: string, intensity: number }>(
+  const heatmapMap = new Map<string, any>(
     heatmap.map((d: any) => [d.date, d])
   );
   const startDate = new Date(year, 0, 1);
   const startDay = startDate.getDay();
-  const weeks: { date: string; intensity: number }[][] = [];
-  let currentWeek: { date: string; intensity: number }[] = [];
+  const weeks: { date: string; intensity: number; stats?: any }[][] = [];
+  let currentWeek: { date: string; intensity: number; stats?: any }[] = [];
 
   // Pad first week
   for (let i = 0; i < startDay; i++) currentWeek.push({ date: "", intensity: -1 });
@@ -66,7 +66,7 @@ export default function AnalyticsPage() {
   for (let d = new Date(startDate); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
     const dateStr = getLocalDateStr(d);
     const entry = heatmapMap.get(dateStr);
-    currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0 });
+    currentWeek.push({ date: dateStr, intensity: entry?.intensity || 0, stats: entry });
     if (currentWeek.length === 7) {
       weeks.push(currentWeek);
       currentWeek = [];
@@ -190,20 +190,72 @@ export default function AnalyticsPage() {
             {weeks.map((week, wi) => (
               <div key={wi} className="flex flex-col gap-1">
                 {week.map((day, di) => (
-                  <div key={di}
-                    className={clsx(
-                      "w-3.5 h-3.5 rounded-md transition-all",
-                      day.intensity === -1 ? "opacity-0" : "",
-                      day.intensity === 0 ? "bg-gray-200 dark:bg-[#1f1f35]" :
-                      day.intensity === 1 ? "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" :
-                      day.intensity === 2 ? "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" :
-                      day.intensity === 3 ? "bg-[#00f5d4] shadow-[0_2px_0_0_#00c4a7]" :
-                      day.intensity === 4 ? "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" :
-                      day.intensity === 5 ? "bg-[#9ca3af] shadow-[0_2px_0_0_#6b7280] dark:bg-[#6b7280] dark:shadow-[0_2px_0_0_#4b5563]" :
-                      day.intensity === 6 ? "bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" : "transparent"
+                  <div key={di} className="relative group">
+                    <div
+                      className={clsx(
+                        "w-3.5 h-3.5 rounded-md transition-all",
+                        day.intensity === -1 ? "opacity-0" : "",
+                        day.intensity === 0 ? "bg-gray-200 dark:bg-[#1f1f35]" :
+                        day.intensity === 1 ? "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" :
+                        day.intensity === 2 ? "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" :
+                        day.intensity === 3 ? "bg-[#00f5d4] shadow-[0_2px_0_0_#00c4a7]" :
+                        day.intensity === 4 ? "bg-[#06d6a0] shadow-[0_2px_0_0_#038c67]" :
+                        day.intensity === 5 ? "bg-[#9ca3af] shadow-[0_2px_0_0_#6b7280] dark:bg-[#6b7280] dark:shadow-[0_2px_0_0_#4b5563]" :
+                        day.intensity === 6 ? "bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" : "transparent"
+                      )}
+                    />
+                    
+                    {/* Tooltip */}
+                    {day.date && day.intensity !== -1 && (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 rounded-xl border border-gray-200 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 dark:border-[#2a2a3d] dark:bg-[#1a1a2e] scale-95 group-hover:scale-100 pointer-events-none">
+                        <p className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">{day.date}</p>
+                        {day.stats && day.stats.count > 0 ? (
+                          <div className="space-y-1.5">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="text-[#9ca3af] dark:text-[#6b6b80]">Total Classes</span>
+                              <span className="font-bold text-[#1a1a2e] dark:text-white">{day.stats.count}</span>
+                            </div>
+                            {day.stats.present > 0 && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#06d6a0] shadow-[0_1px_0_0_#038c67]" /> Present</span>
+                                <span className="font-bold text-[#06d6a0]">{day.stats.present}</span>
+                              </div>
+                            )}
+                            {day.stats.absent > 0 && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ef476f] shadow-[0_1px_0_0_#cc1a42]" /> Absent</span>
+                                <span className="font-bold text-[#ef476f]">{day.stats.absent}</span>
+                              </div>
+                            )}
+                            {day.stats.late > 0 && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ff6b35] shadow-[0_1px_0_0_#d95220]" /> Late</span>
+                                <span className="font-bold text-[#ff6b35]">{day.stats.late}</span>
+                              </div>
+                            )}
+                            {day.stats.excused > 0 && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#7b2cbf] shadow-[0_1px_0_0_#5a189a]" /> Excused</span>
+                                <span className="font-bold text-[#7b2cbf]">{day.stats.excused}</span>
+                              </div>
+                            )}
+                            {day.stats.cancelled > 0 && (
+                              <div className="flex justify-between items-center text-xs">
+                                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9ca3af] shadow-[0_1px_0_0_#6b7280]" /> Cancelled</span>
+                                <span className="font-bold text-[#9ca3af]">{day.stats.cancelled}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
+                        )}
+                        
+                        {/* Triangle pointers */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-white dark:border-t-[#1a1a2e] z-10" />
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-[1px] border-[6px] border-transparent border-t-gray-200 dark:border-t-[#2a2a3d] -z-10" />
+                      </div>
                     )}
-                    title={day.date ? `${day.date}: ${["No class","Missed","Mixed","Mostly present","Perfect","Full day cancelled","Partial cancelled"][day.intensity] || ""}` : ""}
-                  />
+                  </div>
                 ))}
               </div>
             ))}
