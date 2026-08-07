@@ -28,6 +28,7 @@ const INTENSITY_COLORS = ["#1e293b", "#ef4444", "#f59e0b", "#86efac", "#22c55e"]
 
 export default function AnalyticsPage() {
   const [currentYear] = useState(new Date().getFullYear());
+  const [hoveredDay, setHoveredDay] = useState<{ x: number, y: number, day: any } | null>(null);
   
   const { data: dashboard, isLoading: dashLoading } = useSWRFetch<any>("/analytics/dashboard");
   const { data: heatmapData, isLoading: heatLoading } = useSWRFetch<any>(`/analytics/heatmap`);
@@ -210,7 +211,7 @@ export default function AnalyticsPage() {
       {/* Heatmap */}
       <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 250ms forwards" }}>
         <h3 className="text-lg font-bold text-[#1a1a2e] dark:text-white mb-4">Attendance Heatmap</h3>
-        <div className="overflow-x-auto overflow-y-hidden pb-4 [&::-webkit-scrollbar]:hidden snap-x snap-mandatory scroll-smooth" dir="rtl">
+        <div className="overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory scroll-smooth" dir="rtl">
           <div className="flex" style={{ direction: 'ltr', width: `${(currentYear - earliestYear + 1) * 100}%`, minWidth: `${(currentYear - earliestYear + 1) * 700}px` }}>
             {yearsData.map((yData) => (
               <div key={yData.year} className="flex-1 flex flex-col snap-start">
@@ -221,9 +222,20 @@ export default function AnalyticsPage() {
                         {week.map((day, di) => (
                           <div key={di} className="relative group">
                     <div
+                      onMouseEnter={(e) => {
+                        if (day.intensity !== -1 && day.date) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setHoveredDay({
+                            x: rect.left + rect.width / 2,
+                            y: rect.top,
+                            day
+                          });
+                        }
+                      }}
+                      onMouseLeave={() => setHoveredDay(null)}
                       className={clsx(
-                        "w-3.5 h-3.5 rounded-md transition-all",
-                        day.intensity === -1 ? "opacity-0" : "",
+                        "w-3.5 h-3.5 rounded-md transition-all cursor-crosshair hover:ring-2 hover:ring-offset-1 hover:ring-offset-white dark:hover:ring-offset-[#141425] hover:ring-gray-300 dark:hover:ring-gray-500",
+                        day.intensity === -1 ? "opacity-0 pointer-events-none" : "",
                         day.intensity === 0 ? "bg-gray-200 dark:bg-[#1f1f35]" :
                         day.intensity === 1 ? "bg-[#ef476f] shadow-[0_2px_0_0_#cc1a42]" :
                         day.intensity === 2 ? "bg-[#ff6b35] shadow-[0_2px_0_0_#d95220]" :
@@ -233,104 +245,6 @@ export default function AnalyticsPage() {
                         day.intensity === 6 ? "bg-[#4361ee] shadow-[0_2px_0_0_#324dc7]" : "transparent"
                       )}
                     />
-                    
-                    {/* Tooltip */}
-                    {day.date && day.intensity !== -1 && (
-                      <div className={clsx(
-                        "absolute left-1/2 -translate-x-1/2 w-48 p-3 rounded-xl border border-gray-200 bg-white shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 dark:border-[#2a2a3d] dark:bg-[#1a1a2e] scale-95 group-hover:scale-100 pointer-events-none",
-                        di < 3 ? "top-full mt-2" : "bottom-full mb-2"
-                      )}>
-                        <p className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">{day.date}</p>
-                        {day.stats && day.stats.count > 0 ? (
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center text-xs">
-                              <span className="text-[#9ca3af] dark:text-[#6b6b80]">Total Classes</span>
-                              <span className="font-bold text-[#1a1a2e] dark:text-white">{day.stats.count}</span>
-                            </div>
-                            {day.stats.present > 0 && (
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#06d6a0] shadow-[0_1px_0_0_#038c67]" /> Present</span>
-                                  <span className="font-bold text-[#06d6a0]">{day.stats.present}</span>
-                                </div>
-                                {day.stats.presentSubjects?.length > 0 && (
-                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
-                                    {Array.from(new Set(day.stats.presentSubjects as string[])).join(", ")}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {day.stats.absent > 0 && (
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ef476f] shadow-[0_1px_0_0_#cc1a42]" /> Absent</span>
-                                  <span className="font-bold text-[#ef476f]">{day.stats.absent}</span>
-                                </div>
-                                {day.stats.absentSubjects?.length > 0 && (
-                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
-                                    {Array.from(new Set(day.stats.absentSubjects as string[])).join(", ")}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {day.stats.late > 0 && (
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ff6b35] shadow-[0_1px_0_0_#d95220]" /> Late</span>
-                                  <span className="font-bold text-[#ff6b35]">{day.stats.late}</span>
-                                </div>
-                                {day.stats.lateSubjects?.length > 0 && (
-                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
-                                    {Array.from(new Set(day.stats.lateSubjects as string[])).join(", ")}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {day.stats.excused > 0 && (
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#7b2cbf] shadow-[0_1px_0_0_#5a189a]" /> Excused</span>
-                                  <span className="font-bold text-[#7b2cbf]">{day.stats.excused}</span>
-                                </div>
-                                {day.stats.excusedSubjects?.length > 0 && (
-                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
-                                    {Array.from(new Set(day.stats.excusedSubjects as string[])).join(", ")}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            {day.stats.cancelled > 0 && (
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9ca3af] shadow-[0_1px_0_0_#6b7280]" /> Cancelled</span>
-                                  <span className="font-bold text-[#9ca3af]">{day.stats.cancelled}</span>
-                                </div>
-                                {day.stats.cancelledSubjects?.length > 0 && (
-                                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
-                                    {Array.from(new Set(day.stats.cancelledSubjects as string[])).join(", ")}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
-                        )}
-                        
-                        {/* Triangle pointers */}
-                        {di < 3 ? (
-                          <>
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-[6px] border-transparent border-b-white dark:border-b-[#1a1a2e] z-10" />
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[1px] border-[6px] border-transparent border-b-gray-200 dark:border-b-[#2a2a3d] -z-10" />
-                          </>
-                        ) : (
-                          <>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-white dark:border-t-[#1a1a2e] z-10" />
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-[1px] border-[6px] border-transparent border-t-gray-200 dark:border-t-[#2a2a3d] -z-10" />
-                          </>
-                        )}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -456,5 +370,108 @@ export default function AnalyticsPage() {
         </>
       )}
     </PageTransition>
+    
+    {/* Global Fixed Tooltip */}
+    {hoveredDay && (
+      <div
+        className="fixed z-[9999] pointer-events-none w-48 p-3 rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-[#2a2a3d] dark:bg-[#1a1a2e] animate-in fade-in zoom-in-95 duration-150"
+        style={{
+          left: hoveredDay.x,
+          top: hoveredDay.y < 200 ? hoveredDay.y + 14 + 8 : hoveredDay.y - 8,
+          transform: hoveredDay.y < 200 ? 'translate(-50%, 0)' : 'translate(-50%, -100%)'
+        }}
+      >
+        <p className="text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">{hoveredDay.day.date}</p>
+        {hoveredDay.day.stats && hoveredDay.day.stats.count > 0 ? (
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-[#9ca3af] dark:text-[#6b6b80]">Total Classes</span>
+              <span className="font-bold text-[#1a1a2e] dark:text-white">{hoveredDay.day.stats.count}</span>
+            </div>
+            {hoveredDay.day.stats.present > 0 && (
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#06d6a0] shadow-[0_1px_0_0_#038c67]" /> Present</span>
+                  <span className="font-bold text-[#06d6a0]">{hoveredDay.day.stats.present}</span>
+                </div>
+                {hoveredDay.day.stats.presentSubjects?.length > 0 && (
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                    {Array.from(new Set(hoveredDay.day.stats.presentSubjects as string[])).join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+            {hoveredDay.day.stats.absent > 0 && (
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ef476f] shadow-[0_1px_0_0_#cc1a42]" /> Absent</span>
+                  <span className="font-bold text-[#ef476f]">{hoveredDay.day.stats.absent}</span>
+                </div>
+                {hoveredDay.day.stats.absentSubjects?.length > 0 && (
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                    {Array.from(new Set(hoveredDay.day.stats.absentSubjects as string[])).join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+            {hoveredDay.day.stats.late > 0 && (
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#ff6b35] shadow-[0_1px_0_0_#d95220]" /> Late</span>
+                  <span className="font-bold text-[#ff6b35]">{hoveredDay.day.stats.late}</span>
+                </div>
+                {hoveredDay.day.stats.lateSubjects?.length > 0 && (
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                    {Array.from(new Set(hoveredDay.day.stats.lateSubjects as string[])).join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+            {hoveredDay.day.stats.excused > 0 && (
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#7b2cbf] shadow-[0_1px_0_0_#5a189a]" /> Excused</span>
+                  <span className="font-bold text-[#7b2cbf]">{hoveredDay.day.stats.excused}</span>
+                </div>
+                {hoveredDay.day.stats.excusedSubjects?.length > 0 && (
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                    {Array.from(new Set(hoveredDay.day.stats.excusedSubjects as string[])).join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+            {hoveredDay.day.stats.cancelled > 0 && (
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9ca3af] shadow-[0_1px_0_0_#6b7280]" /> Cancelled</span>
+                  <span className="font-bold text-[#9ca3af]">{hoveredDay.day.stats.cancelled}</span>
+                </div>
+                {hoveredDay.day.stats.cancelledSubjects?.length > 0 && (
+                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] ml-3.5 leading-tight break-words">
+                    {Array.from(new Set(hoveredDay.day.stats.cancelledSubjects as string[])).join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
+        )}
+        
+        {/* Triangle pointers */}
+        {hoveredDay.y < 200 ? (
+          <>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-[6px] border-transparent border-b-white dark:border-b-[#1a1a2e] z-10" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[1px] border-[6px] border-transparent border-b-gray-200 dark:border-b-[#2a2a3d] -z-10" />
+          </>
+        ) : (
+          <>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-white dark:border-t-[#1a1a2e] z-10" />
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-[1px] border-[6px] border-transparent border-t-gray-200 dark:border-t-[#2a2a3d] -z-10" />
+          </>
+        )}
+      </div>
+    )}
+    </>
   );
 }
