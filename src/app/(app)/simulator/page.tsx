@@ -115,7 +115,7 @@ export default function SimulatorPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-gradient-to-br from-[#9b5de5]/10 via-[#0ea5e9]/5 to-[#FF2D78]/10 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:from-[#9b5de5]/20 dark:via-[#0ea5e9]/10 dark:to-[#FF2D78]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-gradient-to-br from-[#06d6a0]/20 via-[#4361ee]/10 to-[#9b5de5]/20 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:from-[#06d6a0]/20 dark:via-[#4361ee]/10 dark:to-[#9b5de5]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
