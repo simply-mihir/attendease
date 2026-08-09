@@ -422,38 +422,44 @@ export async function GET(req: NextRequest) {
               startTime: cls.startTime,
               endTime: cls.endTime,
               room: cls.room,
-              status: todayRecords.find((r) => r.subjectId === cls.subjectId && (r.scheduleId === cls.scheduleId || !r.scheduleId))?.status || "UNMARKED",
+              status: (todayRecords.find((r) => r.subjectId === cls.subjectId && (r.scheduleId === cls.scheduleId || !r.scheduleId))?.status || "UNMARKED").toUpperCase(),
             }));
 
             if (isSpecialDay || todayClasses.length === 0) {
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
-              let title = "📊 Daily Report — Day Off";
+              let title = "Daily Report — Day Off";
               let body = `No classes were scheduled today (${dayName}). No attendance to report!`;
               let msg = `No classes were scheduled today (<strong>${dayName}</strong>).`;
 
               if (todayHoliday) {
-                title = `🎉 Daily Report — ${todayHoliday.name}`;
+                title = `Daily Report — ${todayHoliday.name}`;
                 body = `It was ${todayHoliday.name} today. No attendance to report!`;
                 msg = `It was <strong>${todayHoliday.name}</strong> today.`;
               } else if (currentExam) {
-                title = `📝 Daily Report — Exam Period`;
+                title = `Daily Report — Exam Period`;
                 body = `Exam period ongoing. No regular attendance to report!`;
                 msg = `It is currently the <strong>${currentExam.name}</strong>.`;
               }
 
               const html = `
                 <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
+                  <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${getGreeting(uNow.hours)}, ${user.name || "Student"}</p>
                   <h2 style="color: #7C3AED; margin: 0 0 16px;">${title}</h2>
                   <p>${msg}</p>
-                  <p style="color: #9CA3AF;">No attendance to report — see you on the next class day! 📚</p>
+                  <p style="color: #9CA3AF;">No attendance to report — see you on the next class day!</p>
+                  <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
+                    <p style="margin:0 0 4px;">Regards,</p>
+                    <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
+                    <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
+                  </div>
                 </div>
               `;
-              const text = `*${title}*\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}\nNo attendance to report — see you on the next class day! 📚`;
+              const text = `[ ${title} ]\n\n${getGreeting(uNow.hours)}, ${user.name || "Student"}\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}\nNo attendance to report — see you on the next class day!\n\nRegards,\nTeam AttendEase\nhttps://attendease-c7wl.vercel.app/`;
 
               if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, text), `tg-report-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyReport && user.email)
-                await retry(() => sendEmail(user.email!, "📊 Daily Report — Day Off — AttendEase", html), `em-report-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, "Daily Report — Day Off — AttendEase", html), `em-report-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title, body, tag: "daily-report", data: { url: "/dashboard" },
@@ -466,13 +472,13 @@ export async function GET(req: NextRequest) {
               const absent = todayClasses.filter((c) => c.status === "ABSENT").length;
               const unmarked = todayClasses.filter((c) => c.status === "UNMARKED").length;
 
-              const txt = formatDailyReport(todayClasses, present, absent, unmarked, uNow.dateString);
-              const html = formatDailyReportHTML(todayClasses, present, absent, unmarked, uNow.dateString);
+              const txt = formatDailyReport(todayClasses, present, absent, unmarked, uNow.dateString, user.name, uNow.hours);
+              const html = formatDailyReportHTML(todayClasses, present, absent, unmarked, uNow.dateString, user.name, uNow.hours);
 
               if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-report-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyReport && user.email)
-                await retry(() => sendEmail(user.email!, `📋 Daily Report — ${uNow.dateString}`, html), `em-report-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, `Daily Report — ${uNow.dateString}`, html), `em-report-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title: `📋 Today: ${present}/${todayClasses.length} attended`,
@@ -692,20 +698,30 @@ function formatWeeklyReportHTML(subjects: any[]): string {
   </div>`;
 }
 
-function formatDailyReport(classes: any[], present: number, absent: number, unmarked: number, dateString: string): string {
-  let t = `📋 *Daily Attendance Report — ${dateString}*\n\n`;
+function getGreeting(hours: number): string {
+  if (hours < 12) return "Good morning";
+  if (hours < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function formatDailyReport(classes: any[], present: number, absent: number, unmarked: number, dateString: string, userName: string | null, hours: number): string {
+  const greeting = getGreeting(hours);
+  const name = userName || "Student";
+  let t = `[ Daily Attendance Report — ${dateString} ]\n\n${greeting}, ${name}\n\n`;
   for (const c of classes) {
-    const icon = c.status === "PRESENT" ? "✅" : c.status === "LATE" ? "⏰" : c.status === "ABSENT" ? "❌" : "⬜";
+    const icon = c.status === "PRESENT" ? "[✓]" : c.status === "LATE" ? "[⏱]" : c.status === "ABSENT" ? "[✕]" : "[−]";
     t += `${icon} *${c.subjectName}* (${c.startTime})\n   Status: ${c.status}\n\n`;
   }
-  t += `\n📊 *Summary:* ${present} present, ${absent} absent, ${unmarked} unmarked out of ${classes.length}`;
+  t += `\n[ Summary ]\n${present} present, ${absent} absent, ${unmarked} unmarked out of ${classes.length}\n\nRegards,\nTeam AttendEase\nhttps://attendease-c7wl.vercel.app/`;
   return t;
 }
 
-function formatDailyReportHTML(classes: any[], present: number, absent: number, unmarked: number, dateString: string): string {
+function formatDailyReportHTML(classes: any[], present: number, absent: number, unmarked: number, dateString: string, userName: string | null, hours: number): string {
+  const greeting = getGreeting(hours);
+  const name = userName || "Student";
   const rows = classes.map((c) => {
     const statusColor = c.status === "PRESENT" ? "#22C55E" : c.status === "LATE" ? "#EAB308" : c.status === "ABSENT" ? "#EF4444" : "#6B7280";
-    const statusIcon = c.status === "PRESENT" ? "✅" : c.status === "LATE" ? "⏰" : c.status === "ABSENT" ? "❌" : "⬜";
+    const statusIcon = c.status === "PRESENT" ? "&#10003;" : c.status === "LATE" ? "&#9202;" : c.status === "ABSENT" ? "&#10007;" : "&#8211;";
     return `<tr>
       <td style="padding:8px 12px;color:#06B6D4;font-weight:600;">${c.startTime}</td>
       <td style="padding:8px 12px;color:#fff;">${c.subjectName}${c.code ? ` (${c.code})` : ""}</td>
@@ -718,7 +734,8 @@ function formatDailyReportHTML(classes: any[], present: number, absent: number, 
   const pctColor = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
 
   return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <h2 style="color:#7C3AED;margin:0 0 16px;">📋 Daily Report</h2>
+    <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${greeting}, ${name}</p>
+    <h2 style="color:#7C3AED;margin:0 0 16px;">Daily Report</h2>
     <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
     <table style="width:100%;border-collapse:collapse;">
       <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -745,6 +762,11 @@ function formatDailyReportHTML(classes: any[], present: number, absent: number, 
     <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
       <span style="color:${pctColor};font-size:24px;font-weight:700;">${pct}%</span>
       <div style="color:#9CA3AF;font-size:13px;">Today's Attendance</div>
+    </div>
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
+      <p style="margin:0 0 4px;">Regards,</p>
+      <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
+      <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
     </div>
   </div>`;
 }

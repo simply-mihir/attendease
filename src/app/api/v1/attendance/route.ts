@@ -4,6 +4,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { markAttendanceSchema } from "@/lib/validations/subject";
 
 import { recalcSubjectStats } from "@/lib/subject-stats";
+import { notifyAttendanceMarked, notifyAttendanceFailed } from "@/lib/attendance-notifier";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -51,7 +52,11 @@ export async function POST(req: NextRequest) {
     const subject = await prisma.subject.findFirst({
       where: { id: subjectId, userId: user.id },
     });
-    if (!subject) return Response.json({ error: "Subject not found" }, { status: 404 });
+    if (!subject) {
+      // notify failure async (don't await)
+      notifyAttendanceFailed(user.id, "Unknown Subject", "Subject not found or you don't have permission.");
+      return Response.json({ error: "Subject not found" }, { status: 404 });
+    }
 
     const record = await prisma.attendanceRecord.upsert({
       where: {
@@ -80,9 +85,15 @@ export async function POST(req: NextRequest) {
     });
 
     const updatedStats = await recalcSubjectStats(subjectId);
+    
+    // notify success async (don't await)
+    notifyAttendanceMarked(user.id, subject.name, status, date);
+
     return Response.json({ record, updatedStats }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Mark attendance error:", error);
+    // Best effort generic failure notification
+    notifyAttendanceFailed(user.id, "Unknown Subject", error?.message || "Internal server error during marking.");
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

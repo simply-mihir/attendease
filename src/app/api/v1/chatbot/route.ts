@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { analyzeUserQuery } from "./ai";
+import { notifyAttendanceMarked } from "@/lib/attendance-notifier";
 import { prisma } from "@/lib/db";
 import { recalcSubjectStats } from "@/lib/subject-stats";
 import { calculateAttendance, simulateSkip } from "@/lib/attendance-calc";
@@ -175,6 +177,7 @@ async function execMarkAttendance(userId: string, subjectQuery: string, status: 
   });
 
   const updatedStats = await recalcSubjectStats(subject.id);
+  notifyAttendanceMarked(userId, subject.name, status, todayStr);
   return {
     success: true,
     subjectName: subject.name,

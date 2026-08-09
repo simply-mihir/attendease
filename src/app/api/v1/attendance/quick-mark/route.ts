@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
 import { getUserTimezone, getUserToday } from "@/lib/timezone";
+import { notifyAttendanceMarked, notifyAttendanceFailed } from "@/lib/attendance-notifier";
 
 // Verify the quick-mark token (timezone-aware)
 function verifyQuickMarkToken(
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
 
     // Verify token (prevents unauthorized marking)
     if (!verifyQuickMarkToken(userId, scheduleId, token, dateStr)) {
+      notifyAttendanceFailed(userId, "Quick Mark", "Invalid or expired authorization token.");
       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
 
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!schedule) {
+      notifyAttendanceFailed(userId, "Unknown Schedule", "Schedule not found or you don't have permission.");
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
@@ -104,13 +107,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    notifyAttendanceMarked(userId, schedule.subject.name, status, dateStr);
+
     return NextResponse.json({
       success: true,
       subjectName: schedule.subject.name,
       status,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Quick-Mark] Error:", error);
+    try {
+      const { userId } = await req.clone().json();
+      if (userId) notifyAttendanceFailed(userId, "Unknown Subject", error?.message || "Internal server error during quick marking.");
+    } catch (_) {}
     return NextResponse.json({ error: "Failed to mark attendance" }, { status: 500 });
   }
 }
