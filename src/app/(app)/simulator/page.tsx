@@ -60,11 +60,7 @@ export default function SimulatorPage() {
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-6 pb-12">
-        <FuturisticLoader variant="inline" title="Loading Simulator..." Icon={TestTube} />
-      </div>
-    );
+    return <SimulatorSkeleton />;
   }
 
   return (
@@ -115,7 +111,7 @@ export default function SimulatorPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border-2 p-6 space-y-6 bg-[#4361ee]/5 border-[#4361ee]/40 shadow-[0_6px_0_0_#4361ee] dark:bg-[#4361ee]/10 dark:shadow-[0_6px_0_0_#304ac9] transition-all duration-500 ease-out relative overflow-hidden" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-2xl border-2 p-6 space-y-6 bg-gradient-to-br from-[#fca311]/15 to-[#fca311]/5 border-[#fca311]/40 shadow-[0_6px_0_0_#fca311] dark:from-[#fca311]/20 dark:to-[#fca311]/5 dark:shadow-[0_6px_0_0_#e89510] transition-all duration-500 ease-out relative overflow-hidden" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
