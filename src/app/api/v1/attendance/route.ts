@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     });
     if (!subject) {
       // notify failure async (don't await)
-      notifyAttendanceFailed(user.id, "Unknown Subject", "Subject not found or you don't have permission.");
+      await notifyAttendanceFailed(user.id, "Unknown Subject", "Subject not found or you don't have permission.");
       return Response.json({ error: "Subject not found" }, { status: 404 });
     }
 
@@ -87,13 +87,13 @@ export async function POST(req: NextRequest) {
     const updatedStats = await recalcSubjectStats(subjectId);
     
     // notify success async (don't await)
-    notifyAttendanceMarked(user.id, subject.name, status, date);
+    await notifyAttendanceMarked(user.id, subject.name, status, date);
 
     return Response.json({ record, updatedStats }, { status: 201 });
   } catch (error: any) {
     console.error("Mark attendance error:", error);
     // Best effort generic failure notification
-    notifyAttendanceFailed(user.id, "Unknown Subject", error?.message || "Internal server error during marking.");
+    await notifyAttendanceFailed(user.id, "Unknown Subject", error?.message || "Internal server error during marking.");
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

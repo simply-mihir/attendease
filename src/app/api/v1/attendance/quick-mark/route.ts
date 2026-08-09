@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     // Verify token (prevents unauthorized marking)
     if (!verifyQuickMarkToken(userId, scheduleId, token, dateStr)) {
-      notifyAttendanceFailed(userId, "Quick Mark", "Invalid or expired authorization token.");
+      await notifyAttendanceFailed(userId, "Quick Mark", "Invalid or expired authorization token.");
       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
     }
 
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!schedule) {
-      notifyAttendanceFailed(userId, "Unknown Schedule", "Schedule not found or you don't have permission.");
+      await notifyAttendanceFailed(userId, "Unknown Schedule", "Schedule not found or you don't have permission.");
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    notifyAttendanceMarked(userId, schedule.subject.name, status, dateStr);
+    await notifyAttendanceMarked(userId, schedule.subject.name, status, dateStr);
 
     return NextResponse.json({
       success: true,
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     console.error("[Quick-Mark] Error:", error);
     try {
       const { userId } = await req.clone().json();
-      if (userId) notifyAttendanceFailed(userId, "Unknown Subject", error?.message || "Internal server error during quick marking.");
+      if (userId) await notifyAttendanceFailed(userId, "Unknown Subject", error?.message || "Internal server error during quick marking.");
     } catch (_) {}
     return NextResponse.json({ error: "Failed to mark attendance" }, { status: 500 });
   }

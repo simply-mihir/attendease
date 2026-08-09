@@ -176,7 +176,7 @@ async function execMarkAttendance(userId: string, subjectQuery: string, status: 
   });
 
   const updatedStats = await recalcSubjectStats(subject.id);
-  notifyAttendanceMarked(userId, subject.name, status, todayStr);
+  await notifyAttendanceMarked(userId, subject.name, status, todayStr);
   return {
     success: true,
     subjectName: subject.name,
