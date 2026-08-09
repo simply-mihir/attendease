@@ -69,6 +69,42 @@ export default function SimulatorPage() {
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .pop-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: white;
+          border: 4px solid var(--slider-color);
+          box-shadow: 0 0 12px var(--slider-color), 0 4px 6px rgba(0,0,0,0.2);
+          cursor: pointer;
+          transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+        }
+        .pop-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 20px var(--slider-color), 0 6px 8px rgba(0,0,0,0.3);
+        }
+        .pop-slider::-webkit-slider-thumb:active {
+          transform: scale(0.9);
+        }
+        .pop-slider::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: white;
+          border: 4px solid var(--slider-color);
+          box-shadow: 0 0 12px var(--slider-color), 0 4px 6px rgba(0,0,0,0.2);
+          cursor: pointer;
+          transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+        }
+        .pop-slider::-moz-range-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 20px var(--slider-color), 0 6px 8px rgba(0,0,0,0.3);
+        }
+      `}} />
       <div className="flex items-center gap-3 mb-6" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#9b5de5]/10">
           <Sliders className="h-6 w-6 text-[#9b5de5]" />
@@ -97,18 +133,18 @@ export default function SimulatorPage() {
         {/* Scenario toggle */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Scenario</label>
-          <div className="flex rounded-xl border-2 overflow-hidden border-gray-200 shadow-[0_3px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:shadow-[0_3px_0_0_#0d0d1a]">
+          <div className="flex rounded-xl border-2 overflow-hidden border-gray-200/50 shadow-[0_3px_0_0_rgba(0,0,0,0.05)] dark:border-[#2a2a3d]/50 dark:shadow-[0_3px_0_0_#0d0d1a]">
             <button
               onClick={() => setScenario("skip")}
-              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "skip" ? "bg-[#FF2D78] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
+              className={`flex-1 py-3 text-sm font-bold transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 ${scenario === "skip" ? "bg-[#FF2D78] text-white shadow-[inset_0_-3px_0_0_rgba(0,0,0,0.2)]" : "bg-transparent text-[#4a4a5a] hover:bg-black/5 hover:scale-[1.02] active:scale-95 dark:text-[#c4c4d4] dark:hover:bg-white/5"}`}
             >
-              <XCircle className="w-4 h-4" /> Skip Classes
+              <XCircle className={`w-4 h-4 transition-transform duration-300 ${scenario === "skip" ? "scale-110" : ""}`} /> Skip Classes
             </button>
             <button
               onClick={() => setScenario("attend")}
-              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "attend" ? "bg-[#0ea5e9] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
+              className={`flex-1 py-3 text-sm font-bold transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 ${scenario === "attend" ? "bg-[#0ea5e9] text-white shadow-[inset_0_-3px_0_0_rgba(0,0,0,0.2)]" : "bg-transparent text-[#4a4a5a] hover:bg-black/5 hover:scale-[1.02] active:scale-95 dark:text-[#c4c4d4] dark:hover:bg-white/5"}`}
             >
-              <CheckCircle2 className="w-4 h-4" /> Attend Classes
+              <CheckCircle2 className={`w-4 h-4 transition-transform duration-300 ${scenario === "attend" ? "scale-110" : ""}`} /> Attend Classes
             </button>
           </div>
         </div>
@@ -123,18 +159,18 @@ export default function SimulatorPage() {
               {count}
             </span>
           </div>
-          <div className="relative pt-2 pb-2">
+          <div className="relative pt-4 pb-4">
             <input
               type="range"
               min={1}
               max={30}
               value={count}
               onChange={(e) => setCount(parseInt(e.target.value))}
-              className={`w-full cursor-pointer h-4 rounded-full appearance-none transition-all duration-300 ${scenario === 'skip' ? 'accent-[#FF2D78]' : 'accent-[#0ea5e9]'} bg-gray-200/50 dark:bg-[#1f1f35]/50 backdrop-blur-sm`}
+              className={`w-full cursor-pointer h-4 rounded-full appearance-none transition-all duration-300 pop-slider outline-none`}
               style={{
-                background: `linear-gradient(to right, ${scenario === 'skip' ? '#FF2D78' : '#0ea5e9'} ${(count - 1) / 29 * 100}%, transparent ${(count - 1) / 29 * 100}%)`,
-                backgroundColor: 'rgba(156, 163, 175, 0.2)'
-              }}
+                '--slider-color': scenario === 'skip' ? '#FF2D78' : '#0ea5e9',
+                background: `linear-gradient(to right, ${scenario === 'skip' ? '#FF2D78' : '#0ea5e9'} ${(count - 1) / 29 * 100}%, rgba(156, 163, 175, 0.2) ${(count - 1) / 29 * 100}%)`,
+              } as React.CSSProperties}
             />
           </div>
           <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-2">
