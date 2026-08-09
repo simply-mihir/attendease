@@ -115,7 +115,7 @@ export default function SimulatorPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-gradient-to-br from-[#9b5de5]/10 via-[#0ea5e9]/5 to-[#FF2D78]/10 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:from-[#9b5de5]/20 dark:via-[#0ea5e9]/10 dark:to-[#FF2D78]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
@@ -181,13 +181,15 @@ export default function SimulatorPage() {
         </div>
 
         {/* Run Simulator Button */}
-        <button
-          onClick={handleSimulate}
-          disabled={loading}
-          className="w-full relative overflow-hidden rounded-xl border-2 border-[#9b5de5] bg-[#9b5de5] px-6 py-4 text-sm font-bold text-white shadow-[0_4px_0_0_#7b4bc4] transition-all hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#7b4bc4] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? <FieldLoader size="sm" /> : <><TestTube className="w-5 h-5" /> Run Simulation</>}
-        </button>
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={handleSimulate}
+            disabled={loading}
+            className="w-fit relative overflow-hidden rounded-full border border-[#fca311]/50 bg-[#fca311]/15 px-10 py-3.5 text-sm font-extrabold text-[#fca311] dark:text-[#ffb703] backdrop-blur-xl shadow-[0_8px_20px_0_rgba(252,163,17,0.25)] transition-all hover:scale-[1.03] hover:bg-[#fca311]/25 hover:shadow-[0_12px_25px_0_rgba(252,163,17,0.35)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {loading ? <FieldLoader size="sm" /> : <><TestTube className="w-5 h-5" /> Run Simulation</>}
+          </button>
+        </div>
       </div>
 
       {/* Result */}
