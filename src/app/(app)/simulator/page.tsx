@@ -115,7 +115,7 @@ export default function SimulatorPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-gradient-to-br from-[#06d6a0]/20 via-[#4361ee]/10 to-[#9b5de5]/20 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:from-[#06d6a0]/20 dark:via-[#4361ee]/10 dark:to-[#9b5de5]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-2xl border-2 p-6 space-y-6 bg-[#9b5de5]/5 border-[#9b5de5]/40 shadow-[0_6px_0_0_#9b5de5] dark:bg-[#9b5de5]/10 dark:shadow-[0_6px_0_0_#7b4bc4] transition-all duration-500 ease-out relative overflow-hidden" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
@@ -185,7 +185,7 @@ export default function SimulatorPage() {
           <button
             onClick={handleSimulate}
             disabled={loading}
-            className="w-fit relative overflow-hidden rounded-full border border-[#fca311]/50 bg-[#fca311]/15 px-10 py-3.5 text-sm font-extrabold text-[#fca311] dark:text-[#ffb703] backdrop-blur-xl shadow-[0_8px_20px_0_rgba(252,163,17,0.25)] transition-all hover:scale-[1.03] hover:bg-[#fca311]/25 hover:shadow-[0_12px_25px_0_rgba(252,163,17,0.35)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-fit relative overflow-hidden rounded-xl border-2 border-[#fca311] bg-[#fca311] px-10 py-3.5 text-sm font-black text-[#1a1a2e] shadow-[0_4px_0_0_#e89510] transition-all hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e89510] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? <FieldLoader size="sm" /> : <><TestTube className="w-5 h-5" /> Run Simulation</>}
           </button>
@@ -194,7 +194,7 @@ export default function SimulatorPage() {
 
       {/* Result */}
       {hasRun && !loading && result && (
-        <div className="rounded-3xl border border-white/40 p-8 bg-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
+        <div className={`rounded-2xl border-2 p-6 transition-all duration-500 ease-out ${result.safe ? 'bg-[#06d6a0]/5 border-[#06d6a0]/40 shadow-[0_6px_0_0_#06d6a0] dark:bg-[#06d6a0]/10 dark:shadow-[0_6px_0_0_#049e77]' : 'bg-[#ef476f]/5 border-[#ef476f]/40 shadow-[0_6px_0_0_#ef476f] dark:bg-[#ef476f]/10 dark:shadow-[0_6px_0_0_#d63b5f]'}`} style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
           <h3 className="font-extrabold text-lg mb-4 text-[#1a1a2e] dark:text-white">Simulation Result</h3>
 
           <div className="flex items-center gap-4 justify-center mb-6">
