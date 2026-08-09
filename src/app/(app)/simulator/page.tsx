@@ -8,23 +8,6 @@ import { FieldLoader } from "@/components/FieldLoader";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 
-function SimulatorSkeleton() {
-  return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-12">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex h-11 w-11 rounded-xl bg-gray-200 dark:bg-white/5" />
-        <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-[#141425] rounded-lg" />
-          <div className="h-4 w-64 bg-gray-100 dark:bg-[#141425] rounded-md" />
-        </div>
-      </div>
-      <div className="rounded-2xl border-2 p-6 h-[400px] flex items-center justify-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
-
 export default function SimulatorPage() {
   const [selectedId, setSelectedId] = useState("");
   const [scenario, setScenario] = useState<"skip" | "attend">("skip");
@@ -60,7 +43,7 @@ export default function SimulatorPage() {
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return <SimulatorSkeleton />;
+    return <FuturisticLoader variant="full" title="Loading simulator..." Icon={TestTube} />;
   }
 
   return (
