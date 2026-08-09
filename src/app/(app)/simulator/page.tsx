@@ -32,6 +32,8 @@ export default function SimulatorPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const [hasRun, setHasRun] = useState(false);
+
   const { data, isLoading: pageLoading } = useSWRFetch<{ subjects: any[] }>("/subjects");
   const subjects = data?.subjects || [];
 
@@ -42,9 +44,10 @@ export default function SimulatorPage() {
     }
   }, [subjects, selectedId]);
 
-  useEffect(() => {
+  const handleSimulate = () => {
     if (!selectedId) return;
     setLoading(true);
+    setHasRun(true);
     apiFetch("/analytics/simulate", {
       method: "POST",
       body: JSON.stringify({ subjectId: selectedId, scenario, count }),
@@ -52,12 +55,16 @@ export default function SimulatorPage() {
       .then(setResult)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [selectedId, scenario, count]);
+  };
 
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return <SimulatorSkeleton />;
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 pb-12">
+        <FuturisticLoader variant="inline" title="Loading Simulator..." Icon={TestTube} />
+      </div>
+    );
   }
 
   return (
@@ -72,7 +79,7 @@ export default function SimulatorPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border-2 p-6 space-y-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-3xl border border-white/40 p-8 space-y-8 bg-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 50ms forwards" }}>
         {/* Subject picker */}
         <div>
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white mb-2">Select Subject</label>
@@ -99,7 +106,7 @@ export default function SimulatorPage() {
             </button>
             <button
               onClick={() => setScenario("attend")}
-              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "attend" ? "bg-[#06d6a0] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
+              className={`flex-1 py-3 text-sm font-bold transition-all duration-150 cursor-pointer flex items-center justify-center gap-2 ${scenario === "attend" ? "bg-[#0ea5e9] text-white" : "bg-white text-[#4a4a5a] hover:bg-gray-50 dark:bg-[#141425] dark:text-[#c4c4d4]"}`}
             >
               <CheckCircle2 className="w-4 h-4" /> Attend Classes
             </button>
@@ -107,34 +114,49 @@ export default function SimulatorPage() {
         </div>
 
         {/* Count slider */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white">
+        <div className="transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between mb-4">
+            <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white transition-colors duration-300">
               Number of classes to {scenario}
             </label>
-            <span className="text-[#9b5de5] font-extrabold text-lg px-3 py-0.5 bg-[#9b5de5]/10 rounded-xl border-2 border-[#9b5de5]/30 shadow-[0_2px_0_0_#9b5de5]">
+            <span className={`font-extrabold text-xl px-4 py-1.5 rounded-xl border-2 shadow-[0_3px_0_0_rgba(0,0,0,0.1)] transition-all duration-300 ${scenario === 'skip' ? 'text-[#FF2D78] bg-[#FF2D78]/10 border-[#FF2D78]/30 shadow-[#FF2D78]/20' : 'text-[#0ea5e9] bg-[#0ea5e9]/10 border-[#0ea5e9]/30 shadow-[#0ea5e9]/20'}`}>
               {count}
             </span>
           </div>
-          <input
-            type="range"
-            min={1}
-            max={30}
-            value={count}
-            onChange={(e) => setCount(parseInt(e.target.value))}
-            className="w-full accent-[#9b5de5] cursor-pointer h-3 rounded-lg bg-gray-200 dark:bg-[#1f1f35]"
-          />
-          <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1.5">
+          <div className="relative pt-2 pb-2">
+            <input
+              type="range"
+              min={1}
+              max={30}
+              value={count}
+              onChange={(e) => setCount(parseInt(e.target.value))}
+              className={`w-full cursor-pointer h-4 rounded-full appearance-none transition-all duration-300 ${scenario === 'skip' ? 'accent-[#FF2D78]' : 'accent-[#0ea5e9]'} bg-gray-200/50 dark:bg-[#1f1f35]/50 backdrop-blur-sm`}
+              style={{
+                background: `linear-gradient(to right, ${scenario === 'skip' ? '#FF2D78' : '#0ea5e9'} ${(count - 1) / 29 * 100}%, transparent ${(count - 1) / 29 * 100}%)`,
+                backgroundColor: 'rgba(156, 163, 175, 0.2)'
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-2">
             <span>1</span>
             <span>15</span>
             <span>30</span>
           </div>
         </div>
+
+        {/* Run Simulator Button */}
+        <button
+          onClick={handleSimulate}
+          disabled={loading}
+          className="w-full relative overflow-hidden rounded-xl border-2 border-[#9b5de5] bg-[#9b5de5] px-6 py-4 text-sm font-bold text-white shadow-[0_4px_0_0_#7b4bc4] transition-all hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#7b4bc4] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading ? <FieldLoader size="sm" /> : <><TestTube className="w-5 h-5" /> Run Simulation</>}
+        </button>
       </div>
 
       {/* Result */}
-      {result && !loading && (
-        <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
+      {hasRun && !loading && result && (
+        <div className="rounded-3xl border border-white/40 p-8 bg-white/40 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ease-out" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 100ms forwards" }}>
           <h3 className="font-extrabold text-lg mb-4 text-[#1a1a2e] dark:text-white">Simulation Result</h3>
 
           <div className="flex items-center gap-4 justify-center mb-6">
