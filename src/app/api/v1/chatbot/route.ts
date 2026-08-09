@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
-import { analyzeUserQuery } from "./ai";
 import { notifyAttendanceMarked } from "@/lib/attendance-notifier";
 import { prisma } from "@/lib/db";
 import { recalcSubjectStats } from "@/lib/subject-stats";
