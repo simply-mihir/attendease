@@ -168,7 +168,7 @@ export default function SimulatorPage() {
           <button
             onClick={handleSimulate}
             disabled={loading}
-            className="w-fit relative overflow-hidden rounded-xl border-2 border-[#fca311] bg-[#fca311] px-10 py-3.5 text-sm font-black text-[#1a1a2e] shadow-[0_4px_0_0_#e89510] transition-all hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#e89510] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-fit relative overflow-hidden rounded-full border border-[#06d6a0]/50 bg-[#06d6a0]/15 px-10 py-3.5 text-sm font-extrabold text-[#06d6a0] dark:text-[#3cebba] backdrop-blur-xl shadow-[0_8px_20px_0_rgba(6,214,160,0.25)] transition-all hover:scale-[1.03] hover:bg-[#06d6a0]/25 hover:shadow-[0_12px_25px_0_rgba(6,214,160,0.35)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? <FieldLoader size="sm" /> : <><TestTube className="w-5 h-5" /> Run Simulation</>}
           </button>
