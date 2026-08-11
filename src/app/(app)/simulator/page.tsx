@@ -224,9 +224,9 @@ export default function SimulatorPage() {
               <p className="text-xl font-extrabold text-[#4361ee] dark:text-[#5c7cfa]">{result.newCanSkip}</p>
               <p className="text-xs font-bold text-[#4361ee]/80 dark:text-[#5c7cfa]/80 mt-0.5">Can still skip</p>
             </div>
-            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 bg-[#FF2D78]/10 border-[#FF2D78]/40 shadow-[0_4px_0_0_#FF2D78] dark:bg-[#FF2D78]/15 dark:shadow-[0_4px_0_0_#d11f5e]">
-              <p className="text-xl font-extrabold text-[#FF2D78] dark:text-[#ff4d8d]">{result.newMustAttend}</p>
-              <p className="text-xs font-bold text-[#FF2D78]/80 dark:text-[#ff4d8d]/80 mt-0.5">Must attend</p>
+            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 bg-[#ff9f1c]/10 border-[#ff9f1c]/40 shadow-[0_4px_0_0_#ff9f1c] dark:bg-[#ff9f1c]/15 dark:shadow-[0_4px_0_0_#e58e19]">
+              <p className="text-xl font-extrabold text-[#ff9f1c] dark:text-[#ffb347]">{result.newMustAttend}</p>
+              <p className="text-xs font-bold text-[#ff9f1c]/80 dark:text-[#ffb347]/80 mt-0.5">Must attend</p>
             </div>
           </div>
         </div>
