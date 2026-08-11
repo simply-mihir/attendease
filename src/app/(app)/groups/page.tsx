@@ -238,9 +238,9 @@ export default function GroupsPage() {
 
       {/* Empty state */}
       {groups.length === 0 && !showCreate && !showJoin && (
-        <div className="rounded-2xl border border-white/20 p-10 text-center bg-gradient-to-br from-[#ef476f]/15 via-[#9b5de5]/10 to-[#4361ee]/15 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] dark:border-white/10 dark:from-[#ef476f]/20 dark:via-[#9b5de5]/15 dark:to-[#4361ee]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-16 h-16 rounded-2xl bg-[#ef476f]/20 border border-white/20 flex items-center justify-center mx-auto mb-4 shadow-[0_4px_12px_0_rgba(239,71,111,0.3)]">
-            <Users className="w-8 h-8 text-[#ef476f]" />
+        <div className="rounded-2xl border border-white/20 p-10 text-center bg-gradient-to-br from-[#0d9488]/25 to-[#0f766e]/20 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] dark:border-white/10 dark:from-[#0f766e]/30 dark:to-[#115e59]/25 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="w-16 h-16 rounded-2xl bg-[#0f766e]/30 border border-white/20 flex items-center justify-center mx-auto mb-4 shadow-[0_4px_12px_0_rgba(15,118,110,0.3)]">
+            <Users className="w-8 h-8 text-[#2dd4bf]" />
           </div>
           <h3 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white mb-2">No Groups Yet</h3>
           <p className="text-[#9ca3af] dark:text-[#6b6b80] text-sm font-bold mb-6 max-w-md mx-auto">
@@ -272,7 +272,7 @@ export default function GroupsPage() {
         ) : groups.map((group) => (
           <div
             key={group.id}
-            className="rounded-2xl border border-white/20 overflow-hidden transition-all duration-150 backdrop-blur-2xl bg-gradient-to-br from-[#0ea5e9]/15 via-[#9b5de5]/10 to-[#FF2D78]/15 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] hover:scale-[1.01] dark:border-white/10 dark:from-[#0ea5e9]/20 dark:via-[#9b5de5]/15 dark:to-[#FF2D78]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
+            className="rounded-2xl border border-white/20 overflow-hidden transition-all duration-150 backdrop-blur-2xl bg-gradient-to-br from-[#0d9488]/25 to-[#0f766e]/20 shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] hover:scale-[1.01] dark:border-white/10 dark:from-[#0f766e]/30 dark:to-[#115e59]/25 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
           >
             {/* Group header */}
             <div className="p-5 border-b border-white/10">
