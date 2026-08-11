@@ -169,14 +169,23 @@ export default function ForecastPage() {
                     }))}
                     margin={{ top: 5, right: 10, bottom: 5, left: 0 }}
                   >
+                    <defs>
+                      <linearGradient id={`colorProjected-${forecast.subjectId}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={forecast.colorHex || "#FF2D78"} stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor={forecast.colorHex || "#FF2D78"} stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid
+                      vertical={false}
                       strokeDasharray="3 3"
-                      stroke="rgba(150,150,150,0.15)"
+                      stroke="rgba(150,150,150,0.1)"
                     />
                     <XAxis
                       dataKey="shortDate"
                       tick={{ fontSize: 10, fill: "#94a3b8" }}
                       interval="preserveStartEnd"
+                      axisLine={false}
+                      tickLine={false}
                     />
                     <YAxis
                       domain={[
@@ -184,15 +193,18 @@ export default function ForecastPage() {
                         100,
                       ]}
                       tick={{ fontSize: 10, fill: "#94a3b8" }}
+                      axisLine={false}
+                      tickLine={false}
                     />
                     <Tooltip
                       formatter={(v: number) => [`${v}%`, "Projected"]}
                       contentStyle={{
-                        backgroundColor: "rgba(15, 23, 42, 0.92)",
-                        border: "2px solid #2a2a3d",
+                        backgroundColor: "rgba(15, 23, 42, 0.7)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid rgba(255,255,255,0.15)",
                         borderRadius: "16px",
                         fontSize: "12px",
-                        boxShadow: "0 6px 0 0 rgba(0, 0, 0, 0.3)",
+                        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
                       }}
                       itemStyle={{ color: "#fff", fontWeight: "bold" }}
                       labelStyle={{ color: "#94a3b8" }}
@@ -213,20 +225,22 @@ export default function ForecastPage() {
                     <Area
                       type="monotone"
                       dataKey="projectedPct"
-                      fill={forecast.willPass ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)"}
+                      fill={`url(#colorProjected-${forecast.subjectId})`}
                       stroke="transparent"
+                      animationDuration={1500}
                     />
                     <Line
                       type="monotone"
                       dataKey="projectedPct"
                       stroke={forecast.colorHex || "#FF2D78"}
-                      strokeWidth={3}
+                      strokeWidth={4}
                       dot={false}
+                      animationDuration={1500}
                       activeDot={{
-                        r: 5,
+                        r: 6,
                         fill: forecast.colorHex || "#FF2D78",
                         stroke: "#fff",
-                        strokeWidth: 2,
+                        strokeWidth: 3,
                       }}
                     />
                   </ComposedChart>
