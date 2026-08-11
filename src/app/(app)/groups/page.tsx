@@ -153,7 +153,7 @@ export default function GroupsPage() {
           </button>
           <button
             onClick={() => { setShowJoin(true); setShowCreate(false); setError(""); }}
-            className="flex items-center gap-1.5 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]"
+            className="flex items-center gap-1.5 rounded-xl border-2 px-4 py-2 text-xs font-bold transition-all duration-150 cursor-pointer border-[#304bc9] bg-[#4361ee] text-white shadow-[0_3px_0_0_#304bc9] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#304bc9]"
           >
             <LogIn className="w-3.5 h-3.5" /> Join
           </button>
@@ -238,8 +238,8 @@ export default function GroupsPage() {
 
       {/* Empty state */}
       {groups.length === 0 && !showCreate && !showJoin && (
-        <div className="rounded-2xl border-2 p-10 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-16 h-16 rounded-2xl bg-[#ef476f]/10 border-2 border-[#d63b5f] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#d63b5f]">
+        <div className="rounded-2xl border border-white/20 p-10 text-center bg-gradient-to-br from-[#ef476f]/15 via-[#9b5de5]/10 to-[#4361ee]/15 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] dark:border-white/10 dark:from-[#ef476f]/20 dark:via-[#9b5de5]/15 dark:to-[#4361ee]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="w-16 h-16 rounded-2xl bg-[#ef476f]/20 border border-white/20 flex items-center justify-center mx-auto mb-4 shadow-[0_4px_12px_0_rgba(239,71,111,0.3)]">
             <Users className="w-8 h-8 text-[#ef476f]" />
           </div>
           <h3 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white mb-2">No Groups Yet</h3>
