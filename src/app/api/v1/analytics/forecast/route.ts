@@ -70,19 +70,52 @@ export async function GET() {
     }
 
     // Project forward
-    let projectedPresent = subject.totalPresent + subject.totalLate;
-    let projectedTotal = subject.totalClassesHeld;
-    const projectionPoints: { date: string; projectedPct: number }[] = [];
+    const projectionPoints: { date: string; actualPct: number | null; projectedPct: number | null }[] = [];
 
-    // Add current point
+    const semesterStart = currentSemester
+      ? new Date(currentSemester.startDate)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    semesterStart.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1. Generate past dates (from start to today - 1)
+    let runningTotal = 0;
+    let runningPresent = 0;
+    let recordIndex = 0;
+    const records = subject.attendanceRecords;
+
+    for (let d = new Date(semesterStart); d < today; d.setDate(d.getDate() + 1)) {
+      while (recordIndex < records.length && new Date(records[recordIndex].date).getTime() <= d.getTime()) {
+        const rec = records[recordIndex];
+        runningTotal++;
+        if (rec.status === "present" || rec.status === "late") {
+          runningPresent++;
+        }
+        recordIndex++;
+      }
+
+      const dayDiff = Math.round((d.getTime() - semesterStart.getTime()) / (1000 * 60 * 60 * 24));
+      if (dayDiff % 7 === 0) {
+        projectionPoints.push({
+          date: d.toISOString().slice(0, 10),
+          actualPct: runningTotal === 0 ? null : Math.round((runningPresent / runningTotal) * 10000) / 100,
+          projectedPct: null,
+        });
+      }
+    }
+
+    // 2. Add today's point (bridge point)
     projectionPoints.push({
-      date: new Date().toISOString().slice(0, 10),
+      date: today.toISOString().slice(0, 10),
+      actualPct: stats.currentPercentage,
       projectedPct: stats.currentPercentage,
     });
 
-    // Iterate through future dates
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // 3. Iterate through future dates
+    let projectedPresent = subject.totalPresent + subject.totalLate;
+    let projectedTotal = subject.totalClassesHeld;
 
     for (
       let d = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -122,6 +155,7 @@ export async function GET() {
         if (projectionPoints[projectionPoints.length - 1]?.date !== dateStr) {
           projectionPoints.push({
             date: dateStr,
+            actualPct: null,
             projectedPct: pct,
           });
         }

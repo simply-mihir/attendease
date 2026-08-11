@@ -174,6 +174,10 @@ export default function ForecastPage() {
                         <stop offset="5%" stopColor={forecast.colorHex || "#FF2D78"} stopOpacity={0.6}/>
                         <stop offset="95%" stopColor={forecast.colorHex || "#FF2D78"} stopOpacity={0}/>
                       </linearGradient>
+                      <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#06d6a0" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="#06d6a0" stopOpacity={0}/>
+                      </linearGradient>
                     </defs>
                     <CartesianGrid
                       vertical={false}
@@ -197,17 +201,28 @@ export default function ForecastPage() {
                       tickLine={false}
                     />
                     <Tooltip
-                      formatter={(v: number) => [`${v}%`, "Projected"]}
-                      contentStyle={{
-                        backgroundColor: "rgba(15, 23, 42, 0.7)",
-                        backdropFilter: "blur(12px)",
-                        border: "1px solid rgba(255,255,255,0.15)",
-                        borderRadius: "16px",
-                        fontSize: "12px",
-                        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.3)",
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          const actual = payload.find(p => p.dataKey === "actualPct")?.value;
+                          const projected = payload.find(p => p.dataKey === "projectedPct")?.value;
+                          return (
+                            <div className="bg-[#0f172a]/70 backdrop-blur-md border border-white/15 rounded-2xl p-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] text-xs">
+                              <p className="text-[#94a3b8] font-bold mb-2">{label}</p>
+                              <div className="flex flex-col gap-1.5 text-white font-bold">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2.5 h-2.5 rounded-full bg-[#06d6a0]"></div>
+                                  <span>Actual: {actual !== undefined && actual !== null ? `${actual}%` : "--"}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: forecast.colorHex || "#FF2D78" }}></div>
+                                  <span>Projected: {projected !== undefined && projected !== null ? `${projected}%` : "--"}</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
                       }}
-                      itemStyle={{ color: "#fff", fontWeight: "bold" }}
-                      labelStyle={{ color: "#94a3b8" }}
                     />
                     <ReferenceLine
                       y={forecast.minRequiredPct}
@@ -224,6 +239,13 @@ export default function ForecastPage() {
                     />
                     <Area
                       type="monotone"
+                      dataKey="actualPct"
+                      fill="url(#colorActual)"
+                      stroke="transparent"
+                      animationDuration={1500}
+                    />
+                    <Area
+                      type="monotone"
                       dataKey="projectedPct"
                       fill={`url(#colorProjected-${forecast.subjectId})`}
                       stroke="transparent"
@@ -231,9 +253,24 @@ export default function ForecastPage() {
                     />
                     <Line
                       type="monotone"
+                      dataKey="actualPct"
+                      stroke="#06d6a0"
+                      strokeWidth={4}
+                      dot={false}
+                      animationDuration={1500}
+                      activeDot={{
+                        r: 6,
+                        fill: "#06d6a0",
+                        stroke: "#fff",
+                        strokeWidth: 3,
+                      }}
+                    />
+                    <Line
+                      type="monotone"
                       dataKey="projectedPct"
                       stroke={forecast.colorHex || "#FF2D78"}
                       strokeWidth={4}
+                      strokeDasharray="6 6"
                       dot={false}
                       animationDuration={1500}
                       activeDot={{
