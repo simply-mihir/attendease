@@ -266,29 +266,16 @@ export default function GroupsPage() {
       {/* Group cards */}
       <StaggerGrid className="space-y-6" delay={150} staggerDelay={80} animation="fadeSlideUp">
         {loading ? (
-          [1, 2].map((i) => (
-            <div key={i} className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]">
-              <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <div className="h-6 w-32 bg-gray-200 dark:bg-white/5 rounded-md" />
-                    <div className="h-4 w-20 bg-gray-100 dark:bg-white/5 rounded-md" />
-                  </div>
-                  <div className="h-8 w-24 bg-gray-200 dark:bg-white/5 rounded-xl" />
-                </div>
-              </div>
-              <div className="p-8 flex justify-center items-center">
-                <FieldLoader size="lg" />
-              </div>
-            </div>
-          ))
+          <div className="flex justify-center py-20">
+            <FuturisticLoader title="Loading groups..." variant="section" />
+          </div>
         ) : groups.map((group) => (
           <div
             key={group.id}
-            className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"
+            className="rounded-2xl border border-white/20 overflow-hidden transition-all duration-150 backdrop-blur-2xl bg-gradient-to-br from-[#0ea5e9]/15 via-[#9b5de5]/10 to-[#FF2D78]/15 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] hover:scale-[1.01] dark:border-white/10 dark:from-[#0ea5e9]/20 dark:via-[#9b5de5]/15 dark:to-[#FF2D78]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
           >
             {/* Group header */}
-            <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
+            <div className="p-5 border-b border-white/10">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-extrabold text-[#1a1a2e] dark:text-white text-lg">{group.name}</h3>
@@ -319,7 +306,7 @@ export default function GroupsPage() {
               {group.members.map((member) => (
                 <div
                   key={member.userId}
-                  className="rounded-xl border-2 p-4 flex items-center justify-between border-gray-200 bg-gray-50 shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#1f1f35] dark:shadow-[0_4px_0_0_#0d0d1a]"
+                  className="rounded-xl border border-white/10 p-4 flex items-center justify-between bg-white/5 backdrop-blur-md shadow-[0_4px_12px_0_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_0_rgba(0,0,0,0.2)]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Avatar */}
