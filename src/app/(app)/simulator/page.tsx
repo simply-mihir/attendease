@@ -229,8 +229,8 @@ export default function SimulatorPage() {
       )}
 
       {loading && hasRun && (
-        <div className="flex justify-center items-center py-8">
-          <FuturisticLoader variant="inline" title="Calculating..." Icon={TestTube} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-[#0a0a14]/80 backdrop-blur-md transition-all duration-300">
+          <FuturisticLoader variant="full" title="Calculating..." Icon={TestTube} />
         </div>
       )}
     </PageTransition>
