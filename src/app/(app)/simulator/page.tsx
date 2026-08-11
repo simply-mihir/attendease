@@ -228,8 +228,10 @@ export default function SimulatorPage() {
         </div>
       )}
 
-      {loading && (
-        <FuturisticLoader variant="inline" title="Calculating..." Icon={TestTube} />
+      {loading && hasRun && (
+        <div className="flex justify-center items-center py-8">
+          <FuturisticLoader variant="inline" title="Calculating..." Icon={TestTube} />
+        </div>
       )}
     </PageTransition>
   );
