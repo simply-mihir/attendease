@@ -53,7 +53,7 @@ export default function OptimizerPage() {
       </div>
 
       {/* Controls */}
-      <div className="rounded-2xl border-2 p-6 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+      <div className="rounded-2xl border border-white/20 p-6 bg-gradient-to-br from-[#06d6a0]/15 via-[#0ea5e9]/10 to-[#9b5de5]/15 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] dark:border-white/10 dark:from-[#06d6a0]/20 dark:via-[#0ea5e9]/15 dark:to-[#9b5de5]/20 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-bold text-[#1a1a2e] dark:text-white">
             How many classes do you want to skip?
@@ -87,10 +87,10 @@ export default function OptimizerPage() {
           {/* Summary banner */}
           <div
             className={clsx(
-              "rounded-2xl border-2 p-5 flex items-center gap-4 transition-all duration-150 mb-6",
+              "rounded-2xl border p-5 flex items-center gap-4 transition-all duration-150 mb-6 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] hover:scale-[1.01]",
               result.totalSkipsUsed > 0
-                ? "border-[#05a87e] bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#05a87e]"
-                : "border-[#d63b5f] bg-[#ef476f]/10 shadow-[0_4px_0_0_#d63b5f] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d63b5f]"
+                ? "border-[#06d6a0]/40 bg-gradient-to-br from-[#06d6a0]/25 to-[#06d6a0]/10"
+                : "border-[#ef476f]/40 bg-gradient-to-br from-[#ef476f]/25 to-[#ef476f]/10"
             )}
             style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}
           >
@@ -147,7 +147,7 @@ export default function OptimizerPage() {
             result.recommendations.map((rec) => (
               <div
                 key={rec.subjectId}
-                className="rounded-2xl border-2 p-5 transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a] dark:hover:shadow-[0_2px_0_0_#0d0d1a]" style={{ borderLeftWidth: "4px", borderLeftColor: rec.colorHex || "#FF2D78" }}
+                className="rounded-2xl border border-white/20 p-5 transition-all duration-150 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] hover:scale-[1.02] dark:border-white/10 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ backgroundColor: `${rec.colorHex || "#9b5de5"}25`, borderLeftWidth: "4px", borderLeftColor: rec.colorHex || "#FF2D78" }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
