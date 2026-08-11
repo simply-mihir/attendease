@@ -238,9 +238,9 @@ export default function GroupsPage() {
 
       {/* Empty state */}
       {groups.length === 0 && !showCreate && !showJoin && (
-        <div className="rounded-2xl border border-white/20 p-10 text-center bg-gradient-to-br from-[#0d9488]/25 to-[#0f766e]/20 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] dark:border-white/10 dark:from-[#0f766e]/30 dark:to-[#115e59]/25 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
-          <div className="w-16 h-16 rounded-2xl bg-[#0f766e]/30 border border-white/20 flex items-center justify-center mx-auto mb-4 shadow-[0_4px_12px_0_rgba(15,118,110,0.3)]">
-            <Users className="w-8 h-8 text-[#2dd4bf]" />
+        <div className="rounded-2xl border-2 p-10 text-center border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+          <div className="w-16 h-16 rounded-2xl bg-[#ef476f]/10 border-2 border-[#d63b5f] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_0_0_#d63b5f]">
+            <Users className="w-8 h-8 text-[#ef476f]" />
           </div>
           <h3 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white mb-2">No Groups Yet</h3>
           <p className="text-[#9ca3af] dark:text-[#6b6b80] text-sm font-bold mb-6 max-w-md mx-auto">
@@ -272,10 +272,10 @@ export default function GroupsPage() {
         ) : groups.map((group) => (
           <div
             key={group.id}
-            className="rounded-2xl border border-white/20 overflow-hidden transition-all duration-150 backdrop-blur-2xl bg-gradient-to-br from-[#0d9488]/25 to-[#0f766e]/20 shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] hover:scale-[1.01] dark:border-white/10 dark:from-[#0f766e]/30 dark:to-[#115e59]/25 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
+            className="rounded-2xl border-2 overflow-hidden transition-all duration-150 border-gray-200 bg-white shadow-[0_6px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_6px_0_0_#0d0d1a]"
           >
             {/* Group header */}
-            <div className="p-5 border-b border-white/10">
+            <div className="p-5 border-b-2 border-gray-100 dark:border-[#2a2a3d]">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-extrabold text-[#1a1a2e] dark:text-white text-lg">{group.name}</h3>
@@ -306,7 +306,7 @@ export default function GroupsPage() {
               {group.members.map((member) => (
                 <div
                   key={member.userId}
-                  className="rounded-xl border border-white/10 p-4 flex items-center justify-between bg-white/5 backdrop-blur-md shadow-[0_4px_12px_0_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_0_rgba(0,0,0,0.2)]"
+                  className="rounded-xl border-2 p-4 flex items-center justify-between border-gray-200 bg-gray-50 shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#1f1f35] dark:shadow-[0_4px_0_0_#0d0d1a]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Avatar */}
