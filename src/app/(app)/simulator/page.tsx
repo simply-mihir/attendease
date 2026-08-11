@@ -220,13 +220,13 @@ export default function SimulatorPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
-              <p className="text-xl font-extrabold text-[#1a1a2e] dark:text-white">{result.newCanSkip}</p>
-              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Can still skip</p>
+            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 bg-[#4361ee]/10 border-[#4361ee]/40 shadow-[0_4px_0_0_#4361ee] dark:bg-[#4361ee]/15 dark:shadow-[0_4px_0_0_#304ac9]">
+              <p className="text-xl font-extrabold text-[#4361ee] dark:text-[#5c7cfa]">{result.newCanSkip}</p>
+              <p className="text-xs font-bold text-[#4361ee]/80 dark:text-[#5c7cfa]/80 mt-0.5">Can still skip</p>
             </div>
-            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]">
-              <p className="text-xl font-extrabold text-[#1a1a2e] dark:text-white">{result.newMustAttend}</p>
-              <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Must attend</p>
+            <div className="rounded-2xl border-2 p-4 text-center transition-all duration-150 bg-[#FF2D78]/10 border-[#FF2D78]/40 shadow-[0_4px_0_0_#FF2D78] dark:bg-[#FF2D78]/15 dark:shadow-[0_4px_0_0_#d11f5e]">
+              <p className="text-xl font-extrabold text-[#FF2D78] dark:text-[#ff4d8d]">{result.newMustAttend}</p>
+              <p className="text-xs font-bold text-[#FF2D78]/80 dark:text-[#ff4d8d]/80 mt-0.5">Must attend</p>
             </div>
           </div>
         </div>
