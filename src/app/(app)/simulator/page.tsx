@@ -51,8 +51,9 @@ export default function SimulatorPage() {
   }
 
   return (
-    <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
-      <style dangerouslySetInnerHTML={{
+    <>
+      <PageTransition direction="left" staggerChildren={false} className="max-w-3xl mx-auto space-y-6 pb-12">
+        <style dangerouslySetInnerHTML={{
         __html: `
         .pop-slider::-webkit-slider-thumb {
           -webkit-appearance: none;
@@ -231,12 +232,13 @@ export default function SimulatorPage() {
           </div>
         </div>
       )}
+      </PageTransition>
 
       {loading && hasRun && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-[#0a0a14]/80 backdrop-blur-md transition-all duration-300">
           <FuturisticLoader variant="full" title="Calculating..." Icon={TestTube} />
         </div>
       )}
-    </PageTransition>
+    </>
   );
 }
