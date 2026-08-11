@@ -43,7 +43,11 @@ export default function SimulatorPage() {
   const selected = subjects.find((s) => s.id === selectedId);
 
   if (pageLoading) {
-    return <FuturisticLoader variant="full" title="Loading simulator..." Icon={TestTube} />;
+    return (
+      <div className="flex min-h-[calc(100vh-16rem)] w-full items-center justify-center">
+        <FuturisticLoader variant="full" title="Loading simulator..." Icon={TestTube} />
+      </div>
+    );
   }
 
   return (
