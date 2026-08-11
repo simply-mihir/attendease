@@ -85,8 +85,12 @@ export async function GET() {
     let runningPresent = 0;
     let recordIndex = 0;
     const records = subject.attendanceRecords;
+    
+    let projectedPresentPast = 0;
+    let projectedTotalPast = 0;
 
     for (let d = new Date(semesterStart); d < today; d.setDate(d.getDate() + 1)) {
+      // Actuals
       while (recordIndex < records.length && new Date(records[recordIndex].date).getTime() <= d.getTime()) {
         const rec = records[recordIndex];
         runningTotal++;
@@ -96,12 +100,24 @@ export async function GET() {
         recordIndex++;
       }
 
+      // Past Projections
+      const dayOfWeek = d.getDay();
+      if (scheduledDays.has(dayOfWeek)) {
+        const classCount = subject.schedules.filter((s) => s.dayOfWeek === dayOfWeek).length;
+        for (let c = 0; c < classCount; c++) {
+          projectedTotalPast++;
+          const ds = dayStats[dayOfWeek];
+          const attendProb = ds.total > 0 ? ds.present / ds.total : 0.75;
+          projectedPresentPast += attendProb;
+        }
+      }
+
       const dayDiff = Math.round((d.getTime() - semesterStart.getTime()) / (1000 * 60 * 60 * 24));
       if (dayDiff % 7 === 0) {
         projectionPoints.push({
           date: d.toISOString().slice(0, 10),
           actualPct: runningTotal === 0 ? null : Math.round((runningPresent / runningTotal) * 10000) / 100,
-          projectedPct: null,
+          projectedPct: projectedTotalPast === 0 ? null : Math.round((projectedPresentPast / projectedTotalPast) * 10000) / 100,
         });
       }
     }
