@@ -70,6 +70,8 @@ interface DashboardData {
 
 interface GoalPlanData {
   goalPct: number;
+  goalType: string;
+  goalSetupComplete: boolean;
   goalEnabled: boolean;
   todaysPlan: {
     subjectName: string; colorHex: string; startTime: string; endTime: string;

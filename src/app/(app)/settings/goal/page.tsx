@@ -9,7 +9,7 @@ import { ArrowLeft, Target, Save, Loader2, ListChecks } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
-import { invalidate } from "@/hooks/useSWRFetch";
+import { invalidate, invalidatePrefix } from "@/hooks/useSWRFetch";
 
 function SettingsGoalSkeleton() {
   return (
