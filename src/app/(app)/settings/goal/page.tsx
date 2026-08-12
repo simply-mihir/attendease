@@ -5,7 +5,7 @@ import { FieldLoader } from "@/components/FieldLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
-import { ArrowLeft, Target, Save, Loader2, ListChecks } from "lucide-react";
+import { ArrowLeft, Target, Save, Loader2, ListChecks, CheckCircle2, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -230,8 +230,8 @@ export default function GoalSettingsPage() {
                     <div key={s.id} className="p-4 rounded-xl border-2 border-gray-100 dark:border-[#2a2a3d] bg-gray-50 dark:bg-[#141425]">
                       <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.colorHex }} />
-                          <span className="font-bold text-[#1a1a2e] dark:text-white truncate max-w-[200px]">{s.name}</span>
+                          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: s.colorHex }} />
+                          <span className="font-bold text-[#1a1a2e] dark:text-white leading-tight">{s.name}</span>
                         </div>
                         <span className="text-[#06d6a0] text-xl font-black">{s.target}%</span>
                       </div>
@@ -250,19 +250,31 @@ export default function GoalSettingsPage() {
             )}
 
             <div className="p-4 bg-gray-50 dark:bg-[#141425] rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d]">
-              <p className="text-sm text-text-secondary font-bold">
+              <div className="text-sm text-text-secondary font-bold flex items-start gap-2">
                 {goalType === "overall" ? (
                   targetPct >= 90 ? (
-                    <span>🎯 <strong className="text-[#4cc9f0] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
+                    <>
+                      <Target className="w-5 h-5 text-[#4cc9f0] shrink-0 mt-0.5" />
+                      <span><strong className="text-[#4cc9f0] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
+                    </>
                   ) : targetPct >= 75 ? (
-                    <span>✅ <strong className="text-[#4cc9f0] font-black">Solid target.</strong> You'll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
+                    <>
+                      <CheckCircle2 className="w-5 h-5 text-[#4cc9f0] shrink-0 mt-0.5" />
+                      <span><strong className="text-[#4cc9f0] font-black">Solid target.</strong> You'll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
+                    </>
                   ) : (
-                    <span>⚠️ <strong className="text-[#ef476f] font-black">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
+                    <>
+                      <AlertTriangle className="w-5 h-5 text-[#ef476f] shrink-0 mt-0.5" />
+                      <span><strong className="text-[#ef476f] font-black">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
+                    </>
                   )
                 ) : (
-                  <span>✅ <strong className="text-[#06d6a0] font-black">Personalized!</strong> Your dashboard will adapt to the unique target of every single subject in your schedule.</span>
+                  <>
+                    <CheckCircle2 className="w-5 h-5 text-[#06d6a0] shrink-0 mt-0.5" />
+                    <span><strong className="text-[#06d6a0] font-black">Personalized!</strong> Your dashboard will adapt to the unique target of every single subject in your schedule.</span>
+                  </>
                 )}
-              </p>
+              </div>
             </div>
           </div>
         )}
