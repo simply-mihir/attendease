@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:telegram": "npx tsx --env-file=.env scripts/telegram-poller.ts",
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
