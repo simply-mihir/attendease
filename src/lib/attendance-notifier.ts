@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import { sendEmail } from "./email";
+import { sendEmail, formatAttendanceMarkedEmail, formatAttendanceFailedEmail } from "./email";
 import { sendTelegram } from "./telegram";
 import { sendPushNotification } from "./push";
 
@@ -71,32 +71,11 @@ export async function notifyAttendanceMarked(
     const textTitle = `[ Attendance Marked ]`;
     const textMsg = `${greeting}, ${name}\n\n${getIconForStatus(statusUpper)} *${subjectName}*\nStatus: ${statusUpper} on ${dateStr}\n\nRegards,\nTeam AttendEase\nhttps://attendease-c7wl.vercel.app/`;
 
-    const htmlTitle = `Attendance Marked`;
-    const htmlMsg = `
-      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-        <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${greeting}, ${name}</p>
-        <h2 style="color: #7C3AED; margin: 0 0 16px;">${htmlTitle}</h2>
-        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;margin-bottom:16px;">
-          <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#fff;">${subjectName}</p>
-          <p style="margin:0;color:#9CA3AF;">Status: <span style="color:${getHtmlColorForStatus(statusUpper)};font-weight:700;">${getHtmlIconForStatus(statusUpper)} ${statusUpper}</span></p>
-          <p style="margin:8px 0 0;color:#9CA3AF;font-size:13px;">Date: ${dateStr}</p>
-        </div>
-        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
-          <p style="margin:0 0 4px;">Regards,</p>
-          <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
-          <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
-        </div>
-      </div>
-    `;
-
     const promises = [];
 
-    if (ns.telegramEnabled && user.telegramChatId) {
-      promises.push(sendTelegram(user.telegramChatId, `${textTitle}\n\n${textMsg}`).catch(e => console.error("Telegram notify failed", e)));
-    }
-
     if (ns.emailEnabled && user.email) {
-      promises.push(sendEmail(user.email, `Attendance Update: ${subjectName} — AttendEase`, htmlMsg).catch(e => console.error("Email notify failed", e)));
+      const { subject, html } = formatAttendanceMarkedEmail(user.name, subjectName, status, dateStr);
+      promises.push(sendEmail(user.email, subject, html).catch(e => console.error("Email notify failed", e)));
     }
 
     if (ns.pushEnabled && user.pushSubscriptions.length > 0) {
@@ -148,23 +127,6 @@ export async function notifyAttendanceFailed(
     const textMsg = `${greeting}, ${name}\n\nWe encountered an error while updating your attendance for *${subjectName}*.\nError: ${errorMessage}\n\nPlease try again manually via the AttendEase dashboard.\n\nRegards,\nTeam AttendEase\nhttps://attendease-c7wl.vercel.app/`;
 
     const htmlTitle = `Attendance Update Failed`;
-    const htmlMsg = `
-      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-        <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${greeting}, ${name}</p>
-        <h2 style="color: #EF4444; margin: 0 0 16px;">${htmlTitle}</h2>
-        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px;margin-bottom:16px;">
-          <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:#fff;">Subject: ${subjectName}</p>
-          <p style="margin:0;color:#FCA5A5;">Error: ${errorMessage}</p>
-        </div>
-        <p style="color:#9CA3AF;font-size:14px;">Please try again manually via the AttendEase dashboard.</p>
-        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
-          <p style="margin:0 0 4px;">Regards,</p>
-          <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
-          <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
-        </div>
-      </div>
-    `;
-
     const promises = [];
 
     if (ns.telegramEnabled && user.telegramChatId) {
@@ -172,7 +134,8 @@ export async function notifyAttendanceFailed(
     }
 
     if (ns.emailEnabled && user.email) {
-      promises.push(sendEmail(user.email, `Action Required: Attendance Update Failed — AttendEase`, htmlMsg).catch(e => console.error("Email notify failed", e)));
+      const { subject, html } = formatAttendanceFailedEmail(user.name, subjectName, errorMessage);
+      promises.push(sendEmail(user.email, subject, html).catch(e => console.error("Email notify failed", e)));
     }
 
     if (ns.pushEnabled && user.pushSubscriptions.length > 0) {

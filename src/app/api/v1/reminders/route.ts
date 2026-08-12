@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     // Send immediate Telegram alert if opt-in and user has Telegram chatId
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { email: true, telegramChatId: true },
+      select: { name: true, email: true, telegramChatId: true }
     });
 
     if (notifyTelegram && dbUser?.telegramChatId) {
@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
     if (notifyEmail && dbUser?.email) {
       try {
         const emailContent = formatReminderEmail(
+          dbUser.name,
           reminder.title,
           reminder.dueDate.toISOString().slice(0, 10),
           reminder.dueTime || undefined,

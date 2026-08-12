@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendTelegram } from "@/lib/telegram";
-import { sendEmail } from "@/lib/email";
+import {
+  sendEmail,
+  formatDailyBriefEmail,
+  formatDangerAlertEmail,
+  formatWeeklyReportEmail,
+  formatDailyReportEmail,
+  formatPreClassEmail,
+  formatGenericNoticeEmail
+} from "@/lib/email";
 import webpush from "web-push";
 import { generateQuickMarkToken } from "@/lib/quick-mark-token";
 
@@ -252,18 +260,19 @@ export async function GET(req: NextRequest) {
                 msg = `It's the <strong>${currentExam.name}</strong>. Regular classes are cancelled. Good luck with your exams!`;
               }
 
-              const html = `
-                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-                  <h2 style="color: #7C3AED; margin: 0 0 16px;">${emoji} ${title.replace(`${emoji} `, "")}</h2>
-                  <p>${msg}</p>
-                </div>
-              `;
+              const { subject: eSub, html: eHtml } = formatGenericNoticeEmail(
+                user.name,
+                `${emoji} ${title.replace(`${emoji} `, "")}`,
+                msg,
+                "#9b5de5"
+              );
+              
               const text = `${emoji} *${title.replace(`${emoji} `, "")}*\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}`;
 
               if (s.telegramEnabled && s.telegramDailyBrief && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, text), `tg-brief-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyBrief && user.email)
-                await retry(() => sendEmail(user.email!, `${title} — AttendEase`, html), `em-brief-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-brief-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title, body, tag: "daily-brief", data: { url: "/dashboard" },
@@ -273,12 +282,26 @@ export async function GET(req: NextRequest) {
               results.dailyBriefs++;
             } else {
               const txt = formatDailyBrief(todaySch, uNow.dateString);
-              const html = formatDailyBriefHTML(todaySch, uNow.dateString);
+              
+              let tA = 0, tC = 0;
+              for (const sub of user.subjects) {
+                 tA += sub.totalPresent;
+                 tC += sub.totalClassesHeld;
+              }
+              const overallPct = tC > 0 ? Math.round((tA / tC) * 100) : 0;
+              
+              const mappedClasses = todaySch.map(c => {
+                const sub = user.subjects.find((s: any) => s.name === c.subject);
+                const pct = sub && sub.totalClassesHeld > 0 ? Math.round((sub.totalPresent / sub.totalClassesHeld) * 100) : 0;
+                return { name: c.subject, time: `${c.startTime}-${c.endTime}`, room: c.room, pct, code: c.code };
+              });
+              
+              const { subject: eSub, html: eHtml } = formatDailyBriefEmail(user.name, mappedClasses, overallPct, uNow.dateString);
 
               if (s.telegramEnabled && s.telegramDailyBrief && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-brief-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyBrief && user.email)
-                await retry(() => sendEmail(user.email!, `📚 Today's Classes — ${uNow.dateString}`, html), `em-brief-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-brief-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyBrief && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title: `📚 Today: ${todaySch.length} classes`,
@@ -303,12 +326,12 @@ export async function GET(req: NextRequest) {
 
             if (danger.length > 0) {
               const txt = formatDangerAlert(danger);
-              const html = formatDangerAlertHTML(danger);
+              const { subject: eSub, html: eHtml } = formatDangerAlertEmail(user.name, danger);
 
               if (s.telegramEnabled && s.telegramDangerAlert && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-danger-${user.id}`, results);
               if (s.emailEnabled && s.emailDangerAlert && user.email)
-                await retry(() => sendEmail(user.email!, `⚠️ ${danger.length} subjects below minimum`, html), `em-danger-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-danger-${user.id}`, results);
               if (s.pushEnabled && s.pushDangerAlert && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title: `⚠️ ${danger.length} subjects in danger zone`,
@@ -329,15 +352,15 @@ export async function GET(req: NextRequest) {
             const wKey = `weekly:${todayKey}`;
             if (!(await wasSent(user.id, wKey))) {
               const txt = formatWeeklyReport(user.subjects);
-              const html = formatWeeklyReportHTML(user.subjects);
               let tA = 0, tC = 0;
               user.subjects.forEach((sub) => { tA += sub.totalPresent; tC += sub.totalClassesHeld; });
               const overall = tC > 0 ? Math.round((tA / tC) * 100) : 0;
+              const { subject: eSub, html: eHtml } = formatWeeklyReportEmail(user.name, user.subjects);
 
               if (s.telegramEnabled && s.telegramWeeklyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-weekly-${user.id}`, results);
               if (s.emailEnabled && s.emailWeeklyReport && user.email)
-                await retry(() => sendEmail(user.email!, `📊 Weekly Attendance Report`, html), `em-weekly-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-weekly-${user.id}`, results);
               if (s.pushEnabled && s.pushWeeklyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title: `📊 Weekly Report: ${overall}% overall`,
@@ -368,12 +391,12 @@ export async function GET(req: NextRequest) {
               if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
 
               const txt = `⏰ *${cls.subjectName}* starts in ${minsUntil} min\n📍 ${cls.room || "No room"} | ${cls.startTime} - ${cls.endTime}`;
-              const html = formatPreClassHTML(cls.subjectName, minsUntil, cls);
+              const { subject: eSub, html: eHtml } = formatPreClassEmail(user.name, cls.subjectName, minsUntil, cls);
 
               if (s.telegramEnabled && s.telegramPreClass && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-pre-${user.id}`, results);
               if (s.emailEnabled && s.emailPreClass && user.email)
-                await retry(() => sendEmail(user.email!, `⏰ ${cls.subjectName} in ${minsUntil} min`, html), `em-pre-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-pre-${user.id}`, results);
               if (s.pushEnabled && s.pushPreClass && user.pushSubscriptions.length > 0) {
                 const qToken = generateQuickMarkToken(user.id, cls.scheduleId, todayKey);
                 await pushAll(user.pushSubscriptions, {
@@ -426,6 +449,13 @@ export async function GET(req: NextRequest) {
             }));
 
             if (isSpecialDay || todayClasses.length === 0) {
+              const { subject: eSub, html: eHtml } = formatGenericNoticeEmail(
+                user.name,
+                "Daily Report — Day Off",
+                "You have no classes today. Enjoy your day off!",
+                "#4cc9f0"
+              );
+              
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
               let title = "Daily Report — Day Off";
               let body = `No classes were scheduled today (${dayName}). No attendance to report!`;
@@ -441,25 +471,12 @@ export async function GET(req: NextRequest) {
                 msg = `It is currently the <strong>${currentExam.name}</strong>.`;
               }
 
-              const html = `
-                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; background: #0B0F1A; padding: 24px; border-radius: 16px; color: #fff;">
-                  <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${getGreeting(uNow.hours)}, ${user.name || "Student"}</p>
-                  <h2 style="color: #7C3AED; margin: 0 0 16px;">${title}</h2>
-                  <p>${msg}</p>
-                  <p style="color: #9CA3AF;">No attendance to report — see you on the next class day!</p>
-                  <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
-                    <p style="margin:0 0 4px;">Regards,</p>
-                    <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
-                    <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
-                  </div>
-                </div>
-              `;
               const text = `[ ${title} ]\n\n${getGreeting(uNow.hours)}, ${user.name || "Student"}\n\n${msg.replace(/<strong>|<\/strong>/g, "*")}\nNo attendance to report — see you on the next class day!\n\nRegards,\nTeam AttendEase\nhttps://attendease-c7wl.vercel.app/`;
 
               if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, text), `tg-report-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyReport && user.email)
-                await retry(() => sendEmail(user.email!, "Daily Report — Day Off — AttendEase", html), `em-report-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-report-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title, body, tag: "daily-report", data: { url: "/dashboard" },
@@ -473,12 +490,19 @@ export async function GET(req: NextRequest) {
               const unmarked = todayClasses.filter((c) => c.status === "UNMARKED").length;
 
               const txt = formatDailyReport(todayClasses, present, absent, unmarked, uNow.dateString, user.name, uNow.hours);
-              const html = formatDailyReportHTML(todayClasses, present, absent, unmarked, uNow.dateString, user.name, uNow.hours);
+              const { subject: eSub, html: eHtml } = formatDailyReportEmail(
+                user.name,
+                todayClasses,
+                present,
+                absent,
+                unmarked,
+                uNow.dateString
+              );
 
               if (s.telegramEnabled && s.telegramDailyReport && user.telegramChatId)
                 await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-report-${user.id}`, results);
               if (s.emailEnabled && s.emailDailyReport && user.email)
-                await retry(() => sendEmail(user.email!, `Daily Report — ${uNow.dateString}`, html), `em-report-${user.id}`, results);
+                await retry(() => sendEmail(user.email!, eSub, eHtml), `em-report-${user.id}`, results);
               if (s.pushEnabled && s.pushDailyReport && user.pushSubscriptions.length > 0)
                 await pushAll(user.pushSubscriptions, {
                   title: `📋 Today: ${present}/${todayClasses.length} attended`,
@@ -593,40 +617,9 @@ function formatDailyBrief(schedules: any[], dateString: string): string {
   return t;
 }
 
-function formatDailyBriefHTML(schedules: any[], dateString: string): string {
-  const rows = schedules.map((s) => `
-    <tr>
-      <td style="padding:8px 12px;color:#06B6D4;font-weight:600;">${s.startTime}-${s.endTime}</td>
-      <td style="padding:8px 12px;color:#fff;">${s.subject}${s.code ? ` (${s.code})` : ""}</td>
-      <td style="padding:8px 12px;color:#9CA3AF;">${s.room || "-"}</td>
-    </tr>`).join("");
 
-  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <h2 style="color:#7C3AED;margin:0 0 16px;">📚 Today's Classes</h2>
-    <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">TIME</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ROOM</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">${schedules.length} class${schedules.length !== 1 ? "es" : ""} today — AttendEase</p>
-  </div>`;
-}
 
-function formatPreClassHTML(name: string, mins: number, sch: any): string {
-  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <h2 style="color:#7C3AED;margin:0 0 8px;">⏰ ${name}</h2>
-    <p style="font-size:20px;margin:0 0 16px;color:#06B6D4;">Starts in <strong>${mins} minutes</strong></p>
-    <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:12px;">
-      <p style="margin:0;color:#fff;">🕐 ${sch.startTime} - ${sch.endTime}</p>
-      <p style="margin:4px 0 0;color:#9CA3AF;">📍 ${sch.room || "No room"}</p>
-    </div>
-    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to mark attendance.</p>
-  </div>`;
-}
+
 
 function formatDangerAlert(subjects: any[]): string {
   let t = `⚠️ *Attendance Alert*\n\n`;
@@ -637,22 +630,7 @@ function formatDangerAlert(subjects: any[]): string {
   return t;
 }
 
-function formatDangerAlertHTML(subjects: any[]): string {
-  const rows = subjects.map((s) => {
-    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
-    return `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:12px;margin-bottom:8px;">
-      <strong style="color:#EF4444;">${s.name}</strong>
-      <span style="color:#9CA3AF;margin-left:8px;">${pct}% (need ${s.minAttendancePct || 75}%)</span>
-      <div style="color:#9CA3AF;font-size:13px;">${s.totalPresent}/${s.totalClassesHeld} attended</div>
-    </div>`;
-  }).join("");
 
-  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <h2 style="color:#EF4444;margin:0 0 16px;">⚠️ Attendance Alert</h2>
-    ${rows}
-    <p style="color:#9CA3AF;margin:16px 0 0;font-size:13px;">Open AttendEase to see recovery plan.</p>
-  </div>`;
-}
 
 function formatWeeklyReport(subjects: any[]): string {
   let t = `📊 *Weekly Attendance Report*\n\n`;
@@ -667,36 +645,7 @@ function formatWeeklyReport(subjects: any[]): string {
   return t;
 }
 
-function formatWeeklyReportHTML(subjects: any[]): string {
-  let tA = 0, tC = 0;
-  const rows = subjects.map((s) => {
-    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
-    tA += s.totalPresent; tC += s.totalClassesHeld;
-    const color = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
-    return `<tr>
-      <td style="padding:8px 12px;color:#fff;">${s.name}</td>
-      <td style="padding:8px 12px;color:${color};font-weight:600;">${pct}%</td>
-      <td style="padding:8px 12px;color:#9CA3AF;">${s.totalPresent}/${s.totalClassesHeld}</td>
-    </tr>`;
-  }).join("");
-  const overall = tC > 0 ? Math.round((tA / tC) * 100) : 0;
 
-  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <h2 style="color:#7C3AED;margin:0 0 16px;">📊 Weekly Report</h2>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">%</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">ATTENDED</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="margin-top:16px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
-      <span style="color:#7C3AED;font-size:24px;font-weight:700;">${overall}%</span>
-      <div style="color:#9CA3AF;font-size:13px;">Overall Attendance</div>
-    </div>
-  </div>`;
-}
 
 function getGreeting(hours: number): string {
   if (hours < 12) return "Good morning";
@@ -716,57 +665,4 @@ function formatDailyReport(classes: any[], present: number, absent: number, unma
   return t;
 }
 
-function formatDailyReportHTML(classes: any[], present: number, absent: number, unmarked: number, dateString: string, userName: string | null, hours: number): string {
-  const greeting = getGreeting(hours);
-  const name = userName || "Student";
-  const rows = classes.map((c) => {
-    const statusColor = c.status === "PRESENT" ? "#22C55E" : c.status === "LATE" ? "#EAB308" : c.status === "ABSENT" ? "#EF4444" : "#6B7280";
-    const statusIcon = c.status === "PRESENT" ? "&#10003;" : c.status === "LATE" ? "&#9202;" : c.status === "ABSENT" ? "&#10007;" : "&#8211;";
-    return `<tr>
-      <td style="padding:8px 12px;color:#06B6D4;font-weight:600;">${c.startTime}</td>
-      <td style="padding:8px 12px;color:#fff;">${c.subjectName}${c.code ? ` (${c.code})` : ""}</td>
-      <td style="padding:8px 12px;color:${statusColor};font-weight:600;">${statusIcon} ${c.status}</td>
-    </tr>`;
-  }).join("");
 
-  const total = classes.length;
-  const pct = total > 0 ? Math.round((present / total) * 100) : 0;
-  const pctColor = pct >= 75 ? "#22C55E" : pct >= 50 ? "#EAB308" : "#EF4444";
-
-  return `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:24px;border-radius:16px;max-width:500px;">
-    <p style="color:#E5E7EB;font-size:16px;margin:0 0 16px;">${greeting}, ${name}</p>
-    <h2 style="color:#7C3AED;margin:0 0 16px;">Daily Report</h2>
-    <p style="color:#9CA3AF;margin:0 0 16px;">${dateString}</p>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">TIME</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">SUBJECT</th>
-        <th style="padding:8px 12px;text-align:left;color:#9CA3AF;font-size:12px;">STATUS</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="margin-top:16px;display:flex;gap:8px;">
-      <div style="flex:1;padding:12px;background:rgba(34,197,94,0.1);border-radius:12px;text-align:center;">
-        <div style="color:#22C55E;font-size:20px;font-weight:700;">${present}</div>
-        <div style="color:#9CA3AF;font-size:11px;">Present</div>
-      </div>
-      <div style="flex:1;padding:12px;background:rgba(239,68,68,0.1);border-radius:12px;text-align:center;">
-        <div style="color:#EF4444;font-size:20px;font-weight:700;">${absent}</div>
-        <div style="color:#9CA3AF;font-size:11px;">Absent</div>
-      </div>
-      <div style="flex:1;padding:12px;background:rgba(107,114,128,0.1);border-radius:12px;text-align:center;">
-        <div style="color:#6B7280;font-size:20px;font-weight:700;">${unmarked}</div>
-        <div style="color:#9CA3AF;font-size:11px;">Unmarked</div>
-      </div>
-    </div>
-    <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,0.15);border-radius:12px;text-align:center;">
-      <span style="color:${pctColor};font-size:24px;font-weight:700;">${pct}%</span>
-      <div style="color:#9CA3AF;font-size:13px;">Today's Attendance</div>
-    </div>
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);color:#9CA3AF;font-size:13px;">
-      <p style="margin:0 0 4px;">Regards,</p>
-      <p style="margin:0 0 8px;font-weight:bold;color:#E5E7EB;">Team AttendEase</p>
-      <a href="https://attendease-c7wl.vercel.app/" style="color:#7C3AED;text-decoration:none;">https://attendease-c7wl.vercel.app/</a>
-    </div>
-  </div>`;
-}

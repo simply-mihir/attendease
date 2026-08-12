@@ -25,33 +25,52 @@ export async function sendEmail(to: string, subject: string, html: string) {
   return res.json();
 }
 
-function emailWrapper(content: string) {
+function getGreeting(hours: number): string {
+  if (hours < 12) return "Good morning";
+  if (hours < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+// Neobrutalist / Pop Style Email Wrapper
+function emailWrapper(userName: string | null, content: string, shadowColor = "#4cc9f0") {
+  const name = userName || "Student";
+  const now = new Date();
+  const hours = now.getHours(); // Approximate greeting
+  const greeting = getGreeting(hours);
+
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0B0F1A; color: #F3F4F6; margin: 0; padding: 24px; }
-          .container { max-width: 580px; margin: 0 auto; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-          .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 16px; }
-          .logo { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #7C3AED, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-          .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
-          .badge-green { background-color: rgba(34, 197, 94, 0.15); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3); }
-          .badge-red { background-color: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-          .badge-yellow { background-color: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
-          .footer { margin-top: 28px; font-size: 12px; color: #9CA3AF; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 16px; }
-          .class-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0d0d1a; color: #ffffff; margin: 0; padding: 24px; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #1a1a2e; border: 3px solid #2a2a3d; border-radius: 20px; padding: 32px; box-shadow: 6px 6px 0px 0px ${shadowColor}; }
+          .header { margin-bottom: 24px; }
+          .greeting { font-size: 16px; font-weight: 700; color: #a1a1aa; margin-bottom: 8px; }
+          .logo-text { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+          .logo-accent { color: #ff2d78; }
+          .card { background-color: #141425; border: 2px solid #2a2a3d; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+          .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 900; border: 2px solid; text-transform: uppercase; }
+          .badge-green { background-color: rgba(6, 214, 160, 0.1); color: #06d6a0; border-color: #06d6a0; }
+          .badge-red { background-color: rgba(239, 71, 111, 0.1); color: #ef476f; border-color: #ef476f; }
+          .badge-yellow { background-color: rgba(255, 209, 102, 0.1); color: #ffd166; border-color: #ffd166; }
+          .badge-blue { background-color: rgba(76, 201, 240, 0.1); color: #4cc9f0; border-color: #4cc9f0; }
+          .badge-purple { background-color: rgba(155, 93, 229, 0.1); color: #9b5de5; border-color: #9b5de5; }
+          .footer { margin-top: 32px; font-size: 12px; color: #6b7280; font-weight: 700; text-align: center; border-top: 2px dashed #2a2a3d; padding-top: 24px; }
+          h1, h2, h3 { font-weight: 900; letter-spacing: -0.5px; }
+          p { line-height: 1.5; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">🎓 AttendEase</div>
+            <div class="greeting">${greeting} ${name},</div>
           </div>
           ${content}
           <div class="footer">
-            <p>Sent automatically by AttendEase — Smart Attendance Tracker.</p>
+            <p style="margin: 0 0 8px 0; color: #a1a1aa;">AttendEase — Smart Attendance Tracker</p>
+            <a href="https://attendease-c7wl.vercel.app/" style="color: #4cc9f0; text-decoration: none;">https://attendease-c7wl.vercel.app/</a>
           </div>
         </div>
       </body>
@@ -59,106 +78,283 @@ function emailWrapper(content: string) {
   `;
 }
 
+// -------------------------------------------------------------
+// FORMATTERS
+// -------------------------------------------------------------
+
 export function formatDailyBriefEmail(
-  classes: { name: string; time: string; room: string | null; pct: number }[],
-  overallPct: number
+  userName: string | null,
+  classes: { name: string; time: string; room: string | null; pct: number; code?: string }[],
+  overallPct: number,
+  dateString: string
 ) {
-  const subject = "☀️ Good morning! Here's your schedule for today";
+  const subject = "📚 Today's Classes — AttendEase";
   
   const classCards = classes.length === 0
-    ? `<p style="color: #9CA3AF;">No classes today. Enjoy your day off!</p>`
+    ? `<div class="card" style="text-align: center; border-color: #4cc9f0; box-shadow: 4px 4px 0px 0px #4cc9f0;"><p style="font-weight: 700; color: #4cc9f0;">No classes today. Enjoy your day off! 🎉</p></div>`
     : classes.map((c) => `
-        <div class="class-card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong style="font-size: 16px; color: #FFFFFF;">${c.name}</strong>
-            <span class="badge ${c.pct >= 75 ? 'badge-green' : 'badge-red'}">${c.pct}%</span>
+        <div class="card" style="box-shadow: 4px 4px 0px 0px #2a2a3d;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <strong style="font-size: 16px; color: #FFFFFF; font-weight: 900;">${c.name}${c.code ? ` (${c.code})` : ""}</strong>
+            <span class="badge ${c.pct >= 75 ? 'badge-green' : c.pct >= 60 ? 'badge-yellow' : 'badge-red'}">${c.pct}%</span>
           </div>
-          <p style="margin: 6px 0 0 0; font-size: 13px; color: #9CA3AF;">
-            🕒 ${c.time} ${c.room ? `• 📍 Room ${c.room}` : ''}
-          </p>
+          <div style="font-size: 14px; color: #a1a1aa; font-weight: 700;">
+            <span style="color: #06d6a0;">🕒 ${c.time}</span>
+            ${c.room ? `<span style="margin-left: 12px; color: #ffd166;">📍 ${c.room}</span>` : ''}
+          </div>
         </div>
       `).join("");
 
-  const html = emailWrapper(`
-    <h2 style="margin-top: 0; color: #FFFFFF; font-size: 22px;">Daily Class Brief</h2>
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 8px 0; color: #9b5de5; font-size: 28px;">Daily Brief</h1>
+    <p style="color: #a1a1aa; font-weight: 700; margin: 0 0 24px 0;">${dateString}</p>
     ${classCards}
-    <div style="margin-top: 20px; padding: 14px; background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.2); border-radius: 12px;">
-      <p style="margin: 0; font-size: 14px; color: #D8B4FE;">
-        📊 <strong>Overall Attendance:</strong> ${overallPct}%
+    <div style="margin-top: 24px; padding: 16px; background-color: #141425; border: 3px solid #9b5de5; border-radius: 16px; text-align: center; box-shadow: 4px 4px 0px 0px #9b5de5;">
+      <p style="margin: 0; font-size: 16px; color: #ffffff; font-weight: 900;">
+        Overall Attendance: <span style="color: #9b5de5; font-size: 20px;">${overallPct}%</span>
       </p>
     </div>
-  `);
+  `, "#9b5de5");
+
+  return { subject, html };
+}
+
+export function formatPreClassEmail(
+  userName: string | null,
+  className: string,
+  minsUntil: number,
+  sch: { startTime: string; endTime: string; room: string | null }
+) {
+  const subject = `⏰ ${className} in ${minsUntil} min`;
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 8px 0; color: #4cc9f0; font-size: 28px;">${className}</h1>
+    <p style="font-size: 20px; font-weight: 900; margin: 0 0 24px 0; color: #ffffff;">Starts in <span style="color: #ff2d78;">${minsUntil} minutes</span></p>
+    
+    <div class="card" style="border-color: #4cc9f0; box-shadow: 4px 4px 0px 0px #4cc9f0;">
+      <p style="margin: 0 0 8px 0; font-weight: 900; color: #ffffff;">🕒 ${sch.startTime} - ${sch.endTime}</p>
+      <p style="margin: 0; font-weight: 700; color: #a1a1aa;">📍 ${sch.room || "No room specified"}</p>
+    </div>
+    
+    <div style="margin-top: 24px; text-align: center;">
+      <a href="https://attendease-c7wl.vercel.app/" style="display: inline-block; background-color: #4cc9f0; color: #0d0d1a; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px; font-size: 16px; border: 2px solid #ffffff;">
+        Open AttendEase
+      </a>
+    </div>
+  `, "#4cc9f0");
 
   return { subject, html };
 }
 
 export function formatDangerAlertEmail(
-  subjectName: string,
-  currentPct: number,
-  minPct: number,
-  mustAttend: number
+  userName: string | null,
+  subjects: any[]
 ) {
-  const subject = `🚨 Danger Alert: ${subjectName} is at ${currentPct}%`;
+  const subject = `⚠️ Danger Alert: ${subjects.length} subjects below minimum`;
 
-  const html = emailWrapper(`
-    <div style="text-align: center; margin-bottom: 20px;">
-      <span class="badge badge-red" style="font-size: 14px; padding: 6px 14px;">DANGER ZONE WARNING</span>
+  const rows = subjects.map((s) => {
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    return `
+      <div class="card" style="border-color: #ef476f; box-shadow: 4px 4px 0px 0px #ef476f;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="color: #ef476f; font-size: 16px; font-weight: 900;">${s.name}</strong>
+          <span class="badge badge-red">${pct}%</span>
+        </div>
+        <p style="margin: 0; font-weight: 700; color: #a1a1aa; font-size: 14px;">
+          Need <strong style="color: #ffffff;">${s.minAttendancePct || 75}%</strong> • Attended ${s.totalPresent}/${s.totalClassesHeld}
+        </p>
+      </div>
+    `;
+  }).join("");
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 16px 0; color: #ef476f; font-size: 28px;">Danger Zone</h1>
+    <p style="font-weight: 700; color: #ffffff; margin-bottom: 24px;">The following subjects are below your minimum target attendance.</p>
+    ${rows}
+    <div style="margin-top: 24px; text-align: center;">
+      <a href="https://attendease-c7wl.vercel.app/" style="display: inline-block; background-color: #ef476f; color: #ffffff; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px; font-size: 16px; border: 2px solid #ffffff;">
+        View Recovery Plan
+      </a>
     </div>
-    <h2 style="margin-top: 0; color: #F87171; font-size: 22px; text-align: center;">${subjectName}</h2>
-    <p style="font-size: 15px; color: #D1D5DB; line-height: 1.6; text-align: center;">
-      Your attendance has dropped to <strong style="color: #F87171;">${currentPct}%</strong>, which is below your minimum threshold of <strong>${minPct}%</strong>.
-    </p>
-    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
-      <p style="margin: 0; font-size: 16px; color: #FCA5A5;">
-        ⚠️ You must attend the next <strong>${mustAttend} classes</strong> consecutively to reach ${minPct}%.
-      </p>
-    </div>
-  `);
+  `, "#ef476f");
 
   return { subject, html };
 }
 
 export function formatWeeklyReportEmail(
-  stats: { name: string; pct: number; attended: number; total: number }[],
-  overallPct: number
+  userName: string | null,
+  subjects: any[]
 ) {
-  const subject = `📊 Your Weekly Attendance Summary (${overallPct}%)`;
+  let tA = 0, tC = 0;
+  const rows = subjects.map((s) => {
+    const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
+    tA += s.totalPresent; tC += s.totalClassesHeld;
+    const badge = pct >= 75 ? 'badge-green' : pct >= 60 ? 'badge-yellow' : 'badge-red';
+    return `
+      <div class="card" style="border-color: #2a2a3d; box-shadow: 4px 4px 0px 0px #2a2a3d;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="color: #ffffff; font-size: 16px; font-weight: 900;">${s.name}</strong>
+          <span class="badge ${badge}">${pct}%</span>
+        </div>
+        <p style="margin: 0; font-weight: 700; color: #a1a1aa; font-size: 14px;">
+          Attended: ${s.totalPresent} / ${s.totalClassesHeld} classes
+        </p>
+      </div>
+    `;
+  }).join("");
+  const overall = tC > 0 ? Math.round((tA / tC) * 100) : 0;
 
-  const rows = stats.map((s) => `
-    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-      <td style="padding: 12px 0; color: #FFFFFF; font-weight: 500;">${s.name}</td>
-      <td style="padding: 12px 0; color: #9CA3AF; text-align: center;">${s.attended} / ${s.total}</td>
-      <td style="padding: 12px 0; text-align: right;">
-        <span class="badge ${s.pct >= 75 ? 'badge-green' : s.pct >= 65 ? 'badge-yellow' : 'badge-red'}">${s.pct}%</span>
-      </td>
-    </tr>
-  `).join("");
+  const subject = `📊 Your Weekly Attendance Summary (${overall}%)`;
 
-  const html = emailWrapper(`
-    <h2 style="margin-top: 0; color: #FFFFFF; font-size: 22px;">Weekly Report</h2>
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-      <thead>
-        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: left;">
-          <th style="padding-bottom: 8px; color: #9CA3AF; font-size: 12px; text-transform: uppercase;">Subject</th>
-          <th style="padding-bottom: 8px; color: #9CA3AF; font-size: 12px; text-transform: uppercase; text-align: center;">Attended</th>
-          <th style="padding-bottom: 8px; color: #9CA3AF; font-size: 12px; text-transform: uppercase; text-align: right;">Percentage</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
-    <div style="padding: 16px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 12px; text-align: center;">
-      <p style="margin: 0; font-size: 15px; color: #67E8F9;">
-        🚀 <strong>Overall Attendance:</strong> ${overallPct}%
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 16px 0; color: #06d6a0; font-size: 28px;">Weekly Report</h1>
+    ${rows}
+    <div style="margin-top: 24px; padding: 16px; background-color: #141425; border: 3px solid #06d6a0; border-radius: 16px; text-align: center; box-shadow: 4px 4px 0px 0px #06d6a0;">
+      <p style="margin: 0; font-size: 16px; color: #ffffff; font-weight: 900;">
+        Overall Attendance: <span style="color: #06d6a0; font-size: 24px;">${overall}%</span>
       </p>
     </div>
-  `);
+  `, "#06d6a0");
+
+  return { subject, html };
+}
+
+export function formatDailyReportEmail(
+  userName: string | null,
+  classes: any[],
+  present: number,
+  absent: number,
+  unmarked: number,
+  dateString: string
+) {
+  const subject = `Daily Report — ${dateString}`;
+
+  const rows = classes.length === 0
+    ? `<div class="card" style="text-align: center; border-color: #9b5de5; box-shadow: 4px 4px 0px 0px #9b5de5;"><p style="font-weight: 700; color: #9b5de5;">No classes were scheduled for today.</p></div>`
+    : classes.map((c) => {
+        const badge = c.status === "PRESENT" ? "badge-green" : c.status === "LATE" ? "badge-yellow" : c.status === "ABSENT" ? "badge-red" : "badge-blue";
+        return `
+          <div class="card" style="border-color: #2a2a3d; box-shadow: 4px 4px 0px 0px #2a2a3d;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <strong style="color: #ffffff; font-size: 16px; font-weight: 900;">${c.subjectName}${c.code ? ` (${c.code})` : ""}</strong>
+              <span class="badge ${badge}">${c.status}</span>
+            </div>
+            <p style="margin: 0; font-weight: 900; color: #a1a1aa; font-size: 14px;">
+              <span style="color: #4cc9f0;">🕒 ${c.startTime}</span>
+            </p>
+          </div>
+        `;
+      }).join("");
+
+  const total = classes.length;
+  const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+  const pctColor = pct >= 75 ? "#06d6a0" : pct >= 50 ? "#ffd166" : "#ef476f";
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 8px 0; color: #9b5de5; font-size: 28px;">Daily Report</h1>
+    <p style="color: #a1a1aa; font-weight: 700; margin: 0 0 24px 0;">${dateString}</p>
+    ${rows}
+    <div style="margin-top: 24px; display: flex; gap: 12px; margin-bottom: 12px;">
+      <div style="flex: 1; background: #141425; border: 2px solid #06d6a0; border-radius: 12px; padding: 12px; text-align: center;">
+        <div style="color: #06d6a0; font-size: 24px; font-weight: 900;">${present}</div>
+        <div style="color: #a1a1aa; font-size: 12px; font-weight: 700; text-transform: uppercase;">Present</div>
+      </div>
+      <div style="flex: 1; background: #141425; border: 2px solid #ef476f; border-radius: 12px; padding: 12px; text-align: center;">
+        <div style="color: #ef476f; font-size: 24px; font-weight: 900;">${absent}</div>
+        <div style="color: #a1a1aa; font-size: 12px; font-weight: 700; text-transform: uppercase;">Absent</div>
+      </div>
+      <div style="flex: 1; background: #141425; border: 2px solid #a1a1aa; border-radius: 12px; padding: 12px; text-align: center;">
+        <div style="color: #ffffff; font-size: 24px; font-weight: 900;">${unmarked}</div>
+        <div style="color: #a1a1aa; font-size: 12px; font-weight: 700; text-transform: uppercase;">Unmarked</div>
+      </div>
+    </div>
+    <div style="padding: 16px; background-color: #141425; border: 3px solid ${pctColor}; border-radius: 16px; text-align: center; box-shadow: 4px 4px 0px 0px ${pctColor};">
+      <p style="margin: 0; font-size: 16px; color: #ffffff; font-weight: 900;">
+        Today's Attendance: <span style="color: ${pctColor}; font-size: 24px;">${pct}%</span>
+      </p>
+    </div>
+  `, "#9b5de5");
+
+  return { subject, html };
+}
+
+export function formatAttendanceMarkedEmail(
+  userName: string | null,
+  subjectName: string,
+  status: string,
+  dateStr: string
+) {
+  const statusUpper = status.toUpperCase();
+  const subject = `Attendance Update: ${subjectName} — AttendEase`;
+  const badge = statusUpper === "PRESENT" ? "badge-green" : statusUpper === "LATE" ? "badge-yellow" : statusUpper === "ABSENT" ? "badge-red" : "badge-blue";
+  const shadow = statusUpper === "PRESENT" ? "#06d6a0" : statusUpper === "LATE" ? "#ffd166" : statusUpper === "ABSENT" ? "#ef476f" : "#4cc9f0";
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 24px 0; color: #9b5de5; font-size: 28px;">Attendance Marked</h1>
+    
+    <div class="card" style="border-color: ${shadow}; box-shadow: 4px 4px 0px 0px ${shadow}; padding: 24px;">
+      <h2 style="margin: 0 0 16px 0; font-size: 20px; color: #ffffff;">${subjectName}</h2>
+      <p style="margin: 0 0 12px 0; font-weight: 900; color: #a1a1aa; font-size: 15px;">
+        Status: <span class="badge ${badge}" style="font-size: 14px;">${statusUpper}</span>
+      </p>
+      <p style="margin: 0; font-weight: 700; color: #a1a1aa; font-size: 14px;">
+        Date: <span style="color: #ffffff;">${dateStr}</span>
+      </p>
+    </div>
+  `, shadow);
+
+  return { subject, html };
+}
+
+export function formatAttendanceFailedEmail(
+  userName: string | null,
+  subjectName: string,
+  errorMessage: string
+) {
+  const subject = `Action Required: Attendance Update Failed — AttendEase`;
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 24px 0; color: #ef476f; font-size: 28px;">Update Failed</h1>
+    
+    <div class="card" style="border-color: #ef476f; box-shadow: 4px 4px 0px 0px #ef476f; padding: 24px;">
+      <p style="margin: 0 0 12px 0; font-weight: 700; color: #ffffff; font-size: 16px; line-height: 1.5;">
+        We encountered an error while trying to automatically update your attendance for <strong>${subjectName}</strong>.
+      </p>
+      <div style="background: rgba(239, 71, 111, 0.1); border: 2px solid #ef476f; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+        <p style="margin: 0; font-weight: 900; color: #ef476f; font-family: monospace;">${errorMessage}</p>
+      </div>
+      <p style="margin: 0; font-weight: 700; color: #a1a1aa; font-size: 14px;">
+        Please log into the app and mark your attendance manually.
+      </p>
+    </div>
+  `, "#ef476f");
+
+  return { subject, html };
+}
+
+export function formatGenericNoticeEmail(
+  userName: string | null,
+  title: string,
+  message: string,
+  shadowColor = "#ff2d78"
+) {
+  const subject = `${title} — AttendEase`;
+
+  const html = emailWrapper(userName, `
+    <h1 style="margin: 0 0 24px 0; color: ${shadowColor}; font-size: 28px;">${title}</h1>
+    
+    <div class="card" style="border-color: ${shadowColor}; box-shadow: 4px 4px 0px 0px ${shadowColor}; padding: 24px;">
+      <p style="margin: 0; font-weight: 700; color: #ffffff; font-size: 16px; line-height: 1.6;">
+        ${message}
+      </p>
+    </div>
+  `, shadowColor);
 
   return { subject, html };
 }
 
 export function formatReminderEmail(
+  userName: string | null,
   reminderTitle: string,
   dueDate: string,
   dueTime?: string,
@@ -167,26 +363,26 @@ export function formatReminderEmail(
 ) {
   const subject = `🔔 Reminder: ${reminderTitle}${subjectName ? ` (${subjectName})` : ''}`;
 
-  const html = emailWrapper(`
-    <div style="text-align: center; margin-bottom: 16px;">
-      <span class="badge badge-yellow" style="font-size: 14px; padding: 6px 14px;">TASK REMINDER</span>
+  const html = emailWrapper(userName, `
+    <div style="margin-bottom: 16px;">
+      <span class="badge badge-yellow">TASK REMINDER</span>
     </div>
-    <h2 style="margin-top: 0; color: #FFFFFF; font-size: 22px; text-align: center;">${reminderTitle}</h2>
-    ${subjectName ? `<p style="text-align: center; color: #A78BFA; font-weight: 600; margin-top: -10px;">Subject: ${subjectName}</p>` : ''}
+    <h1 style="margin: 0 0 8px 0; color: #ffffff; font-size: 28px;">${reminderTitle}</h1>
+    ${subjectName ? `<p style="color: #9b5de5; font-weight: 900; margin: 0 0 24px 0; font-size: 16px;">${subjectName}</p>` : '<div style="margin-bottom: 24px;"></div>'}
     
-    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 18px; margin: 20px 0;">
-      <p style="margin: 0 0 8px 0; font-size: 14px; color: #D1D5DB;">
-        📅 <strong>Due Date:</strong> ${dueDate} ${dueTime ? `at ${dueTime}` : ''}
+    <div class="card" style="border-color: #ffd166; box-shadow: 4px 4px 0px 0px #ffd166; padding: 24px;">
+      <p style="margin: 0 0 12px 0; font-size: 16px; color: #ffffff; font-weight: 900;">
+        <span style="color: #ffd166;">📅 Due Date:</span> ${dueDate} ${dueTime ? `at ${dueTime}` : ''}
       </p>
-      ${description ? `<p style="margin: 8px 0 0 0; font-size: 13px; color: #9CA3AF;">📝 ${description}</p>` : ''}
+      ${description ? `<p style="margin: 0; font-size: 15px; font-weight: 700; color: #a1a1aa; line-height: 1.5;">${description}</p>` : ''}
     </div>
 
     <div style="text-align: center; margin-top: 24px;">
-      <a href="https://attendease-c7wl.vercel.app/reminders" style="display: inline-block; background: linear-gradient(135deg, #7C3AED, #EC4899); color: #FFFFFF; font-weight: 600; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-size: 14px;">
+      <a href="https://attendease-c7wl.vercel.app/reminders" style="display: inline-block; background-color: #ffd166; color: #0d0d1a; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px; font-size: 16px; border: 2px solid #ffffff;">
         Open Reminders
       </a>
     </div>
-  `);
+  `, "#ffd166");
 
   return { subject, html };
 }
