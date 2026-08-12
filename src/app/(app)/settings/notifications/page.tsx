@@ -81,6 +81,10 @@ export default function NotificationSettingsPage() {
     session?.user ? "/settings/notifications" : null
   );
 
+  const { data: telegramData } = useSWRFetch<{ connected: boolean; username: string | null; connectUrl: string }>(
+    session?.user ? "/telegram/connect" : null
+  );
+
   const [originalSettings, setOriginalSettings] = useState<NotificationSettings | null>(null);
   const [currentSettings, setCurrentSettings] = useState<NotificationSettings | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -307,6 +311,7 @@ export default function NotificationSettingsPage() {
           {CHANNELS.map((channel) => {
             const isChannelEnabled = currentSettings[channel.enabledKey];
             const isPush = channel.key === "push";
+            const isTelegram = channel.key === "telegram";
 
             return (
               <div
@@ -375,6 +380,31 @@ export default function NotificationSettingsPage() {
                           <li>Refresh this page</li>
                         </ol>
                       </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Telegram-specific actions */}
+                {isTelegram && telegramData && (
+                  <div className="px-5 pb-3">
+                    {telegramData.connected ? (
+                      <div className="rounded-xl p-4 flex items-center justify-between bg-[#10b981]/10 border-2 border-[#10b981]/20 shadow-[0_3px_0_0_rgba(16,185,129,0.2)]">
+                        <div>
+                          <p className="text-sm font-black text-[#10b981]">Connected to Telegram</p>
+                          <p className="text-xs font-bold text-[#10b981]/80 mt-0.5">@{telegramData.username}</p>
+                        </div>
+                        <Check className="w-5 h-5 text-[#10b981]" />
+                      </div>
+                    ) : (
+                      <a
+                        href={telegramData.connectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-3d-primary bg-[#10b981] hover:bg-[#059669] shadow-[0_4px_0_0_#047857] hover:shadow-[0_1px_0_0_#047857] border-[#047857] w-full py-3 flex items-center justify-center gap-2 text-sm cursor-pointer"
+                      >
+                        <Send className="w-4 h-4" />
+                        Link Telegram Account
+                      </a>
                     )}
                   </div>
                 )}

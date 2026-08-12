@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Bell, Calendar, Download, Moon, ChevronRight, Trophy, Edit2, HeartPulse, Target } from "lucide-react";
+import { Bell, Calendar, Download, Moon, ChevronRight, Trophy, Edit2, HeartPulse, Target, Send, Check } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserAvatar, AvatarPicker } from "@/components/UserAvatar";
 import { apiFetch } from "@/hooks/useApi";
+import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 
@@ -20,6 +21,8 @@ const settingsItems = [
 export default function SettingsPage() {
   const { data: session, update } = useSession();
   const user = session?.user;
+
+  const { data: telegramData } = useSWRFetch<{ connected: boolean; username: string | null; connectUrl: string }>("/telegram/connect");
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState("");
@@ -181,6 +184,39 @@ export default function SettingsPage() {
           </div>
           <ChevronRight className="w-5 h-5 text-[#FFD166]/40 group-hover:translate-x-1 group-hover:text-[#FFD166] transition-all" />
         </Link>
+
+        {/* Telegram Connect */}
+        <div className="rounded-2xl border-2 border-[#10b981] p-5 mb-4 bg-[#10b981]/10 shadow-[0_6px_0_0_#059669] dark:bg-[#10b981]/15 dark:shadow-[0_6px_0_0_#047857]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[#10b981]/15 text-[#10b981] flex items-center justify-center shrink-0">
+                <Send className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-[#1a1a2e] dark:text-white">Telegram Account</p>
+                {telegramData?.connected ? (
+                  <div className="flex items-center gap-1.5 mt-0.5 text-[#10b981]">
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs font-bold text-[#10b981]">Connected as @{telegramData.username}</span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Link your account for instant alerts</p>
+                )}
+              </div>
+            </div>
+            {!telegramData?.connected && telegramData?.connectUrl && (
+              <a
+                href={telegramData.connectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-3d-primary bg-[#10b981] hover:bg-[#059669] shadow-[0_4px_0_0_#047857] hover:shadow-[0_1px_0_0_#047857] border-[#047857] py-2 px-4 flex items-center justify-center gap-2 text-sm cursor-pointer whitespace-nowrap"
+              >
+                <Send className="w-4 h-4" />
+                Link Account
+              </a>
+            )}
+          </div>
+        </div>
       </StaggerGrid>
 
       {/* Edit Profile Modal */}
