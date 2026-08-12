@@ -67,6 +67,7 @@ export async function PUT(req: NextRequest) {
       "emailDailyBrief", "emailPreClass", "emailDangerAlert", "emailWeeklyReport", "emailDailyReport",
       "telegramDailyBrief", "telegramPreClass", "telegramDangerAlert", "telegramWeeklyReport", "telegramDailyReport",
       "dailyBriefHour", "dailyBriefMinute", "dailyReportHour", "dailyReportMinute", "preClassMinutes",
+      "goalModeEnabled", "goalType", "goalSetupComplete", "goalTargetPct",
     ];
 
     const updateData: Record<string, any> = {};

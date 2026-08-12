@@ -43,14 +43,17 @@ export async function GET(req: NextRequest) {
   });
 
   const goalEnabled = settings?.goalModeEnabled ?? false;
+  const goalType = settings?.goalType ?? "none";
   const goalPct = settings?.goalTargetPct ?? 85.0;
 
-  if (!goalEnabled) {
+  if (!goalEnabled || goalType === "none") {
     return Response.json({
       goalPct,
+      goalType: "none",
+      goalSetupComplete: settings?.goalSetupComplete ?? false,
       goalEnabled: false,
       todaysPlan: [],
-      summary: { mustAttend: 0, canSkip: 0 },
+      summary: { mustAttend: 0, canSkip: 0, total: 0 },
     });
   }
 
@@ -202,12 +205,13 @@ export async function GET(req: NextRequest) {
   for (const entry of entries) {
     const s = entry.subject;
     const effectivePresent = s.totalPresent + s.totalLate;
-    const goalReq = goalPct / 100;
+    // Determine the goal requirement for this specific subject
+    const subjectGoalReq = goalType === "subject" ? s.minAttendancePct / 100 : goalPct / 100;
 
     const canSkipForGoal =
-      effectivePresent - goalReq * s.totalClassesHeld > 0
+      effectivePresent - subjectGoalReq * s.totalClassesHeld > 0
         ? Math.floor(
-            (effectivePresent - goalReq * s.totalClassesHeld) / goalReq
+            (effectivePresent - subjectGoalReq * s.totalClassesHeld) / subjectGoalReq
           )
         : 0;
 
@@ -227,7 +231,7 @@ export async function GET(req: NextRequest) {
       endTime: entry.endTime,
       room: entry.room,
       currentPct: s.currentPercentage,
-      projectedGoalPct: goalPct,
+      projectedGoalPct: goalType === "subject" ? s.minAttendancePct : goalPct,
       priority,
       canSkipForGoal: Math.max(0, canSkipForGoal),
       scheduleId: entry.scheduleId,
@@ -242,6 +246,8 @@ export async function GET(req: NextRequest) {
 
   return Response.json({
     goalPct,
+    goalType,
+    goalSetupComplete: settings?.goalSetupComplete ?? false,
     goalEnabled: true,
     todaysPlan,
     summary: { mustAttend, canSkip, total: todaysPlan.length },

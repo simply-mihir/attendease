@@ -11,6 +11,7 @@ import {
   Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap, Minus, TrendingDown
 , BarChart3 } from "lucide-react";
 import clsx from "clsx";
+import { GoalSetupPopup } from "@/components/GoalSetupPopup";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
 import { MarkingProgressBar } from "@/components/MarkingProgressBar";
 import { ParticleBurst } from "@/components/ParticleBurst";
@@ -238,6 +239,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
   return (
     <PageTransition direction="up" staggerChildren={false} className="space-y-6">
+      {goalPlan && !goalPlan.goalSetupComplete && (
+        <GoalSetupPopup onHide={() => invalidate("/analytics/goal-plan")} />
+      )}
       <MarkingProgressBar isActive={markingStatus.active} status={markingStatus.status} />
       <ParticleBurst trigger={particleBurst.trigger} x={particleBurst.x} y={particleBurst.y} type={particleBurst.type} />
       {/* Greeting */}

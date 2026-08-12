@@ -5,10 +5,11 @@ import { FieldLoader } from "@/components/FieldLoader";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
 import Link from "next/link";
-import { ArrowLeft, Target, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Target, Save, Loader2, ListChecks } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
+import { invalidate } from "@/hooks/useSWRFetch";
 
 function SettingsGoalSkeleton() {
   return (
@@ -29,29 +30,71 @@ function SettingsGoalSkeleton() {
 
 export default function GoalSettingsPage() {
   const [enabled, setEnabled] = useState(false);
+  const [goalType, setGoalType] = useState<"overall" | "subject">("overall");
   const [targetPct, setTargetPct] = useState(85);
+  const [subjectTargets, setSubjectTargets] = useState<{ id: string; name: string; colorHex: string; target: number }[]>([]);
+  
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { data, isLoading: loading } = useSWRFetch<any>("/notifications/settings");
+  const { data: settingsData, isLoading: loadingSettings } = useSWRFetch<any>("/settings/notifications");
+  const { data: subjectsData, isLoading: loadingSubjects } = useSWRFetch<any>("/subjects");
 
   useEffect(() => {
-    if (data?.settings) {
-      setEnabled(data.settings.goalModeEnabled ?? false);
-      setTargetPct(data.settings.goalTargetPct ?? 85);
+    if (settingsData) {
+      setEnabled(settingsData.goalModeEnabled ?? false);
+      const gt = settingsData.goalType ?? "none";
+      setGoalType(gt === "none" ? "overall" : gt);
+      setTargetPct(settingsData.goalTargetPct ?? 85);
     }
-  }, [data]);
+  }, [settingsData]);
+
+  useEffect(() => {
+    if (subjectsData?.subjects) {
+      const activeSubjects = subjectsData.subjects.filter((s: any) => !s.isArchived);
+      setSubjectTargets(activeSubjects.map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        colorHex: s.colorHex,
+        target: s.minAttendancePct ?? 75,
+      })));
+    }
+  }, [subjectsData]);
+
+  const updateSubjectTarget = (id: string, newTarget: number) => {
+    setSubjectTargets(prev => prev.map(s => s.id === id ? { ...s, target: newTarget } : s));
+  };
 
   async function handleSave() {
     setSaving(true);
     try {
-      await apiFetch("/notifications/settings", {
+      // 1. Save NotificationSettings
+      await apiFetch("/settings/notifications", {
         method: "PUT",
         body: JSON.stringify({
           goalModeEnabled: enabled,
+          goalType: enabled ? goalType : "none",
           goalTargetPct: targetPct,
+          goalSetupComplete: true,
         }),
       });
+
+      // 2. Save Subject Minimums if in subject mode
+      if (enabled && goalType === "subject") {
+        await Promise.all(
+          subjectTargets.map(s => 
+            apiFetch(`/subjects/${s.id}`, {
+              method: "PUT",
+              body: JSON.stringify({ minAttendancePct: s.target }),
+            })
+          )
+        );
+      }
+
+      await invalidate("/settings/notifications");
+      await invalidate("/analytics/goal-plan");
+      await invalidatePrefix("/dashboard");
+      
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
@@ -61,12 +104,12 @@ export default function GoalSettingsPage() {
     }
   }
 
-  if (loading) {
+  if (loadingSettings || loadingSubjects) {
     return <SettingsGoalSkeleton />;
   }
 
   return (
-    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6">
+    <PageTransition direction="right" staggerChildren={false} className="max-w-2xl mx-auto space-y-6 pb-20">
       <Link href="/settings" className="btn-3d-secondary inline-flex items-center gap-2 transition" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
         <ArrowLeft className="w-4 h-4" /> Back to Settings
       </Link>
@@ -80,16 +123,16 @@ export default function GoalSettingsPage() {
           Goal Mode
         </h1>
         <p className="text-text-muted text-sm font-bold mt-1 ml-[56px]">
-          Set a target attendance percentage and get daily action plans
+          Set your attendance targets and get daily action plans
         </p>
       </div>
 
-      <StaggerGrid className="card-3d p-6 space-y-6 transition-all" delay={150} staggerDelay={80} animation="fadeSlideUp">
+      <StaggerGrid className="card-3d p-6 space-y-8 transition-all" delay={150} staggerDelay={80} animation="fadeSlideUp">
         {/* Enable toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-black text-text">Enable Goal Mode</p>
-            <p className="text-xs text-text-muted font-bold mt-0.5">Show daily action plan on your dashboard</p>
+            <p className="font-black text-text text-lg">Enable Goal Mode</p>
+            <p className="text-sm text-text-muted font-bold mt-0.5 max-w-sm">Show your daily attendance plan directly on your dashboard</p>
           </div>
           <button
             role="switch"
@@ -111,39 +154,113 @@ export default function GoalSettingsPage() {
           </button>
         </div>
 
-        {/* Target percentage */}
         {enabled && (
-          <div className="space-y-4 pt-2">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-black text-text">
-                  Target Attendance
-                </label>
-                <span className="text-[#ff6b35] text-2xl font-black tracking-tight">{targetPct}%</span>
-              </div>
-              <input
-                type="range"
-                min={50}
-                max={100}
-                value={targetPct}
-                onChange={(e) => setTargetPct(parseInt(e.target.value))}
-                className="w-full accent-[#ff6b35] cursor-pointer h-3 border-2 border-gray-200 dark:border-[#2a2a3d] bg-gray-100 dark:bg-[#0d0d1a] rounded-full shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] dark:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)]"
-              />
-              <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1">
-                <span>50%</span>
-                <span>75%</span>
-                <span>100%</span>
-              </div>
+          <div className="space-y-6 pt-4 border-t-2 border-gray-100 dark:border-white/5">
+            {/* Goal Type Selector */}
+            <div className="grid grid-cols-2 gap-4">
+              <button 
+                onClick={() => setGoalType("overall")} 
+                className={clsx(
+                  "p-4 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 cursor-pointer group",
+                  goalType === "overall" 
+                    ? "bg-[#4cc9f0]/10 border-[#4cc9f0] shadow-[0_4px_0_0_#4cc9f0]" 
+                    : "bg-gray-50 border-gray-200 dark:bg-[#1a1a2e] dark:border-[#2a2a3d] hover:border-gray-300 dark:hover:border-white/20"
+                )}
+              >
+                <Target className={clsx("w-6 h-6", goalType === "overall" ? "text-[#4cc9f0]" : "text-gray-400")} />
+                <div>
+                  <h3 className="font-extrabold text-[#1a1a2e] dark:text-white">Overall Goal</h3>
+                  <p className="text-xs font-bold text-gray-500 mt-1">One target for everything</p>
+                </div>
+              </button>
+              <button 
+                onClick={() => setGoalType("subject")} 
+                className={clsx(
+                  "p-4 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 cursor-pointer group",
+                  goalType === "subject" 
+                    ? "bg-[#06d6a0]/10 border-[#06d6a0] shadow-[0_4px_0_0_#06d6a0]" 
+                    : "bg-gray-50 border-gray-200 dark:bg-[#1a1a2e] dark:border-[#2a2a3d] hover:border-gray-300 dark:hover:border-white/20"
+                )}
+              >
+                <ListChecks className={clsx("w-6 h-6", goalType === "subject" ? "text-[#06d6a0]" : "text-gray-400")} />
+                <div>
+                  <h3 className="font-extrabold text-[#1a1a2e] dark:text-white">Subject-wise</h3>
+                  <p className="text-xs font-bold text-gray-500 mt-1">Unique targets per subject</p>
+                </div>
+              </button>
             </div>
 
-            <div className="p-4 bg-[#ff6b35]/10 rounded-2xl border-2 border-[#ff6b35]/30 shadow-[0_3px_0_0_rgba(255,107,53,0.2)]">
-              <p className="text-sm text-text-secondary font-bold">
-                {targetPct >= 90 ? (
-                  <span>🎯 <strong className="text-[#ff6b35] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
-                ) : targetPct >= 75 ? (
-                  <span>✅ <strong className="text-[#06d6a0] font-black">Solid target.</strong> You&apos;ll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
+            {/* Target percentage (Overall) */}
+            {goalType === "overall" && (
+              <div className="space-y-4 pt-2 animate-fade-in">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-black text-text">
+                      Global Attendance Target
+                    </label>
+                    <span className="text-[#4cc9f0] text-2xl font-black tracking-tight">{targetPct}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={50}
+                    max={100}
+                    value={targetPct}
+                    onChange={(e) => setTargetPct(parseInt(e.target.value))}
+                    className="w-full accent-[#4cc9f0] cursor-pointer h-3 border-2 border-gray-200 dark:border-[#2a2a3d] bg-gray-100 dark:bg-[#0d0d1a] rounded-full shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.04)] dark:shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.2)]"
+                  />
+                  <div className="flex justify-between text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80] mt-1">
+                    <span>50%</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Target percentages (Subject-wise) */}
+            {goalType === "subject" && (
+              <div className="space-y-6 pt-2 animate-fade-in">
+                <label className="block text-sm font-black text-text">
+                  Individual Subject Targets
+                </label>
+                {subjectTargets.length === 0 ? (
+                  <p className="text-sm font-bold text-gray-400">No active subjects found.</p>
                 ) : (
-                  <span>⚠️ <strong className="text-[#ef476f] font-black">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
+                  subjectTargets.map(s => (
+                    <div key={s.id} className="p-4 rounded-xl border-2 border-gray-100 dark:border-[#2a2a3d] bg-gray-50 dark:bg-[#141425]">
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.colorHex }} />
+                          <span className="font-bold text-[#1a1a2e] dark:text-white truncate max-w-[200px]">{s.name}</span>
+                        </div>
+                        <span className="text-[#06d6a0] text-xl font-black">{s.target}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={50}
+                        max={100}
+                        value={s.target}
+                        onChange={(e) => updateSubjectTarget(s.id, parseInt(e.target.value))}
+                        className="w-full accent-[#06d6a0] cursor-pointer h-2 border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0d0d1a] rounded-full"
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            <div className="p-4 bg-gray-50 dark:bg-[#141425] rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d]">
+              <p className="text-sm text-text-secondary font-bold">
+                {goalType === "overall" ? (
+                  targetPct >= 90 ? (
+                    <span>🎯 <strong className="text-[#4cc9f0] font-black">Ambitious!</strong> Your dashboard will show which classes are mandatory to hit {targetPct}%.</span>
+                  ) : targetPct >= 75 ? (
+                    <span>✅ <strong className="text-[#4cc9f0] font-black">Solid target.</strong> You'll see a clear daily plan to maintain {targetPct}% across all subjects.</span>
+                  ) : (
+                    <span>⚠️ <strong className="text-[#ef476f] font-black">Low target.</strong> Consider aiming higher — {targetPct}% may be close to minimum requirements.</span>
+                  )
+                ) : (
+                  <span>✅ <strong className="text-[#06d6a0] font-black">Personalized!</strong> Your dashboard will adapt to the unique target of every single subject in your schedule.</span>
                 )}
               </p>
             </div>
