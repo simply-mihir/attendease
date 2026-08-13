@@ -578,21 +578,22 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   <div className="absolute inset-x-0 top-0 h-[2px]"
                     style={{ background: `linear-gradient(to right, transparent, ${color.bg}60, transparent)` }} />
 
-                  <div className="relative">
+                  <div className="relative flex flex-col h-full">
                     {/* Row 1: Label + Icon */}
-                    <div className="flex items-center justify-between mb-3 h-6">
-                      <div className="text-[11px] font-bold uppercase tracking-wider break-words pr-2 flex items-center"
+                    <div className="flex items-start justify-between mb-3 gap-2">
+                      <div className="text-[11px] font-bold uppercase tracking-wider break-words flex-1"
                         style={{ color: color.bg }}>
                         {loading ? <FieldLoader size="sm" /> : s.name}
                       </div>
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-all duration-300"
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg group-hover:scale-110 transition-all duration-300 mt-[-2px]"
                         style={{ backgroundColor: `${color.bg}1A`, color: color.bg }}>
                         <BookOpen className="h-4 w-4 block group-hover:hidden" />
                         <ChevronRight className="h-4 w-4 hidden group-hover:block" />
                       </div>
                     </div>
 
-                    {/* Row 2: Big percentage number */}
+                    <div className="flex-1 flex flex-col justify-end">
+                      {/* Row 2: Big percentage number */}
                     <div className="text-3xl font-extrabold text-[#1a1a2e] dark:text-white mb-1 h-9 flex items-center">
                       {loading ? <FieldLoader size="lg" /> : `${percentage}%`}
                     </div>
@@ -633,6 +634,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80] mt-2 font-semibold">
                       {s.code || "No code"}
                     </p>
+                    </div>
                   </div>
 
                 </Link>
