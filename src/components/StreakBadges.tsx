@@ -7,12 +7,13 @@ import { STREAK_BADGES, getEarnedBadges, getNextBadge, getBadgeProgress, type Ba
 
 interface StreakBadgesProps {
   streak: number;
+  longestStreak: number;
 }
 
-export function StreakBadges({ streak }: StreakBadgesProps) {
+export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
   const [activeBadge, setActiveBadge] = useState<Badge | null>(null);
-  const earned = getEarnedBadges(streak);
-  const nextProgress = getBadgeProgress(streak);
+  const earned = getEarnedBadges(longestStreak);
+  const nextProgress = getBadgeProgress(streak, longestStreak);
 
   return (
     <div className="card-3d p-5 transition-all duration-150">
@@ -31,7 +32,7 @@ export function StreakBadges({ streak }: StreakBadgesProps) {
       {/* Badge grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {STREAK_BADGES.map((badge) => {
-          const isEarned = streak >= badge.requiredStreak;
+          const isEarned = longestStreak >= badge.requiredStreak;
           const isLatestEarned = isEarned && (STREAK_BADGES.indexOf(badge) === earned.length - 1);
           
           return (

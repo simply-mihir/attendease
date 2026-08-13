@@ -54,19 +54,17 @@ export const STREAK_BADGES: Badge[] = [
   },
 ];
 
-export function getEarnedBadges(streak: number): Badge[] {
-  return STREAK_BADGES.filter(b => streak >= b.requiredStreak);
+export function getEarnedBadges(longestStreak: number): Badge[] {
+  return STREAK_BADGES.filter(b => longestStreak >= b.requiredStreak);
 }
 
-export function getNextBadge(streak: number): Badge | null {
-  return STREAK_BADGES.find(b => streak < b.requiredStreak) || null;
+export function getNextBadge(longestStreak: number): Badge | null {
+  return STREAK_BADGES.find(b => longestStreak < b.requiredStreak) || null;
 }
 
-export function getBadgeProgress(streak: number): { badge: Badge; progress: number } | null {
-  const next = getNextBadge(streak);
+export function getBadgeProgress(currentStreak: number, longestStreak: number): { badge: Badge; progress: number } | null {
+  const next = getNextBadge(longestStreak);
   if (!next) return null;
-  const prev = STREAK_BADGES[STREAK_BADGES.indexOf(next) - 1];
-  const start = prev ? prev.requiredStreak : 0;
-  const progress = ((streak - start) / (next.requiredStreak - start)) * 100;
+  const progress = (currentStreak / next.requiredStreak) * 100;
   return { badge: next, progress: Math.min(progress, 100) };
 }

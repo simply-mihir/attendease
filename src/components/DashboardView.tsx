@@ -206,6 +206,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
   const isCurrent = dashboard?.isCurrentSemester ?? true;
   const overallPct = dashboard?.stats?.overallAttendance ?? dashboard?.overallPct ?? 0;
   const currentStreak = dashboard?.currentStreak ?? 0; // Or calculate if missing from new API
+  const longestStreak = dashboard?.longestStreak ?? 0;
   const totalSubjects = dashboard?.stats?.totalSubjects ?? dashboard?.totalSubjects ?? 0;
   const dangerCount = dashboard?.stats?.dangerCount ?? dashboard?.dangerSubjects?.length ?? 0;
   const dangerSubjectsList = dashboard?.dangerSubjects || (dashboard?.subjectsSummary?.filter((s) => s.statusColor === "red")) || [];
@@ -411,7 +412,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Streak Badges */}
       {isCurrent && (
         <div className="mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.4s ease-out 100ms forwards" }}>
-          <StreakBadges streak={currentStreak} />
+          <StreakBadges streak={currentStreak} longestStreak={longestStreak} />
         </div>
       )}
 
