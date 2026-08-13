@@ -315,45 +315,40 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ===== MOBILE FULLSCREEN MENU ===== */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-[#0a0e1a] animate-fade-in md:hidden">
-          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#070b14]">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white/40 dark:bg-[#0a0e1a]/60 backdrop-blur-2xl animate-fade-in md:hidden">
+          <div className="flex items-center justify-between p-4 border-b border-white/30 dark:border-white/10 bg-white/30 dark:bg-black/20">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shrink-0 shadow-[0_3px_0_0_#cc1a5e]">
                 <GraduationCap className="w-4 h-4 text-white" />
               </div>
-              <span className="text-lg font-black tracking-tight text-[#FF2D78]">Menu</span>
+              <span className="text-lg font-black tracking-tight text-[#FF2D78] drop-shadow-sm">Menu</span>
             </div>
             <button 
               onClick={() => setMobileMenuOpen(false)} 
-              className="p-2 rounded-xl border-2 border-gray-200 bg-gray-50 text-[#1a1a2e] shadow-[0_3px_0_0_#d1d5db] active:translate-y-[2px] active:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#1a1a2e] dark:text-white dark:shadow-[0_3px_0_0_#0d0d1a]"
+              className="p-2 rounded-xl border border-white/40 bg-white/50 text-[#1a1a2e] shadow-sm active:translate-y-[2px] dark:border-white/10 dark:bg-black/30 dark:text-white backdrop-blur-md"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-6 bg-gray-50 dark:bg-[#070b14]">
+          <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-6 bg-transparent">
              <div>
-               <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-1">Navigation</h3>
+               <h3 className="text-xs font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-3 px-1 drop-shadow-sm">Navigation</h3>
                <div className="grid grid-cols-2 gap-3">
                  {navItems.map(item => {
-                   const active = pathname?.startsWith(item.href);
                    return (
                      <Link 
                        key={item.href} 
                        href={item.href} 
                        onClick={() => setMobileMenuOpen(false)}
-                       className={clsx(
-                         "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-transparent transition-all duration-150 active:translate-y-[2px] active:shadow-none shadow-[0_4px_0_0_rgba(0,0,0,0.2)] dark:shadow-[0_4px_0_0_rgba(0,0,0,0.4)]",
-                         `bg-gradient-to-br ${item.gradient}`
-                       )}
+                       className="relative overflow-hidden flex flex-col items-center gap-2 p-3 rounded-2xl border border-white/40 dark:border-white/10 transition-all duration-150 active:translate-y-[2px] shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl group"
                      >
-                        <div className={clsx(
-                          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mb-1",
-                          "bg-white/20 border border-white/30"
-                        )}>
-                          <item.icon className="w-5 h-5 text-white" />
+                        <div className={clsx("absolute inset-0 opacity-70 dark:opacity-50 bg-gradient-to-br", item.gradient)} />
+                        
+                        <div className="relative z-10 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mb-1 bg-white/20 dark:bg-black/20 border border-white/40 dark:border-white/20 shadow-inner group-active:scale-95 transition-transform">
+                          <item.icon className="w-5 h-5 text-white drop-shadow-sm" />
                         </div>
-                        <span className="text-xs font-bold text-center text-white">
+                        <span className="relative z-10 text-xs font-bold text-center text-white drop-shadow-md">
                           {item.label}
                         </span>
                      </Link>
@@ -362,28 +357,32 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                </div>
              </div>
 
-             <div className="border-t-2 border-gray-200 dark:border-[#2a2a3d] pt-6">
+             <div className="border-t border-white/30 dark:border-white/10 pt-6">
                 <Link 
                   href="/settings?edit=true" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-200 bg-white shadow-[0_4px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_4px_0_0_#0d0d1a]"
+                  className="relative overflow-hidden flex items-center gap-4 p-4 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] backdrop-blur-xl"
                 >
-                  <UserAvatar user={user} size="lg" className="shadow-[0_2px_0_0_#cc1a5e]" />
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-bold text-[#1a1a2e] dark:text-white truncate">{user?.name || "Student"}</p>
-                    <p className="text-xs font-semibold text-[#9ca3af] dark:text-[#6b6b80] truncate">{user?.email}</p>
+                  <div className="absolute inset-0 bg-white/40 dark:bg-black/40" />
+                  <UserAvatar user={user} size="lg" className="relative z-10 shadow-[0_2px_0_0_#cc1a5e]" />
+                  <div className="relative z-10 flex-1 min-w-0 text-left">
+                    <p className="text-sm font-bold text-[#1a1a2e] dark:text-white truncate drop-shadow-sm">{user?.name || "Student"}</p>
+                    <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate drop-shadow-sm">{user?.email}</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="relative z-10 w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </Link>
              </div>
 
              <button
                onClick={handleLogout}
                disabled={signingOut}
-               className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-[#0e7490] bg-[#06b6d4] text-white font-black shadow-[0_4px_0_0_#0e7490] active:translate-y-[2px] active:shadow-[0_2px_0_0_#0e7490] disabled:opacity-60 transition-all duration-150 cursor-pointer"
+               className="relative overflow-hidden w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] backdrop-blur-xl active:translate-y-[2px] disabled:opacity-60 transition-all duration-150 cursor-pointer"
              >
-               {signingOut ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogOut className="w-5 h-5" />}
-               {signingOut ? "Signing out..." : "Sign Out"}
+               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/70 to-blue-500/70 dark:from-cyan-500/50 dark:to-blue-500/50" />
+               <div className="relative z-10 flex items-center gap-2 text-white font-black drop-shadow-md">
+                 {signingOut ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogOut className="w-5 h-5" />}
+                 {signingOut ? "Signing out..." : "Sign Out"}
+               </div>
              </button>
           </div>
         </div>
