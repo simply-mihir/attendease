@@ -34,8 +34,8 @@ export default function SemestersPage() {
   
   const [loading, setLoading] = useState(false);
 
-  const { data, isLoading: pageLoading } = useSWRFetch<{ semesters: any[] }>("/semesters");
-  const semesters = data?.semesters || [];
+  const { data, isLoading: pageLoading } = useSWRFetch<any[]>("/semesters");
+  const semesters = data || [];
 
   const [linkSemesterId, setLinkSemesterId] = useState<string | null>(null);
   const [allSubjects, setAllSubjects] = useState<any[]>([]);
