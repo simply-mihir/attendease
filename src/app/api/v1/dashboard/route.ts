@@ -47,6 +47,7 @@ export async function GET() {
         minAttendancePct: true,
         currentPercentage: true,
         streakCount: true,
+        longestStreak: true,
       },
     }),
     prisma.attendanceRecord.findMany({
@@ -132,12 +133,14 @@ export async function GET() {
   const totalClasses = subjects.reduce((sum, s) => sum + s.totalClassesHeld, 0);
   const totalAttended = subjects.reduce((sum, s) => sum + s.totalPresent + s.totalLate, 0);
   const overallAttendance = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 100;
+  const longestStreak = subjects.reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
   const dangerSubjects = subjectsWithStats.filter((s) => s.currentPercentage < (s.minAttendancePct || 75));
 
   return cachedJson({
     userName,
     currentStreak,
+    longestStreak,
     todaySchedule,
     subjects: subjectsWithStats,
     stats: {
