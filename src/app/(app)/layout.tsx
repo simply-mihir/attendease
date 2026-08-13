@@ -343,21 +343,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                        href={item.href} 
                        onClick={() => setMobileMenuOpen(false)}
                        className={clsx(
-                         "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-150 shadow-[0_4px_0_0_#d1d5db] dark:shadow-[0_4px_0_0_#0d0d1a] active:translate-y-[2px] active:shadow-[0_2px_0_0_#d1d5db] dark:active:shadow-[0_2px_0_0_#0d0d1a]",
-                         active 
-                           ? "bg-[#FF2D78]/10 border-[#FF2D78]/30 shadow-[0_4px_0_0_#fecdd3] dark:shadow-[0_4px_0_0_#3a1020]" 
-                           : "bg-white border-gray-200 dark:bg-[#141425] dark:border-[#2a2a3d]"
+                         "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 border-transparent transition-all duration-150 active:translate-y-[2px] active:shadow-none shadow-[0_4px_0_0_rgba(0,0,0,0.2)] dark:shadow-[0_4px_0_0_rgba(0,0,0,0.4)]",
+                         `bg-gradient-to-br ${item.gradient}`
                        )}
                      >
                         <div className={clsx(
                           "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mb-1",
-                          active
-                            ? `bg-gradient-to-br ${item.gradient} shadow-sm text-white`
-                            : "bg-gray-100 dark:bg-white/5 border border-gray-200/60 dark:border-white/5"
+                          "bg-white/20 border border-white/30"
                         )}>
-                          <item.icon className={clsx("w-5 h-5", active ? "text-white" : "text-gray-500 dark:text-gray-400")} />
+                          <item.icon className="w-5 h-5 text-white" />
                         </div>
-                        <span className={clsx("text-xs font-bold text-center", active ? "text-[#FF2D78]" : "text-[#4a4a5a] dark:text-[#c4c4d4]")}>
+                        <span className="text-xs font-bold text-center text-white">
                           {item.label}
                         </span>
                      </Link>
