@@ -199,7 +199,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
           <nav className={clsx("flex-1 px-2 space-y-1 overflow-y-auto pt-2 lg:pt-0", sidebarCollapsed ? "px-2 lg:px-3" : "px-3")}>
             {navItems.map((item) => {
-              const active = pathname.startsWith(item.href);
+              const active = pathname?.startsWith(item.href);
               return (
                 <Link key={item.href} href={item.href}
                   onMouseEnter={() => item.prefetchKey && preload(item.prefetchKey, fetcher)}
@@ -281,7 +281,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-gray-200 bg-white/95 backdrop-blur-sm dark:border-[#2a2a3d] dark:bg-[#0a0e1a]/95 md:hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around py-2 px-2">
           {mobileNavItems.map(item => {
-            const active = pathname.startsWith(item.href) && item.href !== "#menu";
+            const active = pathname?.startsWith(item.href) && item.href !== "#menu";
             
             if (item.href === "#menu") {
               return (
@@ -336,7 +336,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-1">Navigation</h3>
                <div className="grid grid-cols-2 gap-3">
                  {navItems.map(item => {
-                   const active = pathname.startsWith(item.href);
+                   const active = pathname?.startsWith(item.href);
                    return (
                      <Link 
                        key={item.href} 
