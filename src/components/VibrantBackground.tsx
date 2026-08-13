@@ -163,6 +163,7 @@ export function VibrantBackground() {
           <div className="absolute -bottom-24 -right-20 h-[400px] w-[400px] rounded-full bg-[#FF2D78]/8 blur-[100px]" />
           <div className="absolute bottom-[8%] right-[8%] h-[180px] w-[180px] rounded-full bg-[#9b5de5]/6 blur-[70px]" style={{ animation: "bubbleFloat3 25s ease-in-out 2s infinite" }} />
         </div>
+      </div>
     </div>
   );
 }
