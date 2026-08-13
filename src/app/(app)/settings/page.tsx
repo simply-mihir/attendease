@@ -74,7 +74,7 @@ export default function SettingsPage() {
 
       <StaggerGrid className="space-y-6" delay={100} staggerDelay={100} animation="fadeSlideUp">
         {/* Profile card */}
-        <div className="rounded-2xl border-2 border-[#FF2D78] p-5 mb-4 bg-[#FF2D78]/10 shadow-[0_6px_0_0_#cc1a5e] dark:bg-[#FF2D78]/15 dark:shadow-[0_6px_0_0_#b81e56]">
+        <div className="rounded-2xl border-2 border-[#FF2D78] p-5 mb-4 bg-gradient-to-r from-[#FF2D78]/30 to-[#FF2D78]/5 shadow-[0_6px_0_0_#cc1a5e] dark:from-[#FF2D78]/40 dark:to-[#FF2D78]/10 dark:shadow-[0_6px_0_0_#b81e56]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <UserAvatar user={user || {}} size="lg" className="shadow-[0_4px_0_0_#cc1a5e]" />
@@ -90,7 +90,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Notifications — Orange outline */}
-        <Link href="/settings/notifications" className="block rounded-2xl border-2 border-[#ff6b35] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ff6b35]/10 shadow-[0_4px_0_0_#cc5529] dark:bg-[#ff6b35]/15 dark:shadow-[0_4px_0_0_#a34421] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#cc5529] dark:hover:shadow-[0_3px_0_0_#a34421] group">
+        <Link href="/settings/notifications" className="block rounded-2xl border-2 border-[#ff6b35] p-4 mb-4 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#ff6b35]/30 to-[#ff6b35]/5 shadow-[0_4px_0_0_#cc5529] dark:from-[#ff6b35]/40 dark:to-[#ff6b35]/10 dark:shadow-[0_4px_0_0_#a34421] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#cc5529] dark:hover:shadow-[0_3px_0_0_#a34421] group">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] shrink-0">
               <Bell className="h-5 w-5" />
@@ -104,7 +104,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Semesters — Teal outline */}
-        <Link href="/settings/semesters" className="block rounded-2xl border-2 border-[#06d6a0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] dark:bg-[#06d6a0]/15 dark:shadow-[0_4px_0_0_#049e77] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#05a87e] dark:hover:shadow-[0_3px_0_0_#049e77] group">
+        <Link href="/settings/semesters" className="block rounded-2xl border-2 border-[#06d6a0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#06d6a0]/30 to-[#06d6a0]/5 shadow-[0_4px_0_0_#05a87e] dark:from-[#06d6a0]/40 dark:to-[#06d6a0]/10 dark:shadow-[0_4px_0_0_#049e77] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#05a87e] dark:hover:shadow-[0_3px_0_0_#049e77] group">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/15 text-[#06d6a0] shrink-0">
               <Calendar className="h-5 w-5" />
@@ -118,7 +118,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Export Data — Blue outline */}
-        <Link href="/export" className="block rounded-2xl border-2 border-[#4361ee] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4361ee]/10 shadow-[0_4px_0_0_#3451cc] dark:bg-[#4361ee]/15 dark:shadow-[0_4px_0_0_#2a41a3] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3451cc] dark:hover:shadow-[0_3px_0_0_#2a41a3] group">
+        <Link href="/export" className="block rounded-2xl border-2 border-[#4361ee] p-4 mb-4 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#4361ee]/30 to-[#4361ee]/5 shadow-[0_4px_0_0_#3451cc] dark:from-[#4361ee]/40 dark:to-[#4361ee]/10 dark:shadow-[0_4px_0_0_#2a41a3] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3451cc] dark:hover:shadow-[0_3px_0_0_#2a41a3] group">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361ee]/15 text-[#4361ee] shrink-0">
               <Download className="h-5 w-5" />
@@ -132,7 +132,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Medical Leave — Coral outline */}
-        <Link href="/medical-leave" className="block rounded-2xl border-2 border-[#ef476f] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ef476f]/10 shadow-[0_4px_0_0_#c43559] dark:bg-[#ef476f]/15 dark:shadow-[0_4px_0_0_#9e2a47] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#c43559] dark:hover:shadow-[0_3px_0_0_#9e2a47] group">
+        <Link href="/medical-leave" className="block rounded-2xl border-2 border-[#ef476f] p-4 mb-4 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#ef476f]/30 to-[#ef476f]/5 shadow-[0_4px_0_0_#c43559] dark:from-[#ef476f]/40 dark:to-[#ef476f]/10 dark:shadow-[0_4px_0_0_#9e2a47] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#c43559] dark:hover:shadow-[0_3px_0_0_#9e2a47] group">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ef476f]/15 text-[#ef476f] shrink-0">
               <HeartPulse className="h-5 w-5" />
@@ -146,7 +146,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Goal Mode — Cyan outline */}
-        <Link href="/settings/goal" className="block rounded-2xl border-2 border-[#4cc9f0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4cc9f0]/10 shadow-[0_4px_0_0_#3aa3c4] dark:bg-[#4cc9f0]/15 dark:shadow-[0_4px_0_0_#2e829d] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3aa3c4] dark:hover:shadow-[0_3px_0_0_#2e829d] group">
+        <Link href="/settings/goal" className="block rounded-2xl border-2 border-[#4cc9f0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#4cc9f0]/30 to-[#4cc9f0]/5 shadow-[0_4px_0_0_#3aa3c4] dark:from-[#4cc9f0]/40 dark:to-[#4cc9f0]/10 dark:shadow-[0_4px_0_0_#2e829d] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3aa3c4] dark:hover:shadow-[0_3px_0_0_#2e829d] group">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4cc9f0]/15 text-[#4cc9f0] shrink-0">
               <Target className="h-5 w-5" />
@@ -160,7 +160,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Theme Appearance card */}
-        <div className="rounded-2xl border-2 border-[#9b5de5] p-5 mb-4 bg-[#9b5de5]/10 shadow-[0_6px_0_0_#7c4ab8] dark:bg-[#9b5de5]/15 dark:shadow-[0_6px_0_0_#5a3589] flex items-center justify-between">
+        <div className="rounded-2xl border-2 border-[#9b5de5] p-5 mb-4 bg-gradient-to-r from-[#9b5de5]/30 to-[#9b5de5]/5 shadow-[0_6px_0_0_#7c4ab8] dark:from-[#9b5de5]/40 dark:to-[#9b5de5]/10 dark:shadow-[0_6px_0_0_#5a3589] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#9b5de5]/15 text-[#9b5de5] flex items-center justify-center shrink-0">
               <Moon className="w-5 h-5" />
@@ -174,7 +174,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Achievements link */}
-        <Link href="/analytics" className="group rounded-2xl border-2 border-[#FFD166] p-5 cursor-pointer transition-all duration-150 bg-[#FFD166]/10 shadow-[0_6px_0_0_#ccaa52] dark:bg-[#FFD166]/15 dark:shadow-[0_6px_0_0_#a38842] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ccaa52] dark:hover:shadow-[0_4px_0_0_#a38842] flex items-center gap-4">
+        <Link href="/analytics" className="group rounded-2xl border-2 border-[#FFD166] p-5 cursor-pointer transition-all duration-150 bg-gradient-to-r from-[#FFD166]/30 to-[#FFD166]/5 shadow-[0_6px_0_0_#ccaa52] dark:from-[#FFD166]/40 dark:to-[#FFD166]/10 dark:shadow-[0_6px_0_0_#a38842] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ccaa52] dark:hover:shadow-[0_4px_0_0_#a38842] flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-[#FFD166]/15 text-[#FFD166] flex items-center justify-center shrink-0">
             <Trophy className="w-5 h-5" />
           </div>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
         </Link>
 
         {/* Telegram Connect */}
-        <div className="rounded-2xl border-2 border-[#10b981] p-5 mb-4 bg-[#10b981]/10 shadow-[0_6px_0_0_#059669] dark:bg-[#10b981]/15 dark:shadow-[0_6px_0_0_#047857]">
+        <div className="rounded-2xl border-2 border-[#10b981] p-5 mb-4 bg-gradient-to-r from-[#10b981]/30 to-[#10b981]/5 shadow-[0_6px_0_0_#059669] dark:from-[#10b981]/40 dark:to-[#10b981]/10 dark:shadow-[0_6px_0_0_#047857]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-[#10b981]/15 text-[#10b981] flex items-center justify-center shrink-0">
