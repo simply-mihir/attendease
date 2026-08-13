@@ -74,133 +74,133 @@ export default function SettingsPage() {
 
       <StaggerGrid className="space-y-6" delay={100} staggerDelay={100} animation="fadeSlideUp">
         {/* Profile card */}
-        <div className="rounded-2xl border-2 border-[#cc1a5e] p-5 mb-4 bg-[#FF2D78] shadow-[0_6px_0_0_#cc1a5e]">
+        <div className="rounded-2xl border-2 border-[#FF2D78] p-5 mb-4 bg-[#FF2D78]/10 shadow-[0_6px_0_0_#cc1a5e] dark:bg-[#FF2D78]/15 dark:shadow-[0_6px_0_0_#b81e56]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <UserAvatar user={user || {}} size="lg" className="shadow-[0_4px_0_0_#cc1a5e] border-white/20" />
+              <UserAvatar user={user || {}} size="lg" className="shadow-[0_4px_0_0_#cc1a5e]" />
               <div>
-                <h2 className="text-lg font-black text-white">{user?.name || "Student"}</h2>
-                <p className="text-sm font-bold text-white/80">{user?.email}</p>
+                <h2 className="text-lg font-black text-text">{user?.name || "Student"}</h2>
+                <p className="text-sm font-bold text-text-muted">{user?.email}</p>
               </div>
             </div>
-            <button onClick={openEditModal} className="flex items-center justify-center rounded-xl border-2 p-3 transition-all duration-150 cursor-pointer border-transparent bg-white/20 text-white shadow-[0_3px_0_0_rgba(0,0,0,0.1)] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_rgba(0,0,0,0.1)] hover:bg-white/30">
+            <button onClick={openEditModal} className="flex items-center justify-center rounded-xl border-2 p-3 transition-all duration-150 cursor-pointer border-gray-200 bg-white text-[#4a4a5a] shadow-[0_3px_0_0_#d1d5db] hover:translate-y-[2px] hover:shadow-[0_1px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:text-[#c4c4d4] dark:shadow-[0_3px_0_0_#0d0d1a]">
               <Edit2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Notifications — Orange outline */}
-        <Link href="/settings/notifications" className="block rounded-2xl border-2 border-[#cc5529] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ff6b35] shadow-[0_4px_0_0_#cc5529] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#cc5529] group">
+        <Link href="/settings/notifications" className="block rounded-2xl border-2 border-[#ff6b35] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ff6b35]/10 shadow-[0_4px_0_0_#cc5529] dark:bg-[#ff6b35]/15 dark:shadow-[0_4px_0_0_#a34421] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#cc5529] dark:hover:shadow-[0_3px_0_0_#a34421] group">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6b35]/15 text-[#ff6b35] shrink-0">
               <Bell className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-bold text-white transition-colors">Notifications</p>
-              <p className="text-xs text-white/80">Telegram, email, alarms, and push notifications</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#ff6b35] transition-colors">Notifications</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Telegram, email, alarms, and push notifications</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+            <ChevronRight className="h-4 w-4 text-[#ff6b35]/40 group-hover:translate-x-1 group-hover:text-[#ff6b35] transition-all" />
           </div>
         </Link>
 
         {/* Semesters — Teal outline */}
-        <Link href="/settings/semesters" className="block rounded-2xl border-2 border-[#05a87e] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#06d6a0] shadow-[0_4px_0_0_#05a87e] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#05a87e] group">
+        <Link href="/settings/semesters" className="block rounded-2xl border-2 border-[#06d6a0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#06d6a0]/10 shadow-[0_4px_0_0_#05a87e] dark:bg-[#06d6a0]/15 dark:shadow-[0_4px_0_0_#049e77] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#05a87e] dark:hover:shadow-[0_3px_0_0_#049e77] group">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#06d6a0]/15 text-[#06d6a0] shrink-0">
               <Calendar className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-bold text-white transition-colors">Semesters</p>
-              <p className="text-xs text-white/80">Manage your semesters and terms</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#06d6a0] transition-colors">Semesters</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Manage your semesters and terms</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+            <ChevronRight className="h-4 w-4 text-[#06d6a0]/40 group-hover:translate-x-1 group-hover:text-[#06d6a0] transition-all" />
           </div>
         </Link>
 
         {/* Export Data — Blue outline */}
-        <Link href="/export" className="block rounded-2xl border-2 border-[#3451cc] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4361ee] shadow-[0_4px_0_0_#3451cc] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3451cc] group">
+        <Link href="/export" className="block rounded-2xl border-2 border-[#4361ee] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4361ee]/10 shadow-[0_4px_0_0_#3451cc] dark:bg-[#4361ee]/15 dark:shadow-[0_4px_0_0_#2a41a3] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3451cc] dark:hover:shadow-[0_3px_0_0_#2a41a3] group">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4361ee]/15 text-[#4361ee] shrink-0">
               <Download className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-bold text-white transition-colors">Export Data</p>
-              <p className="text-xs text-white/80">Download your attendance as CSV</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#4361ee] transition-colors">Export Data</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Download your attendance as CSV</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+            <ChevronRight className="h-4 w-4 text-[#4361ee]/40 group-hover:translate-x-1 group-hover:text-[#4361ee] transition-all" />
           </div>
         </Link>
 
         {/* Medical Leave — Coral outline */}
-        <Link href="/medical-leave" className="block rounded-2xl border-2 border-[#c43559] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ef476f] shadow-[0_4px_0_0_#c43559] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#c43559] group">
+        <Link href="/medical-leave" className="block rounded-2xl border-2 border-[#ef476f] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#ef476f]/10 shadow-[0_4px_0_0_#c43559] dark:bg-[#ef476f]/15 dark:shadow-[0_4px_0_0_#9e2a47] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#c43559] dark:hover:shadow-[0_3px_0_0_#9e2a47] group">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ef476f]/15 text-[#ef476f] shrink-0">
               <HeartPulse className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-bold text-white transition-colors">Medical Leave</p>
-              <p className="text-xs text-white/80">Bulk mark dates as excused</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#ef476f] transition-colors">Medical Leave</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Bulk mark dates as excused</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+            <ChevronRight className="h-4 w-4 text-[#ef476f]/40 group-hover:translate-x-1 group-hover:text-[#ef476f] transition-all" />
           </div>
         </Link>
 
         {/* Goal Mode — Cyan outline */}
-        <Link href="/settings/goal" className="block rounded-2xl border-2 border-[#3aa3c4] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4cc9f0] shadow-[0_4px_0_0_#3aa3c4] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3aa3c4] group">
+        <Link href="/settings/goal" className="block rounded-2xl border-2 border-[#4cc9f0] p-4 mb-4 cursor-pointer transition-all duration-150 bg-[#4cc9f0]/10 shadow-[0_4px_0_0_#3aa3c4] dark:bg-[#4cc9f0]/15 dark:shadow-[0_4px_0_0_#2e829d] hover:translate-y-[1px] hover:shadow-[0_3px_0_0_#3aa3c4] dark:hover:shadow-[0_3px_0_0_#2e829d] group">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4cc9f0]/15 text-[#4cc9f0] shrink-0">
               <Target className="h-5 w-5" />
             </div>
             <div className="flex-1 text-left">
-              <p className="font-bold text-white transition-colors">Goal Mode</p>
-              <p className="text-xs text-white/80">Set your attendance target</p>
+              <p className="font-semibold text-[#1a1a2e] dark:text-white group-hover:text-[#4cc9f0] transition-colors">Goal Mode</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">Set your attendance target</p>
             </div>
-            <ChevronRight className="h-4 w-4 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+            <ChevronRight className="h-4 w-4 text-[#4cc9f0]/40 group-hover:translate-x-1 group-hover:text-[#4cc9f0] transition-all" />
           </div>
         </Link>
 
         {/* Theme Appearance card */}
-        <div className="rounded-2xl border-2 border-[#7c4ab8] p-5 mb-4 bg-[#9b5de5] shadow-[0_6px_0_0_#7c4ab8] flex items-center justify-between">
+        <div className="rounded-2xl border-2 border-[#9b5de5] p-5 mb-4 bg-[#9b5de5]/10 shadow-[0_6px_0_0_#7c4ab8] dark:bg-[#9b5de5]/15 dark:shadow-[0_6px_0_0_#5a3589] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#9b5de5]/15 text-[#9b5de5] flex items-center justify-center shrink-0">
               <Moon className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold text-white">Appearance</p>
-              <p className="text-xs text-white/80 mt-0.5">Toggle between Light and Dark mode</p>
+              <p className="font-bold text-[#1a1a2e] dark:text-white">Appearance</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Toggle between Light and Dark mode</p>
             </div>
           </div>
           <ThemeToggle />
         </div>
 
         {/* Achievements link */}
-        <Link href="/analytics" className="group rounded-2xl border-2 border-[#ccaa52] p-5 mb-4 cursor-pointer transition-all duration-150 bg-[#FFD166] shadow-[0_6px_0_0_#ccaa52] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ccaa52] flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-white/30 text-black/70 flex items-center justify-center shrink-0">
+        <Link href="/analytics" className="group rounded-2xl border-2 border-[#FFD166] p-5 cursor-pointer transition-all duration-150 bg-[#FFD166]/10 shadow-[0_6px_0_0_#ccaa52] dark:bg-[#FFD166]/15 dark:shadow-[0_6px_0_0_#a38842] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#ccaa52] dark:hover:shadow-[0_4px_0_0_#a38842] flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-[#FFD166]/15 text-[#FFD166] flex items-center justify-center shrink-0">
             <Trophy className="w-5 h-5" />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-black/80 transition">Achievements & Badges</p>
-            <p className="text-xs text-black/60 mt-0.5">View your earned badges and progress</p>
+            <p className="font-bold text-[#1a1a2e] dark:text-white group-hover:text-[#FFD166] transition">Achievements & Badges</p>
+            <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">View your earned badges and progress</p>
           </div>
-          <ChevronRight className="w-5 h-5 text-black/50 group-hover:translate-x-1 transition-all" />
+          <ChevronRight className="w-5 h-5 text-[#FFD166]/40 group-hover:translate-x-1 group-hover:text-[#FFD166] transition-all" />
         </Link>
 
         {/* Telegram Connect */}
-        <div className="rounded-2xl border-2 border-[#059669] p-5 mb-4 bg-[#10b981] shadow-[0_6px_0_0_#059669]">
+        <div className="rounded-2xl border-2 border-[#10b981] p-5 mb-4 bg-[#10b981]/10 shadow-[0_6px_0_0_#059669] dark:bg-[#10b981]/15 dark:shadow-[0_6px_0_0_#047857]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#10b981]/15 text-[#10b981] flex items-center justify-center shrink-0">
                 <Send className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <p className="font-bold text-white">Telegram Account</p>
+                <p className="font-bold text-[#1a1a2e] dark:text-white">Telegram Account</p>
                 {telegramData?.connected ? (
-                  <div className="flex items-center gap-1.5 mt-0.5 text-white">
+                  <div className="flex items-center gap-1.5 mt-0.5 text-[#10b981]">
                     <Check className="w-4 h-4" />
-                    <span className="text-xs font-bold text-white">Connected as @{telegramData.username}</span>
+                    <span className="text-xs font-bold text-[#10b981]">Connected as @{telegramData.username}</span>
                   </div>
                 ) : (
-                  <p className="text-xs text-white/80 mt-0.5">Link your account for instant alerts</p>
+                  <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] mt-0.5">Link your account for instant alerts</p>
                 )}
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function SettingsPage() {
                 href={telegramData.connectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-3d-primary bg-white hover:bg-gray-50 text-[#059669] shadow-[0_4px_0_0_rgba(0,0,0,0.1)] hover:shadow-[0_1px_0_0_rgba(0,0,0,0.1)] border-transparent py-2 px-4 flex items-center justify-center gap-2 text-sm cursor-pointer whitespace-nowrap"
+                className="btn-3d-primary bg-[#10b981] hover:bg-[#059669] shadow-[0_4px_0_0_#047857] hover:shadow-[0_1px_0_0_#047857] border-[#047857] py-2 px-4 flex items-center justify-center gap-2 text-sm cursor-pointer whitespace-nowrap"
               >
                 <Send className="w-4 h-4" />
                 Link Account
