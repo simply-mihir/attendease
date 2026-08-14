@@ -192,9 +192,9 @@ export function ScheduleChatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-[88px] right-4 md:bottom-8 md:right-8 z-50 flex h-14 w-14 items-center justify-center
-            rounded-full bg-gradient-to-br from-[#FF2D78] to-[#9b5de5] text-white
-            shadow-[0_8px_20px_-5px_rgba(255,45,120,0.5)]
-            hover:scale-105 hover:shadow-[0_12px_25px_-5px_rgba(255,45,120,0.6)]
+            rounded-full bg-gradient-to-br from-[#D8FFC5] to-[#06d6a0] text-[#1a1a2e]
+            shadow-[0_8px_20px_-5px_rgba(6,214,160,0.5)]
+            hover:scale-105 hover:shadow-[0_12px_25px_-5px_rgba(6,214,160,0.6)]
             active:scale-95
             transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
           aria-label="Open AttendEase Assistant"
@@ -231,7 +231,7 @@ export function ScheduleChatbot() {
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full
-                  bg-gradient-to-br from-[#FF2D78]/20 to-[#9b5de5]/20 text-[#FF2D78] dark:text-[#ff7eb3]
+                  bg-gradient-to-br from-[#06d6a0]/20 to-[#D8FFC5]/30 text-[#06d6a0] dark:text-[#D8FFC5]
                   shadow-inner"
                 >
                   <Sparkles className="h-5 w-5" />
@@ -268,7 +268,7 @@ export function ScheduleChatbot() {
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white text-xs font-bold shadow-md
                       ${msg.role === "assistant" 
                         ? "bg-gradient-to-br from-[#9b5de5] to-[#4361ee]" 
-                        : "bg-gradient-to-br from-[#FF2D78] to-[#ff6b35]"}`}
+                        : "bg-gradient-to-br from-[#D8FFC5] to-[#06d6a0] text-[#1a1a2e]"}`}
                   >
                     {msg.role === "assistant" ? (
                       <Bot className="h-4 w-4" />
@@ -282,7 +282,7 @@ export function ScheduleChatbot() {
                     className={`max-w-[82%] px-4 py-3 text-[13px] leading-relaxed shadow-sm
                       ${
                         msg.role === "user"
-                          ? "bg-gradient-to-r from-[#FF2D78] to-[#ff6b35] text-white rounded-2xl rounded-tr-sm shadow-[0_4px_15px_-3px_rgba(255,45,120,0.3)]"
+                          ? "bg-gradient-to-r from-[#D8FFC5] to-[#06d6a0] text-[#1a1a2e] font-medium rounded-2xl rounded-tr-sm shadow-[0_4px_15px_-3px_rgba(6,214,160,0.3)]"
                           : "bg-white/90 dark:bg-white/10 backdrop-blur-md border border-gray-100 dark:border-white/5 text-[#1a1a2e] dark:text-[#e2e2e9] rounded-2xl rounded-tl-sm"
                       }`}
                   >
@@ -345,7 +345,7 @@ export function ScheduleChatbot() {
                   </div>
                   <div className="rounded-2xl rounded-tl-sm bg-white/90 dark:bg-white/10 backdrop-blur-md border border-gray-100 dark:border-white/5 px-4 py-4 flex items-center justify-center shadow-sm">
                     <div className="flex gap-1.5">
-                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#FF2D78] to-[#ff6b35]" style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }} />
+                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#D8FFC5] to-[#06d6a0]" style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }} />
                       <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#9b5de5] to-[#4361ee]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.2s infinite" }} />
                       <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#06d6a0] to-[#4cc9f0]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.4s infinite" }} />
                     </div>
@@ -366,7 +366,7 @@ export function ScheduleChatbot() {
                   className="shrink-0 flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-white/10
                     bg-white/80 dark:bg-white/5 backdrop-blur-md
                     px-4 py-2 text-[11px] font-bold text-[#4a4a5a] dark:text-[#c4c4d4]
-                    hover:border-[#FF2D78]/30 hover:text-[#FF2D78] hover:bg-[#FF2D78]/5
+                    hover:border-[#06d6a0]/40 hover:text-[#06d6a0] dark:hover:text-[#D8FFC5] hover:bg-[#06d6a0]/10
                     disabled:opacity-40 shadow-sm
                     transition-all duration-200"
                 >
@@ -381,7 +381,7 @@ export function ScheduleChatbot() {
               <div
                 className={`flex items-center gap-2 rounded-2xl border border-gray-200/80 bg-white/90 px-3 py-2.5
                 dark:border-white/10 dark:bg-[#070b14]/80 backdrop-blur-xl shadow-inner
-                focus-within:border-[#FF2D78]/50 focus-within:ring-2 focus-within:ring-[#FF2D78]/10
+                focus-within:border-[#06d6a0]/50 focus-within:ring-2 focus-within:ring-[#06d6a0]/20
                 transition-all duration-300
                 ${isListening ? "border-[#ef476f] ring-2 ring-[#ef476f]/20" : ""}`}
               >
@@ -393,8 +393,8 @@ export function ScheduleChatbot() {
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-300
                       ${
                         isListening
-                          ? "bg-gradient-to-br from-[#ef476f] to-[#FF2D78] text-white shadow-md"
-                          : "text-[#9ca3af] bg-gray-100/50 dark:bg-white/5 hover:text-[#FF2D78] hover:bg-[#FF2D78]/10"
+                          ? "bg-gradient-to-br from-[#06d6a0] to-[#D8FFC5] text-[#1a1a2e] shadow-md"
+                          : "text-[#9ca3af] bg-gray-100/50 dark:bg-white/5 hover:text-[#06d6a0] dark:hover:text-[#D8FFC5] hover:bg-[#06d6a0]/10"
                       }
                       disabled:opacity-30`}
                     style={isListening ? { animation: "futuristicPulse 1s ease-in-out infinite" } : undefined}
@@ -428,7 +428,7 @@ export function ScheduleChatbot() {
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl
-                    bg-gradient-to-br from-[#FF2D78] to-[#9b5de5] text-white shadow-md
+                    bg-gradient-to-br from-[#D8FFC5] to-[#06d6a0] text-[#1a1a2e] shadow-md
                     disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed
                     hover:scale-105 active:scale-95 transition-all duration-200"
                 >
