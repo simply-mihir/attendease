@@ -315,8 +315,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ===== MOBILE FULLSCREEN MENU ===== */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-[#0a0e1a] animate-fade-in md:hidden">
-          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-[#2a2a3d] bg-white dark:bg-[#070b14]">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white/70 dark:bg-[#0a0e1a]/70 backdrop-blur-md animate-fade-in md:hidden">
+          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-[#2a2a3d] bg-white/50 dark:bg-[#070b14]/50">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#FF2D78] border-2 border-[#cc1a5e] flex items-center justify-center shrink-0 shadow-[0_3px_0_0_#cc1a5e]">
                 <GraduationCap className="w-4 h-4 text-white" />
@@ -331,7 +331,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-6 bg-gray-50 dark:bg-[#070b14]">
+          <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-6 bg-transparent">
              <div>
                <h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-1">Navigation</h3>
                <div className="grid grid-cols-2 gap-3">
