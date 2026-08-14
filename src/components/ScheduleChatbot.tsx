@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   BarChart3,
   Zap,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { invalidatePrefix } from "@/hooks/useSWRFetch";
 
@@ -43,6 +45,7 @@ const EXAMPLES = [
 
 export function ScheduleChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -211,16 +214,15 @@ export function ScheduleChatbot() {
             onClick={() => setIsOpen(false)}
           />
           <div
-            className="fixed bottom-0 right-0 left-0 z-50 flex flex-col
-            h-[85vh]
-            rounded-t-[32px] border-t border-white/20 bg-white/80 backdrop-blur-2xl
-            shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)]
-            dark:bg-[#070b14]/70 dark:border-white/10
-            dark:shadow-[0_-10px_50px_-10px_rgba(0,0,0,0.6)]
-            md:bottom-8 md:right-8 md:left-auto
-            md:w-[420px] md:h-[620px] md:max-h-[85vh]
-            md:rounded-[32px] md:border md:border-white/20
-            overflow-hidden animate-slideIn"
+            className={`fixed z-50 flex flex-col overflow-hidden animate-slideIn
+            bg-white/80 dark:bg-[#070b14]/70 backdrop-blur-2xl
+            shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_50px_-10px_rgba(0,0,0,0.6)]
+            transition-all duration-300 ease-in-out
+            ${
+              isExpanded
+                ? "inset-0 md:rounded-none border-0"
+                : "top-0 right-0 bottom-0 left-0 md:left-auto md:w-[420px] md:border-l md:border-white/20 dark:md:border-white/10 rounded-none md:rounded-l-[32px]"
+            }`}
           >
             {/* Header */}
             <div
@@ -245,15 +247,27 @@ export function ScheduleChatbot() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full
-                  bg-gray-100/50 dark:bg-white/5 text-[#9ca3af] 
-                  hover:text-[#1a1a2e] dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10
-                  transition-all duration-200"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="hidden md:flex h-9 w-9 items-center justify-center rounded-full
+                    bg-gray-100/50 dark:bg-white/5 text-[#9ca3af] 
+                    hover:text-[#1a1a2e] dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10
+                    transition-all duration-200"
+                  title={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full
+                    bg-gray-100/50 dark:bg-white/5 text-[#9ca3af] 
+                    hover:text-[#1a1a2e] dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10
+                    transition-all duration-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
