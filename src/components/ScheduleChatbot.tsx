@@ -13,7 +13,6 @@ import {
   Calendar,
   CheckCircle2,
   BarChart3,
-  BookOpen,
   Zap,
 } from "lucide-react";
 import { invalidatePrefix } from "@/hooks/useSWRFetch";
@@ -193,12 +192,11 @@ export function ScheduleChatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-[88px] right-4 md:bottom-8 md:right-8 z-50 flex h-14 w-14 items-center justify-center
-            rounded-2xl border-2 border-[#cc1a5e] bg-[#FF2D78] text-white
-            shadow-[0_6px_0_0_#cc1a5e]
-            hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#cc1a5e]
-            active:translate-y-[4px] active:shadow-[0_2px_0_0_#cc1a5e]
-            transition-all duration-150"
-          style={{ animation: "sidebarTogglePulse 2s ease-in-out infinite" }}
+            rounded-full bg-gradient-to-br from-[#FF2D78] to-[#9b5de5] text-white
+            shadow-[0_8px_20px_-5px_rgba(255,45,120,0.5)]
+            hover:scale-105 hover:shadow-[0_12px_25px_-5px_rgba(255,45,120,0.6)]
+            active:scale-95
+            transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
           aria-label="Open AttendEase Assistant"
         >
           <MessageCircle className="h-6 w-6" />
@@ -209,84 +207,87 @@ export function ScheduleChatbot() {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden animate-fade-in"
             onClick={() => setIsOpen(false)}
           />
           <div
             className="fixed bottom-0 right-0 left-0 z-50 flex flex-col
             h-[85vh]
-            rounded-t-2xl border-t-2 border-x-0 border-[#FF2D78]/30 bg-white
-            shadow-[0_8px_0_0_#d1d5db,0_20px_60px_-15px_rgba(0,0,0,0.2)]
-            dark:bg-[#141425] dark:border-[#FF2D78]/20
-            dark:shadow-[0_8px_0_0_#0d0d1a,0_20px_60px_-15px_rgba(0,0,0,0.5)]
+            rounded-t-[32px] border-t border-white/20 bg-white/80 backdrop-blur-2xl
+            shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)]
+            dark:bg-[#070b14]/70 dark:border-white/10
+            dark:shadow-[0_-10px_50px_-10px_rgba(0,0,0,0.6)]
             md:bottom-8 md:right-8 md:left-auto
-            md:w-[400px] md:h-[580px] md:max-h-[80vh]
-            md:rounded-2xl md:border-2 md:border-[#FF2D78]/30
+            md:w-[420px] md:h-[620px] md:max-h-[85vh]
+            md:rounded-[32px] md:border md:border-white/20
             overflow-hidden animate-slideIn"
           >
             {/* Header */}
             <div
-              className="flex items-center justify-between px-4 py-3
-              border-b-2 border-gray-100 dark:border-[#2a2a3d]
-              bg-gradient-to-r from-[#FF2D78]/5 to-[#9b5de5]/5
-              dark:from-[#FF2D78]/10 dark:to-[#9b5de5]/10"
+              className="flex items-center justify-between px-6 py-4
+              border-b border-gray-200/50 dark:border-white/5
+              bg-white/50 dark:bg-black/20 backdrop-blur-xl shrink-0"
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <div
-                  className="flex h-9 w-9 items-center justify-center rounded-xl
-                  bg-[#FF2D78]/10 text-[#FF2D78]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full
+                  bg-gradient-to-br from-[#FF2D78]/20 to-[#9b5de5]/20 text-[#FF2D78] dark:text-[#ff7eb3]
+                  shadow-inner"
                 >
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-[#1a1a2e] dark:text-white">
+                  <h3 className="text-sm font-black tracking-tight text-[#1a1a2e] dark:text-white">
                     AttendEase Assistant
                   </h3>
-                  <p className="text-[10px] text-[#9ca3af] dark:text-[#6b6b80]">
-                    Voice & chat • Attendance • Analytics
+                  <p className="text-[11px] font-medium text-[#9ca3af] dark:text-[#6b6b80]">
+                    Powered by AI ✨
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg
-                  text-[#9ca3af] hover:text-[#ef476f] hover:bg-[#ef476f]/10
-                  transition-all duration-150"
+                className="flex h-9 w-9 items-center justify-center rounded-full
+                  bg-gray-100/50 dark:bg-white/5 text-[#9ca3af] 
+                  hover:text-[#1a1a2e] dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10
+                  transition-all duration-200"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                  className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                 >
                   {/* Avatar */}
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-white text-xs font-bold
-                      ${msg.role === "assistant" ? "bg-[#9b5de5]" : "bg-[#FF2D78]"}`}
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white text-xs font-bold shadow-md
+                      ${msg.role === "assistant" 
+                        ? "bg-gradient-to-br from-[#9b5de5] to-[#4361ee]" 
+                        : "bg-gradient-to-br from-[#FF2D78] to-[#ff6b35]"}`}
                   >
                     {msg.role === "assistant" ? (
-                      <Bot className="h-3.5 w-3.5" />
+                      <Bot className="h-4 w-4" />
                     ) : (
-                      <User className="h-3.5 w-3.5" />
+                      <User className="h-4 w-4" />
                     )}
                   </div>
 
                   {/* Bubble */}
                   <div
-                    className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed
+                    className={`max-w-[82%] px-4 py-3 text-[13px] leading-relaxed shadow-sm
                       ${
                         msg.role === "user"
-                          ? "bg-[#FF2D78] text-white rounded-tr-md"
-                          : "bg-gray-100 text-[#1a1a2e] dark:bg-[#1e1e35] dark:text-[#c4c4d4] rounded-tl-md"
+                          ? "bg-gradient-to-r from-[#FF2D78] to-[#ff6b35] text-white rounded-2xl rounded-tr-sm shadow-[0_4px_15px_-3px_rgba(255,45,120,0.3)]"
+                          : "bg-white/90 dark:bg-white/10 backdrop-blur-md border border-gray-100 dark:border-white/5 text-[#1a1a2e] dark:text-[#e2e2e9] rounded-2xl rounded-tl-sm"
                       }`}
                   >
                     {msg.content.split("\n").map((line, i) => (
-                      <p key={i} className={i > 0 ? "mt-1.5" : ""}>
+                      <p key={i} className={i > 0 ? "mt-2" : ""}>
                         {line}
                       </p>
                     ))}
@@ -294,8 +295,8 @@ export function ScheduleChatbot() {
                     {/* Action badges */}
                     {msg.actions?.includes("attendance_marked") && (
                       <div
-                        className="mt-2 flex items-center gap-1.5 rounded-lg
-                        bg-[#06d6a0]/15 px-2.5 py-1.5 text-xs font-semibold text-[#06d6a0]"
+                        className="mt-3 flex w-fit items-center gap-1.5 rounded-full
+                        bg-[#06d6a0]/15 border border-[#06d6a0]/30 px-3 py-1 text-xs font-bold text-[#06d6a0]"
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Attendance updated
@@ -303,8 +304,8 @@ export function ScheduleChatbot() {
                     )}
                     {msg.actions?.includes("schedule_changed") && (
                       <div
-                        className="mt-2 flex items-center gap-1.5 rounded-lg
-                        bg-[#4361ee]/15 px-2.5 py-1.5 text-xs font-semibold text-[#4361ee]"
+                        className="mt-3 flex w-fit items-center gap-1.5 rounded-full
+                        bg-[#4361ee]/15 border border-[#4361ee]/30 px-3 py-1 text-xs font-bold text-[#4361ee]"
                       >
                         <Calendar className="h-3.5 w-3.5" />
                         Calendar updated
@@ -313,7 +314,7 @@ export function ScheduleChatbot() {
 
                     {/* Examples on welcome */}
                     {msg.id === "welcome" && (
-                      <div className="mt-3 space-y-1.5">
+                      <div className="mt-4 space-y-2">
                         {EXAMPLES.map((ex) => (
                           <button
                             key={ex}
@@ -321,10 +322,10 @@ export function ScheduleChatbot() {
                               setInput(ex);
                               inputRef.current?.focus();
                             }}
-                            className="block w-full text-left rounded-lg px-2.5 py-1.5
-                              text-xs text-[#4361ee] dark:text-[#4cc9f0]
-                              bg-[#4361ee]/5 dark:bg-[#4cc9f0]/5
-                              hover:bg-[#4361ee]/10 dark:hover:bg-[#4cc9f0]/10
+                            className="block w-full text-left rounded-xl px-3 py-2
+                              text-[12px] font-semibold text-[#4361ee] dark:text-[#4cc9f0]
+                              bg-[#4361ee]/5 dark:bg-[#4cc9f0]/5 border border-[#4361ee]/10 dark:border-[#4cc9f0]/10
+                              hover:bg-[#4361ee]/15 dark:hover:bg-[#4cc9f0]/15
                               transition-colors"
                           >
                             &ldquo;{ex}&rdquo;
@@ -338,24 +339,15 @@ export function ScheduleChatbot() {
 
               {/* Loading indicator */}
               {isLoading && (
-                <div className="flex gap-2.5">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#9b5de5] text-white">
-                    <Bot className="h-3.5 w-3.5" />
+                <div className="flex gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#9b5de5] to-[#4361ee] text-white shadow-md">
+                    <Bot className="h-4 w-4" />
                   </div>
-                  <div className="rounded-2xl rounded-tl-md bg-gray-100 dark:bg-[#1e1e35] px-4 py-3">
+                  <div className="rounded-2xl rounded-tl-sm bg-white/90 dark:bg-white/10 backdrop-blur-md border border-gray-100 dark:border-white/5 px-4 py-4 flex items-center justify-center shadow-sm">
                     <div className="flex gap-1.5">
-                      <div
-                        className="h-2 w-2 rounded-full bg-[#FF2D78]"
-                        style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }}
-                      />
-                      <div
-                        className="h-2 w-2 rounded-full bg-[#9b5de5]"
-                        style={{ animation: "futuristicDot 1.4s ease-in-out 0.2s infinite" }}
-                      />
-                      <div
-                        className="h-2 w-2 rounded-full bg-[#4361ee]"
-                        style={{ animation: "futuristicDot 1.4s ease-in-out 0.4s infinite" }}
-                      />
+                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#FF2D78] to-[#ff6b35]" style={{ animation: "futuristicDot 1.4s ease-in-out infinite" }} />
+                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#9b5de5] to-[#4361ee]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.2s infinite" }} />
+                      <div className="h-2 w-2 rounded-full bg-gradient-to-r from-[#06d6a0] to-[#4cc9f0]" style={{ animation: "futuristicDot 1.4s ease-in-out 0.4s infinite" }} />
                     </div>
                   </div>
                 </div>
@@ -365,19 +357,18 @@ export function ScheduleChatbot() {
             </div>
 
             {/* Quick action chips */}
-            <div className="px-3 py-2 flex gap-2 overflow-x-auto border-t border-gray-100 dark:border-[#2a2a3d]/50">
+            <div className="px-5 py-3 flex gap-2 overflow-x-auto border-t border-gray-200/50 dark:border-white/5 bg-white/30 dark:bg-black/10 backdrop-blur-md scrollbar-hide shrink-0">
               {QUICK_ACTIONS.map((action) => (
                 <button
                   key={action.label}
                   onClick={() => sendMessage(action.prompt)}
                   disabled={isLoading}
-                  className="shrink-0 flex items-center gap-1.5 rounded-xl border-2 border-gray-200 dark:border-[#2a2a3d]
-                    px-3 py-1.5 text-[11px] font-bold
-                    text-[#4a4a5a] dark:text-[#c4c4d4]
-                    shadow-[0_2px_0_0_#d1d5db] dark:shadow-[0_2px_0_0_#0d0d1a]
-                    hover:border-[#FF2D78]/30 hover:text-[#FF2D78] hover:translate-y-[1px] hover:shadow-[0_1px_0_0_#d1d5db]
-                    disabled:opacity-40
-                    transition-all duration-150"
+                  className="shrink-0 flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-white/10
+                    bg-white/80 dark:bg-white/5 backdrop-blur-md
+                    px-4 py-2 text-[11px] font-bold text-[#4a4a5a] dark:text-[#c4c4d4]
+                    hover:border-[#FF2D78]/30 hover:text-[#FF2D78] hover:bg-[#FF2D78]/5
+                    disabled:opacity-40 shadow-sm
+                    transition-all duration-200"
                 >
                   <action.icon className="h-3.5 w-3.5" />
                   {action.label}
@@ -386,34 +377,33 @@ export function ScheduleChatbot() {
             </div>
 
             {/* Input */}
-            <div className="px-3 py-3 border-t-2 border-gray-100 dark:border-[#2a2a3d]">
+            <div className="px-5 py-4 border-t border-gray-200/50 dark:border-white/5 bg-white/60 dark:bg-black/30 backdrop-blur-xl shrink-0">
               <div
-                className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2
-                border-gray-200 bg-[#fafafa]
-                dark:border-[#2a2a3d] dark:bg-[#0d0d1a]
-                focus-within:border-[#FF2D78] focus-within:ring-2 focus-within:ring-[#FF2D78]/20
-                transition-all
-                ${isListening ? "border-[#ef476f] ring-2 ring-[#ef476f]/30" : ""}`}
+                className={`flex items-center gap-2 rounded-2xl border border-gray-200/80 bg-white/90 px-3 py-2.5
+                dark:border-white/10 dark:bg-[#070b14]/80 backdrop-blur-xl shadow-inner
+                focus-within:border-[#FF2D78]/50 focus-within:ring-2 focus-within:ring-[#FF2D78]/10
+                transition-all duration-300
+                ${isListening ? "border-[#ef476f] ring-2 ring-[#ef476f]/20" : ""}`}
               >
                 {/* Voice button */}
                 {speechSupported && (
                   <button
                     onClick={toggleVoice}
                     disabled={isLoading}
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-150
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-300
                       ${
                         isListening
-                          ? "bg-[#ef476f] text-white"
-                          : "text-[#9ca3af] hover:text-[#FF2D78] hover:bg-[#FF2D78]/10"
+                          ? "bg-gradient-to-br from-[#ef476f] to-[#FF2D78] text-white shadow-md"
+                          : "text-[#9ca3af] bg-gray-100/50 dark:bg-white/5 hover:text-[#FF2D78] hover:bg-[#FF2D78]/10"
                       }
                       disabled:opacity-30`}
                     style={isListening ? { animation: "futuristicPulse 1s ease-in-out infinite" } : undefined}
                     title={isListening ? "Stop listening" : "Voice input"}
                   >
                     {isListening ? (
-                      <MicOff className="h-4 w-4" />
+                      <MicOff className="h-4.5 w-4.5" />
                     ) : (
-                      <Mic className="h-4 w-4" />
+                      <Mic className="h-4.5 w-4.5" />
                     )}
                   </button>
                 )}
@@ -426,31 +416,25 @@ export function ScheduleChatbot() {
                   onKeyDown={handleKeyDown}
                   placeholder={
                     isListening
-                      ? "Listening..."
+                      ? "Listening... speak now"
                       : "Ask anything about attendance..."
                   }
                   disabled={isLoading}
-                  className="flex-1 bg-transparent text-sm text-[#1a1a2e] dark:text-white
+                  className="flex-1 bg-transparent text-sm font-medium text-[#1a1a2e] dark:text-white
                     placeholder-[#9ca3af] dark:placeholder-[#6b6b80]
-                    outline-none disabled:opacity-50"
+                    outline-none disabled:opacity-50 px-1"
                 />
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || isLoading}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg
-                    bg-[#FF2D78] text-white
-                    disabled:opacity-30 disabled:cursor-not-allowed
-                    hover:bg-[#cc1a5e] transition-colors"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl
+                    bg-gradient-to-br from-[#FF2D78] to-[#9b5de5] text-white shadow-md
+                    disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed
+                    hover:scale-105 active:scale-95 transition-all duration-200"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4.5 w-4.5 ml-0.5" />
                 </button>
               </div>
-              {isListening && (
-                <p className="text-[10px] text-[#ef476f] font-bold mt-1.5 text-center"
-                  style={{ animation: "futuristicPulse 1.5s ease-in-out infinite" }}>
-                  🎙️ Listening... speak now
-                </p>
-              )}
             </div>
           </div>
         </>

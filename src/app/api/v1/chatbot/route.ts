@@ -8,7 +8,7 @@ import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemma-4-26b-a4b-it:free";
+const MODEL = "meta-llama/llama-3.1-8b-instruct:free";
 
 // ── Tool executor functions ─────────────────────────────────────
 
