@@ -8,7 +8,14 @@ import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "mistralai/mistral-7b-instruct:free";
+const MODELS = [
+  "google/gemma-2-9b-it:free",
+  "mistralai/mistral-7b-instruct:free",
+  "huggingfaceh4/zephyr-7b-beta:free",
+  "meta-llama/llama-3.1-8b-instruct:free",
+  "qwen/qwen-2-7b-instruct:free",
+  "gryphe/mythomax-l2-13b:free"
+];
 
 // ── Tool executor functions ─────────────────────────────────────
 
@@ -571,26 +578,39 @@ CRITICAL RULES:
 
   try {
     // Step 1: Get intent from LLM
-    const intentRes = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://attendease-c7wl.vercel.app",
-        "X-Title": "AttendEase",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages,
-        temperature: 0.1,
-        max_tokens: 512,
-      }),
-    });
+    let intentRes;
+    let lastErr;
+    
+    for (const modelName of MODELS) {
+      try {
+        intentRes = await fetch(OPENROUTER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            "HTTP-Referer": "https://attendease-c7wl.vercel.app",
+            "X-Title": "AttendEase",
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages,
+            temperature: 0.1,
+            max_tokens: 512,
+          }),
+        });
+        
+        if (intentRes.ok) break;
+        lastErr = await intentRes.json().catch(() => ({}));
+        console.warn(`[Chatbot] Model ${modelName} failed:`, lastErr);
+      } catch (err) {
+        lastErr = err;
+        console.warn(`[Chatbot] Network error for ${modelName}:`, err);
+      }
+    }
 
-    if (!intentRes.ok) {
-      const err = await intentRes.json().catch(() => ({}));
-      console.error("[Chatbot] LLM error:", err);
-      return NextResponse.json({ error: "AI service temporarily unavailable." }, { status: 502 });
+    if (!intentRes || !intentRes.ok) {
+      console.error("[Chatbot] All fallback LLMs failed. Last error:", lastErr);
+      return NextResponse.json({ error: "AI service temporarily unavailable due to high load. Please try again later." }, { status: 502 });
     }
 
     const intentData = await intentRes.json();
