@@ -608,42 +608,60 @@ CRITICAL RULES:
       }
     }
 
-    if (!intentRes || !intentRes.ok) {
-      console.error("[Chatbot] All fallback LLMs failed. Last error:", lastErr);
-      return NextResponse.json({ error: "AI service temporarily unavailable due to high load. Please try again later." }, { status: 502 });
-    }
-
-    const intentData = await intentRes.json();
-    const rawContent = intentData.choices?.[0]?.message?.content || "";
-
-    // Parse intent JSON from response
     let intent: string = "chat";
     let params: any = {};
+    let usingRegexFallback = false;
 
-    try {
-      // Strip thinking tags, code fences, and whitespace
-      let cleaned = rawContent
-        .replace(/<think>[\s\S]*?<\/think>/gi, "")
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/gi, "")
-        .trim();
+    if (!intentRes || !intentRes.ok) {
+      console.error("[Chatbot] All fallback LLMs failed. Last error:", lastErr);
+      
+      const lowerMsg = message.toLowerCase();
+      usingRegexFallback = true;
 
-      // Find JSON object in the response
-      const jsonStart = cleaned.indexOf("{");
-      const jsonEnd = cleaned.lastIndexOf("}");
-      if (jsonStart !== -1 && jsonEnd > jsonStart) {
-        const jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
-        const parsed = JSON.parse(jsonStr);
-        intent = parsed.intent || "chat";
-        params = parsed.params || {};
+      if (lowerMsg.includes("mark") && (lowerMsg.includes("present") || lowerMsg.includes("absent"))) {
+        intent = "mark_bulk_attendance";
+        params = { status: lowerMsg.includes("present") ? "present" : "absent" };
+      } else if (lowerMsg.includes("today") || lowerMsg.includes("schedule") || lowerMsg.includes("class")) {
+        intent = "get_todays_classes";
+      } else if (lowerMsg.includes("bunk") || lowerMsg.includes("skip")) {
+        intent = "skip_optimizer";
+        params = { maxSkips: 3 };
+      } else if (lowerMsg.includes("analytic") || lowerMsg.includes("overall") || lowerMsg.includes("stat")) {
+        intent = "get_analytics";
+      } else if (lowerMsg.includes("history") || lowerMsg.includes("past")) {
+        intent = "get_attendance_history";
+        params = { days: 7 };
+      } else {
+        return NextResponse.json({ 
+          error: "The AI service is currently facing a global outage, and I couldn't understand your request offline. Try asking 'What are my classes today?' or 'Can I bunk?'." 
+        }, { status: 502 });
       }
-    } catch (e) {
-      console.error("[Chatbot] JSON parse error:", e, "Raw:", rawContent.substring(0, 300));
-      // If we can't parse, treat as chat and return the raw text
-      return NextResponse.json({
-        reply: rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() || "Sorry, I didn't understand that. Could you rephrase?",
-        actions: [],
-      });
+    } else {
+      const intentData = await intentRes.json();
+      const rawContent = intentData.choices?.[0]?.message?.content || "";
+
+      try {
+        let cleaned = rawContent
+          .replace(/<think>[\s\S]*?<\/think>/gi, "")
+          .replace(/```json\s*/gi, "")
+          .replace(/```\s*/gi, "")
+          .trim();
+
+        const jsonStart = cleaned.indexOf("{");
+        const jsonEnd = cleaned.lastIndexOf("}");
+        if (jsonStart !== -1 && jsonEnd > jsonStart) {
+          const jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
+          const parsed = JSON.parse(jsonStr);
+          intent = parsed.intent || "chat";
+          params = parsed.params || {};
+        }
+      } catch (e) {
+        console.error("[Chatbot] JSON parse error:", e, "Raw:", rawContent.substring(0, 300));
+        return NextResponse.json({
+          reply: rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() || "Sorry, I didn't understand that. Could you rephrase?",
+          actions: [],
+        });
+      }
     }
 
     // Step 2: Execute the intent
