@@ -791,9 +791,9 @@ function formatFallback(intent: string, result: any): string {
     case "get_todays_classes": {
       if (result.classes.length === 0) {
         if (result.target === "next") {
-           return `📅 *Schedule:*\n\n🏖️ You have absolutely no classes scheduled for the next 7 days! Enjoy your time off.`;
+           return `📅 **Schedule:**\n\n🏖️ You have absolutely no classes scheduled for the next 7 days! Enjoy your time off.`;
         }
-        return `📅 *Schedule for ${result.dayName}, ${result.date}:*\n\n🏖️ No classes are scheduled for ${result.target === "tomorrow" ? "tomorrow" : "today"}. You have a free day! Enjoy your time off.`;
+        return `📅 **Schedule for ${result.dayName}, ${result.date}:**\n\n🏖️ No classes are scheduled for ${result.target === "tomorrow" ? "tomorrow" : "today"}. You have a free day! Enjoy your time off.`;
       }
 
       const marked = result.classes.filter((c: any) => c.attendanceMarked).length;
@@ -803,12 +803,12 @@ function formatFallback(intent: string, result: any): string {
         const idx = i + 1;
         const status = c.attendanceMarked ? `✅ Marked: ${c.attendanceStatus}` : "⏳ Not marked";
         const pctLabel = c.currentPct >= c.minPct ? `${c.currentPct}% (Safe 🟢)` : `${c.currentPct}% (Below ${c.minPct}% 🔴)`;
-        return `*${idx}. ${c.subjectName}*\n   🕒 Time: ${c.startTime} - ${c.endTime}${c.room ? ` | 📍 Room: ${c.room}` : ""}\n   📊 Attendance: ${pctLabel} | Status: ${status}`;
+        return `**${idx}. ${c.subjectName}**\n   🕒 Time: ${c.startTime} - ${c.endTime}${c.room ? ` | 📍 Room: ${c.room}` : ""}\n   📊 Attendance: ${pctLabel} | Status: ${status}`;
       });
 
-      let msg = `📅 *Schedule for ${result.dayName}, ${result.date}*\n📚 ${result.totalClasses} class${result.totalClasses > 1 ? "es" : ""} scheduled today.\n\n${lines.join("\n\n")}`;
+      let msg = `📅 **Schedule for ${result.dayName}, ${result.date}**\n📚 ${result.totalClasses} class${result.totalClasses > 1 ? "es" : ""} scheduled today.\n\n${lines.join("\n\n")}`;
 
-      msg += `\n\n📝 *Summary:* ${marked} of ${result.totalClasses} marked`;
+      msg += `\n\n📝 **Summary:** ${marked} of ${result.totalClasses} marked`;
       if (unmarked > 0) msg += ` | ⚠️ ${unmarked} pending`;
 
       return msg;
@@ -817,14 +817,14 @@ function formatFallback(intent: string, result: any): string {
     case "mark_attendance": {
       const statusLabel = result.status.charAt(0).toUpperCase() + result.status.slice(1);
       const icon = result.status === "absent" ? "❌" : result.status === "late" ? "⏳" : "✅";
-      return `${icon} *Attendance recorded successfully.*\n\n📚 Subject: ${result.subjectName}\n📌 Status: ${statusLabel}\n📈 Updated attendance: ${result.newPercentage}%\n\nYour dashboard has been refreshed to reflect this change.`;
+      return `${icon} **Attendance recorded successfully.**\n\n📚 Subject: ${result.subjectName}\n📌 Status: ${statusLabel}\n📈 Updated attendance: ${result.newPercentage}%\n\nYour dashboard has been refreshed to reflect this change.`;
     }
 
     case "mark_bulk_attendance": {
       const statusLabel = result.status.charAt(0).toUpperCase() + result.status.slice(1);
       const icon = result.status === "absent" ? "❌" : result.status === "late" ? "⏳" : "✅";
       const subjectLines = result.subjects.map((s: string, i: number) => `   ${i + 1}. ${s}`).join("\n");
-      return `${icon} *Bulk attendance recorded successfully.*\n\n📌 Status: ${statusLabel}\n🔄 Classes updated: ${result.count}\n\n${subjectLines}\n\nAll records have been securely saved and your dashboard is updated.`;
+      return `${icon} **Bulk attendance recorded successfully.**\n\n📌 Status: ${statusLabel}\n🔄 Classes updated: ${result.count}\n\n${subjectLines}\n\nAll records have been securely saved and your dashboard is updated.`;
     }
 
     case "get_analytics": {
@@ -837,16 +837,16 @@ function formatFallback(intent: string, result: any): string {
         const skipInfo = s.canSkip > 0
           ? `${s.canSkip} skip${s.canSkip > 1 ? "s" : ""} available`
           : "no skips available";
-        return `▪️ *${s.name}*: ${s.currentPct}% [${statusTag}]\n   ${s.totalClasses} classes held | 🔥 Streak: ${s.streak} days | 🏃‍♂️ ${skipInfo}`;
+        return `▪️ **${s.name}**: ${s.currentPct}% [${statusTag}]\n   ${s.totalClasses} classes held | 🔥 Streak: ${s.streak} days | 🏃‍♂️ ${skipInfo}`;
       });
 
-      let msg = `📊 *Attendance Analytics Overview*\n\n📈 Overall attendance: *${result.overallPct}%* across ${result.totalSubjects} subject${result.totalSubjects > 1 ? "s" : ""}`;
+      let msg = `📊 **Attendance Analytics Overview**\n\n📈 Overall attendance: **${result.overallPct}%** across ${result.totalSubjects} subject${result.totalSubjects > 1 ? "s" : ""}`;
       msg += `\n🎯 Breakdown: ${safe} safe, ${warning} at risk, ${danger} in danger`;
-      msg += `\n\n*Subject-wise details:*\n\n${lines.join("\n\n")}`;
+      msg += `\n\n**Subject-wise details:**\n\n${lines.join("\n\n")}`;
 
       if (danger > 0) {
         const dangerNames = result.subjects.filter((s: any) => s.status === "red").map((s: any) => s.name).join(", ");
-        msg += `\n\n🚨 *Immediate attention required for:* ${dangerNames}.\nThese subjects are below the minimum attendance threshold!`;
+        msg += `\n\n🚨 **Immediate attention required for:** ${dangerNames}.\nThese subjects are below the minimum attendance threshold!`;
       }
 
       return msg;
@@ -854,7 +854,7 @@ function formatFallback(intent: string, result: any): string {
 
     case "get_subject_info": {
       const statusTag = result.status === "green" ? "🟢 Safe" : result.status === "yellow" ? "🟡 At Risk" : "🔴 Danger";
-      let msg = `📚 *Subject Report: ${result.name}${result.code ? ` (${result.code})` : ""}*\n`;
+      let msg = `📚 **Subject Report: ${result.name}${result.code ? ` (${result.code})` : ""}**\n`;
       msg += `\n📌 Status: ${statusTag}`;
       msg += `\n📈 Current attendance: ${result.currentPct}%`;
       msg += `\n🎯 Minimum required: ${result.minRequired}%`;
@@ -863,16 +863,16 @@ function formatFallback(intent: string, result: any): string {
       msg += `\n🔥 Current streak: ${result.streak} day${result.streak !== 1 ? "s" : ""}`;
 
       if (result.canSkip > 0) {
-        msg += `\n\n🏖️ *Good news!* You can safely skip up to ${result.canSkip} more class${result.canSkip > 1 ? "es" : ""} and remain above ${result.minRequired}%.`;
+        msg += `\n\n🏖️ **Good news!** You can safely skip up to ${result.canSkip} more class${result.canSkip > 1 ? "es" : ""} and remain above ${result.minRequired}%.`;
       } else if (result.needToAttend > 0) {
-        msg += `\n\n⚠️ *Recovery plan:* You need to attend the next ${result.needToAttend} consecutive class${result.needToAttend > 1 ? "es" : ""} to reach ${result.minRequired}%. Lock in! 💪`;
+        msg += `\n\n⚠️ **Recovery plan:** You need to attend the next ${result.needToAttend} consecutive class${result.needToAttend > 1 ? "es" : ""} to reach ${result.minRequired}%. Lock in! 💪`;
       } else {
         msg += `\n\n⚖️ You are exactly at the threshold. No skips are available at this time.`;
       }
 
       if (result.schedule && result.schedule.length > 0) {
         const schedLines = result.schedule.map((s: any) => `▪️ ${s.day}: ${s.time}${s.room ? ` (${s.room})` : ""}`).join("\n");
-        msg += `\n\n📅 *Weekly schedule:*\n${schedLines}`;
+        msg += `\n\n📅 **Weekly schedule:**\n${schedLines}`;
       }
 
       return msg;
@@ -880,7 +880,7 @@ function formatFallback(intent: string, result: any): string {
 
     case "skip_optimizer": {
       if (result.recommendations.length === 0) {
-        let msg = "🧠 *Skip Optimizer Result*\n\n❌ No safe skips are available at this time.";
+        let msg = "🧠 **Skip Optimizer Result**\n\n❌ No safe skips are available at this time.";
         if (result.cannotSkip.length > 0) {
           msg += `\n🚨 The following subjects are at or below their minimum attendance threshold and absolutely require your attendance: ${result.cannotSkip.join(", ")}.`;
         }
@@ -888,13 +888,13 @@ function formatFallback(intent: string, result: any): string {
       }
 
       const lines = result.recommendations.map((r: any) =>
-        `▪️ *${r.subjectName}*: ${r.skipsAllocated} skip${r.skipsAllocated > 1 ? "s" : ""} allocated\n   📈 Current: ${r.currentPct}% | 📉 After skipping: ${r.newPct}% | 🛡️ Remaining buffer: ${r.remainingBuffer} skip${r.remainingBuffer !== 1 ? "s" : ""}`
+        `▪️ **${r.subjectName}**: ${r.skipsAllocated} skip${r.skipsAllocated > 1 ? "s" : ""} allocated\n   📈 Current: ${r.currentPct}% | 📉 After skipping: ${r.newPct}% | 🛡️ Remaining buffer: ${r.remainingBuffer} skip${r.remainingBuffer !== 1 ? "s" : ""}`
       );
 
-      let msg = `🧠 *Skip Optimizer Result*\n\n🎯 Requested: ${result.totalRequested} skip${result.totalRequested > 1 ? "s" : ""} | ✅ Allocated: ${result.totalSkipsUsed}\n\n*Recommended allocation:*\n\n${lines.join("\n\n")}`;
+      let msg = `🧠 **Skip Optimizer Result**\n\n🎯 Requested: ${result.totalRequested} skip${result.totalRequested > 1 ? "s" : ""} | ✅ Allocated: ${result.totalSkipsUsed}\n\n**Recommended allocation:**\n\n${lines.join("\n\n")}`;
 
       if (result.cannotSkip.length > 0) {
-        msg += `\n\n⛔ *Do not skip:* ${result.cannotSkip.join(", ")}. These subjects have no buffer remaining.`;
+        msg += `\n\n⛔ **Do not skip:** ${result.cannotSkip.join(", ")}. These subjects have no buffer remaining.`;
       }
 
       if (result.safeToSkipAll) {
@@ -906,7 +906,7 @@ function formatFallback(intent: string, result: any): string {
 
     case "schedule_override": {
       if (result.action === "swap") {
-        return `🔄 *Schedule Override Confirmed*\n\n📌 Action: Swap\n📅 Date: ${result.date}\n🔀 Swapped: ${result.subject1} and ${result.subject2}\n\nBoth subjects will follow each other's original time slots for the specified date. Your dashboard and notifications will reflect this change.`;
+        return `🔄 **Schedule Override Confirmed**\n\n📌 Action: Swap\n📅 Date: ${result.date}\n🔀 Swapped: ${result.subject1} and ${result.subject2}\n\nBoth subjects will follow each other's original time slots for the specified date. Your dashboard and notifications will reflect this change.`;
       }
 
       const actionLabels: Record<string, string> = {
@@ -916,7 +916,7 @@ function formatFallback(intent: string, result: any): string {
       };
       const actionLabel = actionLabels[result.action] || result.action;
 
-      let msg = `⚙️ *Schedule Override Confirmed*\n\n📌 Action: ${actionLabel}\n📚 Subject: ${result.subjectName}\n📅 Date: ${result.date}`;
+      let msg = `⚙️ **Schedule Override Confirmed**\n\n📌 Action: ${actionLabel}\n📚 Subject: ${result.subjectName}\n📅 Date: ${result.date}`;
       if (result.newTime) msg += `\n🕒 New time: ${result.newTime}`;
 
       if (result.action === "cancel") {
@@ -931,7 +931,7 @@ function formatFallback(intent: string, result: any): string {
     }
 
     case "get_attendance_history": {
-      if (result.records.length === 0) return `📜 *Attendance History*\n\n🔍 No records found for the last ${result.days} day${result.days > 1 ? "s" : ""}. You can mark attendance from your dashboard or by asking me.`;
+      if (result.records.length === 0) return `📜 **Attendance History**\n\n🔍 No records found for the last ${result.days} day${result.days > 1 ? "s" : ""}. You can mark attendance from your dashboard or by asking me.`;
 
       const statusCounts: Record<string, number> = {};
       result.records.forEach((r: any) => {
@@ -946,7 +946,7 @@ function formatFallback(intent: string, result: any): string {
         return `${icon} ${r.date} | ${r.subject}: ${r.status.charAt(0).toUpperCase() + r.status.slice(1)}`;
       });
 
-      let msg = `📜 *Attendance History (last ${result.days} days)*\n\n🔢 Total records: ${result.total}\n📊 Breakdown: ${countSummary}\n\n${lines.join("\n")}`;
+      let msg = `📜 **Attendance History (last ${result.days} days)**\n\n🔢 Total records: ${result.total}\n📊 Breakdown: ${countSummary}\n\n${lines.join("\n")}`;
 
       if (result.total > 15) msg += `\n\n📂 ${result.total - 15} additional record${result.total - 15 > 1 ? "s" : ""} not shown. View your full history on the Calendar page.`;
 

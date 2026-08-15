@@ -16,6 +16,10 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  Copy,
+  Share2,
+  Edit2,
+  Check
 } from "lucide-react";
 import { invalidatePrefix } from "@/hooks/useSWRFetch";
 
@@ -59,9 +63,31 @@ export function ScheduleChatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  const handleCopy = (content: string, id: string) => {
+    navigator.clipboard.writeText(content);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleShare = async (content: string) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "AttendEase Assistant",
+          text: content,
+        });
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
+    } else {
+      navigator.clipboard.writeText(content);
+    }
+  };
 
   // Check speech support
   useEffect(() => {
@@ -291,9 +317,10 @@ export function ScheduleChatbot() {
                     )}
                   </div>
 
-                  {/* Bubble */}
-                  <div
-                    className={`max-w-[82%] px-4 py-3 text-[13px] leading-relaxed shadow-sm
+                  {/* Bubble Container */}
+                  <div className="flex flex-col gap-1 max-w-[82%]">
+                    <div
+                      className={`px-4 py-3 text-[13px] leading-relaxed shadow-sm
                       ${
                         msg.role === "user"
                           ? "bg-gradient-to-r from-[#D8FFC5] to-[#06d6a0] text-[#1a1a2e] font-medium rounded-2xl rounded-tr-sm shadow-[0_4px_15px_-3px_rgba(6,214,160,0.3)]"
@@ -347,6 +374,38 @@ export function ScheduleChatbot() {
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  {/* Chat Actions */}
+                  <div className={`flex gap-3 px-1 mt-0.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    {msg.role === "user" ? (
+                      <button
+                        onClick={() => {
+                          setInput(msg.content);
+                          inputRef.current?.focus();
+                        }}
+                        className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 hover:text-[#06d6a0] dark:hover:text-[#06d6a0] transition-colors"
+                      >
+                        <Edit2 className="h-3 w-3" /> EDIT
+                      </button>
+                    ) : msg.id !== "welcome" && (
+                      <>
+                        <button
+                          onClick={() => handleCopy(msg.content, msg.id)}
+                          className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 hover:text-[#4361ee] dark:hover:text-[#4cc9f0] transition-colors"
+                        >
+                          {copiedId === msg.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} 
+                          {copiedId === msg.id ? "COPIED" : "COPY"}
+                        </button>
+                        <button
+                          onClick={() => handleShare(msg.content)}
+                          className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 hover:text-[#4361ee] dark:hover:text-[#4cc9f0] transition-colors"
+                        >
+                          <Share2 className="h-3 w-3" /> SHARE
+                        </button>
+                      </>
+                    )}
+                  </div>
                   </div>
                 </div>
               ))}
