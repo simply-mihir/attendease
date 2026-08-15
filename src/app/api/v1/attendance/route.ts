@@ -5,6 +5,7 @@ import { markAttendanceSchema } from "@/lib/validations/subject";
 
 import { recalcSubjectStats } from "@/lib/subject-stats";
 import { notifyAttendanceMarked, notifyAttendanceFailed } from "@/lib/attendance-notifier";
+import { invalidateServerCache } from "@/lib/api-cache";
 
 export async function GET(req: NextRequest) {
   const user = await getAuthUser();
@@ -85,7 +86,11 @@ export async function POST(req: NextRequest) {
     });
 
     const updatedStats = await recalcSubjectStats(subjectId);
-    
+
+    // Bust cached streak/dashboard data for this user
+    invalidateServerCache(`streak:${user.id}`);
+    invalidateServerCache(`dashboard:${user.id}`);
+
     // notify success async (don't await)
     await notifyAttendanceMarked(user.id, subject.name, status, date);
 

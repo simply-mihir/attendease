@@ -4,15 +4,19 @@ export async function calcOverallStreak(userId: string): Promise<number> {
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  // 1. Fetch all attendance records and exceptions for user
+  // Only look back 365 days max — no need to fetch ancient records
+  const lookbackDate = new Date(startOfToday);
+  lookbackDate.setDate(lookbackDate.getDate() - 365);
+
+  // 1. Fetch attendance records and exceptions within lookback window
   const [allRecords, exceptions] = await Promise.all([
     prisma.attendanceRecord.findMany({
-      where: { userId },
+      where: { userId, date: { gte: lookbackDate } },
       select: { date: true, status: true },
       orderBy: { date: "desc" },
     }),
     prisma.classException.findMany({
-      where: { userId },
+      where: { userId, date: { gte: lookbackDate } },
       select: { date: true },
     }),
   ]);

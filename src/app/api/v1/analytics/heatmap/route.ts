@@ -9,9 +9,17 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 
+  // Only fetch current year by default; accept ?year= param
+  const searchParams = req.nextUrl.searchParams;
+  const now = new Date();
+  const year = parseInt(searchParams.get("year") || String(now.getFullYear()));
+  const yearStart = new Date(`${year}-01-01T00:00:00Z`);
+  const yearEnd = new Date(`${year + 1}-01-01T00:00:00Z`);
+
   const records = await prisma.attendanceRecord.findMany({
     where: {
       userId: user.id,
+      date: { gte: yearStart, lt: yearEnd },
     },
     select: { date: true, status: true, subject: { select: { name: true } } },
     orderBy: { date: "asc" },

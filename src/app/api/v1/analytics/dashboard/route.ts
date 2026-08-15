@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { calculateAttendance } from "@/lib/attendance-calc";
-import { cachedJson } from "@/lib/api-cache";
+import { cachedJson, serverCache } from "@/lib/api-cache";
 import { calcOverallStreak } from "@/lib/streak-calc";
 
 export async function GET(req: NextRequest) {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { name: "asc" },
     }),
-    calcOverallStreak(user.id),
+    serverCache(`streak:${user.id}`, 30, () => calcOverallStreak(user.id)),
   ]);
 
   let overallPresent = 0;

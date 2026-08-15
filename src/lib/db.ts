@@ -9,7 +9,12 @@ let prisma: PrismaClient;
 if (globalForPrisma.prisma) {
   prisma = globalForPrisma.prisma;
 } else {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 5,                // Limit concurrent connections (Neon free tier)
+    idleTimeoutMillis: 30_000,  // Close idle connections after 30s
+    connectionTimeoutMillis: 10_000,
+  });
   const adapter = new PrismaPg(pool);
   prisma = new PrismaClient({
     adapter,

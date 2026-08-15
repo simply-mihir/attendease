@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { cachedJson } from "@/lib/api-cache";
+import { cachedJson, serverCache, invalidateServerCache } from "@/lib/api-cache";
 import { calcOverallStreak } from "@/lib/streak-calc";
 import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
@@ -81,7 +81,7 @@ export async function GET() {
       },
       orderBy: { startTime: "asc" },
     }),
-    calcOverallStreak(user.id),
+    serverCache(`streak:${user.id}`, 30, () => calcOverallStreak(user.id)),
     prisma.subject.count({
       where: { userId: user.id, semesterId: null },
     }),

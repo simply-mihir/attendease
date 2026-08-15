@@ -19,14 +19,16 @@ export async function recalcSubjectStats(subjectId: string) {
   const currentPercentage =
     totalClassesHeld === 0 ? 100 : Math.round((effective / totalClassesHeld) * 10000) / 100;
 
-  // Calculate streak by fetching only minimal required data
+  // Calculate streak — only need the most recent consecutive run
+  // Limit to 200 records; any real streak won't exceed this
   const recentRecords = await prisma.attendanceRecord.findMany({
-    where: { 
+    where: {
       subjectId,
       status: { notIn: ["holiday", "cancelled"] }
     },
     select: { status: true },
-    orderBy: { date: "desc" }
+    orderBy: { date: "desc" },
+    take: 200,
   });
 
   let streakCount = 0;
