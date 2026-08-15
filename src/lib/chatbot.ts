@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { recalcSubjectStats } from "@/lib/subject-stats";
 import { calculateAttendance, simulateSkip } from "@/lib/attendance-calc";
 import { getUserTimezone, getUserToday } from "@/lib/timezone";
+import { analyzeIntent } from "@/lib/nlp/engine";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -30,124 +31,133 @@ function minutesToTime(mins: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-async function execGetTodaysClasses(userId: string) {
+async function execGetSchedule(userId: string, target: "today" | "tomorrow" | "next" = "today") {
   const tz = await getUserTimezone(userId);
-  const { dayOfWeek, dateStr: todayStr } = getUserToday(tz);
+  const startOffset = target === "tomorrow" ? 1 : 0;
+  const maxLoops = target === "next" ? 7 : 1;
 
-  const [schedules, overrides, todayRecords] = await Promise.all([
-    prisma.schedule.findMany({
-      where: { userId, dayOfWeek, isActive: true },
-      include: {
-        subject: {
-          select: {
-            id: true, name: true, colorHex: true, currentPercentage: true,
-            minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
-            totalLate: true, streakCount: true,
+  for (let i = 0; i < maxLoops; i++) {
+    const currentOffset = startOffset + i;
+    const { dayOfWeek, dateStr: targetStr, dayName } = getUserToday(tz, currentOffset);
+
+    const [schedules, overrides, dateRecords] = await Promise.all([
+      prisma.schedule.findMany({
+        where: { userId, dayOfWeek, isActive: true },
+        include: {
+          subject: {
+            select: {
+              id: true, name: true, colorHex: true, currentPercentage: true,
+              minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
+              totalLate: true, streakCount: true,
+            },
           },
         },
-      },
-      orderBy: { startTime: "asc" },
-    }),
-    prisma.scheduleOverride.findMany({
-      where: { userId, date: new Date(todayStr + "T00:00:00Z") },
-      include: {
-        subject: {
-          select: {
-            id: true, name: true, colorHex: true, currentPercentage: true,
-            minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
-            totalLate: true, streakCount: true,
+        orderBy: { startTime: "asc" },
+      }),
+      prisma.scheduleOverride.findMany({
+        where: { userId, date: new Date(targetStr + "T00:00:00Z") },
+        include: {
+          subject: {
+            select: {
+              id: true, name: true, colorHex: true, currentPercentage: true,
+              minAttendancePct: true, totalClassesHeld: true, totalPresent: true,
+              totalLate: true, streakCount: true,
+            },
           },
         },
-      },
-    }),
-    prisma.attendanceRecord.findMany({
-      where: { userId, date: new Date(todayStr) },
-    }),
-  ]);
+      }),
+      prisma.attendanceRecord.findMany({
+        where: { userId, date: new Date(targetStr) },
+      }),
+    ]);
 
-  // Build original time lookup for swap endTime resolution
-  const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
-  for (const s of schedules) {
-    originalBySubject.set(s.subject.id, { startTime: s.startTime, endTime: s.endTime });
-  }
+    const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
+    for (const s of schedules) {
+      originalBySubject.set(s.subject.id, { startTime: s.startTime, endTime: s.endTime });
+    }
 
-  const markedMap = new Map(
-    todayRecords.map((r) => [`${r.subjectId}-${r.scheduleId || ""}`, r])
-  );
+    const markedMap = new Map(
+      dateRecords.map((r) => [`${r.subjectId}-${r.scheduleId || ""}`, r])
+    );
 
-  // Start with regular classes
-  let classes = schedules.map((s) => {
-    const key = `${s.subjectId}-${s.id}`;
-    const record = markedMap.get(key);
-    return {
-      scheduleId: s.id,
-      subjectId: s.subject.id,
-      subjectName: s.subject.name,
-      startTime: s.startTime,
-      endTime: s.endTime,
-      room: s.room,
-      currentPct: s.subject.currentPercentage,
-      minPct: s.subject.minAttendancePct,
-      streakCount: s.subject.streakCount,
-      attendanceMarked: !!record,
-      attendanceStatus: record?.status || null,
-    };
-  });
+    let classes = schedules.map((s) => {
+      const key = `${s.subjectId}-${s.id}`;
+      const record = markedMap.get(key);
+      return {
+        scheduleId: s.id,
+        subjectId: s.subject.id,
+        subjectName: s.subject.name,
+        startTime: s.startTime,
+        endTime: s.endTime,
+        room: s.room,
+        currentPct: s.subject.currentPercentage,
+        minPct: s.subject.minAttendancePct,
+        streakCount: s.subject.streakCount,
+        attendanceMarked: !!record,
+        attendanceStatus: record?.status || null,
+      };
+    });
 
-  // Apply overrides
-  for (const ov of overrides) {
-    switch (ov.type) {
-      case "cancel":
-        classes = classes.filter((c) => c.subjectId !== ov.subjectId);
-        break;
-      case "reschedule": {
-        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
-        if (idx !== -1 && ov.newTime) {
-          const orig = classes[idx];
-          const duration = timeToMinutes(orig.endTime) - timeToMinutes(orig.startTime);
-          const newEnd = duration > 0 ? minutesToTime(timeToMinutes(ov.newTime) + duration) : orig.endTime;
-          classes[idx] = { ...orig, startTime: ov.newTime, endTime: newEnd };
-        } else if (idx === -1 && ov.subject && ov.newTime) {
-          classes.push({
-            scheduleId: ov.id, subjectId: ov.subjectId,
-            subjectName: ov.subject.name, startTime: ov.newTime, endTime: "",
-            room: null, currentPct: ov.subject.currentPercentage,
-            minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
-            attendanceMarked: false, attendanceStatus: null,
-          });
+    for (const ov of overrides) {
+      switch (ov.type) {
+        case "cancel":
+          classes = classes.filter((c) => c.subjectId !== ov.subjectId);
+          break;
+        case "reschedule": {
+          const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+          if (idx !== -1 && ov.newTime) {
+            const orig = classes[idx];
+            const duration = timeToMinutes(orig.endTime) - timeToMinutes(orig.startTime);
+            const newEnd = duration > 0 ? minutesToTime(timeToMinutes(ov.newTime) + duration) : orig.endTime;
+            classes[idx] = { ...orig, startTime: ov.newTime, endTime: newEnd };
+          } else if (idx === -1 && ov.subject && ov.newTime) {
+            classes.push({
+              scheduleId: ov.id, subjectId: ov.subjectId,
+              subjectName: ov.subject.name, startTime: ov.newTime, endTime: "",
+              room: null, currentPct: ov.subject.currentPercentage,
+              minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
+              attendanceMarked: false, attendanceStatus: null,
+            });
+          }
+          break;
         }
-        break;
-      }
-      case "extra":
-        if (ov.subject) {
-          classes.push({
-            scheduleId: ov.id, subjectId: ov.subjectId,
-            subjectName: ov.subject.name, startTime: ov.newTime || "09:00", endTime: "",
-            room: null, currentPct: ov.subject.currentPercentage,
-            minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
-            attendanceMarked: false, attendanceStatus: null,
-          });
+        case "extra":
+          if (ov.subject) {
+            classes.push({
+              scheduleId: ov.id, subjectId: ov.subjectId,
+              subjectName: ov.subject.name, startTime: ov.newTime || "09:00", endTime: "",
+              room: null, currentPct: ov.subject.currentPercentage,
+              minPct: ov.subject.minAttendancePct, streakCount: ov.subject.streakCount,
+              attendanceMarked: false, attendanceStatus: null,
+            });
+          }
+          break;
+        case "swap": {
+          const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
+          if (idx !== -1 && ov.newTime) {
+            const swapPartnerOrig = ov.swapSubjectId ? originalBySubject.get(ov.swapSubjectId) : null;
+            classes[idx] = {
+              ...classes[idx],
+              startTime: ov.newTime,
+              endTime: swapPartnerOrig?.endTime || classes[idx].endTime,
+            };
+          }
+          break;
         }
-        break;
-      case "swap": {
-        const idx = classes.findIndex((c) => c.subjectId === ov.subjectId);
-        if (idx !== -1 && ov.newTime) {
-          const swapPartnerOrig = ov.swapSubjectId ? originalBySubject.get(ov.swapSubjectId) : null;
-          classes[idx] = {
-            ...classes[idx],
-            startTime: ov.newTime,
-            endTime: swapPartnerOrig?.endTime || classes[idx].endTime,
-          };
-        }
-        break;
       }
     }
+
+    classes.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+
+    if (target === "next" && classes.length === 0 && i < maxLoops - 1) {
+      continue;
+    }
+
+    return { classes, totalClasses: classes.length, dayName, date: targetStr, target };
   }
 
-  classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  return { date: todayStr, dayName: dayNames[dayOfWeek], classes, totalClasses: classes.length };
+  const { dayName, dateStr: targetStr } = getUserToday(tz, 0);
+  return { classes: [], totalClasses: 0, dayName, date: targetStr, target };
 }
 
 async function execMarkAttendance(userId: string, subjectQuery: string, status: string) {
@@ -495,10 +505,6 @@ async function findSubject(userId: string, query: string) {
 // ── Main route handler ──────────────────────────────────────────
 
 export async function processChatbotMessage(userId: string, message: string, history: any[] = []) {
-  if (!OPENROUTER_API_KEY) {
-    return { reply: "Chatbot not configured. Set OPENROUTER_API_KEY in .env", actions: [] };
-  }
-
   // Get user details for context
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return { reply: "User not found.", actions: [] };
@@ -526,8 +532,8 @@ You MUST respond with ONLY a JSON object (no markdown, no code fences, no extra 
 
 Available intents and their params:
 
-1. "get_todays_classes" — params: {}
-   Use when: user asks about today's classes, schedule, what's on today
+1. "get_schedule" — params: {"target": "<today|tomorrow|next>"}
+   Use when: user asks about their schedule, what classes they have, or when their next class is. Use target="next" if they ask "when is my next class".
 
 2. "mark_attendance" — params: {"subject": "<name>", "status": "<present|absent|late|excused|cancelled>"}
    Use when: user wants to mark attendance. Map: bunked/skipped/missed → absent, attended/went → present, late/reached late → late
@@ -572,67 +578,111 @@ CRITICAL RULES:
   ];
 
   try {
-    // Step 1: Get intent from LLM
-    let intentRes;
-    let lastErr;
+    const lowerMsg = message.toLowerCase();
     
-    for (const modelName of MODELS) {
-      try {
-        intentRes = await fetch(OPENROUTER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-            "HTTP-Referer": "https://attendease-c7wl.vercel.app",
-            "X-Title": "AttendEase",
-          },
-          body: JSON.stringify({
-            model: modelName,
-            messages,
-            temperature: 0.1,
-            max_tokens: 512,
-          }),
-        });
-        
-        if (intentRes.ok) break;
-        lastErr = await intentRes.json().catch(() => ({}));
-        console.warn(`[Chatbot] Model ${modelName} failed:`, lastErr);
-      } catch (err) {
-        lastErr = err;
-        console.warn(`[Chatbot] Network error for ${modelName}:`, err);
-      }
-    }
-
+    // Step 1: Fast offline NLP classification
     let intent: string = "chat";
     let params: any = {};
-    let usingRegexFallback = false;
+    let usingLLM = true;
 
-    if (!intentRes || !intentRes.ok) {
-      console.error("[Chatbot] All fallback LLMs failed. Last error:", lastErr);
-      
-      const lowerMsg = message.toLowerCase();
-      usingRegexFallback = true;
+    try {
+      const nlpRes = await analyzeIntent(lowerMsg);
+      if (nlpRes.score > 0.65) {
+        const [baseIntent, subIntent] = nlpRes.intent.split(".");
+        
+        // Schedule override still relies heavily on LLM for date/time parsing
+        if (baseIntent !== "schedule_override" && baseIntent !== "chat" && baseIntent !== "None") {
+          usingLLM = false;
+          intent = baseIntent;
+          
+          if (intent === "get_schedule") {
+            params = { target: subIntent || "today" };
+          } else if (intent === "mark_attendance") {
+            params = { status: subIntent || "present" };
+            let subject = subjects.find(s => lowerMsg.includes(s.name.toLowerCase()) || (s.code && lowerMsg.includes(s.code.toLowerCase())));
+            if (!subject) {
+              subject = subjects.find((s) => {
+                const words = s.name.toLowerCase().split(/\s+/);
+                if (words.length > 1) {
+                  const acronym = words.map((w) => w[0].toLowerCase()).join("");
+                  if (lowerMsg.includes(acronym)) return true;
+                }
+                return false;
+              });
+            }
+            if (subject) params.subject = subject.name;
+            else usingLLM = true; // Fallback to LLM if NLP couldn't extract the subject
+          } else if (intent === "mark_bulk_attendance") {
+            params = { status: subIntent || "present" };
+          } else if (intent === "skip_optimizer") {
+            params = { maxSkips: 3 };
+          } else if (intent === "get_attendance_history") {
+            params = { days: 7 };
+          } else if (intent === "get_analytics") {
+            // No params needed
+          } else if (intent === "get_subject_info") {
+            let subject = subjects.find(s => lowerMsg.includes(s.name.toLowerCase()) || (s.code && lowerMsg.includes(s.code.toLowerCase())));
+            if (!subject) {
+              subject = subjects.find((s) => {
+                const words = s.name.toLowerCase().split(/\s+/);
+                if (words.length > 1) {
+                  const acronym = words.map((w) => w[0].toLowerCase()).join("");
+                  if (lowerMsg.includes(acronym)) return true;
+                }
+                return false;
+              });
+            }
+            if (subject) params.subject = subject.name;
+            else usingLLM = true;
+          }
+        }
+      }
+    } catch (nlpErr) {
+      console.warn("[Chatbot] NLP engine error, falling back to LLM:", nlpErr);
+    }
 
-      if (lowerMsg.includes("mark") && (lowerMsg.includes("present") || lowerMsg.includes("absent"))) {
-        intent = "mark_bulk_attendance";
-        params = { status: lowerMsg.includes("present") ? "present" : "absent" };
-      } else if (lowerMsg.includes("today") || lowerMsg.includes("schedule") || lowerMsg.includes("class")) {
-        intent = "get_todays_classes";
-      } else if (lowerMsg.includes("bunk") || lowerMsg.includes("skip")) {
-        intent = "skip_optimizer";
-        params = { maxSkips: 3 };
-      } else if (lowerMsg.includes("analytic") || lowerMsg.includes("overall") || lowerMsg.includes("stat")) {
-        intent = "get_analytics";
-      } else if (lowerMsg.includes("history") || lowerMsg.includes("past")) {
-        intent = "get_attendance_history";
-        params = { days: 7 };
-      } else {
+    // Step 2: Fallback to LLM if NLP confidence is low or entities are missing
+    if (usingLLM) {
+      if (!OPENROUTER_API_KEY) {
+        return { reply: "Chatbot not configured for complex requests. Set OPENROUTER_API_KEY in .env", actions: [] };
+      }
+      let intentRes;
+      let lastErr;
+      for (const modelName of MODELS) {
+        try {
+          intentRes = await fetch(OPENROUTER_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+              "HTTP-Referer": "https://attendease-c7wl.vercel.app",
+              "X-Title": "AttendEase",
+            },
+            body: JSON.stringify({
+              model: modelName,
+              messages,
+              temperature: 0.1,
+              max_tokens: 512,
+            }),
+          });
+          
+          if (intentRes.ok) break;
+          lastErr = await intentRes.json().catch(() => ({}));
+          console.warn(`[Chatbot] Model ${modelName} failed:`, lastErr);
+        } catch (err) {
+          lastErr = err;
+          console.warn(`[Chatbot] Network error for ${modelName}:`, err);
+        }
+      }
+
+      if (!intentRes || !intentRes.ok) {
+        console.error("[Chatbot] All LLMs failed. Cannot fulfill complex request offline.", lastErr);
         return { 
-          reply: "The AI service is currently facing a global outage, and I couldn't understand your request offline. Try asking 'What are my classes today?' or 'Can I bunk?'.",
+          reply: "I'm having trouble connecting to my AI brain right now, and I couldn't understand your request offline. 💀\n\nTry asking simpler things like 'mark dbms present' or 'when is my next class'.",
           actions: []
         };
       }
-    } else {
+
       const intentData = await intentRes.json();
       const rawContent = intentData.choices?.[0]?.message?.content || "";
 
@@ -665,8 +715,9 @@ CRITICAL RULES:
     const actions: string[] = [];
 
     switch (intent) {
-      case "get_todays_classes":
-        result = await execGetTodaysClasses(user.id);
+      case "get_schedule":
+      case "get_todays_classes": // Legacy fallback just in case
+        result = await execGetSchedule(user.id, params.target || "today");
         break;
       case "mark_attendance":
         if (!params.subject || !params.status) {
@@ -736,9 +787,13 @@ function formatFallback(intent: string, result: any): string {
   if (result.error) return `Unable to complete the request: ${result.error}`;
 
   switch (intent) {
+    case "get_schedule":
     case "get_todays_classes": {
       if (result.classes.length === 0) {
-        return `📅 *Schedule for ${result.dayName}, ${result.date}:*\n\n🏖️ No classes are scheduled for today. You have a free day! Enjoy your time off.`;
+        if (result.target === "next") {
+           return `📅 *Schedule:*\n\n🏖️ You have absolutely no classes scheduled for the next 7 days! Enjoy your time off.`;
+        }
+        return `📅 *Schedule for ${result.dayName}, ${result.date}:*\n\n🏖️ No classes are scheduled for ${result.target === "tomorrow" ? "tomorrow" : "today"}. You have a free day! Enjoy your time off.`;
       }
 
       const marked = result.classes.filter((c: any) => c.attendanceMarked).length;

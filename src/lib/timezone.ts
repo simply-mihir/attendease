@@ -23,8 +23,9 @@ export async function getUserTimezone(userId: string): Promise<string> {
  * timezone conversion (avoids locale-string parsing which breaks on some
  * Node.js versions / Vercel runtimes).
  */
-export function getUserToday(tz: string) {
+export function getUserToday(tz: string, offsetDays: number = 0) {
   const now = new Date();
+  if (offsetDays !== 0) now.setDate(now.getDate() + offsetDays);
 
   // Extract individual date/time parts in the user's timezone
   const fmt = new Intl.DateTimeFormat("en-US", {
