@@ -8,12 +8,13 @@ import { getUserTimezone, getUserToday } from "@/lib/timezone";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODELS = [
-  "google/gemma-2-9b-it:free",
-  "mistralai/mistral-7b-instruct:free",
-  "huggingfaceh4/zephyr-7b-beta:free",
-  "meta-llama/llama-3.1-8b-instruct:free",
-  "qwen/qwen-2-7b-instruct:free",
-  "gryphe/mythomax-l2-13b:free"
+  "microsoft/phi-3-medium-128k-instruct:free",
+  "microsoft/phi-3-mini-128k-instruct:free",
+  "meta-llama/llama-3-8b-instruct:free",
+  "openchat/openchat-7b:free",
+  "undi95/toppy-m-7b:free",
+  "liquid/lfm-40b:free",
+  "google/gemma-2-9b-it:free"
 ];
 
 // ── Tool executor functions ─────────────────────────────────────
