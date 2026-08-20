@@ -189,10 +189,15 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   }
 
   async function handleMark() {
+    if (availableSlots.length > 0 && !markScheduleId) {
+      alert("Please select a specific slot to mark attendance for.");
+      return;
+    }
+
     setMarking(true);
     setMarkSuccess(false);
     try {
-      const finalScheduleId = markScheduleId || (availableSlots.length > 0 ? availableSlots[0].id : undefined);
+      const finalScheduleId = markScheduleId || undefined;
       await apiFetch("/attendance", {
         method: "POST",
         body: JSON.stringify({ 
@@ -664,6 +669,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 onChange={(e) => setMarkScheduleId(e.target.value)}
                 className="input-3d w-full text-sm font-semibold"
               >
+                <option value="">Select a slot...</option>
                 {availableSlots.map(slot => (
                   <option key={slot.id} value={slot.id}>{slot.label}</option>
                 ))}
