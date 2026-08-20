@@ -8,11 +8,9 @@ import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import { getLocalDateStr } from "@/lib/local-date";
 // slug-only URLs: the [id] param is now the slug (e.g. "dbms")
-import {
-  ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer, Ban,
+import { X, ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer, Ban,
   Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
-  Mail, MessageSquare, Volume2, BookOpen
-} from "lucide-react";
+  Mail, MessageSquare, Volume2, BookOpen } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { FieldLoader } from "@/components/FieldLoader";
@@ -1026,7 +1024,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Edit Subject Modal */}
       {showEditSubjectModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <h3 className="text-xl font-black text-text">Edit Subject</h3>
             <div className="space-y-3">
@@ -1092,7 +1090,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Edit Attendance Modal */}
       {editingRecord && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <div className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <h3 className="text-xl font-black text-text">Edit Record</h3>
             <div className="space-y-3">
@@ -1143,7 +1141,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Add / Edit Schedule Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <form
             onSubmit={handleSaveSchedule}
             className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
@@ -1227,23 +1225,33 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Schedule Extra Class Modal */}
       {showExtraClassModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <form
             onSubmit={handleSaveExtraClass}
             className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#00f5d4]/40 bg-white shadow-[0_12px_0_0_#00c4a7] dark:border-[#00f5d4]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
           >
-            <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-2xl bg-[#00f5d4] border-2 border-[#00c4a7] flex items-center justify-center shadow-[0_3px_0_0_#00a890] shrink-0 text-[#0d0d1a]">
-                <Zap className="w-5 h-5" />
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#00f5d4] border-2 border-[#00c4a7] flex items-center justify-center shadow-[0_3px_0_0_#00a890] shrink-0 text-[#0d0d1a]">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-text">
+                    {extraClassMode === "add" ? "Schedule Extra Class" : "Edit Extra Class"}
+                  </h3>
+                  <p className="text-xs font-semibold text-text-muted">
+                    {extraClassMode === "add" ? `Add a one-off or makeup lecture for ${subject.name}` : `Modify the details of this extra class for ${subject.name}`}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-black text-text">
-                  {extraClassMode === "add" ? "Schedule Extra Class" : "Edit Extra Class"}
-                </h3>
-                <p className="text-xs font-semibold text-text-muted">
-                  {extraClassMode === "add" ? `Add a one-off or makeup lecture for ${subject.name}` : `Modify the details of this extra class for ${subject.name}`}
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowExtraClassModal(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 rounded-xl cursor-pointer"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="space-y-3">
@@ -1349,7 +1357,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Create Subject Reminder Modal */}
       {showSubjectReminderModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <form
             onSubmit={handleSaveSubjectReminder}
             className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#ff6b35]/40 bg-white shadow-[0_12px_0_0_#d95220] dark:border-[#ff6b35]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
@@ -1513,7 +1521,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Delete Subject Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-overlay">
           <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 flex items-center justify-center shadow-[0_3px_0_0_#ef476f]">
