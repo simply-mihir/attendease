@@ -1,18 +1,20 @@
 import { prisma } from "@/lib/db";
 
 export async function recalcSubjectStats(subjectId: string) {
-  // Aggregate counts directly in DB
+  // Aggregate sum of weights directly in DB
   const counts = await prisma.attendanceRecord.groupBy({
     by: ["status"],
     where: { subjectId },
-    _count: true,
+    _sum: {
+      weight: true
+    },
   });
 
-  const present = counts.find((c) => c.status === "present")?._count ?? 0;
-  const late = counts.find((c) => c.status === "late")?._count ?? 0;
-  const absent = counts.find((c) => c.status === "absent")?._count ?? 0;
-  const excused = counts.find((c) => c.status === "excused")?._count ?? 0;
-  const cancelled = counts.find((c) => c.status === "cancelled")?._count ?? 0;
+  const present = counts.find((c) => c.status === "present")?._sum.weight ?? 0;
+  const late = counts.find((c) => c.status === "late")?._sum.weight ?? 0;
+  const absent = counts.find((c) => c.status === "absent")?._sum.weight ?? 0;
+  const excused = counts.find((c) => c.status === "excused")?._sum.weight ?? 0;
+  const cancelled = counts.find((c) => c.status === "cancelled")?._sum.weight ?? 0;
   
   const totalClassesHeld = present + late + absent + excused;
   const effective = present + late;

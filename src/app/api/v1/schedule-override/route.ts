@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
 import { parseScheduleMessage } from "@/lib/schedule-parser";
 
-// POST — parse user message and create override
+// POST — parse user message and create override, OR accept explicit manual override
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!(session?.user as any)?.id) {
@@ -12,12 +12,39 @@ export async function POST(req: NextRequest) {
   }
   const userId = (session!.user as any).id;
 
-  const { message } = await req.json();
-  if (!message || typeof message !== "string") {
-    return NextResponse.json({ error: "Message required" }, { status: 400 });
-  }
+  const body = await req.json();
 
   try {
+    // If no "message", assume it's a manual override creation
+    if (!body.message) {
+      const { createOverrideSchema } = await import("@/lib/validations/subject");
+      const parsedManual = createOverrideSchema.safeParse(body);
+      
+      if (!parsedManual.success) {
+        return NextResponse.json({ error: parsedManual.error.errors[0].message }, { status: 400 });
+      }
+
+      const override = await prisma.scheduleOverride.create({
+        data: {
+          userId: userId,
+          date: new Date(parsedManual.data.date),
+          subjectId: parsedManual.data.subjectId,
+          type: parsedManual.data.type,
+          originalTime: parsedManual.data.originalTime,
+          newTime: parsedManual.data.newTime,
+          note: parsedManual.data.note,
+          weight: parsedManual.data.weight,
+        },
+      });
+
+      return NextResponse.json({ success: true, override });
+    }
+
+    const { message } = body;
+    if (typeof message !== "string") {
+      return NextResponse.json({ error: "Message must be a string" }, { status: 400 });
+    }
+
     // Get user's subjects for matching
     const subjects = await prisma.subject.findMany({
       where: {

@@ -99,7 +99,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     endTime: "11:00",
     room: "",
     topic: "",
-    status: "present",
+    weight: 1,
   });
   const [savingExtraClass, setSavingExtraClass] = useState(false);
   const [addReminderForExtraClass, setAddReminderForExtraClass] = useState(true);
@@ -270,34 +270,16 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     e.preventDefault();
     setSavingExtraClass(true);
     try {
-      const selectedDate = new Date(extraClassForm.date);
-      const dayOfWeek = selectedDate.getDay();
-
-      const roomStr = extraClassForm.room
-        ? `${extraClassForm.room} (Extra Class)`
-        : "Extra Class";
-
-      const scheduleRes = await apiFetch("/schedules", {
-        method: "POST",
-        body: JSON.stringify({
-          subjectId: id,
-          dayOfWeek,
-          startTime: extraClassForm.startTime,
-          endTime: extraClassForm.endTime,
-          room: roomStr,
-          building: extraClassForm.topic || "Extra Class",
-        }),
-      });
-
-      await apiFetch("/attendance", {
+      await apiFetch("/schedule-override", {
         method: "POST",
         body: JSON.stringify({
           subjectId: id,
           date: extraClassForm.date,
-          status: extraClassForm.status,
-          scheduleId: scheduleRes?.schedule?.id || null,
-          source: "extra_class",
-          notes: `Extra Class${extraClassForm.topic ? `: ${extraClassForm.topic}` : ""}${extraClassForm.room ? ` (${extraClassForm.room})` : ""}`,
+          type: "extra",
+          originalTime: extraClassForm.startTime,
+          newTime: extraClassForm.endTime,
+          note: `Extra Class${extraClassForm.topic ? `: ${extraClassForm.topic}` : ""}${extraClassForm.room ? ` (${extraClassForm.room})` : ""}`,
+          weight: extraClassForm.weight,
         }),
       });
 
@@ -1123,18 +1105,14 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Attendance Status</label>
-                <select
-                  value={extraClassForm.status}
-                  onChange={e => setExtraClassForm({ ...extraClassForm, status: e.target.value })}
+                <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Number of Classes (Weight)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={extraClassForm.weight}
+                  onChange={e => setExtraClassForm({ ...extraClassForm, weight: parseInt(e.target.value) || 1 })}
                   className="input-3d w-full text-sm font-semibold"
-                >
-                  <option value="present">Present</option>
-                  <option value="absent">Absent</option>
-                  <option value="late">Late</option>
-                  <option value="excused">Excused</option>
-                  <option value="cancelled">Cancelled / Class Off</option>
-                </select>
+                />
               </div>
 
               <label className="flex items-center gap-2 text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] cursor-pointer pt-1">

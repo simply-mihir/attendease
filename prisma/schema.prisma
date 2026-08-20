@@ -194,6 +194,7 @@ model AttendanceRecord {
   markedAt     DateTime  @default(now())
   editedAt     DateTime?
   editedReason String?
+  weight       Int       @default(1)
 
   subject  Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -425,6 +426,7 @@ model ScheduleOverride {
   swapSubjectId   String?  // For swaps: the other subject involved
   swapSubject     Subject? @relation("SwapSubject", fields: [swapSubjectId], references: [id])
   note            String?  // User's original message / note
+  weight          Int      @default(1)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

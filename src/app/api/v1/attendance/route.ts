@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
 
-    const { subjectId, date, status, scheduleId, notes, source } = parsed.data;
+    const { subjectId, date, status, scheduleId, notes, source, weight } = parsed.data;
 
     // Verify subject belongs to user
     const subject = await prisma.subject.findFirst({
@@ -76,10 +76,12 @@ export async function POST(req: NextRequest) {
         status,
         source: source || "manual",
         notes,
+        weight,
       },
       update: {
         status,
         notes,
+        weight,
         editedAt: new Date(),
         editedReason: "Updated via mark",
       },

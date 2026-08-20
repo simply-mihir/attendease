@@ -27,7 +27,18 @@ export const markAttendanceSchema = z.object({
   status: z.enum(["present", "absent", "late", "excused", "cancelled", "holiday"]),
   scheduleId: z.string().optional(),
   notes: z.string().optional(),
-  source: z.enum(["manual", "quick_widget", "notification", "bulk"]).optional().default("manual"),
+  source: z.enum(["manual", "quick_widget", "notification", "bulk", "extra_class"]).optional().default("manual"),
+  weight: z.number().min(1).optional().default(1),
+});
+
+export const createOverrideSchema = z.object({
+  subjectId: z.string().min(1),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  type: z.enum(["reschedule", "cancel", "extra", "swap"]),
+  originalTime: z.string().optional(),
+  newTime: z.string().optional(),
+  note: z.string().optional(),
+  weight: z.number().min(1).optional().default(1),
 });
 
 export const bulkAttendanceSchema = z.object({
