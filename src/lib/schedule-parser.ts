@@ -95,22 +95,31 @@ export function parseScheduleMessage(
 
     case "extra": {
       const subject = matchedSubjects[0];
-      const newTime = times[0] || null;
-      if (!newTime) {
+      const startTime = times[0] || null;
+      if (!startTime) {
         return {
           success: false,
           error: "What time is the extra class? E.g., 'Extra DBMS class at 3pm on Saturday'.",
         };
       }
+      
+      let endTime = times[1] || null;
+      if (!endTime) {
+        // Default to 1 hour later
+        const [h, m] = startTime.split(":").map(Number);
+        const newH = (h + 1) % 24;
+        endTime = `${newH.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+      }
+
       return {
         success: true,
         type: "extra",
         subjectId: subject.id,
         subjectName: subject.name,
         date,
-        originalTime: null,
-        newTime,
-        confirmMessage: `Added! Extra ${subject.name} class at ${newTime} on ${formatDate(date)}.`,
+        originalTime: startTime,
+        newTime: endTime,
+        confirmMessage: `Added! Extra ${subject.name} class from ${startTime} to ${endTime} on ${formatDate(date)}.`,
       };
     }
 

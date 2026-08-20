@@ -344,7 +344,8 @@ async function execScheduleOverride(
   subjectQuery: string,
   dateStr: string,
   newTime?: string,
-  swapSubjectQuery?: string
+  swapSubjectQuery?: string,
+  endTime?: string
 ) {
   const subject = await findSubject(userId, subjectQuery);
   if (!subject) return { error: `Could not find subject "${subjectQuery}".` };
@@ -390,16 +391,29 @@ async function execScheduleOverride(
     where: { subjectId: subject.id, dayOfWeek: date.getDay(), isActive: true },
   });
 
+  let finalOriginalTime = sched?.startTime || null;
+  let finalNewTime = newTime || null;
+
+  if (action === "extra") {
+    finalOriginalTime = newTime || "10:00"; // fallback start time
+    if (!endTime) {
+      const [h, m] = finalOriginalTime.split(":").map(Number);
+      const nextH = (h + 1) % 24;
+      endTime = `${nextH.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+    }
+    finalNewTime = endTime;
+  }
+
   await prisma.scheduleOverride.create({
     data: {
       userId, date, subjectId: subject.id, type: action,
-      originalTime: sched?.startTime || null,
-      newTime: newTime || null,
+      originalTime: finalOriginalTime,
+      newTime: finalNewTime,
       note: `${action} ${subject.name}`,
     },
   });
 
-  return { success: true, action, subjectName: subject.name, date: dateStr, newTime };
+  return { success: true, action, subjectName: subject.name, date: dateStr, newTime, endTime };
 }
 
 async function execGetAttendanceHistory(userId: string, subjectQuery?: string, days: number = 7) {
@@ -550,8 +564,8 @@ Available intents and their params:
 6. "skip_optimizer" — params: {"maxSkips": <number, default 3>}
    Use when: user asks "can I bunk?", "how many can I skip?", "safe to skip?"
 
-7. "schedule_override" — params: {"action": "<reschedule|cancel|extra|swap>", "subject": "<name>", "date": "<YYYY-MM-DD>", "newTime": "<HH:MM 24h>", "swapSubject": "<name>"}
-   Use when: user talks about timing changes, cancellations, extra classes, swaps
+7. "schedule_override" — params: {"action": "<reschedule|cancel|extra|swap>", "subject": "<name>", "date": "<YYYY-MM-DD>", "newTime": "<HH:MM 24h>", "endTime": "<HH:MM 24h>", "swapSubject": "<name>"}
+   Use when: user talks about timing changes, cancellations, extra classes, swaps. For extra class, ALWAYS try to provide both newTime (start time) and endTime.
    For dates: today=${todayDateStr}, tomorrow=${(() => { const t = new Date(todayDateStr + "T12:00:00"); t.setDate(t.getDate() + 1); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; })()}
    Convert day names to actual dates. Convert "2pm" to "14:00", "9:30am" to "09:30"
 
@@ -754,7 +768,7 @@ CRITICAL RULES:
         } else {
           result = await execScheduleOverride(
             user.id, params.action, params.subject, params.date,
-            params.newTime, params.swapSubject
+            params.newTime, params.swapSubject, params.endTime
           );
           if (result.success) actions.push("schedule_changed");
         }
