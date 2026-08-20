@@ -131,18 +131,26 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
+  const subjectId = searchParams.get("subjectId");
+  const future = searchParams.get("future") === "true";
+
+  let dateFilter: any = undefined;
+  if (startDate && endDate) {
+    dateFilter = {
+      gte: new Date(startDate),
+      lte: new Date(endDate),
+    };
+  } else if (future) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dateFilter = { gte: today };
+  }
 
   const overrides = await prisma.scheduleOverride.findMany({
     where: {
       userId: userId,
-      ...(startDate && endDate
-        ? {
-            date: {
-              gte: new Date(startDate),
-              lte: new Date(endDate),
-            },
-          }
-        : {}),
+      ...(subjectId ? { subjectId } : {}),
+      ...(dateFilter ? { date: dateFilter } : {}),
     },
     include: {
       subject: { select: { id: true, name: true, code: true } },

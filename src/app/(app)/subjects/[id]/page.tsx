@@ -94,7 +94,9 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
   // Extra Class State
   const [showExtraClassModal, setShowExtraClassModal] = useState(false);
+  const [extraClassMode, setExtraClassMode] = useState<"add" | "edit">("add");
   const [extraClassForm, setExtraClassForm] = useState({
+    id: "",
     date: getLocalDateStr(),
     startTime: "10:00",
     endTime: "11:00",
@@ -126,6 +128,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
   const { data, isLoading: loading, error } = useSWRFetch<any>(`/subjects/${id}`);
   const subject = data?.subject;
+
+  // Upcoming Extra Classes
+  const { data: extraClassesData } = useSWRFetch<any>(subject ? `/schedule-override?subjectId=${subject.id}&future=true` : null);
+  const upcomingExtraClasses = (extraClassesData?.overrides || []).filter((o: any) => o.type === "extra");
 
   if (error || (!loading && !subject)) {
     return (
@@ -273,7 +279,9 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   }
 
   function openAddExtraClassModal() {
+    setExtraClassMode("add");
     setExtraClassForm({
+      id: "",
       date: getLocalDateStr(),
       startTime: "10:00",
       endTime: "11:00",
@@ -284,22 +292,56 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     setShowExtraClassModal(true);
   }
 
+  function openEditExtraClassModal(cls: any) {
+    setExtraClassMode("edit");
+    const roomMatch = cls.note?.match(/\((.*?)\)/);
+    const topicMatch = cls.note?.match(/Extra Class(?::\s*(.*?))?(?:\s*\(.*\))?$/);
+    
+    setExtraClassForm({
+      id: cls.id,
+      date: new Date(cls.date).toISOString().slice(0, 10),
+      startTime: cls.originalTime || "10:00",
+      endTime: cls.newTime || "11:00",
+      room: roomMatch ? roomMatch[1] : "",
+      topic: topicMatch && topicMatch[1] ? topicMatch[1].trim() : "",
+      weight: cls.weight || 1,
+    });
+    setShowExtraClassModal(true);
+  }
+
+  async function handleDeleteExtraClass(id: string) {
+    if (!confirm("Delete this extra class?")) return;
+    try {
+      await apiFetch(`/schedule-override/${id}`, { method: "DELETE" });
+      await invalidate(`/schedule-override?subjectId=${subject?.id || id}&future=true`);
+    } catch (err) { console.error(err); }
+  }
+
   async function handleSaveExtraClass(e: React.FormEvent) {
     e.preventDefault();
     setSavingExtraClass(true);
     try {
-      await apiFetch("/schedule-override", {
-        method: "POST",
-        body: JSON.stringify({
-          subjectId: id,
-          date: extraClassForm.date,
-          type: "extra",
-          originalTime: extraClassForm.startTime,
-          newTime: extraClassForm.endTime,
-          note: `Extra Class${extraClassForm.topic ? `: ${extraClassForm.topic}` : ""}${extraClassForm.room ? ` (${extraClassForm.room})` : ""}`,
-          weight: extraClassForm.weight,
-        }),
-      });
+      const payload = {
+        subjectId: id,
+        date: extraClassForm.date,
+        type: "extra",
+        originalTime: extraClassForm.startTime,
+        newTime: extraClassForm.endTime,
+        note: `Extra Class${extraClassForm.topic ? `: ${extraClassForm.topic}` : ""}${extraClassForm.room ? ` (${extraClassForm.room})` : ""}`,
+        weight: extraClassForm.weight,
+      };
+
+      if (extraClassMode === "add") {
+        await apiFetch("/schedule-override", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiFetch(`/schedule-override/${extraClassForm.id}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (addReminderForExtraClass) {
         await apiFetch("/reminders", {
@@ -719,6 +761,90 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         )}
       </div>
 
+      {/* Upcoming Extra Classes */}
+      <div
+        className="card-3d p-6 sm:p-7"
+        style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 200ms forwards" }}
+      >
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#7b2cbf] border-2 border-[#5a1c93] text-white flex items-center justify-center shadow-[0_3px_0_0_#461376]">
+              <Zap className="w-5 h-5 text-[#c77dff]" />
+            </div>
+            <div>
+              <h3 className="font-black text-base text-text">Upcoming Extra Classes</h3>
+              <p className="text-xs font-semibold text-text-muted">Scheduled extra classes for this subject</p>
+            </div>
+          </div>
+          <button
+            onClick={openAddExtraClassModal}
+            className="btn-3d-secondary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" /> Schedule
+          </button>
+        </div>
+
+        {upcomingExtraClasses.length === 0 ? (
+          <p className="text-text-muted text-sm py-6 text-center font-bold">No upcoming extra classes scheduled.</p>
+        ) : (
+          <div className="space-y-2.5">
+            {upcomingExtraClasses.map((cls: any) => {
+              const roomMatch = cls.note?.match(/\((.*?)\)/);
+              const room = roomMatch ? roomMatch[1] : "";
+              const topicMatch = cls.note?.match(/Extra Class(?::\s*(.*?))?(?:\s*\(.*\))?$/);
+              const topic = topicMatch && topicMatch[1] ? topicMatch[1].trim() : "";
+              
+              return (
+                <div
+                  key={cls.id}
+                  className="flex items-center justify-between p-3.5 card-3d transition-all"
+                >
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-sm font-bold text-text">
+                      {new Date(cls.date).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
+                    </span>
+                    <span className="text-xs font-mono text-[#06d6a0] bg-[#06d6a0]/15 border border-[#06d6a0]/40 px-2 py-0.5 rounded-lg font-bold">
+                      {cls.originalTime} - {cls.newTime}
+                    </span>
+                    {room && (
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg bg-gray-100 text-[#4a4a5a] dark:bg-white/5 dark:text-[#a0a0b0] border border-gray-200 dark:border-[#2a2a3d]">
+                        Room: {room}
+                      </span>
+                    )}
+                    {topic && (
+                      <span className="text-[10px] font-bold text-text-secondary px-2 py-0.5">
+                        {topic}
+                      </span>
+                    )}
+                    {cls.weight !== 1 && (
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg bg-[#ef476f]/15 text-[#ef476f] border border-[#ef476f]/40">
+                        Weight: {cls.weight}x
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    <button
+                      onClick={() => openEditExtraClassModal(cls)}
+                      className="p-1.5 text-[#6b6b80] hover:text-[#06d6a0] transition rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 cursor-pointer"
+                      title="Edit extra class"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteExtraClass(cls.id)}
+                      className="p-1.5 text-[#6b6b80] hover:text-[#ef476f] transition rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+                      title="Delete extra class"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Subject Reminders & Tasks */}
       <div
         className="card-3d p-6 sm:p-7"
@@ -1060,8 +1186,12 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 <Zap className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-text">Schedule Extra Class</h3>
-                <p className="text-xs font-semibold text-text-muted">Add a one-off or makeup lecture for {subject.name}</p>
+                <h3 className="text-xl font-black text-text">
+                  {extraClassMode === "add" ? "Schedule Extra Class" : "Edit Extra Class"}
+                </h3>
+                <p className="text-xs font-semibold text-text-muted">
+                  {extraClassMode === "add" ? `Add a one-off or makeup lecture for ${subject.name}` : `Modify the details of this extra class for ${subject.name}`}
+                </p>
               </div>
             </div>
 
@@ -1133,15 +1263,17 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] cursor-pointer pt-1">
-                <input
-                  type="checkbox"
-                  checked={addReminderForExtraClass}
-                  onChange={e => setAddReminderForExtraClass(e.target.checked)}
-                  className="rounded accent-[#00f5d4] w-4 h-4 cursor-pointer"
-                />
-                Also create a reminder for this extra class
-              </label>
+              {extraClassMode === "add" && (
+                <label className="flex items-center gap-2 text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] cursor-pointer pt-1">
+                  <input
+                    type="checkbox"
+                    checked={addReminderForExtraClass}
+                    onChange={e => setAddReminderForExtraClass(e.target.checked)}
+                    className="rounded accent-[#00f5d4] w-4 h-4 cursor-pointer"
+                  />
+                  Also create a reminder for this extra class
+                </label>
+              )}
             </div>
 
             <div className="flex gap-3 pt-2">

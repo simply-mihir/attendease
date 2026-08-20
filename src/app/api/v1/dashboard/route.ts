@@ -22,8 +22,8 @@ export async function GET() {
     include: { holidays: true, examPeriods: true },
   });
 
-  // 6 parallel queries including overall streak and orphan count
-  const [dbUser, subjects, todayRecords, schedules, currentStreak, orphanCount] = await Promise.all([
+  // 7 parallel queries including overall streak, orphan count, and extra classes
+  const [dbUser, subjects, todayRecords, schedules, currentStreak, orphanCount, extraClasses] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
       select: { name: true },
@@ -85,6 +85,31 @@ export async function GET() {
     prisma.subject.count({
       where: { userId: user.id, semesterId: null },
     }),
+    prisma.scheduleOverride.findMany({
+      where: {
+        userId: user.id,
+        date: todayDateForQuery,
+        type: "extra",
+        ...(activeSemester ? { subject: { semesterId: activeSemester.id } } : {}),
+      },
+      include: {
+        subject: {
+          select: {
+            id: true,
+            name: true,
+            colorHex: true,
+            icon: true,
+            code: true,
+            currentPercentage: true,
+            minAttendancePct: true,
+            totalClassesHeld: true,
+            totalPresent: true,
+            totalLate: true,
+            streakCount: true,
+          },
+        },
+      },
+    }),
   ]);
 
   const userName = dbUser?.name || user.name || "Student";
@@ -105,7 +130,7 @@ export async function GET() {
   });
 
   // Build today's schedule with complete attendance status and stats
-  const todaySchedule = schedules.map((s) => {
+  const regularSchedule = schedules.map((s) => {
     const record = todayRecords.find((r) => r.subjectId === s.subjectId && (!r.scheduleId || r.scheduleId === s.id)) || todayRecords.find((r) => r.subjectId === s.subjectId) || null;
     const pct = s.subject.totalClassesHeld > 0 ? s.subject.currentPercentage : 100;
     const min = s.subject.minAttendancePct || 75;
@@ -126,8 +151,47 @@ export async function GET() {
       attendanceMarked: !!record,
       attendanceStatus: record?.status || null,
       attendance: record,
+      isExtra: false,
     };
   });
+
+  const extraClassList = extraClasses.map((s) => {
+    let record = todayRecords.find((r) => r.subjectId === s.subjectId && r.scheduleId === s.id) || null;
+    if (!record) {
+      const fallbackRecord = todayRecords.find(r => r.subjectId === s.subjectId && !r.scheduleId);
+      if (fallbackRecord) record = fallbackRecord;
+    }
+
+    const pct = s.subject.totalClassesHeld > 0 ? s.subject.currentPercentage : 100;
+    const min = s.subject.minAttendancePct || 75;
+    const buffer = pct - min;
+    
+    // Extract room from note
+    const roomMatch = s.note?.match(/\((.*?)\)/);
+    const room = roomMatch ? roomMatch[1] : "";
+
+    return {
+      ...s,
+      scheduleId: s.id,
+      subjectId: s.subject.id,
+      subjectName: s.subject.name,
+      colorHex: s.subject.colorHex,
+      startTime: s.originalTime || "00:00",
+      endTime: s.newTime || "00:00",
+      room: room,
+      currentPct: pct,
+      minPct: min,
+      statusColor: buffer >= 10 ? "green" : buffer >= 0 ? "yellow" : "red",
+      streakCount: s.subject.streakCount,
+      attendanceMarked: !!record,
+      attendanceStatus: record?.status || null,
+      attendance: record,
+      isExtra: true,
+      weight: s.weight,
+    };
+  });
+
+  const todaySchedule = [...regularSchedule, ...extraClassList].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   // Stats
   const totalClasses = subjects.reduce((sum, s) => sum + s.totalClassesHeld, 0);
