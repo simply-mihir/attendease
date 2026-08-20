@@ -3,6 +3,7 @@ import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendTelegram, formatReminderTelegram } from "@/lib/telegram";
 import { sendEmail, formatReminderEmail } from "@/lib/email";
+import { getUserTimezone, getUserToday } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,37 @@ export async function GET(req: NextRequest) {
   if (category) where.category = category;
   if (completed !== null && completed !== undefined) {
     where.isCompleted = completed === "true";
+  }
+
+  // Auto-complete past due reminders
+  const tz = await getUserTimezone(user.id);
+  const { dateStr } = getUserToday(tz);
+  
+  const now = new Date();
+  const fmtTime = new Intl.DateTimeFormat("en-US", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false });
+  const parts = fmtTime.formatToParts(now);
+  let hour = parts.find(p => p.type === "hour")?.value || "00";
+  if (hour === "24") hour = "00";
+  const minute = parts.find(p => p.type === "minute")?.value || "00";
+  const timeStr = `${hour}:${minute}`;
+
+  const uncompleted = await prisma.reminder.findMany({
+    where: { userId: user.id, isCompleted: false },
+    select: { id: true, dueDate: true, dueTime: true }
+  });
+
+  const toComplete = uncompleted.filter(r => {
+    const rDateStr = r.dueDate.toISOString().slice(0, 10);
+    if (rDateStr < dateStr) return true;
+    if (rDateStr === dateStr && r.dueTime && r.dueTime < timeStr) return true;
+    return false;
+  });
+
+  if (toComplete.length > 0) {
+    await prisma.reminder.updateMany({
+      where: { id: { in: toComplete.map(r => r.id) } },
+      data: { isCompleted: true }
+    });
   }
 
   const reminders = await prisma.reminder.findMany({

@@ -70,6 +70,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [marking, setMarking] = useState(false);
   const [markDate, setMarkDate] = useState(getLocalDateStr());
   const [markStatus, setMarkStatus] = useState("present");
+  const [markScheduleId, setMarkScheduleId] = useState("");
   const [markSuccess, setMarkSuccess] = useState(false);
   
   // Modals State
@@ -129,9 +130,11 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const { data, isLoading: loading, error } = useSWRFetch<any>(`/subjects/${id}`);
   const subject = data?.subject;
 
-  // Upcoming Extra Classes
-  const { data: extraClassesData } = useSWRFetch<any>(subject ? `/schedule-override?subjectId=${subject.id}&future=true` : null);
-  const upcomingExtraClasses = (extraClassesData?.overrides || []).filter((o: any) => o.type === "extra");
+  // Extra Classes
+  const { data: extraClassesData } = useSWRFetch<any>(subject ? `/schedule-override?subjectId=${subject.id}` : null);
+  const allExtraClasses = (extraClassesData?.overrides || []).filter((o: any) => o.type === "extra");
+  const todayStrForUpcoming = getLocalDateStr();
+  const upcomingExtraClasses = allExtraClasses.filter((cls: any) => new Date(cls.date).toISOString().slice(0, 10) >= todayStrForUpcoming);
 
   if (error || (!loading && !subject)) {
     return (
@@ -163,13 +166,41 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     minRequiredPct: subject.minAttendancePct,
   });
 
+  // Calculate available slots for markDate
+  const availableSlots: { id: string; label: string; time: string }[] = [];
+  if (subject) {
+    const [y, m, d] = markDate.split("-").map(Number);
+    if (y && m && d) {
+      const localDate = new Date(y, m - 1, d);
+      const localDayOfWeek = localDate.getDay();
+
+      const regularForDay = subject.schedules?.filter((s: any) => s.dayOfWeek === localDayOfWeek) || [];
+      regularForDay.forEach((s: any) => {
+        availableSlots.push({ id: s.id, label: `Regular: ${s.startTime} - ${s.endTime}`, time: s.startTime });
+      });
+
+      const extraForDay = allExtraClasses.filter((cls: any) => new Date(cls.date).toISOString().slice(0, 10) === markDate);
+      extraForDay.forEach((cls: any) => {
+        availableSlots.push({ id: cls.id, label: `Extra: ${cls.originalTime} - ${cls.newTime}`, time: cls.originalTime });
+      });
+
+      availableSlots.sort((a, b) => a.time.localeCompare(b.time));
+    }
+  }
+
   async function handleMark() {
     setMarking(true);
     setMarkSuccess(false);
     try {
+      const finalScheduleId = markScheduleId || (availableSlots.length > 0 ? availableSlots[0].id : undefined);
       await apiFetch("/attendance", {
         method: "POST",
-        body: JSON.stringify({ subjectId: id, date: markDate, status: markStatus }),
+        body: JSON.stringify({ 
+          subjectId: id, 
+          date: markDate, 
+          status: markStatus,
+          scheduleId: finalScheduleId
+        }),
       });
       await invalidate(`/subjects/${id}`);
       setMarkSuccess(true);
@@ -625,6 +656,20 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
               className="input-3d w-full text-sm font-semibold"
             />
           </div>
+          {availableSlots.length > 0 && (
+            <div className="flex-1 min-w-[140px] w-full">
+              <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Slot</label>
+              <select
+                value={markScheduleId}
+                onChange={(e) => setMarkScheduleId(e.target.value)}
+                className="input-3d w-full text-sm font-semibold"
+              >
+                {availableSlots.map(slot => (
+                  <option key={slot.id} value={slot.id}>{slot.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="flex-1 min-w-[140px] w-full">
             <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Status</label>
             <select
