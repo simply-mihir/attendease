@@ -261,7 +261,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
       endTime: "11:00",
       room: "",
       topic: "",
-      status: "present",
+      weight: 1,
     });
     setShowExtraClassModal(true);
   }
