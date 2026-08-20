@@ -179,7 +179,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       const extraForDay = allExtraClasses.filter((cls: any) => new Date(cls.date).toISOString().slice(0, 10) === markDate);
       extraForDay.forEach((cls: any) => {
-        availableSlots.push({ id: cls.id, label: `Extra: ${cls.originalTime} - ${cls.newTime}`, time: cls.originalTime });
+        availableSlots.push({ id: cls.id, label: `Extra: ${cls.originalTime} - ${cls.newTime}`, time: cls.originalTime, weight: cls.weight });
       });
 
       availableSlots.sort((a, b) => a.time.localeCompare(b.time));
@@ -195,6 +195,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     setMarking(true);
     setMarkSuccess(false);
     try {
+      const slot = availableSlots.find(s => s.id === markScheduleId);
+      const isExtra = slot?.label.startsWith("Extra:");
+      const weight = (slot as any)?.weight || 1;
+
       const finalScheduleId = markScheduleId || undefined;
       await apiFetch("/attendance", {
         method: "POST",
@@ -202,7 +206,9 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           subjectId: id, 
           date: markDate, 
           status: markStatus,
-          scheduleId: finalScheduleId
+          scheduleId: isExtra ? undefined : finalScheduleId,
+          source: isExtra ? "extra_class" : "manual",
+          weight: weight
         }),
       });
       await invalidate(`/subjects/${id}`);

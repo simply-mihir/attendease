@@ -10,7 +10,7 @@ import { SwipeableCard } from "@/components/SwipeableCard";
 interface ScheduleCardProps {
   cls: any;
   marking: string | null;
-  onMark: (subjectId: string, scheduleId: string, status: string) => void;
+  onMark: (subjectId: string, scheduleId: string, status: string, weight?: number, isExtra?: boolean) => void;
 }
 
 function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
@@ -58,12 +58,12 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
 
     setOptimisticStatus(status);
     if (navigator.vibrate) navigator.vibrate(30);
-    onMark(cls.subjectId, cls.id || cls.scheduleId, status);
+    onMark(cls.subjectId, cls.id || cls.scheduleId, status, cls.weight, cls.isExtra);
   }
 
   function handleSwipe(status: string) {
     setOptimisticStatus(status);
-    onMark(cls.subjectId, cls.id || cls.scheduleId, status);
+    onMark(cls.subjectId, cls.id || cls.scheduleId, status, cls.weight, cls.isExtra);
   }
 
   const isMarking = !!optimisticStatus && !!marking;

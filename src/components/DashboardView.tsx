@@ -115,7 +115,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
 
   const loading = dashLoading || goalLoading;
 
-  const quickMark = useCallback(async (subjectId: string, scheduleId: string, status: string) => {
+  const quickMark = useCallback(async (subjectId: string, scheduleId: string, status: string, weight?: number, isExtra?: boolean) => {
     setMarkingId(`${subjectId}-${status}`);
     
     if (status === "present" || status === "absent") {
@@ -140,7 +140,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       await apiFetch("/attendance", {
         method: "POST",
-        body: JSON.stringify({ subjectId, scheduleId, date: localDate, status, source: "quick_widget" }),
+        body: JSON.stringify({ 
+          subjectId, 
+          scheduleId: isExtra ? undefined : scheduleId, 
+          date: localDate, 
+          status, 
+          source: isExtra ? "extra_class" : "quick_widget",
+          weight: weight || 1
+        }),
       });
       await invalidate(`/dashboard${qs}`);
       await invalidate("/analytics/goal-plan");
