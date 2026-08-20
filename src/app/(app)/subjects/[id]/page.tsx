@@ -7,6 +7,7 @@ import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { calculateAttendance } from "@/lib/attendance-calc";
 import { getLocalDateStr } from "@/lib/local-date";
+// slug-only URLs: the [id] param is now the slug (e.g. "dbms")
 import {
   ArrowLeft, Clock, MapPin, Flame, CheckCircle2, XCircle, Timer, Ban,
   Trash2, Calendar as CalIcon, AlertTriangle, Edit2, Save, Plus, Zap, Loader2, Bell, Circle,
@@ -62,7 +63,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function SubjectDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+  const id = params.id; // slug like "dbms" — API resolves by slug or id
   const router = useRouter();
   
   // Mark Attendance State
@@ -123,10 +124,27 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   });
   const [savingSubjectReminder, setSavingSubjectReminder] = useState(false);
 
-  const { data, isLoading: loading } = useSWRFetch<any>(`/subjects/${id}`);
+  const { data, isLoading: loading, error } = useSWRFetch<any>(`/subjects/${id}`);
   const subject = data?.subject;
 
-  if (loading || !subject) {
+  if (error || (!loading && !subject)) {
+    return (
+      <div className="max-w-4xl mx-auto py-20 text-center space-y-4">
+        <div className="w-16 h-16 mx-auto rounded-full bg-[#ef476f]/10 flex items-center justify-center">
+          <AlertTriangle className="w-8 h-8 text-[#ef476f]" />
+        </div>
+        <h2 className="text-xl font-bold">Could not load subject</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {error?.message || "Subject not found or you don’t have access."}
+        </p>
+        <button onClick={() => router.push("/subjects")} className="btn-3d-primary px-5 py-2 text-sm font-bold mt-2">
+          Back to Subjects
+        </button>
+      </div>
+    );
+  }
+
+  if (loading) {
     return <SubjectSkeleton />;
   }
 

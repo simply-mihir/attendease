@@ -123,6 +123,7 @@ model Subject {
   userId             String
   semesterId         String?
   name               String
+  slug               String?
   code               String?
   instructorName     String?
   minAttendancePct   Float    @default(75.0)
@@ -154,6 +155,7 @@ model Subject {
   scheduleOverrides   ScheduleOverride[]
   swappedOverrides    ScheduleOverride[] @relation("SwapSubject")
 
+  @@unique([userId, slug])
   @@index([userId])
   @@index([semesterId])
   @@index([userId, isArchived])

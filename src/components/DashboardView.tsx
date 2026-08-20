@@ -12,6 +12,7 @@ import {
 , BarChart3 } from "lucide-react";
 import clsx from "clsx";
 import { GoalSetupPopup } from "@/components/GoalSetupPopup";
+import { subjectHref } from "@/lib/subject-slug";
 import { ScheduleCard } from "@/components/MemoizedScheduleCard";
 import { MarkingProgressBar } from "@/components/MarkingProgressBar";
 import { ParticleBurst } from "@/components/ParticleBurst";
@@ -549,7 +550,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               return (
                 <Link
                   key={s.id}
-                  href={s.dummy ? "#" : `/subjects/${s.id}`}
+                  href={s.dummy ? "#" : subjectHref(s.slug || s.id)}
                   className="group relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-150 block
                     hover:translate-y-[2px] overflow-hidden"
                   style={{

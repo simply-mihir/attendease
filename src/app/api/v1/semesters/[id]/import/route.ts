@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { generateSlug } from "@/lib/subject-slug";
 
 // GET — list subjects available for import
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -85,16 +86,20 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     } else if (mode === "copy") {
       // Copy: create a new subject with same details, fresh attendance
       const {
-        id, createdAt, updatedAt, semesterId,
+        id, createdAt, updatedAt, semesterId, slug: _slug,
         totalClassesHeld, totalPresent, totalAbsent, totalLate, totalExcused, totalCancelled,
         currentPercentage, streakCount, longestStreak,
         ...copyData
       } = subject as any;
-      
+
+      // Generate unique slug for the copy
+      const newSlug = await uniqueSlugForImport(copyData.name || "subject", user.id);
+
       const newSubject = await prisma.subject.create({
         data: {
           ...copyData,
           userId: user.id,
+          slug: newSlug,
           semesterId: params.id,
           totalClassesHeld: 0,
           totalPresent: 0,
@@ -129,4 +134,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   return NextResponse.json({ imported, count: imported.length }, { status: 201 });
+}
+
+async function uniqueSlugForImport(name: string, userId: string): Promise<string> {
+  const base = generateSlug(name);
+  let candidate = base;
+  let counter = 1;
+  while (true) {
+    const conflict = await prisma.subject.findFirst({ where: { userId, slug: candidate } });
+    if (!conflict) return candidate;
+    counter++;
+    candidate = `${base}-${counter}`;
+  }
 }

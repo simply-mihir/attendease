@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiFetch } from "@/hooks/useApi";
 import { useSWRFetch, invalidate } from "@/hooks/useSWRFetch";
 import { Plus, BookOpen, Archive, RotateCcw, Trash2, AlertTriangle, Camera, TrendingUp, Minus, TrendingDown, ChevronRight } from "lucide-react";
+import { subjectHref } from "@/lib/subject-slug";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -151,7 +152,7 @@ export default function SubjectsPage() {
                 <div className="absolute inset-x-0 top-0 h-[2px]"
                   style={{ background: `linear-gradient(to right, transparent, ${color.bg}60, transparent)` }} />
 
-                <Link href={`/subjects/${s.id}`} className="relative block flex-1">
+                <Link href={subjectHref(s.slug || s.id)} className="relative block flex-1">
                   {/* Row 1: Label + Icon */}
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[11px] font-bold uppercase tracking-wider break-words pr-2"

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { createSubjectSchema } from "@/lib/validations/subject";
 import { cachedJson } from "@/lib/api-cache";
+import { generateSlug } from "@/lib/subject-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,15 @@ export async function GET(req: NextRequest) {
     orderBy: { name: "asc" },
   });
 
+  // Backfill slugs for any subjects that don't have them yet
+  for (const s of subjects) {
+    if (!s.slug) {
+      const slug = await uniqueSlug(s.name, user.id, s.id);
+      await prisma.subject.update({ where: { id: s.id }, data: { slug } });
+      (s as any).slug = slug;
+    }
+  }
+
   return cachedJson({ subjects }, 30);
 }
 
@@ -45,10 +55,13 @@ export async function POST(req: NextRequest) {
       where: { userId: user.id, isCurrent: true },
     });
 
+    const slug = await uniqueSlug(parsed.data.name, user.id);
+
     const subject = await prisma.subject.create({
-      data: { 
-        ...parsed.data, 
+      data: {
+        ...parsed.data,
         userId: user.id,
+        slug,
         semesterId: parsed.data.semesterId || activeSemester?.id || null
       },
       include: { schedules: true },
@@ -58,5 +71,25 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Create subject error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+/** Generate a unique slug for a user, appending -2, -3, etc. if needed. */
+async function uniqueSlug(name: string, userId: string, excludeId?: string): Promise<string> {
+  const base = generateSlug(name);
+  let candidate = base;
+  let counter = 1;
+
+  while (true) {
+    const conflict = await prisma.subject.findFirst({
+      where: {
+        userId,
+        slug: candidate,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+    if (!conflict) return candidate;
+    counter++;
+    candidate = `${base}-${counter}`;
   }
 }

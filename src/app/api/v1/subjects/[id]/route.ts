@@ -1,14 +1,38 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
+import { generateSlug } from "@/lib/subject-slug";
+
+/** Resolve a subject by slug first, then fall back to ID. */
+async function resolveSubject(slugOrId: string, userId: string) {
+  // Try slug lookup first
+  const bySlug = await prisma.subject.findFirst({
+    where: { slug: slugOrId, userId },
+  });
+  if (bySlug) return bySlug;
+
+  // Fall back to ID (backward compat for old bookmarks / API callers)
+  return prisma.subject.findFirst({ where: { id: slugOrId, userId } });
+}
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
   const { id } = params;
 
+  // Resolve by slug or id
+  const base = await resolveSubject(id, user.id);
+  if (!base) return Response.json({ error: "Not found" }, { status: 404 });
+
+  // If subject has no slug yet, backfill it now
+  if (!base.slug) {
+    const slug = await uniqueSlug(base.name, user.id, base.id);
+    await prisma.subject.update({ where: { id: base.id }, data: { slug } });
+    base.slug = slug;
+  }
+
   const subject = await prisma.subject.findFirst({
-    where: { id, userId: user.id },
+    where: { id: base.id, userId: user.id },
     include: {
       schedules: { where: { isActive: true }, orderBy: { dayOfWeek: "asc" } },
       attendanceRecords: { orderBy: { date: "desc" }, take: 60 },
@@ -25,12 +49,21 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!user) return unauthorizedResponse();
   const { id } = params;
 
-  const existing = await prisma.subject.findFirst({ where: { id, userId: user.id } });
+  const existing = await resolveSubject(id, user.id);
   if (!existing) return Response.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
+
+  // Regenerate slug if name changed
+  let slug = existing.slug;
+  if (body.name && body.name !== existing.name) {
+    slug = await uniqueSlug(body.name, user.id, existing.id);
+  } else if (!slug) {
+    slug = await uniqueSlug(existing.name, user.id, existing.id);
+  }
+
   const subject = await prisma.subject.update({
-    where: { id },
+    where: { id: existing.id },
     data: {
       name: body.name,
       code: body.code,
@@ -43,6 +76,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       reminderBeforeMin: body.reminderBeforeMin,
       isArchived: body.isArchived,
       archiveReason: body.archiveReason,
+      slug,
     },
     include: { schedules: true },
   });
@@ -55,9 +89,29 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   if (!user) return unauthorizedResponse();
   const { id } = params;
 
-  const existing = await prisma.subject.findFirst({ where: { id, userId: user.id } });
+  const existing = await resolveSubject(id, user.id);
   if (!existing) return Response.json({ error: "Not found" }, { status: 404 });
 
-  await prisma.subject.delete({ where: { id } });
+  await prisma.subject.delete({ where: { id: existing.id } });
   return Response.json({ success: true });
+}
+
+/** Generate a unique slug for a user, appending -2, -3, etc. if needed. */
+async function uniqueSlug(name: string, userId: string, excludeId?: string): Promise<string> {
+  const base = generateSlug(name);
+  let candidate = base;
+  let counter = 1;
+
+  while (true) {
+    const conflict = await prisma.subject.findFirst({
+      where: {
+        userId,
+        slug: candidate,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+    if (!conflict) return candidate;
+    counter++;
+    candidate = `${base}-${counter}`;
+  }
 }
