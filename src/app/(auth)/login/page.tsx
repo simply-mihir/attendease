@@ -39,9 +39,10 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <main className="min-h-screen flex items-center justify-center p-4">
       
-      {/* === ANIMATED BACKGROUND === */}
+      {/* === ANIMATED BACKGROUND (Fixed behind content) === */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
       
       {/* Grid */}
       <div className="absolute inset-0 opacity-[0.05]">
@@ -107,9 +108,9 @@ export default function LoginPage() {
 
       {/* Scan lines */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.02]" style={{ background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,92,246,0.1) 2px, rgba(139,92,246,0.1) 4px)" }} />
+      </div>
 
       {/* === MAIN CONTENT === */}
-      <div className="absolute inset-0 flex items-center justify-center p-4">
       <div className="relative z-10 w-full max-w-md px-6">
         
         {/* Logo + Title — animated entrance */}
@@ -216,7 +217,6 @@ export default function LoginPage() {
           Track attendance. Stay on track. Graduate with confidence.
         </p>
       </div>
-      </div>
-    </div>
+    </main>
   );
 }
