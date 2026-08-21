@@ -481,6 +481,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const ringColor = stats.statusColor === "green" ? ["#06d6a0", "#00f5d4"] : stats.statusColor === "yellow" ? ["#ff6b35", "#ffa62b"] : ["#ef476f", "#FF2D78"];
 
   return (
+    <>
     <PageTransition direction="right" staggerChildren={false} className="max-w-4xl mx-auto space-y-6 pb-16">
       {/* Top Navigation & Controls */}
       <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideRight 0.5s ease-out 0ms forwards" }}>
@@ -1027,6 +1028,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           </div>
         )}
       </div>
+    </PageTransition>
 
       {/* Edit Subject Modal */}
       {showEditSubjectModal && (
@@ -1560,6 +1562,6 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           </div>
         </div>
       )}
-    </PageTransition>
+    </>
   );
 }
