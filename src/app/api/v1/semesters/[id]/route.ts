@@ -69,3 +69,23 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   return NextResponse.json(updated);
 }
+
+// DELETE — delete semester
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const user = await getAuthUser();
+  if (!user) return unauthorizedResponse();
+
+  const semester = await prisma.semester.findFirst({
+    where: { id: params.id, userId: user.id },
+  });
+
+  if (!semester) {
+    return NextResponse.json({ error: "Semester not found" }, { status: 404 });
+  }
+
+  await prisma.semester.delete({
+    where: { id: params.id },
+  });
+
+  return NextResponse.json({ success: true });
+}

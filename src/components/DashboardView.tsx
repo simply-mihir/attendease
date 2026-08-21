@@ -282,6 +282,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
           </div>
         </div>
         <div className="flex items-center gap-2.5">
+          <Link href="/settings/semesters" className="btn-3d-secondary flex items-center gap-2 px-4 py-2 text-sm font-bold">
+            <Settings className="h-4 w-4" /> <span className="hidden sm:inline">Manage Semesters</span><span className="sm:hidden">Manage</span>
+          </Link>
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
@@ -291,7 +294,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             </button>
           )}
           <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-3d-primary flex items-center gap-2 px-4 py-2 text-sm font-bold">
-            <Plus className="h-4 w-4" /> Add Subject
+            <Plus className="h-4 w-4" /> <span className="hidden sm:inline">New Subject</span><span className="sm:hidden">Subject</span>
           </Link>
         </div>
       </div>
