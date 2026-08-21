@@ -76,15 +76,9 @@ export const authOptions: NextAuthOptions = {
             }
           } catch {}
         }
-        try {
-          await prisma.notificationSetting.upsert({
-            where: { userId },
-            update: {},
-            create: { userId },
-          });
-        } catch (err) {
-          console.error("Error setting notification defaults:", err);
-        }
+        // NOTE: notification settings are created at registration (register route)
+        // and at OAuth sign-up (createUser event). No per-request upsert needed —
+        // the settings GET route has a lazy-create fallback for any edge case.
       }
       return token;
     },
@@ -105,6 +99,13 @@ export const authOptions: NextAuthOptions = {
       if (!user.image && user.id) {
         const avatar = generateRandomAvatar(user.email || user.id);
         await prisma.user.update({ where: { id: user.id }, data: { image: avatar } });
+      }
+      // Create default notification settings for OAuth sign-ups
+      // (credential sign-ups handle this in the register route)
+      if (user.id) {
+        try {
+          await prisma.notificationSetting.create({ data: { userId: user.id } });
+        } catch {}
       }
     },
   },
