@@ -50,7 +50,7 @@ function emailWrapper(userName: string | null, content: string, shadowColor = "#
           .greeting { font-size: 16px; font-weight: 700; color: #a1a1aa; margin-bottom: 8px; }
           .logo-text { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff; display: flex; align-items: center; gap: 8px; }
           .logo-accent { color: #ff2d78; }
-          .card { background-color: #141425; border: 2px solid #2a2a3d; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+          .card { background-color: #141425; border: 2px solid #2a2a3d; border-radius: 12px; padding: 16px 16px 16px 20px; margin-bottom: 20px; border-left: 5px solid #4cc9f0; }
           .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 900; border: 2px solid; text-transform: uppercase; }
           .badge-green { background-color: rgba(6, 214, 160, 0.1); color: #06d6a0; border-color: #06d6a0; }
           .badge-red { background-color: rgba(239, 71, 111, 0.1); color: #ef476f; border-color: #ef476f; }
@@ -92,8 +92,10 @@ export function formatDailyBriefEmail(
   
   const classCards = classes.length === 0
     ? `<div class="card" style="text-align: center; border-color: #4cc9f0; box-shadow: 4px 4px 0px 0px #4cc9f0;"><p style="font-weight: 700; color: #4cc9f0;">No classes today. Enjoy your day off! 🎉</p></div>`
-    : classes.map((c) => `
-        <div class="card" style="box-shadow: 4px 4px 0px 0px #2a2a3d;">
+    : classes.map((c) => {
+        const leftColor = c.pct >= 75 ? '#06d6a0' : c.pct >= 60 ? '#ffd166' : '#ef476f';
+        return `
+        <div class="card" style="border-left-color: ${leftColor}; box-shadow: 4px 4px 0px 0px ${leftColor}33;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
             <strong style="font-size: 16px; color: #FFFFFF; font-weight: 900;">${c.name}${c.code ? ` (${c.code})` : ""}</strong>
             <span class="badge ${c.pct >= 75 ? 'badge-green' : c.pct >= 60 ? 'badge-yellow' : 'badge-red'}">${c.pct}%</span>
@@ -103,7 +105,7 @@ export function formatDailyBriefEmail(
             ${c.room ? `<span style="margin-left: 12px; color: #ffd166;">📍 ${c.room}</span>` : ''}
           </div>
         </div>
-      `).join("");
+      `;}).join("");
 
   const html = emailWrapper(userName, `
     <h1 style="margin: 0 0 8px 0; color: #9b5de5; font-size: 28px;">Daily Brief</h1>
@@ -190,8 +192,9 @@ export function formatWeeklyReportEmail(
     const pct = s.totalClassesHeld > 0 ? Math.round((s.totalPresent / s.totalClassesHeld) * 100) : 0;
     tA += s.totalPresent; tC += s.totalClassesHeld;
     const badge = pct >= 75 ? 'badge-green' : pct >= 60 ? 'badge-yellow' : 'badge-red';
+    const leftColor = pct >= 75 ? '#06d6a0' : pct >= 60 ? '#ffd166' : '#ef476f';
     return `
-      <div class="card" style="border-color: #2a2a3d; box-shadow: 4px 4px 0px 0px #2a2a3d;">
+      <div class="card" style="border-left-color: ${leftColor}; box-shadow: 4px 4px 0px 0px ${leftColor}33;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <strong style="color: #ffffff; font-size: 16px; font-weight: 900;">${s.name}</strong>
           <span class="badge ${badge}">${pct}%</span>
@@ -233,8 +236,9 @@ export function formatDailyReportEmail(
     ? `<div class="card" style="text-align: center; border-color: #9b5de5; box-shadow: 4px 4px 0px 0px #9b5de5;"><p style="font-weight: 700; color: #9b5de5;">No classes were scheduled for today.</p></div>`
     : classes.map((c) => {
         const badge = c.status === "PRESENT" ? "badge-green" : c.status === "LATE" ? "badge-yellow" : c.status === "ABSENT" ? "badge-red" : "badge-blue";
+        const leftColor = c.status === "PRESENT" ? '#06d6a0' : c.status === "LATE" ? '#ffd166' : c.status === "ABSENT" ? '#ef476f' : '#4cc9f0';
         return `
-          <div class="card" style="border-color: #2a2a3d; box-shadow: 4px 4px 0px 0px #2a2a3d;">
+          <div class="card" style="border-left-color: ${leftColor}; box-shadow: 4px 4px 0px 0px ${leftColor}33;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
               <strong style="color: #ffffff; font-size: 16px; font-weight: 900;">${c.subjectName}${c.code ? ` (${c.code})` : ""}</strong>
               <span class="badge ${badge}">${c.status}</span>

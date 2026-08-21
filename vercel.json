@@ -1,1 +1,8 @@
-{}
+{
+  "crons": [
+    {
+      "path": "/api/cron/notifications?token=${KEEP_ALIVE_TOKEN}",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

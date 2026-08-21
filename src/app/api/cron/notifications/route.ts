@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, ensureSchema } from "@/lib/db";
 import { sendTelegram } from "@/lib/telegram";
 import {
   sendEmail,
@@ -155,6 +155,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Ensure slug column exists before any Subject query with include
+  await ensureSchema();
+
   const now = new Date();
   const results = {
     dailyBriefs: 0,
@@ -257,8 +260,9 @@ export async function GET(req: NextRequest) {
         // 1. DAILY MORNING BRIEF
         // ==========================================
         const briefHour = s.dailyBriefHour ?? 7;
-        const briefMin = s.dailyBriefMinute ?? 0;
-        const isBriefTime = uNow.hours === briefHour && uNow.minutes >= briefMin && uNow.minutes < briefMin + 5;
+        // Hour-based matching: Vercel Hobby cron runs hourly, so match the
+        // entire hour.  wasSent() deduplication prevents double-sends.
+        const isBriefTime = uNow.hours === briefHour;
 
         if (isBriefTime) {
           const bKey = `daily-brief:${todayKey}`;
@@ -417,7 +421,9 @@ export async function GET(req: NextRequest) {
             if (isNaN(sH) || isNaN(sM)) continue;
             const minsUntil = (sH - uNow.hours) * 60 + (sM - uNow.minutes);
 
-            if (minsUntil > 0 && minsUntil <= preMin && minsUntil > preMin - 5) {
+            // Widen window to 60 min so hourly cron never misses a class.
+            // wasSent() deduplication prevents double-sends.
+            if (minsUntil > 0 && minsUntil <= Math.max(preMin, 60)) {
               const rKey = `pre-class:${cls.scheduleId}:${todayKey}`;
               if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
 
@@ -450,8 +456,8 @@ export async function GET(req: NextRequest) {
         // 3. DAILY ATTENDANCE REPORT (end of day)
         // ==========================================
         const reportHour = s.dailyReportHour ?? 20;
-        const reportMin = s.dailyReportMinute ?? 0;
-        const isReportTime = uNow.hours === reportHour && uNow.minutes >= reportMin && uNow.minutes < reportMin + 5;
+        // Hour-based matching (same rationale as daily brief)
+        const isReportTime = uNow.hours === reportHour;
 
         if (isReportTime) {
           const rpKey = `daily-report:${todayKey}`;
