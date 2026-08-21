@@ -188,7 +188,7 @@ export default function LoginPage() {
             </div>
 
             <button disabled={loading} type="submit" 
-              className="w-full py-3 btn-3d-primary rounded-xl text-sm font-black flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer">
+              className="w-full py-3 btn-3d-amber rounded-xl text-sm font-black flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
               Sign in with email
             </button>

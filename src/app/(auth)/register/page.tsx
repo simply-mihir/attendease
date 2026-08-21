@@ -199,7 +199,7 @@ export default function RegisterPage() {
                 className="input-3d w-full text-sm" placeholder="Repeat your password" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full py-3 btn-3d-primary rounded-xl text-sm font-black flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer">
+              className="w-full py-3 btn-3d-amber rounded-xl text-sm font-black flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
               Create account
             </button>
