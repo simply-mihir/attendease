@@ -12,13 +12,19 @@ const defaultConfig: SWRConfiguration = {
 
 export function useSWRFetch<T = unknown>(
   path: string | null,
-  config?: SWRConfiguration
+  config?: SWRConfiguration & { throwOnError?: boolean }
 ) {
-  return useSWR<T>(
+  const result = useSWR<T>(
     path,
     (url: string) => apiFetch(url),
     { ...defaultConfig, ...config }
   );
+
+  if (result.error && config?.throwOnError !== false) {
+    throw result.error;
+  }
+
+  return result;
 }
 
 // Invalidate a specific cache key from anywhere (e.g., after a mutation)

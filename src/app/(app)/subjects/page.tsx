@@ -27,7 +27,7 @@ export default function SubjectsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [deletingSubject, setDeletingSubject] = useState<any | null>(null);
 
-  const { data, error, mutate, isLoading } = useSWRFetch<{ subjects: any[] }>(`/subjects?archived=${showArchived}`);
+  const { data, error, mutate, isLoading } = useSWRFetch<{ subjects: any[] }>(`/subjects?archived=${showArchived}`, { throwOnError: false });
   const subjects = data?.subjects || [];
 
   async function toggleArchive(id: string, isArchived: boolean) {
