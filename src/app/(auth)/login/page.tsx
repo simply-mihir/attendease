@@ -41,23 +41,8 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
       
-      {/* === ANIMATED BACKGROUND (Fixed behind content) === */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-      
-      {/* Grid */}
-      <div className="absolute inset-0 opacity-[0.05]">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(139,92,246,0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(139,92,246,0.3) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-            animation: "gridScroll 20s linear infinite",
-          }}
-        />
-      </div>
+      {/* === DECORATIVE OVERLAYS (orbitals + particles) === */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
 
       {/* Large orbital decoration — top right */}
       <div className="absolute -top-32 -right-32 h-96 w-96 opacity-20">
@@ -101,13 +86,6 @@ export default function LoginPage() {
           ))}
         </div>
       )}
-
-      {/* Ambient glow blobs */}
-      <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-purple-600/5 blur-3xl" style={{ animation: "glowDrift 12s ease-in-out infinite" }} />
-      <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-indigo-600/5 blur-3xl" style={{ animation: "glowDrift 10s ease-in-out infinite reverse" }} />
-
-      {/* Scan lines */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.02]" style={{ background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,92,246,0.1) 2px, rgba(139,92,246,0.1) 4px)" }} />
       </div>
 
       {/* === MAIN CONTENT === */}
