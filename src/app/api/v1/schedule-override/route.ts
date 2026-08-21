@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
+import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { parseScheduleMessage } from "@/lib/schedule-parser";
 
 // POST — parse user message and create override, OR accept explicit manual override
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const userId = (session!.user as any).id;
+  const user = await getAuthUser();
+  if (!user) return unauthorizedResponse();
+  const userId = user.id;
 
   const body = await req.json();
 
@@ -122,11 +119,9 @@ export async function POST(req: NextRequest) {
 
 // GET — fetch overrides for a date range
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!(session?.user as any)?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const userId = (session!.user as any).id;
+  const user = await getAuthUser();
+  if (!user) return unauthorizedResponse();
+  const userId = user.id;
 
   const { searchParams } = new URL(req.url);
   const startDate = searchParams.get("startDate");

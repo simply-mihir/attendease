@@ -4,7 +4,7 @@ import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient;
-  dbMigrated: boolean;
+  schemaReady: Promise<void> | null;
 };
 
 let prisma: PrismaClient;
@@ -43,26 +43,33 @@ if (globalForPrisma.prisma) {
 }
 
 /**
- * Auto-apply missing schema changes that can't run via `prisma db push` in CI.
- * Runs once per cold start. Each migration is idempotent (IF NOT EXISTS).
+ * Auto-apply missing schema changes that can't run via `prisma db push` in
+ * Vercel's build environment.  Runs once per cold start (promise is cached so
+ * concurrent requests share the same migration).  Every statement is
+ * idempotent (IF NOT EXISTS) — safe to re-run on every deploy.
  */
-export async function ensureSchema() {
-  if (globalForPrisma.dbMigrated) return;
-  globalForPrisma.dbMigrated = true;
+export function ensureSchema(): Promise<void> {
+  if (globalForPrisma.schemaReady) return globalForPrisma.schemaReady;
 
-  try {
-    await prisma.$executeRawUnsafe(`
-      ALTER TABLE "Subject" ADD COLUMN IF NOT EXISTS "slug" TEXT;
-    `);
-    // Add unique index if it doesn't exist
-    await prisma.$executeRawUnsafe(`
-      CREATE UNIQUE INDEX IF NOT EXISTS "Subject_userId_slug_key"
-      ON "Subject" ("userId", "slug")
-      WHERE "slug" IS NOT NULL;
-    `);
-  } catch (err) {
-    console.error("ensureSchema warning:", err);
-  }
+  globalForPrisma.schemaReady = (async () => {
+    try {
+      // ── Subject.slug ──────────────────────────────────────────
+      await prisma.$executeRawUnsafe(
+        `ALTER TABLE "Subject" ADD COLUMN IF NOT EXISTS "slug" TEXT`
+      );
+      await prisma.$executeRawUnsafe(
+        `CREATE UNIQUE INDEX IF NOT EXISTS "Subject_userId_slug_key"
+         ON "Subject" ("userId", "slug")
+         WHERE "slug" IS NOT NULL`
+      );
+    } catch (err) {
+      console.error("ensureSchema error:", err);
+      // Reset so next request retries instead of caching a failure
+      globalForPrisma.schemaReady = null;
+    }
+  })();
+
+  return globalForPrisma.schemaReady;
 }
 
 export { prisma };
