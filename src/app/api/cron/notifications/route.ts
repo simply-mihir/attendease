@@ -162,11 +162,42 @@ export async function GET(req: NextRequest) {
     dangerAlerts: 0,
     weeklyReports: 0,
     dailyReports: 0,
+    completedReminders: 0,
     skippedDuplicates: 0,
     errors: [] as string[],
   };
 
   try {
+    // ==========================================
+    // 0. AUTO-COMPLETE REMINDERS
+    // ==========================================
+    const uncompletedReminders = await prisma.reminder.findMany({
+      where: { isCompleted: false },
+      select: { id: true, dueDate: true, dueTime: true, user: { select: { timezone: true } } }
+    });
+
+    const toCompleteIds: string[] = [];
+    for (const r of uncompletedReminders) {
+      const tz = r.user.timezone || "Asia/Kolkata";
+      const uNow = getTimeInTimezone(now, tz);
+      const rDateStr = r.dueDate.toISOString().slice(0, 10);
+      const timeStr = `${String(uNow.hours).padStart(2, '0')}:${String(uNow.minutes).padStart(2, '0')}`;
+
+      if (rDateStr < uNow.dateKey) {
+        toCompleteIds.push(r.id);
+      } else if (rDateStr === uNow.dateKey && r.dueTime && r.dueTime < timeStr) {
+        toCompleteIds.push(r.id);
+      }
+    }
+
+    if (toCompleteIds.length > 0) {
+      await prisma.reminder.updateMany({
+        where: { id: { in: toCompleteIds } },
+        data: { isCompleted: true }
+      });
+      results.completedReminders = toCompleteIds.length;
+    }
+
     const users = await prisma.user.findMany({
       where: {
         OR: [

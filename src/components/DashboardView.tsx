@@ -20,6 +20,7 @@ import { StreakFlame } from "@/components/StreakFlame";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { StreakBadges } from "@/components/StreakBadges";
 import { PageTransition } from "@/components/PageTransition";
+import { DashboardQuickMark } from "./DashboardQuickMark";
 import { StaggerGrid } from "@/components/StaggerGrid";
 import { getClassesForDay } from "@/lib/schedule-utils";
 const SUBJECT_COLORS = [
@@ -577,6 +578,11 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             </div>
           ) : null;
         })()
+      )}
+
+      {/* Subject Cards */}
+      {isCurrent && dashboard?.subjects && dashboard.subjects.length > 0 && (
+        <DashboardQuickMark subjects={dashboard.subjects} />
       )}
 
       {/* Subject Cards */}

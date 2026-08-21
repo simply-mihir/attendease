@@ -27,7 +27,22 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
   const [optimisticStatus, setOptimisticStatus] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number; status: string } | null>(null);
+  const [isFinished, setIsFinished] = useState(false);
   const prevMarking = useRef(marking);
+
+  useEffect(() => {
+    if (!cls.endTime) return;
+    const checkFinished = () => {
+      const now = new Date();
+      const [h, m] = cls.endTime.split(":").map(Number);
+      const end = new Date();
+      end.setHours(h, m, 0, 0);
+      setIsFinished(now > end);
+    };
+    checkFinished();
+    const interval = setInterval(checkFinished, 60000);
+    return () => clearInterval(interval);
+  }, [cls.endTime]);
 
   // Detect when marking completes (marking goes from truthy to null) → show success
   useEffect(() => {
@@ -93,6 +108,7 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
             "relative rounded-2xl border-2 p-4 sm:p-5 overflow-hidden flex flex-col h-full",
             "transition-all duration-300 ease-out",
             isMarking && "scale-[0.98]",
+            isFinished && !hasMarked && "opacity-80 grayscale-[0.3]"
           )}
           style={{
             borderColor: `${cls.colorHex || cls.subject?.colorHex || "#FF2D78"}40`,
@@ -114,9 +130,14 @@ function ScheduleCardInner({ cls, marking, onMark }: ScheduleCardProps) {
                 {cls.subjectName || cls.subject?.name}
               </h3>
               <div className="flex flex-col gap-1.5 text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80] mt-3">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1.5 flex-wrap">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
                   {cls.startTime} - {cls.endTime}
+                  {isFinished && !hasMarked && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#1a1a2e] text-[#a1a1aa] dark:bg-white/10 dark:text-white/70 tracking-wider uppercase">
+                      Class Ended
+                    </span>
+                  )}
                 </span>
                 {cls.room && (
                   <span className="flex items-center gap-1.5">
