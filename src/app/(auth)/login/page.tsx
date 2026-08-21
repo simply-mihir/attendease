@@ -145,7 +145,7 @@ export default function LoginPage() {
               Google
             </button>
             
-            <button onClick={() => signIn("github", { callbackUrl: "/dashboard" })} className="flex-1 py-3 bg-[#24292e] hover:bg-[#2f363d] active:translate-y-[2px] active:shadow-[0_0_0_0_#1b1f23] border-2 border-[#1b1f23] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-[0_4px_0_0_#1b1f23]">
+            <button onClick={() => signIn("github", { callbackUrl: "/dashboard" })} className="flex-1 py-3 btn-3d-truegray rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition">
               <Github className="w-5 h-5" />
               GitHub
             </button>
