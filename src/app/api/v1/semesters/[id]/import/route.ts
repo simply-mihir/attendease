@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { prisma, ensureSchema } from "@/lib/db";
 import { generateSlug } from "@/lib/subject-slug";
 
 // GET — list subjects available for import
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  await ensureSchema();
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 

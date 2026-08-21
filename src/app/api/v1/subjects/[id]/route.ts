@@ -1,17 +1,22 @@
 import { NextRequest } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, ensureSchema } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { generateSlug } from "@/lib/subject-slug";
 
-/** Resolve a subject by slug first, then fall back to ID. */
+/** Resolve a subject by slug first, then fall back to ID. Ensures schema is ready. */
 async function resolveSubject(slugOrId: string, userId: string) {
-  // Try slug lookup first
-  const bySlug = await prisma.subject.findFirst({
-    where: { slug: slugOrId, userId },
-  });
-  if (bySlug) return bySlug;
+  await ensureSchema();
+  // Try slug lookup first (safe — fails gracefully if slug column doesn't exist)
+  try {
+    const bySlug = await prisma.subject.findFirst({
+      where: { slug: slugOrId, userId },
+    });
+    if (bySlug) return bySlug;
+  } catch {
+    // slug column doesn't exist yet — skip slug lookup
+  }
 
-  // Fall back to ID (backward compat for old bookmarks / API callers)
+  // Fall back to ID
   return prisma.subject.findFirst({ where: { id: slugOrId, userId } });
 }
 
@@ -20,15 +25,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   if (!user) return unauthorizedResponse();
   const { id } = params;
 
-  // Resolve by slug or id
   const base = await resolveSubject(id, user.id);
   if (!base) return Response.json({ error: "Not found" }, { status: 404 });
 
-  // If subject has no slug yet, backfill it now
-  if (!base.slug) {
-    const slug = await uniqueSlug(base.name, user.id, base.id);
-    await prisma.subject.update({ where: { id: base.id }, data: { slug } });
-    base.slug = slug;
+  // Backfill slug if missing (safe)
+  try {
+    if (!base.slug) {
+      const slug = await uniqueSlug(base.name, user.id, base.id);
+      await prisma.subject.update({ where: { id: base.id }, data: { slug } });
+      base.slug = slug;
+    }
+  } catch {
+    // slug column doesn't exist yet
   }
 
   const subject = await prisma.subject.findFirst({
@@ -54,12 +62,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json();
 
-  // Regenerate slug if name changed
+  // Regenerate slug if name changed (safe)
   let slug = existing.slug;
-  if (body.name && body.name !== existing.name) {
-    slug = await uniqueSlug(body.name, user.id, existing.id);
-  } else if (!slug) {
-    slug = await uniqueSlug(existing.name, user.id, existing.id);
+  try {
+    if (body.name && body.name !== existing.name) {
+      slug = await uniqueSlug(body.name, user.id, existing.id);
+    } else if (!slug) {
+      slug = await uniqueSlug(existing.name, user.id, existing.id);
+    }
+  } catch {
+    slug = undefined;
   }
 
   const subject = await prisma.subject.update({
@@ -76,7 +88,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       reminderBeforeMin: body.reminderBeforeMin,
       isArchived: body.isArchived,
       archiveReason: body.archiveReason,
-      slug,
+      ...(slug !== undefined ? { slug } : {}),
     },
     include: { schedules: true },
   });

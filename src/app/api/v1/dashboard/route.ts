@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { prisma, ensureSchema } from "@/lib/db";
 import { cachedJson, serverCache, invalidateServerCache } from "@/lib/api-cache";
 import { calcOverallStreak } from "@/lib/streak-calc";
 import { getUserTimezone, getUserToday } from "@/lib/timezone";
@@ -8,6 +8,7 @@ import { getUserTimezone, getUserToday } from "@/lib/timezone";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  await ensureSchema();
   const user = await getAuthUser();
   if (!user) return unauthorizedResponse();
 

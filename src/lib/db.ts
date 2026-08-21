@@ -2,9 +2,13 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient;
+  dbMigrated: boolean;
+};
 
 let prisma: PrismaClient;
+let pool: Pool;
 
 if (globalForPrisma.prisma) {
   prisma = globalForPrisma.prisma;
@@ -14,18 +18,16 @@ if (globalForPrisma.prisma) {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
-  const pool = new Pool({
+  pool = new Pool({
     connectionString,
     max: 5,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
-    // Supabase and most cloud Postgres providers require SSL
     ssl: connectionString.includes("localhost") || connectionString.includes("127.0.0.1")
       ? false
       : { rejectUnauthorized: false },
   });
 
-  // Log pool errors instead of crashing
   pool.on("error", (err) => {
     console.error("Unexpected pg pool error:", err.message);
   });
@@ -37,6 +39,29 @@ if (globalForPrisma.prisma) {
   });
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.prisma = prisma;
+  }
+}
+
+/**
+ * Auto-apply missing schema changes that can't run via `prisma db push` in CI.
+ * Runs once per cold start. Each migration is idempotent (IF NOT EXISTS).
+ */
+export async function ensureSchema() {
+  if (globalForPrisma.dbMigrated) return;
+  globalForPrisma.dbMigrated = true;
+
+  try {
+    await prisma.$executeRawUnsafe(`
+      ALTER TABLE "Subject" ADD COLUMN IF NOT EXISTS "slug" TEXT;
+    `);
+    // Add unique index if it doesn't exist
+    await prisma.$executeRawUnsafe(`
+      CREATE UNIQUE INDEX IF NOT EXISTS "Subject_userId_slug_key"
+      ON "Subject" ("userId", "slug")
+      WHERE "slug" IS NOT NULL;
+    `);
+  } catch (err) {
+    console.error("ensureSchema warning:", err);
   }
 }
 
