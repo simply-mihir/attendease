@@ -18,14 +18,19 @@ if (globalForPrisma.prisma) {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
+  const isLocal =
+    connectionString.includes("localhost") ||
+    connectionString.includes("127.0.0.1");
+
   pool = new Pool({
     connectionString,
-    max: 5,
-    idleTimeoutMillis: 30_000,
+    // Serverless: 1 conn per instance keeps us well under Supabase's
+    // PgBouncer pool_size (15 in session mode).  Queries within a single
+    // request are queued automatically by pg Pool — safe and correct.
+    max: isLocal ? 5 : 1,
+    idleTimeoutMillis: 20_000,
     connectionTimeoutMillis: 10_000,
-    ssl: connectionString.includes("localhost") || connectionString.includes("127.0.0.1")
-      ? false
-      : { rejectUnauthorized: false },
+    ssl: isLocal ? false : { rejectUnauthorized: false },
   });
 
   pool.on("error", (err) => {
@@ -37,9 +42,10 @@ if (globalForPrisma.prisma) {
     adapter,
     log: process.env.NODE_ENV === "development" ? ["query"] : [],
   });
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = prisma;
-  }
+
+  // Always cache — prevents duplicate Pools across hot-reload (dev)
+  // AND across re-imports within the same serverless instance (prod).
+  globalForPrisma.prisma = prisma;
 }
 
 /**
