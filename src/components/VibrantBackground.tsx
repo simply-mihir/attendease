@@ -37,7 +37,7 @@ interface BlobProps {
 }
 
 const FastBlob = React.memo(function FastBlob({ color, size, top, left, right, bottom, opacity, animation, className = "" }: BlobProps) {
-  const bg = `radial-gradient(circle at center, ${hexToRgba(color, opacity)} 0%, ${hexToRgbaZero(color)} 70%)`;
+  const bg = `radial-gradient(circle at center, ${hexToRgba(color, opacity)} 0%, ${hexToRgba(color, opacity * 0.4)} 50%, ${hexToRgbaZero(color)} 100%)`;
   
   return (
     <div 
@@ -65,7 +65,7 @@ export function VibrantBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-[#fafafa] dark:bg-[#0a0e1a]">
       {/* ============ DARK MODE BLOBS ============ */}
-      <div className="absolute inset-0 hidden dark:block opacity-100">
+      <div className="absolute inset-0 hidden dark:block opacity-100" style={{ filter: 'blur(40px)' }}>
         
         {/* Core Mobile-Friendly Blobs (Visible on all sizes, highly performant) */}
         <FastBlob color="#FF2D78" size="400px" top="-10%" left="-10%" opacity={0.3} />
@@ -112,7 +112,7 @@ export function VibrantBackground() {
       </div>
 
       {/* ============ LIGHT MODE BLOBS ============ */}
-      <div className="absolute inset-0 dark:hidden opacity-100">
+      <div className="absolute inset-0 dark:hidden opacity-100" style={{ filter: 'blur(40px)' }}>
         
         {/* Core Mobile-Friendly Blobs (Visible on all sizes, highly performant) */}
         <FastBlob color="#FF2D78" size="400px" top="-10%" left="-10%" opacity={0.12} />
