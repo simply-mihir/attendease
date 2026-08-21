@@ -1030,7 +1030,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Edit Subject Modal */}
       {showEditSubjectModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <h3 className="text-xl font-black text-text">Edit Subject</h3>
             <div className="space-y-3">
@@ -1096,7 +1096,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Edit Attendance Modal */}
       {editingRecord && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <h3 className="text-xl font-black text-text">Edit Record</h3>
             <div className="space-y-3">
@@ -1147,7 +1147,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Add / Edit Schedule Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveSchedule}
             className="rounded-2xl p-6 max-w-sm w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
@@ -1231,7 +1231,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Schedule Extra Class Modal */}
       {showExtraClassModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveExtraClass}
             className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#00f5d4]/40 bg-white shadow-[0_12px_0_0_#00c4a7] dark:border-[#00f5d4]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
@@ -1363,7 +1363,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Create Subject Reminder Modal */}
       {showSubjectReminderModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <form
             onSubmit={handleSaveSubjectReminder}
             className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-[#ff6b35]/40 bg-white shadow-[0_12px_0_0_#d95220] dark:border-[#ff6b35]/40 dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4"
@@ -1527,7 +1527,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       {/* Delete Subject Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 md:left-[var(--sidebar-width)] z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="rounded-2xl p-6 sm:p-7 max-w-md w-full border-2 border-gray-200 bg-white shadow-[0_12px_0_0_#d1d5db] dark:border-[#2a2a3d] dark:bg-[#141425] dark:shadow-[0_12px_0_0_#0d0d1a] space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#ef476f]/15 text-[#ef476f] border-2 border-[#ef476f]/40 flex items-center justify-center shadow-[0_3px_0_0_#ef476f]">
