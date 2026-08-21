@@ -3,7 +3,7 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { FieldLoader } from "@/components/FieldLoader";
 import Link from "next/link";
-import { GraduationCap, Calendar, BookOpen, ArrowRight } from "lucide-react";
+import { GraduationCap, Calendar, BookOpen, ArrowRight, Edit2 } from "lucide-react";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
@@ -53,10 +53,9 @@ export default function SemestersPage() {
           const color = "#06b6d4"; // Cyan color for all cards
           
           return (
-            <Link
+            <div
               key={sem.id}
-              href={`/semesters/${sem.id}`}
-              className="group relative rounded-2xl border-2 p-5 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-5 overflow-hidden cursor-pointer"
+              className="group relative rounded-2xl border-2 p-5 transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-5 overflow-hidden"
               style={{
                 borderColor: `${color}40`,
                 backgroundColor: `${color}0D`,
@@ -124,19 +123,28 @@ export default function SemestersPage() {
                 </div>
               </div>
               
-              <div className="relative shrink-0 flex items-center mt-2 md:mt-0">
-                <div 
-                  className="rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-1.5 shadow-[0_4px_0_0_rgba(0,0,0,0.1)] group-hover:translate-y-[2px] group-hover:shadow-[0_2px_0_0_rgba(0,0,0,0.1)]"
+              <div className="relative shrink-0 flex items-center mt-2 md:mt-0 gap-2">
+                <Link
+                  href="/settings/semesters"
+                  className="rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all duration-150 flex items-center shadow-[0_4px_0_0_rgba(0,0,0,0.1)] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_rgba(0,0,0,0.1)] cursor-pointer"
+                  style={{ borderColor: `${color}40`, backgroundColor: `${color}1A`, color: color }}
+                  title="Edit Semester"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Link>
+                <Link 
+                  href={`/semesters/${sem.id}`}
+                  className="rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-all duration-150 flex items-center gap-1.5 shadow-[0_4px_0_0_rgba(0,0,0,0.1)] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_rgba(0,0,0,0.1)] cursor-pointer"
                   style={{ 
                     borderColor: `${color}40`, 
                     backgroundColor: `${color}1A`, 
                     color: color,
                   }}
                 >
-                  {sem.isCurrent ? "Manage" : "View Dashboard"} <ArrowRight className="h-4 w-4" />
-                </div>
+                  {sem.isCurrent ? "Dashboard" : "View Dashboard"} <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            </Link>
+            </div>
           );
         })}
 

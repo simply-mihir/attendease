@@ -71,7 +71,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       slug = await uniqueSlug(existing.name, user.id, existing.id);
     }
   } catch {
-    slug = undefined;
+    slug = null;
   }
 
   const subject = await prisma.subject.update({
