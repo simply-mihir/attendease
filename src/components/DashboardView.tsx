@@ -243,9 +243,52 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
   });
 
-  if (loading && !dashboard) {
-    // Only show full-page loader if we don't even have old data to skeleton
-    // Actually, we'll just fall through to the skeletons if we don't have dashboard data
+  // Show full loading skeleton until real data arrives — never render 0% defaults
+  if (!dashboard) {
+    return (
+      <PageTransition direction="up" staggerChildren={false} className="space-y-6">
+        {/* Greeting skeleton */}
+        <div className="mb-6">
+          <div className="h-9 w-56 bg-gray-200 dark:bg-[#1f1f35] rounded-lg mb-2" />
+          <div className="h-4 w-80 bg-gray-100 dark:bg-[#141425] rounded-md" />
+        </div>
+        {/* Semester banner skeleton */}
+        <div className="rounded-2xl bg-white border-2 border-gray-200 dark:bg-[#141425] dark:border-[#2a2a3d] p-5 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gray-100 dark:bg-white/5" />
+            <div>
+              <div className="h-5 w-32 bg-gray-200 dark:bg-white/5 rounded-md mb-1" />
+              <div className="h-4 w-44 bg-gray-100 dark:bg-white/5 rounded-md" />
+            </div>
+          </div>
+        </div>
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] p-5 bg-white dark:bg-[#141425]">
+              <div className="h-4 w-16 bg-gray-200 dark:bg-white/5 rounded mb-4" />
+              <div className="h-9 w-20 bg-gray-100 dark:bg-white/5 rounded-lg">
+                <FieldLoader size="lg" />
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Subject cards skeleton */}
+        <div>
+          <div className="h-5 w-28 bg-gray-200 dark:bg-white/5 rounded mb-4" />
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="rounded-2xl border-2 border-gray-200 dark:border-[#2a2a3d] p-5 bg-white dark:bg-[#141425] h-40">
+                <div className="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded mb-4" />
+                <div className="h-9 w-16 bg-gray-100 dark:bg-white/5 rounded-lg">
+                  <FieldLoader size="lg" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </PageTransition>
+    );
   }
 
   return (

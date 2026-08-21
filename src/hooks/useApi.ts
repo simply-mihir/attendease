@@ -29,7 +29,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     ...(options.headers as Record<string, string>),
   };
 
-  const res = await fetch(`/api/v1${path}`, { ...options, headers });
+  const res = await fetch(`/api/v1${path}`, { ...options, headers, cache: "no-store" as RequestCache });
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
