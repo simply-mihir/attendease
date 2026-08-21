@@ -187,6 +187,10 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   }
 
   async function handleMark() {
+    if (availableSlots.length === 0) {
+      alert("No class found to mark attendance");
+      return;
+    }
     if (availableSlots.length > 0 && !markScheduleId) {
       alert("Please select a specific slot to mark attendance for.");
       return;
