@@ -1581,8 +1581,3 @@ html.dark .feature-glass-card:hover {
   100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
 }
 
-@media (min-width: 768px) {
-  .modal-overlay {
-    padding-left: var(--sidebar-width, 260px);
-  }
-}

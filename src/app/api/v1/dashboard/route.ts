@@ -22,6 +22,9 @@ export async function GET() {
     include: { holidays: true, examPeriods: true },
   });
 
+  // Build semester filter — try active semester first, fall back to all subjects
+  const semesterFilter = activeSemester ? { semesterId: activeSemester.id } : {};
+
   // 7 parallel queries including overall streak, orphan count, and extra classes
   const [dbUser, subjects, todayRecords, schedules, currentStreak, orphanCount, extraClasses] = await Promise.all([
     prisma.user.findUnique({
@@ -29,10 +32,10 @@ export async function GET() {
       select: { name: true },
     }),
     prisma.subject.findMany({
-      where: { 
-        userId: user.id, 
+      where: {
+        userId: user.id,
         isArchived: false,
-        ...(activeSemester ? { semesterId: activeSemester.id } : {})
+        ...semesterFilter,
       },
       select: {
         id: true,
@@ -48,6 +51,7 @@ export async function GET() {
         currentPercentage: true,
         streakCount: true,
         longestStreak: true,
+        semesterId: true,
       },
     }),
     prisma.attendanceRecord.findMany({
@@ -114,8 +118,29 @@ export async function GET() {
 
   const userName = dbUser?.name || user.name || "Student";
 
+  // Fallback: if semester filter returned 0 subjects but user has subjects, show all
+  let finalSubjects = subjects;
+  if (subjects.length === 0 && activeSemester) {
+    finalSubjects = await prisma.subject.findMany({
+      where: { userId: user.id, isArchived: false },
+      select: {
+        id: true, name: true, code: true, colorHex: true, icon: true,
+        totalClassesHeld: true, totalPresent: true, totalLate: true,
+        totalAbsent: true, minAttendancePct: true, currentPercentage: true,
+        streakCount: true, longestStreak: true, semesterId: true,
+      },
+    });
+    // Auto-fix: link orphan subjects to the active semester
+    if (finalSubjects.length > 0) {
+      await prisma.subject.updateMany({
+        where: { userId: user.id, isArchived: false, semesterId: { not: activeSemester.id } },
+        data: { semesterId: activeSemester.id },
+      });
+    }
+  }
+
   // Build subjects with computed stats
-  const subjectsWithStats = subjects.map((s) => {
+  const subjectsWithStats = finalSubjects.map((s) => {
     const pct = s.totalClassesHeld > 0 ? s.currentPercentage : 100;
     const min = s.minAttendancePct || 75;
     const buffer = pct - min;
@@ -194,10 +219,10 @@ export async function GET() {
   const todaySchedule = [...regularSchedule, ...extraClassList].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   // Stats
-  const totalClasses = subjects.reduce((sum, s) => sum + s.totalClassesHeld, 0);
-  const totalAttended = subjects.reduce((sum, s) => sum + s.totalPresent + s.totalLate, 0);
+  const totalClasses = finalSubjects.reduce((sum, s) => sum + s.totalClassesHeld, 0);
+  const totalAttended = finalSubjects.reduce((sum, s) => sum + s.totalPresent + s.totalLate, 0);
   const overallAttendance = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 100;
-  const longestStreak = subjects.reduce((max, s) => Math.max(max, s.longestStreak), 0);
+  const longestStreak = finalSubjects.reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
   const dangerSubjects = subjectsWithStats.filter((s) => s.currentPercentage < (s.minAttendancePct || 75));
 
@@ -208,7 +233,7 @@ export async function GET() {
     todaySchedule,
     subjects: subjectsWithStats,
     stats: {
-      totalSubjects: subjects.length,
+      totalSubjects: finalSubjects.length,
       totalClasses,
       totalAttended,
       overallAttendance,
