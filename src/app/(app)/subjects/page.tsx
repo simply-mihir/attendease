@@ -27,7 +27,7 @@ export default function SubjectsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [deletingSubject, setDeletingSubject] = useState<any | null>(null);
 
-  const { data, isLoading: loading } = useSWRFetch<{ subjects: any[] }>(`/subjects?archived=${showArchived}`);
+  const { data, error, mutate, isLoading } = useSWRFetch<{ subjects: any[] }>(`/subjects?archived=${showArchived}`);
   const subjects = data?.subjects || [];
 
   async function toggleArchive(id: string, isArchived: boolean) {
@@ -90,7 +90,17 @@ export default function SubjectsPage() {
         </div>
       )}
 
-      {loading ? (
+      {error ? (
+        <div className="flex flex-col items-center justify-center py-20 animate-fade-in px-4 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-4 border-2 border-rose-500/20 shadow-[0_4px_0_0_rgba(244,63,94,0.1)]">
+            <AlertTriangle className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-extrabold text-text mb-2">Error Loading Subjects</h2>
+          <p className="text-sm font-semibold text-text-muted max-w-md">
+            We couldn't load your subjects. This might be due to a database connection issue. Please check your database credentials.
+          </p>
+        </div>
+      ) : isLoading ? (
         <div className="py-16">
           <FuturisticLoader variant="section" title="Loading Subjects..." Icon={BookOpen} />
         </div>
