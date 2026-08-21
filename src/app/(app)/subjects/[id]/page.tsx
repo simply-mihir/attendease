@@ -402,6 +402,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
 
       setShowExtraClassModal(false);
       await invalidate(`/subjects/${id}`);
+      await invalidate(`/schedule-override?subjectId=${subject?.id || id}&future=true`);
       await invalidate("/dashboard");
     } catch (err) {
       console.error("Extra class save error:", err);
