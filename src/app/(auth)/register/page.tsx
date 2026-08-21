@@ -140,9 +140,9 @@ export default function RegisterPage() {
 
           {/* Glassmorphic label */}
           <div className="relative mb-4 mt-2 flex justify-center">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-indigo-500/20 to-purple-500/20 blur-xl animate-pulse" />
-            <div className="relative px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center shadow-xl">
-              <span className="text-[10px] font-black text-white tracking-[0.2em] uppercase drop-shadow-md">Sign in with</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-lime-500/20 via-yellow-400/20 to-lime-500/20 blur-xl animate-pulse" />
+            <div className="relative px-4 py-1.5 rounded-full bg-lime-500/10 border border-lime-500/30 backdrop-blur-sm flex items-center justify-center shadow-xl">
+              <span className="text-[10px] font-black text-lime-100 tracking-[0.2em] uppercase drop-shadow-[0_0_8px_rgba(163,230,53,0.5)]">Sign in with</span>
             </div>
           </div>
 
