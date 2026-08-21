@@ -73,6 +73,10 @@ export async function notifyAttendanceMarked(
 
     const promises = [];
 
+    if (ns.telegramEnabled && user.telegramChatId) {
+      promises.push(sendTelegram(user.telegramChatId, `${textTitle}\n\n${textMsg}`).catch(e => console.error("Telegram notify failed", e)));
+    }
+
     if (ns.emailEnabled && user.email) {
       const { subject, html } = formatAttendanceMarkedEmail(user.name, subjectName, status, dateStr);
       promises.push(sendEmail(user.email, subject, html).catch(e => console.error("Email notify failed", e)));
