@@ -9,7 +9,7 @@ import { useSWRFetch, invalidate, invalidatePrefix } from "@/hooks/useSWRFetch";
 import {
   Plus, Clock, MapPin, Flame, AlertTriangle, CheckCircle2, XCircle,
   Timer, TrendingUp, BookOpen, ArrowRight, Sparkles, Zap, Ban, Target, ChevronDown, Camera, Download, ChevronRight, ArrowDown, GraduationCap, Minus, TrendingDown
-, BarChart3 } from "lucide-react";
+, BarChart3 , Settings } from "lucide-react";
 import clsx from "clsx";
 import { GoalSetupPopup } from "@/components/GoalSetupPopup";
 import { subjectHref } from "@/lib/subject-slug";
