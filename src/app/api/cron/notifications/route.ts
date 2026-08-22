@@ -260,9 +260,9 @@ export async function GET(req: NextRequest) {
         // 1. DAILY MORNING BRIEF
         // ==========================================
         const briefHour = s.dailyBriefHour ?? 7;
-        // Hour-based matching: Vercel Hobby cron runs hourly, so match the
-        // entire hour.  wasSent() deduplication prevents double-sends.
-        const isBriefTime = uNow.hours === briefHour;
+        const briefMin = s.dailyBriefMinute ?? 0;
+        // 5-min window matches external cron interval; wasSent() prevents dupes
+        const isBriefTime = uNow.hours === briefHour && uNow.minutes >= briefMin && uNow.minutes < briefMin + 5;
 
         if (isBriefTime) {
           const bKey = `daily-brief:${todayKey}`;
@@ -421,9 +421,7 @@ export async function GET(req: NextRequest) {
             if (isNaN(sH) || isNaN(sM)) continue;
             const minsUntil = (sH - uNow.hours) * 60 + (sM - uNow.minutes);
 
-            // Widen window to 60 min so hourly cron never misses a class.
-            // wasSent() deduplication prevents double-sends.
-            if (minsUntil > 0 && minsUntil <= Math.max(preMin, 60)) {
+            if (minsUntil > 0 && minsUntil <= preMin && minsUntil > preMin - 5) {
               const rKey = `pre-class:${cls.scheduleId}:${todayKey}`;
               if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
 
@@ -456,8 +454,8 @@ export async function GET(req: NextRequest) {
         // 3. DAILY ATTENDANCE REPORT (end of day)
         // ==========================================
         const reportHour = s.dailyReportHour ?? 20;
-        // Hour-based matching (same rationale as daily brief)
-        const isReportTime = uNow.hours === reportHour;
+        const reportMin = s.dailyReportMinute ?? 0;
+        const isReportTime = uNow.hours === reportHour && uNow.minutes >= reportMin && uNow.minutes < reportMin + 5;
 
         if (isReportTime) {
           const rpKey = `daily-report:${todayKey}`;
@@ -600,19 +598,34 @@ async function retry(fn: () => Promise<any>, label: string, results: { errors: s
 }
 
 async function pushAll(subs: any[], payload: Record<string, any>) {
+  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+    console.error("[Push] VAPID keys not configured — skipping push for", payload.title);
+    return;
+  }
+
   const json = JSON.stringify(payload);
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     subs.map((sub) =>
       webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         json
       ).catch((err) => {
         if (err.statusCode === 410 || err.statusCode === 404) {
+          console.log("[Push] Subscription expired, removing:", sub.endpoint.slice(-20));
           prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
+        } else {
+          console.error("[Push] Send failed:", err.statusCode, err.body || err.message, "endpoint:", sub.endpoint.slice(-20));
         }
+        throw err; // Re-throw so allSettled captures it as rejected
       })
     )
   );
+
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  const failed = results.filter((r) => r.status === "rejected").length;
+  if (failed > 0) {
+    console.warn(`[Push] ${sent}/${results.length} delivered, ${failed} failed for "${payload.title}"`);
+  }
 }
 
 function getTimeInTimezone(date: Date, tz: string) {

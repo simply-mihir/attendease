@@ -1,4 +1,4 @@
-const CACHE_NAME = "attendease-v1";
+const CACHE_NAME = "attendease-v2";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_URLS = ["/", "/dashboard", "/offline.html"];
@@ -35,13 +35,21 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
   if (!event.data) return;
 
-  const data = event.data.json();
+  let data;
+  try {
+    data = event.data.json();
+  } catch (e) {
+    console.error("[SW] Failed to parse push payload:", e);
+    data = { title: "AttendEase", body: event.data.text() || "New notification" };
+  }
+
   const options = {
-    body: data.body,
+    body: data.body || "",
     icon: data.icon || "/icons/icon-192.png",
     badge: data.badge || "/icons/badge-72.png",
     tag: data.tag || "attendease",
-    vibrate: [200, 100, 200],
+    vibrate: data.vibrate || [200, 100, 200],
+    requireInteraction: data.requireInteraction || false,
     data: data.data || {},
     actions: [
       { action: "open", title: "Open App" },
@@ -57,7 +65,7 @@ self.addEventListener("push", (event) => {
     ];
   }
 
-  event.waitUntil(self.registration.showNotification(data.title, options));
+  event.waitUntil(self.registration.showNotification(data.title || "AttendEase", options));
 });
 
 // Notification click handler

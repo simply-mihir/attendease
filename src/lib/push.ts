@@ -24,8 +24,8 @@ interface PushSub {
 }
 
 export async function sendPushNotification(subscription: PushSub, payload: PushPayload) {
-  if (!process.env.VAPID_PUBLIC_KEY) {
-    console.log("[Push] VAPID not configured, skipping:", payload.title);
+  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+    console.error("[Push] VAPID_PUBLIC_KEY or VAPID_PRIVATE_KEY not set — push disabled. Title:", payload.title);
     return;
   }
 
