@@ -61,7 +61,8 @@ self.addEventListener("push", (event) => {
   if (options.data && options.data.scheduleId) {
     options.actions = [
       { action: "mark-present", title: "✓ Present" },
-      { action: "mark-absent", title: "✗ Absent" }
+      { action: "mark-absent", title: "✗ Absent" },
+      { action: "mark-cancelled", title: "⊘ Cancelled" }
     ];
   }
 
@@ -78,8 +79,8 @@ self.addEventListener("notificationclick", (event) => {
   const url = data.url || "/dashboard";
 
   // Handle Quick-Mark actions
-  if (event.action === "mark-present" || event.action === "mark-absent") {
-    const status = event.action === "mark-present" ? "PRESENT" : "ABSENT";
+  if (event.action === "mark-present" || event.action === "mark-absent" || event.action === "mark-cancelled") {
+    const status = event.action === "mark-present" ? "PRESENT" : event.action === "mark-absent" ? "ABSENT" : "CANCELLED";
     
     event.waitUntil(
       fetch("/api/v1/attendance/quick-mark", {
@@ -140,7 +141,8 @@ self.addEventListener("message", (event) => {
     // Add actions if it's a pre-class reminder
     const actions = data.scheduleId ? [
       { action: "mark-present", title: "✓ Present" },
-      { action: "mark-absent", title: "✗ Absent" }
+      { action: "mark-absent", title: "✗ Absent" },
+      { action: "mark-cancelled", title: "⊘ Cancelled" }
     ] : [];
 
     setTimeout(() => {
