@@ -329,7 +329,12 @@ export function ScheduleChatbot() {
                   >
                     {msg.content.split("\n").map((line, i) => (
                       <p key={i} className={i > 0 ? "mt-2" : ""}>
-                        {line}
+                        {line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
+                          if (part.startsWith('**') && part.endsWith('**') && part.length > 3) {
+                            return <strong key={j} className="font-bold">{part.slice(2, -2)}</strong>;
+                          }
+                          return <span key={j}>{part}</span>;
+                        })}
                       </p>
                     ))}
 
