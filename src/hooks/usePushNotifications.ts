@@ -66,10 +66,17 @@ export function usePushNotifications() {
       // 2. Wait for SW to be ready
       const registration = await navigator.serviceWorker.ready;
 
-      // 3. Subscribe to push
-      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      // 3. Fetch VAPID public key from server (runtime, not build-time)
+      let vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!vapidKey) {
-        console.error("[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY not set");
+        try {
+          const res = await fetch("/api/v1/push/vapid-key");
+          const data = await res.json();
+          vapidKey = data.key;
+        } catch {}
+      }
+      if (!vapidKey) {
+        console.error("[Push] VAPID public key not available");
         setIsRegistering(false);
         return false;
       }
