@@ -692,8 +692,8 @@ CRITICAL RULES:
  if (nlpRes.score > 0.65) {
  const [baseIntent, subIntent] = nlpRes.intent.split(".");
  
- // Schedule override still relies heavily on LLM for date/time parsing
- if (baseIntent !== "schedule_override" && baseIntent !== "chat" && baseIntent !== "None") {
+ // Schedule override, holidays, and medical leave rely heavily on LLM for date/time parsing
+ if (baseIntent !== "schedule_override" && baseIntent !== "mark_holiday" && baseIntent !== "mark_medical_leave" && baseIntent !== "chat" && baseIntent !== "None") {
  usingLLM = false;
  intent = baseIntent;
  
@@ -862,6 +862,28 @@ CRITICAL RULES:
  params.newTime, params.swapSubject, params.endTime
  );
  if (result.success) actions.push("schedule_changed");
+ }
+ break;
+ case "mark_holiday":
+ if (!params.date) {
+ result = { error: "Please specify the date for the holiday." };
+ } else {
+ result = await execMarkHoliday(user.id, params.date, params.name || "Holiday");
+ if (result.success) {
+ actions.push("schedule_changed");
+ notifyUserModification(user.id, "Holiday Marked", `${result.name} on ${result.date}`).catch(console.error);
+ }
+ }
+ break;
+ case "mark_medical_leave":
+ if (!params.startDate) {
+ result = { error: "Please specify the start date for the medical leave." };
+ } else {
+ result = await execMarkMedicalLeave(user.id, params.startDate, params.endDate || params.startDate, params.reason || "Medical Leave");
+ if (result.success) {
+ actions.push("attendance_marked");
+ notifyUserModification(user.id, "Medical Leave", `Duration: ${result.start} to ${result.end}\nReason: ${result.reason}`).catch(console.error);
+ }
  }
  break;
  case "get_attendance_history":
