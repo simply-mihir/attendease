@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     whereClause.subject = { semesterId };
   }
 
-  const [schedules, extraClasses] = await Promise.all([
+  const [schedules, extraClasses, holidays] = await Promise.all([
     prisma.schedule.findMany({
       where: whereClause,
       include: {
@@ -63,7 +63,25 @@ export async function GET(req: NextRequest) {
         },
       },
     }),
+    prisma.holiday.findMany({
+      where: {
+        date: todayDateForQuery,
+        semester: { userId: user.id, isCurrent: true },
+      },
+    }),
   ]);
+
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  if (holidays.length > 0) {
+    return Response.json({
+      date: todayStr,
+      dayName: dayNames[dayOfWeek],
+      classes: [],
+      isHoliday: true,
+      holidayName: holidays[0].name,
+    });
+  }
 
   // Check which ones have attendance marked today (exact date match for @db.Date)
   const todayRecords = await prisma.attendanceRecord.findMany({
@@ -141,6 +159,5 @@ export async function GET(req: NextRequest) {
 
   const classes = [...regularClasses, ...extraClassList].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   return Response.json({ date: todayStr, dayName: dayNames[dayOfWeek], classes });
 }

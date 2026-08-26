@@ -40,7 +40,7 @@ async function execGetSchedule(userId: string, target: "today" | "tomorrow" | "n
  const currentOffset = startOffset + i;
  const { dayOfWeek, dateStr: targetStr, dayName } = getUserToday(tz, currentOffset);
 
- const [schedules, overrides, dateRecords] = await Promise.all([
+ const [schedules, overrides, dateRecords, holidays] = await Promise.all([
  prisma.schedule.findMany({
  where: { userId, dayOfWeek, isActive: true },
  include: {
@@ -69,7 +69,25 @@ async function execGetSchedule(userId: string, target: "today" | "tomorrow" | "n
  prisma.attendanceRecord.findMany({
  where: { userId, date: new Date(targetStr) },
  }),
+ prisma.holiday.findMany({
+   where: { 
+     date: new Date(targetStr + "T00:00:00Z"),
+     semester: { userId, isCurrent: true }
+   }
+ }),
  ]);
+
+ if (holidays.length > 0) {
+   return {
+     date: targetStr,
+     dayName,
+     target,
+     classes: [],
+     totalClasses: 0,
+     isHoliday: true,
+     holidayName: holidays[0].name
+   };
+ }
 
  const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
  for (const s of schedules) {
@@ -917,6 +935,9 @@ function formatFallback(intent: string, result: any): string {
  case "get_schedule":
  case "get_todays_classes": {
  if (result.classes.length === 0) {
+ if (result.isHoliday) {
+ return `📅 **Holiday: ${result.holidayName}**\n\nEnjoy your time off for ${result.target === "tomorrow" ? "tomorrow" : "today"}! No classes are scheduled.`;
+ }
  if (result.target === "next") {
  return ` **Schedule:**\n\n You have absolutely no classes scheduled for the next 7 days! Enjoy your time off.`;
  }
