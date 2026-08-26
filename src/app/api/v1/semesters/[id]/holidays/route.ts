@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { notifyUserModification } from "@/lib/attendance-notifier";
 
 // GET — list holidays for a semester
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -51,6 +52,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       // Skip duplicates (unique constraint)
       if (!e.code?.includes("P2002")) throw e;
     }
+  }
+
+  if (created.length > 0) {
+    const title = created.length === 1 ? "Holiday Marked" : "Holidays Marked";
+    const msg = created.length === 1 ? `${created[0].name} on ${created[0].date.toDateString()}` : `${created.length} holidays added.`;
+    notifyUserModification(user.id, title, msg).catch(console.error);
   }
 
   return NextResponse.json(created, { status: 201 });

@@ -166,3 +166,56 @@ export async function notifyAttendanceFailed(
     console.error("[notifyAttendanceFailed] Error:", error);
   }
 }
+
+export async function notifyUserModification(
+  userId: string,
+  title: string,
+  message: string
+) {
+  try {
+    const user = await getUserInfo(userId);
+    if (!user || !user.notificationSetting) return;
+
+    const ns = user.notificationSetting;
+    if (!ns.emailEnabled && !ns.telegramEnabled && !ns.pushEnabled) return;
+
+    const promises = [];
+
+    // 1. Telegram
+    if (ns.telegramEnabled && user.telegramChatId) {
+      const textTitle = `[ ${title} ]`;
+      promises.push(sendTelegram(user.telegramChatId, `${textTitle}\n\n${message}`).catch(e => console.error("Telegram notify failed", e)));
+    }
+
+    // 2. Email
+    if (ns.emailEnabled && user.email) {
+      const { formatGenericNoticeEmail } = await import("./email");
+      const { subject, html } = formatGenericNoticeEmail(user.name, title, message);
+      promises.push(sendEmail(user.email, subject, html).catch(e => console.error("Email notify failed", e)));
+    }
+
+    // 3. Push Notifications
+    if (ns.pushEnabled && user.pushSubscriptions.length > 0) {
+      const pushPayload = {
+        title,
+        body: message,
+        tag: `mod-${Date.now()}`,
+        data: { url: "/dashboard" }
+      };
+      
+      for (const sub of user.pushSubscriptions) {
+        promises.push(
+          sendPushNotification(sub, pushPayload).catch(async (e) => {
+            if (e.statusCode === 410 || e.statusCode === 404) {
+              await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {});
+            }
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(promises);
+  } catch (error) {
+    console.error("[notifyUserModification] Error:", error);
+  }
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { parseScheduleMessage } from "@/lib/schedule-parser";
+import { notifyUserModification } from "@/lib/attendance-notifier";
 
 // POST — parse user message and create override, OR accept explicit manual override
 export async function POST(req: NextRequest) {
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      notifyUserModification(userId, "Schedule Modified", `Manual override (${parsedManual.data.type}) applied.`).catch(console.error);
       return NextResponse.json({ success: true, override });
     }
 
@@ -106,6 +108,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    notifyUserModification(userId, "Schedule Modified", `Override applied: ${parsed.confirmMessage}`).catch(console.error);
     return NextResponse.json({
       success: true,
       reply: parsed.confirmMessage,

@@ -1,5 +1,5 @@
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
-import { notifyAttendanceMarked } from "@/lib/attendance-notifier";
+import { notifyAttendanceMarked, notifyUserModification } from "@/lib/attendance-notifier";
 import { prisma } from "@/lib/db";
 import { recalcSubjectStats } from "@/lib/subject-stats";
 import { calculateAttendance, simulateSkip } from "@/lib/attendance-calc";
@@ -834,7 +834,10 @@ CRITICAL RULES:
  result = { error: "Please specify status: present, absent, or late." };
  } else {
  result = await execMarkBulkAttendance(user.id, params.status);
- if (result.success) actions.push("attendance_marked");
+        if (result.success) {
+          actions.push("attendance_marked");
+          notifyUserModification(user.id, "Bulk Attendance", `Marked all classes today as ${params.status.toUpperCase()}`).catch(console.error);
+        }
  }
  break;
  case "get_analytics":

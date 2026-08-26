@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { recalcSubjectStats } from "@/lib/subject-stats";
+import { notifyUserModification } from "@/lib/attendance-notifier";
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
@@ -142,6 +143,8 @@ export async function POST(req: NextRequest) {
       .filter((s) => affectedSubjectIds.has(s.id))
       .map((s) => s.name);
 
+    notifyUserModification(user.id, "Medical Leave Approved", `Duration: ${start.toDateString()} to ${end.toDateString()}\nReason: ${reason}\nRecords updated: ${upsertPromises.length}`).catch(console.error);
+    
     return Response.json({
       marked: upsertPromises.length,
       subjects: affectedSubjectNames,

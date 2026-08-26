@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAuthUser, unauthorizedResponse } from "@/lib/auth";
 import { bulkAttendanceSchema } from "@/lib/validations/subject";
+import { notifyUserModification } from "@/lib/attendance-notifier";
 
 export async function POST(req: NextRequest) {
   const user = await getAuthUser();
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    notifyUserModification(user.id, "Bulk Attendance Saved", `Successfully recorded ${results.length} attendance updates across ${subjectIds.length} subjects.`).catch(console.error);
     return Response.json({ records: results, count: results.length }, { status: 201 });
   } catch (error) {
     console.error("Bulk attendance error:", error);
