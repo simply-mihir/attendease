@@ -217,7 +217,12 @@ export async function GET() {
     };
   });
 
-  const todaySchedule = [...regularSchedule, ...extraClassList].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const isHolidayToday = activeSemester?.holidays.some((h) => h.date.getTime() === todayDateForQuery.getTime());
+
+  let todaySchedule: any[] = [];
+  if (!isHolidayToday) {
+    todaySchedule = [...regularSchedule, ...extraClassList].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }
 
   // Stats
   const totalClasses = finalSubjects.reduce((sum, s) => sum + s.totalClassesHeld, 0);

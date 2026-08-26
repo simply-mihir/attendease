@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
   const { dayOfWeek, dateStr } = getUserToday(tz);
 
   // Fetch regular schedules and today's overrides in parallel
-  const [schedules, overrides] = await Promise.all([
+  const [schedules, overrides, holidays] = await Promise.all([
     prisma.schedule.findMany({
       where: {
         userId: user.id,
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
     prisma.scheduleOverride.findMany({
       where: {
         userId: user.id,
-        date: new Date(dateStr + "T00:00:00Z"),
+        date: new Date(dateStr), // @db.Date matches UTC midnight perfectly
       },
       include: {
         subject: {
@@ -104,7 +104,24 @@ export async function GET(req: NextRequest) {
         },
       },
     }),
+    prisma.holiday.findMany({
+      where: {
+        date: new Date(dateStr),
+        semester: { userId: user.id, isCurrent: true },
+      },
+    }),
   ]);
+
+  if (holidays.length > 0) {
+    return Response.json({
+      goalPct,
+      goalType: settings?.goalType || "maintain",
+      goalSetupComplete: settings?.goalSetupComplete ?? false,
+      goalEnabled: true,
+      todaysPlan: [],
+      summary: { mustAttend: 0, canSkip: 0, total: 0 },
+    });
+  }
 
   // Build original time lookup for swap endTime resolution
   const originalBySubject = new Map<string, { startTime: string; endTime: string }>();
