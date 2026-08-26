@@ -160,6 +160,88 @@ async function execGetSchedule(userId: string, target: "today" | "tomorrow" | "n
  return { classes: [], totalClasses: 0, dayName, date: targetStr, target };
 }
 
+
+async function execMarkHoliday(userId: string, dateStr: string, name: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "User not found" };
+
+  const semester = await prisma.semester.findFirst({
+    where: { userId: user.id, isCurrent: true },
+  });
+  
+  if (!semester) return { error: "No active semester found to add holiday to." };
+
+  try {
+    const holiday = await prisma.holiday.create({
+      data: {
+        semesterId: semester.id,
+        name: name || "Holiday",
+        date: new Date(dateStr + "T00:00:00Z"),
+      },
+    });
+    return { success: true, date: dateStr, name: holiday.name };
+  } catch (e: any) {
+    if (e.code?.includes("P2002")) return { error: "A holiday is already marked on this date." };
+    return { error: "Failed to mark holiday." };
+  }
+}
+
+async function execMarkMedicalLeave(userId: string, startDateStr: string, endDateStr: string, reason: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "User not found" };
+
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return { error: "Invalid dates provided." };
+  if (end < start) return { error: "End date must be after start date." };
+
+  const subjects = await prisma.subject.findMany({ where: { userId, isArchived: false }, select: { id: true, name: true } });
+  if (subjects.length === 0) return { error: "No subjects found." };
+
+  const subjectIdSet = new Set(subjects.map(s => s.id));
+  const schedules = await prisma.schedule.findMany({
+    where: { userId, subjectId: { in: Array.from(subjectIdSet) }, isActive: true },
+  });
+
+  const schedulesByDay = new Map<number, typeof schedules>();
+  for (const sched of schedules) {
+    const list = schedulesByDay.get(sched.dayOfWeek) || [];
+    list.push(sched);
+    schedulesByDay.set(sched.dayOfWeek, list);
+  }
+
+  const upsertPromises = [];
+  const affectedSubjectIds = new Set<string>();
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const dayOfWeek = d.getDay();
+    const matchingSchedules = schedulesByDay.get(dayOfWeek) || [];
+    const dateObj = new Date(d.toISOString().slice(0, 10));
+
+    for (const sched of matchingSchedules) {
+      affectedSubjectIds.add(sched.subjectId);
+      upsertPromises.push(
+        prisma.attendanceRecord.upsert({
+          where: {
+            subjectId_userId_date_scheduleId: { subjectId: sched.subjectId, userId, date: dateObj, scheduleId: sched.id },
+          },
+          create: {
+            subjectId: sched.subjectId, userId, scheduleId: sched.id, date: dateObj, status: "excused", source: "medical_leave", notes: reason,
+          },
+          update: {
+            status: "excused", source: "medical_leave", notes: reason, editedAt: new Date(), editedReason: "Medical leave bulk update",
+          },
+        })
+      );
+    }
+  }
+
+  await Promise.all(upsertPromises);
+  await Promise.all(Array.from(affectedSubjectIds).map(sid => recalcSubjectStats(sid)));
+
+  return { success: true, count: upsertPromises.length, start: startDateStr, end: endDateStr, reason };
+}
+
 async function execMarkAttendance(userId: string, subjectQuery: string, status: string) {
  const subject = await findSubject(userId, subjectQuery);
  if (!subject) return { error: `Could not find subject matching "${subjectQuery}". Check spelling or use the full name.` };
@@ -572,7 +654,13 @@ Available intents and their params:
 8. "get_attendance_history" — params: {"subject": "<name or empty>", "days": <number, default 7>}
  Use when: user asks about past records, history, when they last attended
 
-9. "chat" — params: {"message": "<your response>"}
+9. "mark_holiday" — params: {"date": "<YYYY-MM-DD>", "name": "<Holiday Name>"}
+ Use when: user asks to declare a holiday or mark a specific day as a holiday.
+ 
+10. "mark_medical_leave" — params: {"startDate": "<YYYY-MM-DD>", "endDate": "<YYYY-MM-DD>", "reason": "<Reason string>"}
+ Use when: user asks to mark medical leave, sick leave, or an excused absence for a date or date range.
+
+11. "chat" — params: {"message": "<your response>"}
  Use when: user is chatting casually, greeting, or asking something you can answer without data
 
 CRITICAL RULES:
@@ -944,7 +1032,13 @@ function formatFallback(intent: string, result: any): string {
  return msg;
  }
 
- case "get_attendance_history": {
+ case "mark_holiday":
+      return `📅 **Holiday Marked**\n\n📌 Name: ${result.name}\n📅 Date: ${result.date}\n\nThe holiday has been added to your active semester. No attendance will be expected on this day.`;
+      
+    case "mark_medical_leave":
+      return `[Excused] **Medical Leave Approved**\n\n📌 Reason: ${result.reason}\n📅 Duration: ${result.start} to ${result.end}\n🔄 Records updated: ${result.count}\n\nYour schedule has been updated with excused absences. Your dashboard stats have been refreshed.`;
+      
+    case "get_attendance_history": {
  if (result.records.length === 0) return ` **Attendance History**\n\n No records found for the last ${result.days} day${result.days > 1 ? "s" : ""}. You can mark attendance from your dashboard or by asking me.`;
 
  const statusCounts: Record<string, number> = {};

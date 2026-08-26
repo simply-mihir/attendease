@@ -77,6 +77,20 @@ export async function initNLP() {
   manager.addDocument('en', 'attendance history', 'get_attendance_history');
   manager.addDocument('en', 'what did i attend last week', 'get_attendance_history');
 
+  // 9. mark_holiday
+  manager.addDocument('en', 'mark tomorrow as a holiday', 'mark_holiday');
+  manager.addDocument('en', 'declare holiday', 'mark_holiday');
+  manager.addDocument('en', 'college declared a holiday', 'mark_holiday');
+  manager.addDocument('en', 'is today a holiday', 'mark_holiday');
+  manager.addDocument('en', 'add a holiday', 'mark_holiday');
+
+  // 10. mark_medical_leave
+  manager.addDocument('en', 'mark medical leave', 'mark_medical_leave');
+  manager.addDocument('en', 'excused absence', 'mark_medical_leave');
+  manager.addDocument('en', 'sick leave', 'mark_medical_leave');
+  manager.addDocument('en', 'medical leave for 3 days', 'mark_medical_leave');
+  manager.addDocument('en', 'i was sick today', 'mark_medical_leave');
+
   await manager.train();
   return manager;
 }
