@@ -805,7 +805,7 @@ Available intents and their params:
  Use when: user wants to undo, revert, or rollback changes (e.g. "undo that", "revert the swap for OS", "revert back all changes"). Set type to "last" if unspecified.
 
 CRITICAL RULES:
-- Output ONLY the JSON object. No other text before or after.
+- Output ONLY a single JSON object (for one action) or a JSON array (for multiple actions). No other text before or after.
 - No markdown code fences. No \`\`\`json. Just raw JSON.
 - If unsure about intent, use "chat" with a helpful response asking for clarification.
 - Match subject names fuzzily — "dbms" matches "Database Management Systems", "os" matches "Operating Systems", etc.
@@ -832,10 +832,11 @@ CRITICAL RULES:
  const nlpRes = await analyzeIntent(lowerMsg);
  if (nlpRes.score > 0.65) {
  const [baseIntent, subIntent] = nlpRes.intent.split(".");
- 
- // Schedule override, holidays, and medical leave rely heavily on LLM for date/time parsing
- if (baseIntent !== "schedule_override" && baseIntent !== "mark_holiday" && baseIntent !== "mark_medical_leave" && baseIntent !== "undo_action" && baseIntent !== "chat" && baseIntent !== "None") {
- usingLLM = false;
+  // Schedule override, holidays, and medical leave rely heavily on LLM for date/time parsing
+  // Also, force LLM for long or complex queries (e.g. chaining with "and" or > 60 chars)
+  const isComplex = lowerMsg.length > 60 || lowerMsg.includes(" and ") || lowerMsg.includes(" also ");
+  if (!isComplex && baseIntent !== "schedule_override" && baseIntent !== "mark_holiday" && baseIntent !== "mark_medical_leave" && baseIntent !== "undo_action" && baseIntent !== "chat" && baseIntent !== "None") {
+  usingLLM = false;
  intent = baseIntent;
  
  if (intent === "get_schedule") {
@@ -961,6 +962,11 @@ CRITICAL RULES:
     
     // Assign to a local variable to iterate
     intentsToProcess = parsedList;
+    if (!intentsToProcess || intentsToProcess.length === 0) {
+      intentsToProcess = [{ intent: "chat", params: { message: "I'm not sure how to process that. Could you be more specific?" } }];
+    }
+  } else {
+    intentsToProcess = [{ intent, params }];
   }
 
   // Step 2: Execute the intents
