@@ -802,7 +802,7 @@ Available intents and their params:
  Use when: user is chatting casually, greeting, or asking something you can answer without data
  
 12. "undo_action" — params: {"type": "<attendance|schedule|holiday|leave|last>", "subject": "<name or empty>", "date": "<YYYY-MM-DD or empty>"}
- Use when: user wants to undo or revert their last action or a specific change (e.g. "undo that", "revert the swap for OS").
+ Use when: user wants to undo, revert, or rollback changes (e.g. "undo that", "revert the swap for OS", "revert back all changes"). Set type to "last" if unspecified.
 
 CRITICAL RULES:
 - Output ONLY the JSON object. No other text before or after.
@@ -834,7 +834,7 @@ CRITICAL RULES:
  const [baseIntent, subIntent] = nlpRes.intent.split(".");
  
  // Schedule override, holidays, and medical leave rely heavily on LLM for date/time parsing
- if (baseIntent !== "schedule_override" && baseIntent !== "mark_holiday" && baseIntent !== "mark_medical_leave" && baseIntent !== "chat" && baseIntent !== "None") {
+ if (baseIntent !== "schedule_override" && baseIntent !== "mark_holiday" && baseIntent !== "mark_medical_leave" && baseIntent !== "undo_action" && baseIntent !== "chat" && baseIntent !== "None") {
  usingLLM = false;
  intent = baseIntent;
  

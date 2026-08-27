@@ -91,6 +91,13 @@ export async function initNLP() {
   manager.addDocument('en', 'medical leave for 3 days', 'mark_medical_leave');
   manager.addDocument('en', 'i was sick today', 'mark_medical_leave');
 
+  // 11. undo_action
+  manager.addDocument('en', 'undo that', 'undo_action');
+  manager.addDocument('en', 'revert changes', 'undo_action');
+  manager.addDocument('en', 'revert back all changes', 'undo_action');
+  manager.addDocument('en', 'undo my last action', 'undo_action');
+  manager.addDocument('en', 'rollback', 'undo_action');
+
   await manager.train();
   return manager;
 }
