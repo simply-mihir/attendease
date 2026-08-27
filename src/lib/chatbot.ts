@@ -633,15 +633,33 @@ export async function processChatbotMessage(userId: string, message: string, his
  const tz = await getUserTimezone(user.id);
  const { dayOfWeek: todayDow, dateStr: todayDateStr, dayName: todayDayName } = getUserToday(tz);
 
+ const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+ const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+ const todaysSchedule = await prisma.schedule.findMany({
+   where: { userId: user.id, dayOfWeek: todayDow, isActive: true },
+   include: { subject: { select: { name: true, code: true } } },
+   orderBy: { startTime: "asc" },
+ });
+ 
+ const scheduleContext = todaysSchedule.length > 0 
+   ? todaysSchedule.map(s => `- ${s.subject.name}${s.subject.code ? ` (${s.subject.code})` : ""} (${s.startTime} to ${s.endTime})`).join("\n")
+   : "No classes scheduled for today.";
+
  const systemPrompt = `You are AttendEase Assistant — a concise attendance tracker chatbot.
 
 Today: ${todayDayName}, ${todayDateStr}
+Current Time: ${currentTime}
 Today's date (YYYY-MM-DD): ${todayDateStr}
 User: ${user.name || "Student"}
 Subjects: ${subjectList || "None"}
+Today's Schedule:
+${scheduleContext}
 
-You MUST respond with ONLY a JSON object (no markdown, no code fences, no extra text). The JSON must have this shape:
+You MUST respond with ONLY a JSON array of objects, or a single JSON object (no markdown, no code fences, no extra text). If the user has multiple requests, return an array. The JSON must have this shape:
 
+[{"intent": "<intent_name>", "params": {<parameters>}}, ...]
+OR
 {"intent": "<intent_name>", "params": {<parameters>}}
 
 Available intents and their params:
@@ -762,6 +780,7 @@ CRITICAL RULES:
  }
 
  // Step 2: Fallback to LLM if NLP confidence is low or entities are missing
+ let intentsToProcess: any[] = [];
  if (usingLLM) {
  if (!OPENROUTER_API_KEY) {
  return { reply: "Chatbot not configured for complex requests. Set OPENROUTER_API_KEY in .env", actions: [] };
@@ -806,120 +825,138 @@ CRITICAL RULES:
  const intentData = await intentRes.json();
  const rawContent = intentData.choices?.[0]?.message?.content || "";
 
- try {
- let cleaned = rawContent
- .replace(/<think>[\s\S]*?<\/think>/gi, "")
- .replace(/```json\s*/gi, "")
- .replace(/```\s*/gi, "")
- .trim();
+ let parsedList: any[] = [];
+    try {
+      let cleaned = rawContent
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/gi, "")
+        .trim();
 
- const jsonStart = cleaned.indexOf("{");
- const jsonEnd = cleaned.lastIndexOf("}");
- if (jsonStart !== -1 && jsonEnd > jsonStart) {
- const jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
- const parsed = JSON.parse(jsonStr);
- intent = parsed.intent || "chat";
- params = parsed.params || {};
- }
- } catch (e) {
- console.error("[Chatbot] JSON parse error:", e, "Raw:", rawContent.substring(0, 300));
- return {
- reply: rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() || "Sorry, I didn't understand that. Could you rephrase?",
- actions: [],
- };
- }
- }
+      const jsonStartArr = cleaned.indexOf("[");
+      const jsonEndArr = cleaned.lastIndexOf("]");
+      const jsonStartObj = cleaned.indexOf("{");
+      const jsonEndObj = cleaned.lastIndexOf("}");
 
- // Step 2: Execute the intent
- let result: any;
- const actions: string[] = [];
+      if (jsonStartArr !== -1 && jsonEndArr > jsonStartArr && (jsonStartObj === -1 || jsonStartArr < jsonStartObj)) {
+        parsedList = JSON.parse(cleaned.substring(jsonStartArr, jsonEndArr + 1));
+      } else if (jsonStartObj !== -1 && jsonEndObj > jsonStartObj) {
+        parsedList = [JSON.parse(cleaned.substring(jsonStartObj, jsonEndObj + 1))];
+      } else {
+        parsedList = [{ intent: "chat", params: { message: "Sorry, I couldn't understand that." } }];
+      }
+      if (!Array.isArray(parsedList)) parsedList = [parsedList];
+    } catch (e) {
+      console.error("[Chatbot] JSON parse error:", e, "Raw:", rawContent.substring(0, 300));
+      return {
+        reply: rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() || "Sorry, I didn't understand that. Could you rephrase?",
+        actions: [],
+      };
+    }
+    
+    // Assign to a local variable to iterate
+    intentsToProcess = parsedList;
+  }
 
- switch (intent) {
- case "get_schedule":
- case "get_todays_classes": // Legacy fallback just in case
- result = await execGetSchedule(user.id, params.target || "today");
- break;
- case "mark_attendance":
- if (!params.subject || !params.status) {
- result = { error: "Please specify which subject and status (present/absent/late)." };
- } else {
- result = await execMarkAttendance(user.id, params.subject, params.status);
- if (result.success) actions.push("attendance_marked");
- }
- break;
- case "mark_bulk_attendance":
- if (!params.status) {
- result = { error: "Please specify status: present, absent, or late." };
- } else {
- result = await execMarkBulkAttendance(user.id, params.status);
-        if (result.success) {
-          actions.push("attendance_marked");
-          notifyUserModification(user.id, "Bulk Attendance", `Marked all classes today as ${params.status.toUpperCase()}`).catch(console.error);
+  // Step 2: Execute the intents
+  const actions: string[] = [];
+  const replies: string[] = [];
+
+  for (const p of intentsToProcess) {
+    const currentIntent = p.intent || "chat";
+    const currentParams = p.params || {};
+    let result: any;
+
+    switch (currentIntent) {
+      case "get_schedule":
+      case "get_todays_classes": // Legacy fallback just in case
+        result = await execGetSchedule(user.id, currentParams.target || "today");
+        break;
+      case "mark_attendance":
+        if (!currentParams.subject || !currentParams.status) {
+          result = { error: "Please specify which subject and status (present/absent/late)." };
+        } else {
+          result = await execMarkAttendance(user.id, currentParams.subject, currentParams.status);
+          if (result.success) actions.push("attendance_marked");
         }
- }
- break;
- case "get_analytics":
- result = await execGetAnalytics(user.id);
- break;
- case "get_subject_info":
- if (!params.subject) {
- result = { error: "Which subject? Please specify." };
- } else {
- result = await execGetSubjectInfo(user.id, params.subject);
- }
- break;
- case "skip_optimizer":
- result = await execSkipOptimizer(user.id, params.maxSkips || 3);
- break;
- case "schedule_override":
- if (!params.subject || !params.action || !params.date) {
- result = { error: "Please specify subject, action (cancel/reschedule/extra/swap), and date." };
- } else {
- result = await execScheduleOverride(
- user.id, params.action, params.subject, params.date,
- params.newTime, params.swapSubject, params.endTime
- );
- if (result.success) actions.push("schedule_changed");
- }
- break;
- case "mark_holiday":
- if (!params.date) {
- result = { error: "Please specify the date for the holiday." };
- } else {
- result = await execMarkHoliday(user.id, params.date, params.name || "Holiday");
- if (result.success) {
- actions.push("schedule_changed");
- notifyUserModification(user.id, "Holiday Marked", `${result.name} on ${result.date}`).catch(console.error);
- }
- }
- break;
- case "mark_medical_leave":
- if (!params.startDate) {
- result = { error: "Please specify the start date for the medical leave." };
- } else {
- result = await execMarkMedicalLeave(user.id, params.startDate, params.endDate || params.startDate, params.reason || "Medical Leave");
- if (result.success) {
- actions.push("attendance_marked");
- notifyUserModification(user.id, "Medical Leave", `Duration: ${result.start} to ${result.end}\nReason: ${result.reason}`).catch(console.error);
- }
- }
- break;
- case "get_attendance_history":
- result = await execGetAttendanceHistory(user.id, params.subject, params.days || 7);
- break;
- case "chat":
- // Direct chat response — no data lookup needed
- return {
- reply: params.message || "I'm here to help. You can ask about your schedule, mark attendance, view analytics, check skip availability, or manage schedule changes.",
- actions: [],
- };
- default:
- result = { error: "I couldn't determine your request. Try asking about your classes, attendance, or analytics." };
- }
+        break;
+      case "mark_bulk_attendance":
+        if (!currentParams.status) {
+          result = { error: "Please specify status: present, absent, or late." };
+        } else {
+          result = await execMarkBulkAttendance(user.id, currentParams.status);
+          if (result.success) {
+            actions.push("attendance_marked");
+            notifyUserModification(user.id, "Bulk Attendance", `Marked all classes today as ${currentParams.status.toUpperCase()}`).catch(console.error);
+          }
+        }
+        break;
+      case "get_analytics":
+        result = await execGetAnalytics(user.id);
+        break;
+      case "get_subject_info":
+        if (!currentParams.subject) {
+          result = { error: "Which subject? Please specify." };
+        } else {
+          result = await execGetSubjectInfo(user.id, currentParams.subject);
+        }
+        break;
+      case "skip_optimizer":
+        result = await execSkipOptimizer(user.id, currentParams.maxSkips || 3);
+        break;
+      case "schedule_override":
+        if (!currentParams.subject || !currentParams.action || !currentParams.date) {
+          result = { error: "Please specify subject, action (cancel/reschedule/extra/swap), and date." };
+        } else {
+          result = await execScheduleOverride(
+            user.id, currentParams.action, currentParams.subject, currentParams.date,
+            currentParams.newTime, currentParams.swapSubject, currentParams.endTime
+          );
+          if (result.success) actions.push("schedule_changed");
+        }
+        break;
+      case "mark_holiday":
+        if (!currentParams.date) {
+          result = { error: "Please specify the date for the holiday." };
+        } else {
+          result = await execMarkHoliday(user.id, currentParams.date, currentParams.name || "Holiday");
+          if (result.success) {
+            actions.push("schedule_changed");
+            notifyUserModification(user.id, "Holiday Marked", `${result.name} on ${result.date}`).catch(console.error);
+          }
+        }
+        break;
+      case "mark_medical_leave":
+        if (!currentParams.startDate) {
+          result = { error: "Please specify the start date for the medical leave." };
+        } else {
+          result = await execMarkMedicalLeave(user.id, currentParams.startDate, currentParams.endDate || currentParams.startDate, currentParams.reason || "Medical Leave");
+          if (result.success) {
+            actions.push("attendance_marked");
+            notifyUserModification(user.id, "Medical Leave", `Duration: ${result.start} to ${result.end}\nReason: ${result.reason}`).catch(console.error);
+          }
+        }
+        break;
+      case "get_attendance_history":
+        result = await execGetAttendanceHistory(user.id, currentParams.subject, currentParams.days || 7);
+        break;
+      case "chat":
+        // Direct chat response — no data lookup needed
+        result = { isChat: true, reply: currentParams.message || "I'm here to help. You can ask about your schedule, mark attendance, view analytics, check skip availability, or manage schedule changes." };
+        break;
+      default:
+        result = { error: "I couldn't determine your request. Try asking about your classes, attendance, or analytics." };
+    }
 
- // Step 3: Format using deterministic formatter (no second LLM call — avoids hallucinated numbers)
- const reply = formatFallback(intent, result);
- return { reply, actions };
+    // Step 3: Format using deterministic formatter (no second LLM call — avoids hallucinated numbers)
+    if (currentIntent === "chat" && result.isChat) {
+      replies.push(result.reply);
+    } else {
+      replies.push(formatFallback(currentIntent, result));
+    }
+  }
+
+  return { reply: replies.join("\n\n---\n\n"), actions };
  } catch (error) {
  console.error("[Chatbot] Error:", error);
  return { reply: "Something went wrong. Try again.", actions: [] };
