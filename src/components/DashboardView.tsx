@@ -561,7 +561,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
               const min = s.dummy ? 75 : (s.minAttendancePct ?? 75);
               const attended = s.dummy ? 0 : (s.totalPresent ?? 0);
               const total = s.dummy ? 0 : (s.totalClassesHeld ?? 0);
-              const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? Minus : TrendingDown;
+              const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? AlertTriangle : TrendingDown;
               
               return (
                 <Link

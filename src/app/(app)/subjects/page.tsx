@@ -131,7 +131,7 @@ export default function SubjectsPage() {
             const total = s.totalClassesHeld ?? 0;
             
             // Pick status icon
-            const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? Minus : TrendingDown;
+            const StatusIcon = percentage >= min ? TrendingUp : percentage >= min - 15 ? AlertTriangle : TrendingDown;
             
             return (
               <div
