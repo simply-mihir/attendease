@@ -684,6 +684,7 @@ Available intents and their params:
 
 7. "schedule_override" — params: {"action": "<reschedule|cancel|extra|swap>", "subject": "<name>", "date": "<YYYY-MM-DD>", "newTime": "<HH:MM 24h>", "endTime": "<HH:MM 24h>", "swapSubject": "<name>"}
  Use when: user talks about timing changes, cancellations, extra classes, swaps. For extra class, ALWAYS try to provide both newTime (start time) and endTime.
+ If a user says "cancel X and in place of X schedule Y", treat this as a single "swap" action between X and Y (do NOT create a separate cancel action). If chaining swaps (e.g., A to B, B to C), output multiple swap intents.
  For dates: today=${todayDateStr}, tomorrow=${(() => { const t = new Date(todayDateStr + "T12:00:00"); t.setDate(t.getDate() + 1); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; })()}
  Convert day names to actual dates. Convert "2pm" to "14:00", "9:30am" to "09:30"
 
