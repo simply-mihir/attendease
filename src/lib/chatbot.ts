@@ -580,6 +580,107 @@ async function execMarkBulkAttendance(userId: string, status: string) {
  return { success: true, status, subjects: results, count: results.length };
 }
 
+async function execUndoAction(userId: string, type: string, subjectQuery?: string, dateStr?: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "User not found" };
+
+  // Calculate cutoff for "recent" actions (last 2 hours)
+  const cutoff = new Date();
+  cutoff.setHours(cutoff.getHours() - 2);
+
+  let targetSubjectId: string | undefined;
+  if (subjectQuery) {
+    const subject = await findSubject(userId, subjectQuery);
+    if (subject) targetSubjectId = subject.id;
+  }
+
+  let targetDate: Date | undefined;
+  if (dateStr) {
+    targetDate = new Date(dateStr + "T00:00:00Z");
+    if (isNaN(targetDate.getTime())) targetDate = undefined;
+  }
+
+  let deletedCount = 0;
+  let actionDetails = "";
+
+  if (!type || type === "last" || type === "attendance") {
+    const whereClause: any = {
+      userId,
+      OR: [
+        { source: "chatbot", markedAt: { gte: cutoff } },
+        { editedReason: "Bulk via chatbot", editedAt: { gte: cutoff } },
+        { editedReason: { contains: "chatbot" }, editedAt: { gte: cutoff } }
+      ]
+    };
+    if (targetSubjectId) whereClause.subjectId = targetSubjectId;
+    if (targetDate) whereClause.date = targetDate;
+
+    const recentAttendance = await prisma.attendanceRecord.findMany({
+      where: whereClause,
+      orderBy: { markedAt: "desc" },
+    });
+
+    if (recentAttendance.length > 0) {
+      const subjectIds = new Set<string>();
+      for (const rec of recentAttendance) {
+        await prisma.attendanceRecord.delete({ where: { id: rec.id } });
+        subjectIds.add(rec.subjectId);
+        deletedCount++;
+      }
+      for (const sId of subjectIds) {
+        await recalcSubjectStats(sId);
+      }
+      actionDetails += `Reverted ${deletedCount} attendance record(s). `;
+      if (type === "attendance") return { success: true, message: actionDetails };
+    } else if (type === "attendance") {
+      return { error: "No recent chatbot attendance records found to undo." };
+    }
+  }
+
+  if (!type || type === "last" || type === "schedule") {
+    const whereOverride: any = { userId };
+    if (targetSubjectId) whereOverride.subjectId = targetSubjectId;
+    if (targetDate) whereOverride.date = targetDate;
+
+    if (!targetSubjectId && !targetDate) {
+      const tz = await getUserTimezone(userId);
+      const { dateStr: todayStr } = getUserToday(tz);
+      whereOverride.date = new Date(todayStr + "T00:00:00Z");
+    }
+
+    const overrides = await prisma.scheduleOverride.findMany({ where: whereOverride });
+    if (overrides.length > 0) {
+      for (const ov of overrides) {
+        await prisma.scheduleOverride.delete({ where: { id: ov.id } });
+        deletedCount++;
+      }
+      actionDetails += `Reverted schedule overrides for the targeted date. `;
+    } else if (type === "schedule") {
+      return { error: "No matching schedule overrides found to undo." };
+    }
+  }
+
+  if (!type || type === "last" || type === "holiday") {
+    const whereHoliday: any = { semester: { userId, isCurrent: true }, createdAt: { gte: cutoff } };
+    if (targetDate) whereHoliday.date = targetDate;
+
+    const holidays = await prisma.holiday.findMany({ where: whereHoliday });
+    if (holidays.length > 0) {
+      for (const h of holidays) {
+        await prisma.holiday.delete({ where: { id: h.id } });
+        deletedCount++;
+      }
+      actionDetails += `Reverted newly added holiday(s). `;
+    }
+  }
+
+  if (deletedCount > 0) {
+    return { success: true, message: actionDetails.trim() };
+  }
+
+  return { error: "Could not find any recent changes to undo matching your request." };
+}
+
 // ── Helper: fuzzy subject finder ────────────────────────────────
 
 async function findSubject(userId: string, query: string) {
@@ -699,6 +800,9 @@ Available intents and their params:
 
 11. "chat" — params: {"message": "<your response>"}
  Use when: user is chatting casually, greeting, or asking something you can answer without data
+ 
+12. "undo_action" — params: {"type": "<attendance|schedule|holiday|leave|last>", "subject": "<name or empty>", "date": "<YYYY-MM-DD or empty>"}
+ Use when: user wants to undo or revert their last action or a specific change (e.g. "undo that", "revert the swap for OS").
 
 CRITICAL RULES:
 - Output ONLY the JSON object. No other text before or after.
@@ -906,40 +1010,39 @@ CRITICAL RULES:
         result = await execSkipOptimizer(user.id, currentParams.maxSkips || 3);
         break;
       case "schedule_override":
-        if (!currentParams.subject || !currentParams.action || !currentParams.date) {
+        if (!currentParams.subject || !currentParams.action) {
           result = { error: "Please specify subject, action (cancel/reschedule/extra/swap), and date." };
         } else {
+          const overrideDate = currentParams.date || todayDateStr;
           result = await execScheduleOverride(
-            user.id, currentParams.action, currentParams.subject, currentParams.date,
+            user.id, currentParams.action, currentParams.subject, overrideDate,
             currentParams.newTime, currentParams.swapSubject, currentParams.endTime
           );
           if (result.success) actions.push("schedule_changed");
         }
         break;
       case "mark_holiday":
-        if (!currentParams.date) {
-          result = { error: "Please specify the date for the holiday." };
-        } else {
-          result = await execMarkHoliday(user.id, currentParams.date, currentParams.name || "Holiday");
-          if (result.success) {
-            actions.push("schedule_changed");
-            notifyUserModification(user.id, "Holiday Marked", `${result.name} on ${result.date}`).catch(console.error);
-          }
+        const holidayDate = currentParams.date || todayDateStr;
+        result = await execMarkHoliday(user.id, holidayDate, currentParams.name || "Holiday");
+        if (result.success) {
+          actions.push("schedule_changed");
+          notifyUserModification(user.id, "Holiday Marked", `${result.name} on ${result.date}`).catch(console.error);
         }
         break;
       case "mark_medical_leave":
-        if (!currentParams.startDate) {
-          result = { error: "Please specify the start date for the medical leave." };
-        } else {
-          result = await execMarkMedicalLeave(user.id, currentParams.startDate, currentParams.endDate || currentParams.startDate, currentParams.reason || "Medical Leave");
-          if (result.success) {
-            actions.push("attendance_marked");
-            notifyUserModification(user.id, "Medical Leave", `Duration: ${result.start} to ${result.end}\nReason: ${result.reason}`).catch(console.error);
-          }
+        const leaveDate = currentParams.startDate || todayDateStr;
+        result = await execMarkMedicalLeave(user.id, leaveDate, currentParams.endDate || leaveDate, currentParams.reason || "Medical Leave");
+        if (result.success) {
+          actions.push("attendance_marked");
+          notifyUserModification(user.id, "Medical Leave", `Duration: ${result.start} to ${result.end}\nReason: ${result.reason}`).catch(console.error);
         }
         break;
       case "get_attendance_history":
         result = await execGetAttendanceHistory(user.id, currentParams.subject, currentParams.days || 7);
+        break;
+      case "undo_action":
+        result = await execUndoAction(user.id, currentParams.type, currentParams.subject, currentParams.date);
+        if (result.success) actions.push("undo_completed");
         break;
       case "chat":
         // Direct chat response — no data lookup needed
@@ -1145,7 +1248,10 @@ function formatFallback(intent: string, result: any): string {
  return msg;
  }
 
- default:
+  case "undo_action":
+    return `↩️ **Undo Successful**\n\n${result.message}\n\nYour dashboard and analytics have been updated to reflect this change.`;
+
+  default:
  return "The requested action has been completed. Let me know if there is anything else I can help with.";
  }
 }
