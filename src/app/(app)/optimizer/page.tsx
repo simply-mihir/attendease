@@ -4,7 +4,6 @@ import { useSWRFetch } from "@/hooks/useSWRFetch";
 import { Zap, ArrowRight, AlertTriangle, CheckCircle2, Sparkles, XCircle } from "lucide-react";
 import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { FieldLoader } from "@/components/FieldLoader";
-import { Skeleton } from "@/components/Skeleton";
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";

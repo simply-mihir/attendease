@@ -15,40 +15,6 @@ import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { FieldLoader } from "@/components/FieldLoader";
 
-function SubjectSkeleton() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
-      <div className="flex items-center justify-between">
-        <div className="h-4 w-32 bg-gray-200 dark:bg-[#141425] rounded-md" />
-      </div>
-      <div className="card-3d p-6 sm:p-7 relative overflow-hidden">
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-3.5 h-16 rounded-full shadow-md bg-gray-200 dark:bg-white/5" />
-            <div>
-              <div className="h-8 w-48 bg-gray-200 dark:bg-white/5 rounded-lg mb-2" />
-              <div className="h-4 w-32 bg-gray-200 dark:bg-white/5 rounded-md" />
-            </div>
-          </div>
-          <div className="relative w-24 h-24 shrink-0 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center">
-            <FieldLoader size="lg" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-6">
-          {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="h-20 bg-gray-100 dark:bg-white/5 border-2 border-gray-200 dark:border-[#2a2a3d] rounded-2xl flex items-center justify-center">
-               <FieldLoader size="md" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="h-10 w-full bg-gray-200 dark:bg-[#141425] rounded-xl" />
-      <div className="h-64 card-3d flex items-center justify-center">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
 
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const STATUS_COLORS: Record<string, string> = {
@@ -152,7 +118,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   }
 
   if (loading) {
-    return <SubjectSkeleton />;
+    return <FuturisticLoader title="Loading subject..." variant="full" />;
   }
 
   const stats = calculateAttendance({

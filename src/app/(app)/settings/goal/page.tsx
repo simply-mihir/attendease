@@ -11,22 +11,6 @@ import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 import { invalidate, invalidatePrefix } from "@/hooks/useSWRFetch";
 
-function SettingsGoalSkeleton() {
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-gray-200 dark:bg-white/5" />
-        <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-[#141425] rounded-lg" />
-          <div className="h-4 w-64 bg-gray-100 dark:bg-[#141425] rounded-md" />
-        </div>
-      </div>
-      <div className="card-3d p-6 h-64 flex items-center justify-center">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
 
 export default function GoalSettingsPage() {
   const [enabled, setEnabled] = useState(false);
@@ -105,7 +89,7 @@ export default function GoalSettingsPage() {
   }
 
   if (loadingSettings || loadingSubjects) {
-    return <SettingsGoalSkeleton />;
+    return <FuturisticLoader title="Loading goals..." variant="full" />;
   }
 
   return (

@@ -11,23 +11,6 @@ import {
 import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 
-function MedicalLeaveSkeleton() {
-  return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
-      <div className="h-8 w-32 bg-gray-200 dark:bg-[#141425] rounded-xl" />
-      <div>
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-gray-200 dark:bg-white/5" />
-          <div className="h-8 w-48 bg-gray-200 dark:bg-[#141425] rounded-lg" />
-        </div>
-        <div className="h-4 w-64 bg-gray-100 dark:bg-[#141425] rounded-md mt-2 ml-[56px]" />
-      </div>
-      <div className="card-3d p-6 h-[400px] flex items-center justify-center">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
 
 interface SubjectOption {
   id: string;
@@ -98,7 +81,7 @@ export default function MedicalLeavePage() {
   const isValid = startDate && endDate && reason.trim().length > 0 && (allSubjects || selectedSubjects.size > 0);
 
   if (loading) {
-    return <MedicalLeaveSkeleton />;
+    return <FuturisticLoader title="Loading medical leave..." variant="full" />;
   }
 
   return (

@@ -11,27 +11,6 @@ import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { FieldLoader } from "@/components/FieldLoader";
 
-function SemesterSkeleton() {
-  return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
-      <div className="flex items-center gap-4">
-        <div className="h-10 w-12 bg-gray-200 dark:bg-white/5 rounded-xl" />
-        <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-white/5 rounded-lg" />
-          <div className="h-4 w-32 bg-gray-100 dark:bg-white/5 rounded-md" />
-        </div>
-      </div>
-      <div className="flex gap-2 border-b-2 border-gray-100 dark:border-[#2a2a3d] pb-4">
-        <div className="h-10 w-28 bg-gray-200 dark:bg-white/5 rounded-xl" />
-        <div className="h-10 w-28 bg-gray-200 dark:bg-white/5 rounded-xl" />
-        <div className="h-10 w-32 bg-gray-200 dark:bg-white/5 rounded-xl" />
-      </div>
-      <div className="pt-8 flex justify-center">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
 
 export default function SemesterDetailPage() {
   const params = useParams();
@@ -96,7 +75,7 @@ export default function SemesterDetailPage() {
   };
 
   if (!semester && isLoading) {
-    return <SemesterSkeleton />;
+    return <FuturisticLoader title="Loading semester details..." variant="full" />;
   }
 
   if (!semester) {

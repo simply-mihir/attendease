@@ -10,20 +10,6 @@ import clsx from "clsx";
 import { PageTransition } from "@/components/PageTransition";
 import { StaggerGrid } from "@/components/StaggerGrid";
 
-function SettingsSemestersSkeleton() {
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="h-8 w-32 bg-gray-200 dark:bg-[#141425] rounded-xl" />
-      <div className="flex items-center justify-between">
-        <div className="h-8 w-48 bg-gray-200 dark:bg-[#141425] rounded-lg" />
-        <div className="h-10 w-32 bg-gray-200 dark:bg-[#141425] rounded-xl" />
-      </div>
-      <div className="card-3d p-6 h-64 flex items-center justify-center">
-        <FieldLoader size="lg" />
-      </div>
-    </div>
-  );
-}
 
 export default function SemestersPage() {
   const [showForm, setShowForm] = useState(false);
@@ -135,7 +121,7 @@ export default function SemestersPage() {
   }
 
   if (pageLoading) {
-    return <SettingsSemestersSkeleton />;
+    return <FuturisticLoader title="Loading settings..." variant="full" />;
   }
 
   return (

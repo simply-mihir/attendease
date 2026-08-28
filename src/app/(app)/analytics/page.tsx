@@ -4,7 +4,6 @@ import { FuturisticLoader } from "@/components/FuturisticLoader";
 import { FieldLoader } from "@/components/FieldLoader";
 import dynamic from "next/dynamic";
 import { useSWRFetch } from "@/hooks/useSWRFetch";
-import { Skeleton } from "@/components/Skeleton";
 import { BarChart3, TrendingUp, Flame, ShieldCheck, ShieldAlert, AlertTriangle, BookOpen } from "lucide-react";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import clsx from "clsx";
