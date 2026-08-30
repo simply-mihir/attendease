@@ -281,20 +281,20 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
             <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80]">{today?.dayName}, {today?.date}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
-          <Link href="/settings/semesters" className="btn-3d-secondary flex items-center gap-2 px-4 py-2 text-sm font-bold">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto mt-2 sm:mt-0">
+          <Link href="/settings/semesters" className="btn-3d-secondary flex-1 sm:flex-none justify-center flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-bold">
             <Settings className="h-4 w-4" /> <span className="hidden sm:inline">Manage Semesters</span><span className="sm:hidden">Manage</span>
           </Link>
           {isCurrent && activeSemId && (
             <button
               onClick={() => setShowImportSubjects(true)}
-              className="btn-3d-gray flex items-center gap-2 px-4 py-2 text-sm font-bold cursor-pointer"
+              className="btn-3d-gray flex-1 sm:flex-none justify-center flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-bold cursor-pointer"
             >
-              <ArrowDown className="h-4 w-4" /> Import
+              <ArrowDown className="h-4 w-4 shrink-0" /> Import
             </button>
           )}
-          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-3d-primary flex items-center gap-2 px-4 py-2 text-sm font-bold">
-            <Plus className="h-4 w-4" /> <span className="hidden sm:inline">New Subject</span><span className="sm:hidden">Subject</span>
+          <Link href={`/subjects/new${semesterId ? `?semesterId=${semesterId}` : ""}`} className="btn-3d-primary flex-1 sm:flex-none justify-center flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-bold">
+            <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">New Subject</span><span className="sm:hidden">Subject</span>
           </Link>
         </div>
       </div>
