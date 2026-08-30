@@ -1,237 +1,196 @@
-# AttendEase — Smart Attendance Tracker
+# AttendEase - Enterprise-Grade Attendance Tracking System
 
-![AttendEase Banner](https://img.shields.io/badge/AttendEase-Smart_Tracker-FF2D78?style=for-the-badge&logo=next.js&logoColor=white)
+![AttendEase Banner](https://img.shields.io/badge/AttendEase-System_Architecture-06d6a0?style=for-the-badge&logo=next.js&logoColor=white)
 
-A production-ready, full-stack attendance tracking app for students with glassmorphic UI, Telegram reminders, push notifications, Google/GitHub OAuth, and real-time analytics.
+AttendEase is a highly scalable, production-ready attendance tracking application designed for academic and institutional environments. It leverages a modern technology stack to provide real-time analytics, automated notifications, and an intuitive user interface. 
 
 ---
 
-## 🏗 System Architecture
+## System Architecture
 
-The application follows a modern monolithic architecture using Next.js App Router, backed by PostgreSQL and Prisma ORM.
+The application is built on a monolithic Next.js App Router architecture, ensuring seamless server-side rendering, robust API route handling, and strict type safety across the stack.
 
 ```mermaid
 graph TD
-    %% Define Styles
-    classDef client fill:#FF2D78,stroke:#cc1a5e,stroke-width:2px,color:#fff
-    classDef server fill:#4361ee,stroke:#3451cc,stroke-width:2px,color:#fff
-    classDef db fill:#06d6a0,stroke:#05a87e,stroke-width:2px,color:#1a1a2e
-    classDef external fill:#ff6b35,stroke:#cc5529,stroke-width:2px,color:#fff
+    classDef client fill:#1f2937,stroke:#374151,stroke-width:2px,color:#f3f4f6
+    classDef server fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff
+    classDef db fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+    classDef external fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
 
-    %% Nodes
     Client[Client UI / PWA]:::client
     NextAPI[Next.js API Routes]:::server
     Cron[Vercel Cron Jobs]:::server
     Prisma[Prisma ORM]:::server
-    DB[(PostgreSQL / Neon)]:::db
+    DB[(PostgreSQL Database)]:::db
     
     Telegram[Telegram Bot API]:::external
     Resend[Resend Email API]:::external
-    WebPush[Web Push / VAPID]:::external
+    WebPush[Web Push Protocol]:::external
     OAuth[Google / GitHub OAuth]:::external
 
-    %% Connections
-    Client <-->|REST & SWR| NextAPI
-    Client <-->|NextAuth| OAuth
+    Client <-->|REST & SWR Data Fetching| NextAPI
+    Client <-->|NextAuth Integration| OAuth
     NextAPI <--> Prisma
-    Cron -->|Trigger| NextAPI
+    Cron -->|Trigger Scheduled Tasks| NextAPI
     Prisma <--> DB
-    NextAPI -->|Alerts| Telegram
-    NextAPI -->|Reports| Resend
-    NextAPI -->|Reminders| WebPush
+    NextAPI -->|Dispatch Alerts| Telegram
+    NextAPI -->|Dispatch Reports| Resend
+    NextAPI -->|Dispatch Push Notifications| WebPush
 ```
 
 ---
 
-## 🔄 User Workflow Flowchart
+## Core Features and Capabilities
 
-How a user interacts with AttendEase on a daily basis:
+### 1. Dashboard and Subject Management
+- **Centralized Dashboard**: A comprehensive daily overview displaying scheduled classes, immediate actionable modules (Quick Mark), statistical summaries, and dynamic danger alerts.
+- **Subject Administration**: Support for color-coded subject categorization, complex recurring schedules, and archival/restoration processes.
+- **Semester Management**: Multi-semester tracking, allowing users to transition between academic terms seamlessly while retaining historical data.
+
+### 2. Attendance Tracking and Analytics
+- **Precision Tracking**: Options to mark attendance states as Present, Absent, or Late. Features a robust audit log to track historical modifications.
+- **Statistical Analytics**: Interactive SVG-based data visualizations, including bar charts, pie charts, and a contribution-style heatmap spanning the academic year.
+- **Predictive Modeling (Simulator)**: A "what-if" computational engine that allows users to project the statistical impact of attending or missing future scheduled classes.
+- **Deficit Calculator**: Computes exact thresholds for maximum permissible absences or the required consecutive classes needed to recover from a deficit.
+
+### 3. Notification and Alerting Engine
+- **Telegram Integration**: Leverages the Telegram Bot API to deliver zero-cost, unlimited pre-class alerts, attendance danger warnings, and comprehensive weekly reports directly to the user's device.
+- **Email Dispatching**: Integrates with the Resend API to transmit clean, HTML-formatted daily briefings and weekly digests.
+- **Native Browser Push**: Utilizes the Web Push API (VAPID) to send native, OS-level notifications to desktop and mobile clients.
+
+### 4. User Interface and Experience
+- **Progressive Web Application (PWA)**: Fully installable on iOS and Android devices, supporting offline capabilities and aggressive caching via Service Workers.
+- **Design System**: Implements a sophisticated dark-mode glassmorphic aesthetic utilizing Tailwind CSS v4, featuring frosted glass panels, complex gradients, and hardware-accelerated micro-animations.
+
+---
+
+## User Workflow Diagram
+
+The following flowchart illustrates the primary user journey, from initial authentication through daily interaction and data analysis.
 
 ```mermaid
 flowchart TD
-    classDef start end fill:#1a1a2e,stroke:#4a4a5a,stroke-width:2px,color:#fff
-    classDef process fill:#4361ee,stroke:#3451cc,stroke-width:2px,color:#fff
-    classDef decision fill:#ff6b35,stroke:#cc5529,stroke-width:2px,color:#fff
+    classDef start end fill:#111827,stroke:#374151,stroke-width:2px,color:#ffffff
+    classDef process fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff
+    classDef decision fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
 
-    Start([Start]):::start --> Login[Sign in with OAuth]:::process
-    Login --> HasSem{Has Semester?}:::decision
+    Start([Application Entry]):::start --> Login[Authenticate via OAuth]:::process
+    Login --> HasSem{Active Semester Exists?}:::decision
     
-    HasSem -->|No| CreateSem[Create Semester]:::process
-    CreateSem --> AddSub[Add Subjects & Schedules]:::process
-    HasSem -->|Yes| Dash[View Dashboard]:::process
+    HasSem -->|False| CreateSem[Initialize Semester Profile]:::process
+    CreateSem --> AddSub[Register Subjects and Define Schedules]:::process
+    HasSem -->|True| Dash[Access Primary Dashboard]:::process
     AddSub --> Dash
     
-    Dash --> Mark{Class Today?}:::decision
-    Mark -->|Yes| QuickMark[Quick Mark Attendance]:::process
-    QuickMark --> Calc[Bunk Calculator & Stats Update]:::process
+    Dash --> Mark{Scheduled Class Today?}:::decision
+    Mark -->|True| QuickMark[Execute Quick Mark Action]:::process
+    QuickMark --> Calc[Recalculate Thresholds and Statistics]:::process
     Calc --> End([End Session]):::start
-    Mark -->|No| ViewAnalytics[View Analytics & Heatmap]:::process
+    Mark -->|False| ViewAnalytics[Review Analytics and Heatmaps]:::process
     ViewAnalytics --> End
 ```
 
 ---
 
-## 🔔 Background Notification Workflow
+## Background Task Architecture
 
-How background tasks and reminders are processed:
+The system utilizes serverless cron execution to handle asynchronous notification dispatching at scale.
 
 ```mermaid
 sequenceDiagram
-    participant Cron as Vercel Cron
-    participant API as Next.js API
-    participant DB as PostgreSQL
-    participant User as Telegram/Push
+    participant Cron as Serverless Cron
+    participant API as Core API Engine
+    participant DB as Relational Database
+    participant User as End-User Devices
 
-    loop Every 5 Minutes
-        Cron->>API: GET /api/cron/notifications
-        API->>DB: Fetch schedules starting in 15 mins
-        DB-->>API: Return upcoming classes
+    loop Rapid Polling (5-Minute Intervals)
+        Cron->>API: HTTP GET /api/cron/notifications
+        API->>DB: Query schedules executing within T-15 minutes
+        DB-->>API: Return schedule payload
         
-        alt Has upcoming classes
-            API->>DB: Check if already notified
-            API->>User: Send "Class starts soon!" Alert
-            API->>DB: Log notification sent
+        alt Payload contains actionable schedules
+            API->>DB: Validate historical notification dispatch records
+            API->>User: Transmit "Upcoming Class" payload via Telegram/Push
+            API->>DB: Insert dispatch record into audit log
         end
     end
 
-    loop Daily Morning (6 AM - 10 AM)
-        Cron->>API: GET /api/cron/notifications?type=daily
-        API->>DB: Fetch today's full schedule
-        API->>User: Send Daily Briefing (Classes + Status)
+    loop Daily Operations (Morning Batch)
+        Cron->>API: HTTP GET /api/cron/notifications?type=daily
+        API->>DB: Query aggregate daily schedule for active users
+        API->>User: Transmit Daily Briefing Report
     end
 ```
 
 ---
 
-## 🚀 Quick Start (Local Development)
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Set up environment
-cp .env.example .env
-# Fill in your DATABASE_URL, NEXTAUTH_SECRET, and OAuth credentials
-
-# 3. Generate Prisma client + push schema to database
-npx prisma generate
-npx prisma db push
-
-# 4. Seed demo data
-npx tsx prisma/seed.ts
-
-# 5. Start dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) — demo login: **demo@attendease.app** / **password123**
-
----
-
-## 🌍 Production Deployment (Vercel)
-
-### 1. Database — Neon PostgreSQL (free)
-1. Create account at [neon.tech](https://neon.tech)
-2. Create a project → copy the connection string
-3. Set `DATABASE_URL` in Vercel environment variables
-
-### 2. Google OAuth
-1. Go to [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials
-2. Create OAuth 2.0 Client ID (Web application)
-3. Add authorized redirect URI: `https://your-domain.vercel.app/api/auth/callback/google`
-4. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
-
-### 3. GitHub OAuth
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers) → OAuth Apps → New
-2. Set callback URL: `https://your-domain.vercel.app/api/auth/callback/github`
-3. Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
-
-### 4. Telegram Bot
-1. Message [@BotFather](https://t.me/BotFather) on Telegram → send `/newbot` → follow prompts to get token
-2. Set bot webhook:
-   ```bash
-   curl -F "url=https://your-app.vercel.app/api/v1/telegram/connect" https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook
-   ```
-3. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME` in Vercel environment variables
-
-### 5. Email Notifications (Resend)
-1. Create account at [resend.com](https://resend.com)
-2. Get API key from dashboard
-3. Set `RESEND_API_KEY` and `FROM_EMAIL` (e.g. `AttendEase <onboarding@resend.dev>`) in Vercel environment variables
-
-### 6. Push Notifications
-```bash
-npx web-push generate-vapid-keys
-```
-Set both `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_CONTACT_EMAIL`, and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (same as VAPID_PUBLIC_KEY)
-
-### 7. Deploy to Vercel
-```bash
-npm i -g vercel
-vercel
-```
-
-Set all environment variables in Vercel dashboard. The `vercel.json` configures cron jobs for:
-- Pre-class reminders (every 5 min)
-- Daily morning brief (6-10 AM, Mon-Sat)
-- Weekly report (Sunday 10 AM)
-
----
-
-## 🛠 Required Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Random 32+ char string |
-| `NEXTAUTH_URL` | Your app URL |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth secret |
-| `GITHUB_CLIENT_ID` | GitHub OAuth client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth secret |
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token from BotFather |
-| `TELEGRAM_BOT_USERNAME` | Telegram bot username |
-| `RESEND_API_KEY` | Resend API key |
-| `FROM_EMAIL` | Sender email address |
-| `VAPID_PUBLIC_KEY` | Web Push public key |
-| `VAPID_PRIVATE_KEY` | Web Push private key |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Same as VAPID_PUBLIC_KEY |
-| `CRON_SECRET` | Secret for cron job auth |
-
----
-
-## ✨ Features
-
-- **Dashboard** — Today's classes with quick mark, stats cards, danger alerts
-- **Subject Management** — Color-coded subjects, schedules, archive/restore
-- **Attendance Tracking** — Present/absent/late, bulk marking, audit log
-- **Bunk Calculator** — How many classes you can skip or need to recover
-- **Analytics** — Custom SVG bar/pie charts, GitHub-style heatmap
-- **What-If Simulator** — See impact of skipping/attending classes
-- **Calendar** — Week and month views with status dots
-- **Telegram Reminders** — Free, unlimited pre-class alerts, danger warnings, daily briefs & weekly reports
-- **Email Notifications** — Clean HTML email reports via Resend
-- **Push Notifications** — Browser push via Web Push API
-- **Google/GitHub OAuth** — One-click social login
-- **Semester Management** — Multiple semesters with switch
-- **Gamification** — Streaks, progress bars, and shimmer animations
-- **PWA** — Installable mobile app, offline support
-- **Glassmorphic UI** — State-of-the-art dark theme with frosted glass, vibrant gradients, and CSS micro-animations
-
----
-
-## 💻 Tech Stack
+## Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | Next.js 14 (App Router) + TypeScript |
-| **Database** | PostgreSQL via Prisma ORM |
-| **Auth** | NextAuth.js (Google, GitHub, Credentials) |
-| **Styling** | Tailwind CSS v4, Glassmorphism, Micro-animations |
-| **Integrations**| Telegram Bot API, Resend Email API, Web Push (VAPID) |
-| **Deployment** | Vercel (with Serverless Cron Jobs) |
+| **Application Framework** | Next.js 14 (App Router) + TypeScript |
+| **Database** | PostgreSQL |
+| **ORM** | Prisma |
+| **Authentication** | NextAuth.js (Google, GitHub, Credentials) |
+| **Styling Engine** | Tailwind CSS v4 |
+| **External APIs**| Telegram Bot API, Resend Email API, Web Push (VAPID) |
+| **Infrastructure** | Vercel (Hosting, Edge Functions, Cron Jobs) |
 
 ---
 
-## 📜 License
-MIT License
+## Infrastructure Deployment
+
+### Environment Variables Requirement Matrix
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Fully qualified PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Cryptographically secure 32+ character string |
+| `NEXTAUTH_URL` | Canonical application URL |
+| `GOOGLE_CLIENT_ID` | OAuth Client ID from Google Cloud Console |
+| `GOOGLE_CLIENT_SECRET` | OAuth Client Secret from Google Cloud Console |
+| `GITHUB_CLIENT_ID` | OAuth Client ID from GitHub Developer Settings |
+| `GITHUB_CLIENT_SECRET` | OAuth Client Secret from GitHub Developer Settings |
+| `TELEGRAM_BOT_TOKEN` | Bot authorization token generated via BotFather |
+| `TELEGRAM_BOT_USERNAME` | Registered Telegram bot handle |
+| `RESEND_API_KEY` | API Key generated from Resend Dashboard |
+| `FROM_EMAIL` | Verified sender email address |
+| `VAPID_PUBLIC_KEY` | Public key for Web Push Protocol generation |
+| `VAPID_PRIVATE_KEY` | Private key for Web Push Protocol generation |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Client-exposed Web Push public key |
+| `CRON_SECRET` | Shared secret for cron job authentication |
+
+### Local Development Initialization
+
+```bash
+# 1. Resolve package dependencies
+npm install
+
+# 2. Provision environment configuration
+cp .env.example .env
+# Ensure all variables defined in the matrix above are properly populated
+
+# 3. Synchronize database schema and generate ORM client
+npx prisma generate
+npx prisma db push
+
+# 4. Populate database with local testing fixtures
+npx tsx prisma/seed.ts
+
+# 5. Initialize local development server
+npm run dev
+```
+
+The application will bind to port 3000. 
+
+---
+
+## License
+
+**Copyright (c) 2026. All Rights Reserved.**
+
+This software and associated documentation files (the "Software") are proprietary and confidential. 
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is **strictly prohibited** without prior written permission from the repository owner. 
+
+Any person or organization wishing to make changes, fork, deploy, or publish this software must obtain explicit, written authorization from the copyright holder.
