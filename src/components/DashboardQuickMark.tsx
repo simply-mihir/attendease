@@ -124,8 +124,8 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
           <p className="text-xs font-semibold text-text-muted">Record your status for any subject's session</p>
         </div>
       </div>
-      <div className="flex gap-4 items-end flex-wrap sm:flex-nowrap">
-        <div className="flex-1 min-w-[140px] w-full">
+      <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end">
+        <div className="flex-1 w-full lg:min-w-[140px]">
           <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject</label>
           <select
             value={markSubjectId}
@@ -138,7 +138,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
             ))}
           </select>
         </div>
-        <div className="flex-1 min-w-[140px] w-full">
+        <div className="flex-1 w-full lg:min-w-[140px]">
           <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
           <input
             type="date"
@@ -148,7 +148,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
           />
         </div>
         {markSubjectId && (
-          <div className="flex-1 min-w-[140px] w-full">
+          <div className="flex-1 w-full lg:min-w-[140px]">
             <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Slot</label>
             <select
               value={markScheduleId}
@@ -171,7 +171,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
             </select>
           </div>
         )}
-        <div className="flex-1 min-w-[140px] w-full">
+        <div className="flex-1 w-full lg:min-w-[140px]">
           <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Status</label>
           <select
             value={markStatus}
