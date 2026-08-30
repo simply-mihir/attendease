@@ -70,7 +70,7 @@ The following flowchart illustrates the primary user journey, from initial authe
 
 ```mermaid
 flowchart TD
-    classDef start end fill:#111827,stroke:#374151,stroke-width:2px,color:#ffffff
+    classDef start fill:#111827,stroke:#374151,stroke-width:2px,color:#ffffff
     classDef process fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff
     classDef decision fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
 
