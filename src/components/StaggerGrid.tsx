@@ -30,6 +30,7 @@ export function StaggerGrid({
       {childArray.map((child, index) => (
         <div
           key={index}
+          className="min-w-0"
           style={{
             opacity: 0,
             animation: mounted
