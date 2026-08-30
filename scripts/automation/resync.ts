@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { recalcSubjectStats } from "./src/lib/subject-stats";
+import { recalcSubjectStats } from "../../src/lib/subject-stats";
 
 const prisma = new PrismaClient();
 

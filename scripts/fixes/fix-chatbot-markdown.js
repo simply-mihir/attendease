@@ -1,5 +1,5 @@
 const fs = require('fs');
-const file = './src/lib/chatbot.ts';
+const file = '../../src/lib/chatbot.ts';
 let code = fs.readFileSync(file, 'utf8');
 
 // Replace all asterisks used for bolding in template literals inside formatFallback

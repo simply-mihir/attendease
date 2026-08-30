@@ -1,6 +1,6 @@
 require('dotenv').config();
-import { processChatbotMessage } from './src/lib/chatbot';
-import { prisma } from './src/lib/db';
+import { processChatbotMessage } from '../../src/lib/chatbot';
+import { prisma } from '../../src/lib/db';
 
 async function run() {
   // Try to find a user
