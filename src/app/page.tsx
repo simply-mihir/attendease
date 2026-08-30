@@ -14,7 +14,7 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#fdfbf7] dark:bg-[#0b0b14] text-[#1a1a2e] dark:text-white">
+    <div className="min-h-[100dvh] flex flex-col bg-[#fdfbf7] dark:bg-[#0b0b14] text-[#1a1a2e] dark:text-white">
       {/* Floating orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-[#7b2cbf]/10 rounded-full blur-3xl" />

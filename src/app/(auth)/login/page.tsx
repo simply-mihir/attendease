@@ -39,7 +39,7 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
+    <main className="min-h-[100dvh] flex items-center justify-center p-4">
       
       {/* === DECORATIVE OVERLAYS (orbitals + particles) === */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">

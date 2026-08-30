@@ -149,7 +149,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     )}
     <NavigationProgress />
     <SWRPrefetcher />
-    <div className="flex min-h-screen flex-col relative z-0">
+    <div className="flex min-h-[100dvh] flex-col relative z-0">
       {/* Vibrant scattered bubbles — covers all pages automatically */}
       <VibrantBackground />
       <OnboardingModal />
@@ -173,12 +173,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ===== BODY: SIDEBAR + MAIN ===== */}
       <div 
-        className="flex flex-1 relative"
+        className="flex flex-1 relative min-w-0"
         style={{ '--sidebar-width': sidebarCollapsed ? '88px' : '260px' } as any}
       >
         {/* Sidebar */}
         <aside className={clsx(
-          "hidden md:flex flex-col transition-all duration-300 ease-in-out sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto",
+          "hidden md:flex flex-col transition-all duration-300 ease-in-out sticky top-16 h-[calc(100dvh-4rem)] overflow-y-auto",
           "bg-gray-50/95 border-r-2 border-gray-200 dark:bg-[#070b14]/95 dark:border-[#2a2a3d] backdrop-blur-sm shrink-0 z-40",
           sidebarCollapsed ? "w-[88px]" : "w-[260px]"
         )}>
@@ -270,7 +270,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto bg-transparent relative">
+        <main className="flex-1 min-w-0 overflow-y-auto bg-transparent relative">
           <div className="p-4 sm:p-6 lg:p-8 min-h-full pb-28 lg:pb-24">
             <ReminderNotifier />
             <div key={pathname} className="animate-fade-in">
