@@ -54,15 +54,15 @@ export default function SubjectsPage() {
 
   return (
     <PageTransition direction="left" staggerChildren={false} className="space-y-6">
-      <div className="flex items-center justify-between" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ opacity: 0, animation: "fadeSlideLeft 0.5s ease-out 0ms forwards" }}>
         <h1 className="text-2xl sm:text-3xl font-black text-text tracking-tight">Subjects</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button onClick={() => setShowArchived(!showArchived)}
-            className="btn-3d-secondary px-3.5 py-2 text-sm font-bold cursor-pointer">
+            className="flex-1 sm:flex-none btn-3d-secondary px-3.5 py-2 text-sm font-bold cursor-pointer whitespace-nowrap">
             {showArchived ? "Show Active" : "Show Archived"}
           </button>
-          <Link href="/subjects/new" className="btn-3d-primary flex items-center gap-2 px-4 py-2 text-sm font-black">
-            <Plus className="w-4 h-4" /> Add Subject
+          <Link href="/subjects/new" className="flex-1 sm:flex-none btn-3d-primary flex items-center justify-center gap-2 px-4 py-2 text-sm font-black whitespace-nowrap">
+            <Plus className="w-4 h-4 shrink-0" /> <span className="hidden sm:inline">Add Subject</span><span className="sm:hidden">Add</span>
           </Link>
         </div>
       </div>
