@@ -28,10 +28,14 @@
     <img src="https://img.shields.io/badge/Telegram_API-2CA5E0?style=flat-square&logo=telegram&logoColor=white" alt="Telegram">
     <img src="https://img.shields.io/badge/Resend-000000?style=flat-square&logo=maildotru&logoColor=white" alt="Resend">
     <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel">
+    <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js">
+    <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
     <img src="https://img.shields.io/badge/Web_Push_API-5A0FC8?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Push">
     <img src="https://img.shields.io/badge/OpenRouter_AI-000000?style=flat-square&logo=openai&logoColor=white" alt="OpenRouter">
     <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod">
     <img src="https://img.shields.io/badge/SWR-000000?style=flat-square&logo=vercel&logoColor=white" alt="SWR">
+    <img src="https://img.shields.io/badge/SheetJS-00A651?style=flat-square&logo=microsoftexcel&logoColor=white" alt="SheetJS">
+    <img src="https://img.shields.io/badge/Lucide_Icons-F28B82?style=flat-square&logo=lucide&logoColor=white" alt="Lucide">
   </p>
 </div>
 
