@@ -26,6 +26,7 @@
     <img src="https://img.shields.io/badge/Resend-000000?style=flat-square&logo=maildotru&logoColor=white" alt="Resend">
     <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel">
     <img src="https://img.shields.io/badge/Web_Push_API-5A0FC8?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Push">
+    <img src="https://img.shields.io/badge/OpenRouter_AI-000000?style=flat-square&logo=openai&logoColor=white" alt="OpenRouter">
   </p>
 </div>
 
@@ -64,6 +65,7 @@ The service is highly scalable, fully containerized, and surfaces a sophisticate
 -  **Subject Administration** — Support for color-coded subject categorization, complex recurring schedules, and archival/restoration processes.
 -  **Semester Management** — Multi-semester tracking, allowing users to transition between academic terms seamlessly while retaining historical data.
 -  **Precision Tracking** — Options to mark attendance states as Present, Absent, or Late, paired with a robust audit log to track historical modifications.
+-  **AI Chatbot Assistant** — Integrated NLP-driven chatbot allowing natural language operations (e.g., "mark all present", "cancel my 9 AM class") powered by LLM models via OpenRouter.
 
 ### Engineering depth
 -  **Predictive Modeling (Simulator)** — A "what-if" computational engine that allows users to project the statistical impact of attending or missing future scheduled classes.
