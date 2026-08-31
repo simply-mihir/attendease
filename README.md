@@ -8,7 +8,7 @@
       <img src="https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo">
     </a>
     <a href="https://github.com/simply-mihir/attendease/releases">
-      <img src="https://img.shields.io/badge/Latest_Release-v1.0.0-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Latest Release">
+      <img src="https://img.shields.io/badge/Latest_Release-v1.1.0-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Latest Release">
     </a>
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/License-Restricted-red?style=for-the-badge" alt="License">
