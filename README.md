@@ -32,6 +32,8 @@
     <img src="https://img.shields.io/badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white" alt="PWA">
     <img src="https://img.shields.io/badge/Web_Push_API-5A0FC8?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Push">
     <img src="https://img.shields.io/badge/OpenRouter_AI-000000?style=flat-square&logo=openai&logoColor=white" alt="OpenRouter">
+    <img src="https://img.shields.io/badge/Google_Gemini-8E75B2?style=flat-square&logo=googlebard&logoColor=white" alt="Gemini">
+    <img src="https://img.shields.io/badge/Vercel_Cron-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel Cron">
     <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod">
     <img src="https://img.shields.io/badge/SWR-000000?style=flat-square&logo=vercel&logoColor=white" alt="SWR">
     <img src="https://img.shields.io/badge/SheetJS-00A651?style=flat-square&logo=microsoftexcel&logoColor=white" alt="SheetJS">
