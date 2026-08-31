@@ -69,6 +69,8 @@ The service is highly scalable, fully containerized, and surfaces a sophisticate
 -  **Centralized Dashboard** — A comprehensive daily overview displaying scheduled classes and immediate actionable modules (Quick Mark).
 -  **Subject Administration** — Support for color-coded subject categorization, complex recurring schedules, and archival/restoration processes.
 -  **Semester Management** — Multi-semester tracking, allowing users to transition between academic terms seamlessly while retaining historical data.
+-  **Social Study Groups** — Create and join friend groups via unique codes to track and compare attendance statistics collaboratively.
+-  **Academic Reminders** — Comprehensive tracking for assignments, exams, and extra classes with priority levels and multi-channel notifications.
 -  **Precision Tracking** — Options to mark attendance states as Present, Absent, or Late, paired with a robust audit log to track historical modifications.
 -  **Interactive Calendar** — Dedicated week and month views with color-coded status dots for at-a-glance historical attendance tracking.
 -  **Data Import Engine** — Seamlessly import academic schedules and attendance history from Excel (`.xlsx`) or CSV files directly into the database.
