@@ -27,6 +27,8 @@
     <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel">
     <img src="https://img.shields.io/badge/Web_Push_API-5A0FC8?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Push">
     <img src="https://img.shields.io/badge/OpenRouter_AI-000000?style=flat-square&logo=openai&logoColor=white" alt="OpenRouter">
+    <img src="https://img.shields.io/badge/Zod-3E67B1?style=flat-square&logo=zod&logoColor=white" alt="Zod">
+    <img src="https://img.shields.io/badge/SWR-000000?style=flat-square&logo=vercel&logoColor=white" alt="SWR">
   </p>
 </div>
 
@@ -65,6 +67,9 @@ The service is highly scalable, fully containerized, and surfaces a sophisticate
 -  **Subject Administration** — Support for color-coded subject categorization, complex recurring schedules, and archival/restoration processes.
 -  **Semester Management** — Multi-semester tracking, allowing users to transition between academic terms seamlessly while retaining historical data.
 -  **Precision Tracking** — Options to mark attendance states as Present, Absent, or Late, paired with a robust audit log to track historical modifications.
+-  **Interactive Calendar** — Dedicated week and month views with color-coded status dots for at-a-glance historical attendance tracking.
+-  **Data Import Engine** — Seamlessly import academic schedules and attendance history from Excel (`.xlsx`) or CSV files directly into the database.
+-  **Gamification System** — Tracks attendance streaks, renders dynamic progress bars, and uses shimmer animations to encourage consistent attendance.
 -  **AI Chatbot Assistant** — Integrated NLP-driven chatbot allowing natural language operations (e.g., "mark all present", "cancel my 9 AM class") powered by LLM models via OpenRouter.
 
 ### Engineering depth
