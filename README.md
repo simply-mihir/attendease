@@ -17,7 +17,7 @@
     <img src="https://img.shields.io/badge/React-18-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React">
     <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
     <img src="https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
-    <img src="https://img.shields.io/badge/Neon-00E599?style=flat-square&logo=neon&logoColor=black" alt="Neon">
+    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase">
     <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma">
     <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind">
     <img src="https://img.shields.io/badge/NextAuth.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextAuth">
@@ -317,7 +317,7 @@ Define the following within your `.env` file:
 
 Deploying AttendEase requires provisioning PostgreSQL and configuring Vercel.
 
-1. **Database Provisioning**: Instantiate a PostgreSQL database (e.g., Neon, Supabase). Obtain the connection string and assign it to `DATABASE_URL`.
+1. **Database Provisioning**: Instantiate a PostgreSQL database on Supabase. Obtain the connection string and assign it to `DATABASE_URL`.
 2. **Push Protocol Keys**: Generate VAPID keys for browser notifications:
    ```bash
    npx web-push generate-vapid-keys
