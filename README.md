@@ -25,6 +25,7 @@
     <img src="https://img.shields.io/badge/Telegram_API-2CA5E0?style=flat-square&logo=telegram&logoColor=white" alt="Telegram">
     <img src="https://img.shields.io/badge/Resend-000000?style=flat-square&logo=maildotru&logoColor=white" alt="Resend">
     <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel">
+    <img src="https://img.shields.io/badge/Web_Push_API-5A0FC8?style=flat-square&logo=googlechrome&logoColor=white" alt="Web Push">
   </p>
 </div>
 
