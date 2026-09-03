@@ -112,9 +112,10 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
 
   return (
     <div
-      className="relative overflow-hidden p-6 sm:p-7 mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-600/10 dark:from-emerald-500/15 dark:to-teal-600/15 backdrop-blur-xl border-2 border-emerald-500/20 dark:border-emerald-500/20 shadow-[0_6px_0_0_#10B9811A]"
+      className="relative overflow-hidden p-6 sm:p-7 mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-teal-600/25 dark:from-emerald-500/30 dark:to-teal-600/30 backdrop-blur-xl border border-emerald-500/40 dark:border-emerald-500/30 shadow-[0_8px_32px_0_rgba(16,185,129,0.2)]"
       style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}
     >
+      <div className="absolute inset-0 bg-white/40 dark:bg-[#141425]/40 pointer-events-none mix-blend-overlay"></div>
       <div className="flex items-center gap-3 mb-5 relative z-10">
         <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm backdrop-blur-md">
           <CheckCircle2 className="w-5 h-5" />

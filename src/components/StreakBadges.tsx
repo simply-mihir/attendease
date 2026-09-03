@@ -16,7 +16,8 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
   const nextProgress = getBadgeProgress(streak, longestStreak);
 
   return (
-    <div className="relative overflow-hidden p-5 transition-all duration-150 rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-600/10 dark:from-orange-500/15 dark:to-red-600/15 backdrop-blur-xl border-2 border-orange-500/20 dark:border-orange-500/20 shadow-[0_6px_0_0_#f973161A]">
+    <div className="relative overflow-hidden p-5 transition-all duration-150 rounded-2xl bg-gradient-to-br from-orange-500/25 to-red-600/25 dark:from-orange-500/30 dark:to-red-600/30 backdrop-blur-xl border border-orange-500/40 dark:border-orange-500/30 shadow-[0_8px_32px_0_rgba(249,115,22,0.2)]">
+      <div className="absolute inset-0 bg-white/40 dark:bg-[#141425]/40 pointer-events-none mix-blend-overlay"></div>
       
       {/* Section header */}
       <div className="relative z-10 flex items-center justify-between mb-4">
