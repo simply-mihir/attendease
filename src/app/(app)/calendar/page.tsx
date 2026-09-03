@@ -45,10 +45,12 @@ export default function CalendarPage() {
   const { data: schedData, isLoading: schedLoading } = useSWRFetch<{ schedules: any[] }>("/schedules");
   const { data: overData, isLoading: overLoading } = useSWRFetch<{ overrides: any[] }>(`/schedule-override?startDate=${from}&endDate=${to}`);
   const { data: recData, isLoading: recLoading } = useSWRFetch<{ records: any[] }>(`/attendance?from=${from}&to=${to}`);
+  const { data: dashData } = useSWRFetch<any>("/dashboard");
 
   const schedules = schedData?.schedules || [];
   const overrides = overData?.overrides || [];
   const records = recData?.records || [];
+  const examPeriods = dashData?.examPeriods || [];
   const pageLoading = schedLoading || recLoading || overLoading;
 
 
@@ -191,11 +193,38 @@ export default function CalendarPage() {
                     <div className="py-8 flex justify-center">
                       <FieldLoader size="md" />
                     </div>
-                  ) : dayClasses.length === 0 ? (
-                    <div className="py-6 text-center">
-                      <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
-                    </div>
-                  ) : dayClasses.map((cls: any) => {
+                  ) : (() => {
+                      // Check for exams
+                      const currentExam = examPeriods.find((ep: any) => {
+                        if (!ep.startDate || !ep.endDate) return false;
+                        const startStr = ep.startDate.split('T')[0];
+                        const endStr = ep.endDate.split('T')[0];
+                        const [sYear, sMonth, sDate] = startStr.split('-').map(Number);
+                        const [eYear, eMonth, eDate] = endStr.split('-').map(Number);
+                        const localStart = new Date(sYear, sMonth - 1, sDate);
+                        const localEnd = new Date(eYear, eMonth - 1, eDate);
+                        const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                        return checkDate >= localStart && checkDate <= localEnd;
+                      });
+
+                      if (currentExam) {
+                        const examName = currentExam.name.toLowerCase().includes('exam') ? currentExam.name : `${currentExam.name} Examination`;
+                        return (
+                          <div className="py-6 text-center px-2">
+                            <div className="mx-auto w-10 h-10 rounded-full bg-[#9b5de5]/20 flex items-center justify-center mb-2">
+                               <Timer className="w-5 h-5 text-[#9b5de5]" />
+                            </div>
+                            <p className="text-xs font-bold text-[#1a1a2e] dark:text-white leading-tight">{examName}</p>
+                            <p className="text-[10px] text-[#9b5de5] font-semibold mt-1">No Regular Classes</p>
+                          </div>
+                        );
+                      }
+
+                      return dayClasses.length === 0 ? (
+                        <div className="py-6 text-center">
+                          <p className="text-xs font-bold text-[#9ca3af] dark:text-[#6b6b80]">No classes</p>
+                        </div>
+                      ) : dayClasses.map((cls: any) => {
                     const rec = dayRecords.find((r: any) => r.subjectId === cls.subjectId);
                     let color = cls.subject?.colorHex || cls.colorHex;
                     const currentSubjectId = cls.subject?.id || cls.subjectId || null;
@@ -274,8 +303,18 @@ export default function CalendarPage() {
                         </div>
                       </div>
                     );
-                  })}
-                  {dayClasses.length === 0 && !pageLoading && <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] text-center mt-6">No classes</p>}
+                  })})()}
+                  {dayClasses.length === 0 && !pageLoading && !examPeriods.find((ep: any) => {
+                        if (!ep.startDate || !ep.endDate) return false;
+                        const startStr = ep.startDate.split('T')[0];
+                        const endStr = ep.endDate.split('T')[0];
+                        const [sYear, sMonth, sDate] = startStr.split('-').map(Number);
+                        const [eYear, eMonth, eDate] = endStr.split('-').map(Number);
+                        const localStart = new Date(sYear, sMonth - 1, sDate);
+                        const localEnd = new Date(eYear, eMonth - 1, eDate);
+                        const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                        return checkDate >= localStart && checkDate <= localEnd;
+                  }) && <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80] text-center mt-6">No classes</p>}
                 </div>
               </div>
             );
@@ -294,13 +333,28 @@ export default function CalendarPage() {
               const dayClasses = getClassesForDay(date, schedules, overrides);
               const dayRecords = recordMap.get(dateStr) || [];
               const today = isToday(date);
+              
+              const currentExam = examPeriods.find((ep: any) => {
+                if (!ep.startDate || !ep.endDate) return false;
+                const startStr = ep.startDate.split('T')[0];
+                const endStr = ep.endDate.split('T')[0];
+                const [sYear, sMonth, sDate] = startStr.split('-').map(Number);
+                const [eYear, eMonth, eDate] = endStr.split('-').map(Number);
+                const localStart = new Date(sYear, sMonth - 1, sDate);
+                const localEnd = new Date(eYear, eMonth - 1, eDate);
+                const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                return checkDate >= localStart && checkDate <= localEnd;
+              });
+
               return (
                 <div key={i} className={clsx("group relative p-2 rounded-xl text-center min-h-[64px] border-2 transition cursor-pointer",
                   today
                     ? "bg-[#FF2D78]/10 border-[#FF2D78] shadow-[0_3px_0_0_#FF2D78]"
+                    : currentExam
+                    ? "bg-[#9b5de5]/10 border-[#9b5de5]/40 shadow-[0_3px_0_0_rgba(155,93,229,0.3)] hover:border-[#9b5de5]/60"
                     : "bg-gray-50 dark:bg-[#0d0d1a] border-gray-200 dark:border-[#2a2a3d]/50 hover:border-gray-400 dark:hover:border-gray-600"
                 )}>
-                  <p className={today ? "text-[#FF2D78] font-extrabold text-sm" : "text-[#1a1a2e] dark:text-white font-bold text-sm"}>{date.getDate()}</p>
+                  <p className={today ? "text-[#FF2D78] font-extrabold text-sm" : currentExam ? "text-[#9b5de5] font-extrabold text-sm" : "text-[#1a1a2e] dark:text-white font-bold text-sm"}>{date.getDate()}</p>
                   {pageLoading ? (
                     <div className="flex justify-center mt-2">
                       <FieldLoader size="sm" />
@@ -315,13 +369,23 @@ export default function CalendarPage() {
                   )}
 
                   {/* Tooltip */}
-                  {dayClasses.length > 0 && !pageLoading && (
+                  {(dayClasses.length > 0 || currentExam) && !pageLoading && (
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-3 rounded-xl bg-white dark:bg-[#141425] border-2 border-gray-200 dark:border-[#2a2a3d] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.3)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] scale-95 group-hover:scale-100 pointer-events-none">
                       <p className="text-[10px] font-black uppercase tracking-widest text-[#9ca3af] dark:text-[#6b6b80] mb-2 border-b-2 border-gray-100 dark:border-[#2a2a3d] pb-1.5">
                         {date.toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                       </p>
                       <div className="space-y-2 text-left max-h-[150px] overflow-y-auto scrollbar-none">
-                        {dayClasses.map((cls: any, ci: number) => {
+                        {currentExam ? (
+                          <div className="flex items-start gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 shadow-sm bg-[#9b5de5]" />
+                             <div>
+                               <p className="text-xs font-bold text-[#1a1a2e] dark:text-white leading-tight">
+                                 {currentExam.name.toLowerCase().includes('exam') ? currentExam.name : `${currentExam.name} Examination`}
+                               </p>
+                               <p className="text-[10px] font-semibold text-[#9b5de5] mt-0.5">No Regular Classes</p>
+                             </div>
+                           </div>
+                        ) : dayClasses.map((cls: any, ci: number) => {
                            const color = cls.subject?.colorHex || cls.colorHex || '#FF2D78';
                            return (
                              <div key={ci} className="flex items-start gap-2">

@@ -241,7 +241,18 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
     return hDate.getFullYear() === todayStart.getFullYear() && hDate.getMonth() === todayStart.getMonth() && hDate.getDate() === todayStart.getDate();
   });
   const currentExam = activeSemester?.examPeriods?.find(ep => {
-    return todayStart >= new Date(ep.startDate) && todayStart <= new Date(ep.endDate);
+    if (!ep.startDate || !ep.endDate) return false;
+    // Extract YYYY-MM-DD from ISO string to prevent timezone offset issues
+    const startStr = ep.startDate.split('T')[0];
+    const endStr = ep.endDate.split('T')[0];
+    
+    const [sYear, sMonth, sDate] = startStr.split('-').map(Number);
+    const [eYear, eMonth, eDate] = endStr.split('-').map(Number);
+    
+    const localStart = new Date(sYear, sMonth - 1, sDate);
+    const localEnd = new Date(eYear, eMonth - 1, eDate);
+    
+    return todayStart >= localStart && todayStart <= localEnd;
   });
 
   // Show full loading animation until real data arrives — never render 0% defaults

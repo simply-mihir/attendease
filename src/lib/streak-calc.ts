@@ -9,7 +9,7 @@ export async function calcOverallStreak(userId: string): Promise<number> {
   lookbackDate.setDate(lookbackDate.getDate() - 365);
 
   // 1. Fetch attendance records, exceptions, and exams within lookback window
-  const [allRecords, exceptions, exams] = await Promise.all([
+  const [allRecords, exceptions, reminderExams, examPeriods] = await Promise.all([
     prisma.attendanceRecord.findMany({
       where: { userId, date: { gte: lookbackDate } },
       select: { date: true, status: true },
@@ -23,10 +23,23 @@ export async function calcOverallStreak(userId: string): Promise<number> {
       where: { userId, category: "exam", dueDate: { gte: lookbackDate }, isCompleted: false },
       select: { dueDate: true },
     }),
+    prisma.examPeriod.findMany({
+      where: { semester: { userId } },
+      select: { startDate: true, endDate: true },
+    }),
   ]);
 
   const exceptionDates = new Set(exceptions.map((e) => e.date.toISOString().slice(0, 10)));
-  const examDates = new Set(exams.map((e) => e.dueDate.toISOString().slice(0, 10)));
+  const examDates = new Set(reminderExams.map((e) => e.dueDate.toISOString().slice(0, 10)));
+  
+  for (const ep of examPeriods) {
+    let current = new Date(ep.startDate);
+    const end = new Date(ep.endDate);
+    while (current <= end) {
+      examDates.add(current.toISOString().slice(0, 10));
+      current.setDate(current.getDate() + 1);
+    }
+  }
 
   // Group records by YYYY-MM-DD
   const recordsByDate = new Map<string, { hasAbsent: boolean; hasPresent: boolean; allCancelledOrHoliday: boolean }>();

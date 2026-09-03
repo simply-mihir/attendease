@@ -16,14 +16,24 @@ export async function GET(req: NextRequest) {
   const yearStart = new Date(`${year}-01-01T00:00:00Z`);
   const yearEnd = new Date(`${year + 1}-01-01T00:00:00Z`);
 
-  const records = await prisma.attendanceRecord.findMany({
-    where: {
-      userId: user.id,
-      date: { gte: yearStart, lt: yearEnd },
-    },
-    select: { date: true, status: true, subject: { select: { name: true } } },
-    orderBy: { date: "asc" },
-  });
+  const [records, examPeriods] = await Promise.all([
+    prisma.attendanceRecord.findMany({
+      where: {
+        userId: user.id,
+        date: { gte: yearStart, lt: yearEnd },
+      },
+      select: { date: true, status: true, subject: { select: { name: true } } },
+      orderBy: { date: "asc" },
+    }),
+    prisma.examPeriod.findMany({
+      where: {
+        semester: { userId: user.id },
+        startDate: { lt: yearEnd },
+        endDate: { gte: yearStart },
+      },
+      select: { name: true, startDate: true, endDate: true },
+    })
+  ]);
 
   // Group by date
   type DayStats = {
@@ -50,6 +60,32 @@ export async function GET(req: NextRequest) {
     else if (r.status === "late") entry.late.push(subjectName);
     else if (r.status === "excused") entry.excused.push(subjectName);
     else if (r.status === "cancelled" || r.status === "holiday") entry.cancelled.push(subjectName);
+  }
+
+  // Inject Exam Periods into the heatmap as fully "present" days to mark the streak
+  for (const ep of examPeriods) {
+    let current = new Date(ep.startDate);
+    const end = new Date(ep.endDate);
+    const examName = ep.name.toLowerCase().includes('exam') ? ep.name : `${ep.name} Examination`;
+    
+    while (current <= end) {
+      if (current >= yearStart && current < yearEnd) {
+        const dateStr = current.toISOString().slice(0, 10);
+        if (!byDate.has(dateStr)) {
+          byDate.set(dateStr, { present: [], absent: [], late: [], excused: [], cancelled: [], total: 0 });
+        }
+        const entry = byDate.get(dateStr)!;
+        
+        // Count as 1 present class to light up the heatmap
+        if (entry.total === 0) {
+           entry.total = 1;
+        } else {
+           entry.total++;
+        }
+        entry.present.push(examName);
+      }
+      current.setDate(current.getDate() + 1);
+    }
   }
 
   const data = Array.from(byDate.entries()).map(([date, stats]) => {
