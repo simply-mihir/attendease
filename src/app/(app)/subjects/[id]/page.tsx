@@ -73,7 +73,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [addReminderForExtraClass, setAddReminderForExtraClass] = useState(true);
 
   // Subject Reminders State
-  const { data: subjectRemindersData } = useSWRFetch<any>(`/reminders?subjectId=${id}`);
+  const { data: subjectRemindersData } = useSWRFetch<any>(subject ? `/reminders?subjectId=${subject.id}` : null);
   const subjectReminders = subjectRemindersData?.reminders || [];
 
   const [showSubjectReminderModal, setShowSubjectReminderModal] = useState(false);
@@ -133,7 +133,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           notifyTelegram: true,
         }),
       });
-      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate(`/reminders?subjectId=${subject.id}`);
       await invalidate("/reminders");
       setCourseExamDate("");
       setCourseExamTime("10:00");
@@ -411,7 +411,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
             description: extraClassForm.room ? `Room: ${extraClassForm.room}` : undefined,
           }),
         });
-        await invalidate(`/reminders?subjectId=${id}`);
+        await invalidate(`/reminders?subjectId=${subject.id}`);
         await invalidate("/reminders");
       }
 
@@ -460,7 +460,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         notifyEmail: false,
         notifyTelegram: false,
       });
-      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate(`/reminders?subjectId=${subject.id}`);
       await invalidate("/reminders");
     } catch (err) {
       console.error(err);
@@ -475,7 +475,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
         method: "PUT",
         body: JSON.stringify({ isCompleted: !currentStatus }),
       });
-      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate(`/reminders?subjectId=${subject.id}`);
       await invalidate("/reminders");
     } catch (err) { console.error(err); }
   }
@@ -484,7 +484,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
     if (!confirm("Delete reminder?")) return;
     try {
       await apiFetch(`/reminders/${reminderId}`, { method: "DELETE" });
-      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate(`/reminders?subjectId=${subject.id}`);
       await invalidate("/reminders");
     } catch (err) { console.error(err); }
   }
