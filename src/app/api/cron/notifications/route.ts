@@ -428,6 +428,51 @@ export async function GET(req: NextRequest) {
         }
 
         // ==========================================
+        // 1.5. EXAM REMINDERS (1 hour before)
+        // ==========================================
+        const todaysExamsForNotification = await prisma.reminder.findMany({
+          where: {
+            userId: user.id,
+            category: "exam",
+            dueDate: new Date(todayKey + "T00:00:00Z"),
+            isCompleted: false
+          },
+          include: { subject: true }
+        });
+
+        for (const exam of todaysExamsForNotification) {
+          if (!exam.dueTime) continue;
+          const [eH, eM] = exam.dueTime.split(":").map(Number);
+          if (isNaN(eH) || isNaN(eM)) continue;
+          const minsUntil = (eH - uNow.hours) * 60 + (eM - uNow.minutes);
+
+          if (minsUntil > 55 && minsUntil <= 60) {
+            const rKey = `exam-rem:${exam.id}:${todayKey}`;
+            if (await wasSent(user.id, rKey)) { results.skippedDuplicates++; continue; }
+
+            const txt = `📝 Exam in ${minsUntil} min: ${exam.subject?.name || "Exam"} \nTime: ${exam.dueTime}`;
+            const { subject: eSub, html: eHtml } = formatGenericNoticeEmail(
+              user.name,
+              `Exam in ${minsUntil} min: ${exam.subject?.name || "Exam"}`,
+              `Your exam for <strong>${exam.subject?.name || "Exam"}</strong> starts in ${minsUntil} minutes at ${exam.dueTime}. Best of luck!`,
+              "#ff0054"
+            );
+
+            if (s.telegramEnabled && user.telegramChatId)
+              await retry(() => sendTelegram(user.telegramChatId!, txt), `tg-exam-${exam.id}`, results);
+            if (s.emailEnabled && user.email)
+              await retry(() => sendEmail(user.email!, eSub, eHtml), `em-exam-${exam.id}`, results);
+            if (s.pushEnabled && user.pushSubscriptions.length > 0)
+              await pushAll(user.pushSubscriptions, {
+                title: `Exam in ${minsUntil} min!`, body: `Your ${exam.subject?.name || "course"} exam starts at ${exam.dueTime}.`, tag: `exam-${exam.id}`, data: { url: "/dashboard" }
+              });
+
+            await markSent(user.id, rKey, "exam-rem");
+            results.preClassReminders++;
+          }
+        }
+
+        // ==========================================
         // 2. PRE-CLASS REMINDERS (using merged/overridden schedule)
         // ==========================================
         const preMin = s.preClassMinutes ?? 15;
