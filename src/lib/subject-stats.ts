@@ -28,14 +28,28 @@ export async function recalcSubjectStats(subjectId: string) {
       subjectId,
       status: { notIn: ["holiday", "cancelled"] }
     },
-    select: { status: true },
+    select: { status: true, date: true },
     orderBy: { date: "desc" },
     take: 200,
   });
 
+  const recentExams = await prisma.reminder.findMany({
+    where: { subjectId, category: "exam", isCompleted: false },
+    select: { dueDate: true }
+  });
+
+  type Event = { date: Date, type: "present" | "late" | "absent" | "excused" | "exam" };
+  
+  const allEvents: Event[] = [
+    ...recentRecords.map(r => ({ date: r.date, type: r.status as Event["type"] })),
+    ...recentExams.map(r => ({ date: r.dueDate, type: "exam" as Event["type"] }))
+  ];
+
+  allEvents.sort((a, b) => b.date.getTime() - a.date.getTime());
+
   let streakCount = 0;
-  for (const rec of recentRecords) {
-    if (rec.status === "present" || rec.status === "late") {
+  for (const rec of allEvents) {
+    if (rec.type === "present" || rec.type === "late" || rec.type === "exam") {
       streakCount++;
     } else break;
   }

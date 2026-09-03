@@ -8,8 +8,8 @@ export async function calcOverallStreak(userId: string): Promise<number> {
   const lookbackDate = new Date(startOfToday);
   lookbackDate.setDate(lookbackDate.getDate() - 365);
 
-  // 1. Fetch attendance records and exceptions within lookback window
-  const [allRecords, exceptions] = await Promise.all([
+  // 1. Fetch attendance records, exceptions, and exams within lookback window
+  const [allRecords, exceptions, exams] = await Promise.all([
     prisma.attendanceRecord.findMany({
       where: { userId, date: { gte: lookbackDate } },
       select: { date: true, status: true },
@@ -19,9 +19,14 @@ export async function calcOverallStreak(userId: string): Promise<number> {
       where: { userId, date: { gte: lookbackDate } },
       select: { date: true },
     }),
+    prisma.reminder.findMany({
+      where: { userId, category: "exam", dueDate: { gte: lookbackDate }, isCompleted: false },
+      select: { dueDate: true },
+    }),
   ]);
 
   const exceptionDates = new Set(exceptions.map((e) => e.date.toISOString().slice(0, 10)));
+  const examDates = new Set(exams.map((e) => e.dueDate.toISOString().slice(0, 10)));
 
   // Group records by YYYY-MM-DD
   const recordsByDate = new Map<string, { hasAbsent: boolean; hasPresent: boolean; allCancelledOrHoliday: boolean }>();
@@ -55,6 +60,13 @@ export async function calcOverallStreak(userId: string): Promise<number> {
   for (let i = 0; i < 365; i++) {
     const dow = checkDate.getDay();
     const dStr = checkDate.toISOString().slice(0, 10);
+
+    // If there is an exam on this day, it's an automatic streak increment!
+    if (examDates.has(dStr)) {
+      overallStreak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+      continue;
+    }
 
     // Saturdays (6) and Sundays (0) are non-working day exceptions
     if (dow === 0 || dow === 6) {
