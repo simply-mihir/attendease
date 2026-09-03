@@ -542,12 +542,16 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       <GraduationCap className="w-7 h-7" />
                     </div>
                   </div>
-                  <div className="animate-glass-snap relative z-10">
-                    <div className="inline-block px-8 py-5 mt-2 rounded-[2rem] bg-white/30 dark:bg-black/20 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(14,165,233,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-                      <h3 className="text-xl font-black text-[#0369a1] dark:text-[#38bdf8] mb-1 drop-shadow-sm">
+                  <div className="relative inline-block mt-2 animate-refined-heartbeat">
+                    {/* Glowing aurora background blobs */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-sky-400 via-fuchsia-500 to-amber-400 rounded-[2.5rem] blur-xl opacity-60 animate-aurora-glow-spin"></div>
+                    
+                    {/* Glassmorphic foreground */}
+                    <div className="relative px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/60 dark:border-white/20 shadow-2xl">
+                      <h3 className="text-xl font-black mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#0ea5e9] via-[#d946ef] to-[#0ea5e9] animate-shimmer-text bg-[length:200%_auto] drop-shadow-sm">
                         No classes. {examName} are going on.
                       </h3>
-                      <p className="font-bold text-[#075985] dark:text-[#7dd3fc] text-sm drop-shadow-sm">
+                      <p className="font-bold text-[#075985] dark:text-[#bae6fd] text-sm drop-shadow-sm">
                         Best wishes {userName} for your {examName}!
                       </p>
                     </div>
