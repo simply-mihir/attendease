@@ -1581,56 +1581,16 @@ html.dark .feature-glass-card:hover {
   100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
 }
 
-@keyframes lucid-3d-text-anim {
-  0% {
-    transform: scale(1);
-    color: #0ea5e9;
-    text-shadow: 
-      1px 1px 0px #0284c7,
-      2px 2px 0px #0369a1,
-      3px 3px 0px #075985,
-      4px 4px 6px rgba(0, 0, 0, 0.2);
-  }
-  60% {
-    transform: scale(1.12);
-    color: #ec4899;
-    text-shadow: 
-      1px 1px 0px #be185d,
-      2px 2px 0px #9d174d,
-      3px 3px 0px #831843,
-      6px 6px 10px rgba(0, 0, 0, 0.3);
-  }
-  65% {
-    transform: scale(0.95);
-    color: #8b5cf6;
-    text-shadow: 
-      1px 1px 0px #6d28d9,
-      2px 2px 0px #5b21b6,
-      3px 3px 0px #4c1d95,
-      2px 2px 4px rgba(0, 0, 0, 0.15);
-  }
-  80% {
-    transform: scale(1.05);
-    color: #0ea5e9;
-    text-shadow: 
-      1px 1px 0px #0284c7,
-      2px 2px 0px #0369a1,
-      3px 3px 0px #075985,
-      5px 5px 8px rgba(0, 0, 0, 0.25);
-  }
-  100% {
-    transform: scale(1);
-    color: #0ea5e9;
-    text-shadow: 
-      1px 1px 0px #0284c7,
-      2px 2px 0px #0369a1,
-      3px 3px 0px #075985,
-      4px 4px 6px rgba(0, 0, 0, 0.2);
-  }
+@keyframes glass-snap-grow {
+  0% { transform: scale(1); filter: hue-rotate(0deg); }
+  60% { transform: scale(1.08); filter: hue-rotate(90deg); }
+  65% { transform: scale(0.92); filter: hue-rotate(180deg); }
+  80% { transform: scale(1.03); filter: hue-rotate(45deg); }
+  100% { transform: scale(1); filter: hue-rotate(0deg); }
 }
 
-.animate-lucid-3d-text {
-  animation: lucid-3d-text-anim 4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+.animate-glass-snap {
+  animation: glass-snap-grow 4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   display: inline-block;
-  will-change: transform, color, text-shadow;
+  will-change: transform, filter;
 }

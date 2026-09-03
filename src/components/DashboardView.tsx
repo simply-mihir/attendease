@@ -542,14 +542,15 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       <GraduationCap className="w-7 h-7" />
                     </div>
                   </div>
-                  <div className="inline-block relative z-10 px-8 py-5 mt-2 rounded-[2.5rem] bg-[#e0f2fe] dark:bg-[#0c4a6e] shadow-[8px_8px_16px_rgba(14,165,233,0.15),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-4px_-4px_8px_rgba(14,165,233,0.2)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.05),inset_-4px_-4px_8px_rgba(0,0,0,0.4)] transition-transform">
-                    <h3 className="text-xl font-black mb-1 animate-lucid-3d-text">
-                      No classes. {examName} are going on.
-                    </h3>
-                    <br />
-                    <p className="font-bold text-sm animate-lucid-3d-text" style={{ animationDelay: '0.1s' }}>
-                      Best wishes {userName} for your {examName}!
-                    </p>
+                  <div className="animate-glass-snap relative z-10">
+                    <div className="inline-block px-8 py-5 mt-2 rounded-[2rem] bg-white/30 dark:bg-black/20 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(14,165,233,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+                      <h3 className="text-xl font-black text-[#0369a1] dark:text-[#38bdf8] mb-1 drop-shadow-sm">
+                        No classes. {examName} are going on.
+                      </h3>
+                      <p className="font-bold text-[#075985] dark:text-[#7dd3fc] text-sm drop-shadow-sm">
+                        Best wishes {userName} for your {examName}!
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
