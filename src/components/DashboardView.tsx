@@ -536,13 +536,13 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                     Today's Classes
                   </h2>
                 </div>
-                <div className="rounded-2xl p-8 bg-[#0ea5e9]/[0.06] border-2 border-[#0ea5e9]/40 shadow-[0_6px_0_0_#0ea5e9] dark:bg-[#0ea5e9]/[0.08] dark:border-[#0ea5e9]/40 dark:shadow-[0_6px_0_0_#0284c7] text-center relative overflow-hidden">
+                <div className="rounded-2xl p-8 bg-[#0ea5e9]/[0.06] border-2 border-[#0ea5e9]/40 shadow-[0_6px_0_0_#0ea5e9] dark:bg-[#0ea5e9]/[0.08] dark:border-[#0ea5e9]/40 dark:shadow-[0_6px_0_0_#0284c7] text-center relative overflow-hidden animate-exam-card">
                   <div className="flex justify-center mb-4 relative z-10">
                     <div className="w-14 h-14 rounded-2xl bg-[#0ea5e9]/20 border border-[#0ea5e9]/30 flex items-center justify-center text-[#0ea5e9] shadow-sm">
                       <GraduationCap className="w-7 h-7" />
                     </div>
                   </div>
-                  <div className="inline-block relative z-10 px-8 py-5 mt-2 rounded-[2.5rem] bg-[#e0f2fe] dark:bg-[#0c4a6e] shadow-[8px_8px_16px_rgba(14,165,233,0.15),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-4px_-4px_8px_rgba(14,165,233,0.2)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.05),inset_-4px_-4px_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-[1.02]">
+                  <div className="inline-block relative z-10 px-8 py-5 mt-2 rounded-[2.5rem] bg-[#e0f2fe] dark:bg-[#0c4a6e] shadow-[8px_8px_16px_rgba(14,165,233,0.15),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-4px_-4px_8px_rgba(14,165,233,0.2)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.05),inset_-4px_-4px_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-[1.02] animate-exam-text">
                     <h3 className="text-xl font-black text-[#0369a1] dark:text-[#38bdf8] mb-1 drop-shadow-sm">
                       No classes. {examName} are going on.
                     </h3>

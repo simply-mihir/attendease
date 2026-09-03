@@ -1581,3 +1581,41 @@ html.dark .feature-glass-card:hover {
   100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
 }
 
+
+@keyframes exam-pop-card {
+  0%, 100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.06);
+  }
+  55% {
+    transform: scale(0.94);
+  }
+  75% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes exam-pop-text {
+  0%, 100% {
+    filter: hue-rotate(0deg);
+  }
+  45% {
+    filter: hue-rotate(90deg) brightness(1.2);
+  }
+  55% {
+    filter: hue-rotate(180deg) brightness(1.5);
+  }
+  75% {
+    filter: hue-rotate(270deg) brightness(1.1);
+  }
+}
+
+.animate-exam-card {
+  animation: exam-pop-card 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+.animate-exam-text {
+  animation: exam-pop-text 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
