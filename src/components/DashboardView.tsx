@@ -513,6 +513,38 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       {/* Today's Classes */}
       {isCurrent && (
         (() => {
+          if (currentExam) {
+            const examName = currentExam.name.toLowerCase().includes('exam') ? currentExam.name : `${currentExam.name} Exams`;
+            const userName = session?.user?.name?.split(' ')[0] || "Student";
+            
+            return (
+              <div className="space-y-4 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-extrabold text-[#1a1a2e] dark:text-white flex items-center gap-2">
+                    <Clock className="w-6 h-6 text-[#4361ee]" />
+                    Today's Classes
+                  </h2>
+                </div>
+                <div className="rounded-2xl p-8 bg-gradient-to-br from-[#4361ee]/10 to-[#9b5de5]/10 dark:from-[#4361ee]/15 dark:to-[#9b5de5]/15 border-2 border-[#4361ee]/20 text-center shadow-lg relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 opacity-10">
+                    <GraduationCap className="w-40 h-40" />
+                  </div>
+                  <div className="flex justify-center mb-4 relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#1a1a2e] border-2 border-[#4361ee]/30 flex items-center justify-center text-[#4361ee] shadow-sm">
+                      <GraduationCap className="w-7 h-7" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white mb-2 relative z-10">
+                    No classes. {examName} are going on.
+                  </h3>
+                  <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-bold relative z-10 text-base">
+                    Best wishes {userName} for your {examName}!
+                  </p>
+                </div>
+              </div>
+            );
+          }
+
           const todayClasses = getClassesForDay(new Date(), dashboard?.todaySchedule || [], overData?.overrides || []);
           return todayClasses.length > 0 ? (
             <div className="space-y-4 mb-6" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 100ms forwards" }}>
