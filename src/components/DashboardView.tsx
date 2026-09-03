@@ -271,8 +271,7 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       </div>
 
       {/* Semester Banner */}
-      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-gradient-to-br from-lime-500/25 to-green-500/25 dark:from-lime-500/30 dark:to-green-500/30 backdrop-blur-xl border border-lime-500/40 dark:border-lime-500/30 shadow-[0_8px_32px_0_rgba(132,204,22,0.2)] p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-        <div className="absolute inset-0 bg-white/40 dark:bg-[#141425]/40 pointer-events-none mix-blend-overlay"></div>
+      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl p-5 overflow-hidden gap-4 transition-all duration-150 bg-lime-500/[0.06] border-2 border-lime-500/40 shadow-[0_6px_0_0_#84cc16] dark:bg-lime-500/[0.08] dark:border-lime-500/40 dark:shadow-[0_6px_0_0_#65a30d]" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center gap-3 relative z-10">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-500/15 dark:bg-lime-500/20 text-lime-500 border border-lime-500/30 shadow-sm backdrop-blur-md">
             <GraduationCap className="h-5 w-5" />
