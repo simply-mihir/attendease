@@ -1581,36 +1581,34 @@ html.dark .feature-glass-card:hover {
   100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
 }
 
-@keyframes aurora-glow-spin {
-  0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
-  50% { transform: rotate(180deg) scale(1.1); filter: hue-rotate(90deg); }
-  100% { transform: rotate(360deg) scale(1); filter: hue-rotate(0deg); }
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-@keyframes refined-heartbeat {
-  0% { transform: scale(1); }
-  10% { transform: scale(1.05); }
-  15% { transform: scale(0.95); }
-  25% { transform: scale(1.02); }
-  35% { transform: scale(1); }
-  100% { transform: scale(1); }
+@keyframes playful-jelly-bounce {
+  0%, 15%, 100% { transform: scale(1); }
+  20% { transform: scaleX(1.15) scaleY(0.85); }
+  25% { transform: scaleX(0.85) scaleY(1.15); }
+  30% { transform: scaleX(1.05) scaleY(0.95); }
+  35% { transform: scaleX(0.98) scaleY(1.02); }
+  40% { transform: scaleX(1) scaleY(1); }
 }
 
-@keyframes shimmer-text {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+.animate-gradient-flow-text {
+  background: linear-gradient(90deg, #ff00ea, #00d0ff, #ffea00, #ff00ea);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-flow 4s ease infinite;
 }
 
-.animate-aurora-glow-spin {
-  animation: aurora-glow-spin 8s linear infinite;
-}
-
-.animate-refined-heartbeat {
-  animation: refined-heartbeat 4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+.animate-playful-bounce {
   display: inline-block;
+  animation: playful-jelly-bounce 5s ease-in-out infinite;
+  transform-origin: bottom center;
   will-change: transform;
-}
-
-.animate-shimmer-text {
-  animation: shimmer-text 4s linear infinite;
 }
