@@ -271,14 +271,15 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       </div>
 
       {/* Semester Banner */}
-      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-white border-2 border-gray-200 shadow-[0_6px_0_0_#d1d5db] dark:bg-[#141425] dark:border-[#2a2a3d] dark:shadow-[0_6px_0_0_#0d0d1a] p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF2D78]/10 text-[#FF2D78] border border-[#FF2D78]/20 shadow-sm">
+      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-gradient-to-br from-indigo-500/90 via-purple-500/90 to-pink-500/90 backdrop-blur-xl border border-white/20 shadow-xl p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+        <div className="absolute inset-0 bg-white/5 pointer-events-none mix-blend-overlay"></div>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white border border-white/30 shadow-sm backdrop-blur-md">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="font-extrabold text-[#1a1a2e] dark:text-white">{dashboard?.semesterName || "All Semesters"}</h2>
-            <p className="text-sm font-medium text-[#4a4a5a] dark:text-[#6b6b80]">{today?.dayName}, {today?.date}</p>
+            <h2 className="font-extrabold text-white text-lg drop-shadow-md">{dashboard?.semesterName || "All Semesters"}</h2>
+            <p className="text-sm font-medium text-white/80">{today?.dayName}, {today?.date}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto mt-2 sm:mt-0">
