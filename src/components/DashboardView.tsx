@@ -271,9 +271,9 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
       </div>
 
       {/* Semester Banner */}
-      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-gradient-to-br from-[#FF2D78]/10 to-[#8338ec]/10 dark:from-[#FF2D78]/15 dark:to-[#8338ec]/15 backdrop-blur-xl border-2 border-[#FF2D78]/20 dark:border-[#FF2D78]/20 shadow-[0_6px_0_0_#FF2D781A] p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
+      <div className="relative mb-6 flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/15 dark:to-cyan-500/15 backdrop-blur-xl border-2 border-blue-500/20 dark:border-blue-500/20 shadow-[0_6px_0_0_#3B82F61A] p-5 overflow-hidden gap-4 transition-all duration-150" style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 50ms forwards" }}>
         <div className="flex items-center gap-3 relative z-10">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF2D78]/15 dark:bg-[#FF2D78]/20 text-[#FF2D78] border border-[#FF2D78]/30 shadow-sm backdrop-blur-md">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 dark:bg-blue-500/20 text-blue-500 border border-blue-500/30 shadow-sm backdrop-blur-md">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div>
