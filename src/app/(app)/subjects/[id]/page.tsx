@@ -72,6 +72,9 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const [savingExtraClass, setSavingExtraClass] = useState(false);
   const [addReminderForExtraClass, setAddReminderForExtraClass] = useState(true);
 
+  const { data, isLoading: loading, error } = useSWRFetch<any>(`/subjects/${id}`);
+  const subject = data?.subject;
+
   // Subject Reminders State
   const { data: subjectRemindersData } = useSWRFetch<any>(subject ? `/reminders?subjectId=${subject.id}` : null);
   const subjectReminders = subjectRemindersData?.reminders || [];
@@ -91,8 +94,7 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   });
   const [savingSubjectReminder, setSavingSubjectReminder] = useState(false);
 
-  const { data, isLoading: loading, error } = useSWRFetch<any>(`/subjects/${id}`);
-  const subject = data?.subject;
+
 
   // Extra Classes
   const { data: extraClassesData } = useSWRFetch<any>(subject ? `/schedule-override?subjectId=${subject.id}` : null);
