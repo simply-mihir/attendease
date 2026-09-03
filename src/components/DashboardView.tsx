@@ -542,12 +542,14 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       <GraduationCap className="w-7 h-7" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white mb-2 relative z-10">
-                    No classes. {examName} are going on.
-                  </h3>
-                  <p className="text-[#4a4a5a] dark:text-[#6b6b80] font-bold relative z-10 text-base">
-                    Best wishes {userName} for your {examName}!
-                  </p>
+                  <div className="inline-block relative z-10 px-8 py-5 mt-2 rounded-[2.5rem] bg-[#e0f2fe] dark:bg-[#0c4a6e] shadow-[8px_8px_16px_rgba(14,165,233,0.15),inset_4px_4px_8px_rgba(255,255,255,0.8),inset_-4px_-4px_8px_rgba(14,165,233,0.2)] dark:shadow-[8px_8px_16px_rgba(0,0,0,0.3),inset_4px_4px_8px_rgba(255,255,255,0.05),inset_-4px_-4px_8px_rgba(0,0,0,0.4)] transition-transform hover:scale-[1.02]">
+                    <h3 className="text-xl font-black text-[#0369a1] dark:text-[#38bdf8] mb-1 drop-shadow-sm">
+                      No classes. {examName} are going on.
+                    </h3>
+                    <p className="text-[#075985] dark:text-[#7dd3fc] font-bold text-sm drop-shadow-sm">
+                      Best wishes {userName} for your {examName}!
+                    </p>
+                  </div>
                 </div>
               </div>
             );
