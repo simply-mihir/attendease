@@ -276,6 +276,15 @@ export async function GET(req: NextRequest) {
             }));
 
             if (isSpecialDay || todaySch.length === 0) {
+              const todaysExams = await prisma.reminder.findMany({
+                where: {
+                  userId: user.id,
+                  category: "exam",
+                  dueDate: new Date(todayKey + "T00:00:00Z"),
+                },
+                include: { subject: true }
+              });
+
               const dayName = new Date(now.toLocaleString("en-US", { timeZone: tz })).toLocaleDateString("en-US", { weekday: "long" });
 
               let title = "☀️ No Classes Today!";
@@ -289,10 +298,18 @@ export async function GET(req: NextRequest) {
                 emoji = "🎉";
                 msg = `Happy <strong>${todayHoliday.name}</strong>! No classes today. Enjoy your holiday!`;
               } else if (currentExam) {
-                title = `📝 Exam Period: ${currentExam.name}`;
-                body = `Good luck with your exams! Regular classes are cancelled.`;
-                emoji = "📝";
-                msg = `It's the <strong>${currentExam.name}</strong>. Regular classes are cancelled. Good luck with your exams!`;
+                if (todaysExams.length > 0) {
+                  const examSubjects = todaysExams.map(e => e.subject?.name || "an unknown subject").join(" & ");
+                  title = `📝 ${examSubjects} Exam Today`;
+                  body = `You have an exam for ${examSubjects} today. Best of luck!`;
+                  emoji = "📝";
+                  msg = `You have an exam for <strong>${examSubjects}</strong> today. Best of luck!`;
+                } else {
+                  title = `📝 ${currentExam.name}`;
+                  body = `Best wishes for your ${currentExam.name}! Regular classes are cancelled.`;
+                  emoji = "📝";
+                  msg = `It's the <strong>${currentExam.name}</strong>. Regular classes are cancelled. Best wishes for your ${currentExam.name}!`;
+                }
               }
 
               const { subject: eSub, html: eHtml } = formatGenericNoticeEmail(

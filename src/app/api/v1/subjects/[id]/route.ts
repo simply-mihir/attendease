@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     include: {
       schedules: { where: { isActive: true }, orderBy: { dayOfWeek: "asc" } },
       attendanceRecords: { orderBy: { date: "desc" }, take: 60 },
-      semester: { select: { name: true } },
+      semester: { select: { id: true, name: true, examPeriods: { orderBy: { startDate: "asc" } } } },
     },
   });
 

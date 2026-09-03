@@ -208,14 +208,16 @@ export default function SemesterDetailPage() {
             >
               <div className="flex-1 w-full">
                 <label className="block text-xs font-black mb-1.5 text-text">Exam Period Name</label>
-                <input
-                  type="text"
+                <select
                   required
                   value={examName}
                   onChange={e => setExamName(e.target.value)}
-                  placeholder="e.g. Midterms"
                   className="input-3d"
-                />
+                >
+                  <option value="" disabled>Select exam type...</option>
+                  <option value="Mid Semester Exam">Mid Semester Exam</option>
+                  <option value="End Semester Exam">End Semester Exam</option>
+                </select>
               </div>
               <div className="flex-1 w-full">
                 <label className="block text-xs font-black mb-1.5 text-text">Start Date</label>

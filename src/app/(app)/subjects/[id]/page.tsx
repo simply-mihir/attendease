@@ -100,6 +100,47 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
   const todayStrForUpcoming = getLocalDateStr();
   const upcomingExtraClasses = allExtraClasses.filter((cls: any) => new Date(cls.date).toISOString().slice(0, 10) >= todayStrForUpcoming);
 
+  // Exam Periods
+  const allExamPeriods = subject?.semester?.examPeriods || [];
+  const upcomingExamPeriods = allExamPeriods.filter((ep: any) => new Date(ep.endDate).toISOString().slice(0, 10) >= todayStrForUpcoming);
+  const currentOrUpcomingExam = upcomingExamPeriods.length > 0 ? upcomingExamPeriods[0] : null;
+
+  const [courseExamDate, setCourseExamDate] = useState("");
+  const [courseExamTime, setCourseExamTime] = useState("10:00");
+  const [savingCourseExam, setSavingCourseExam] = useState(false);
+
+  async function handleScheduleCourseExam(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentOrUpcomingExam) return;
+    setSavingCourseExam(true);
+    try {
+      await apiFetch("/reminders", {
+        method: "POST",
+        body: JSON.stringify({
+          subjectId: subject.id,
+          title: `${currentOrUpcomingExam.name}`,
+          category: "exam",
+          dueDate: courseExamDate,
+          dueTime: courseExamTime,
+          priority: "high",
+          notifyPush: true,
+          notifyAlarm: true,
+          notifyEmail: true,
+          notifyTelegram: true,
+        }),
+      });
+      await invalidate(`/reminders?subjectId=${id}`);
+      await invalidate("/reminders");
+      setCourseExamDate("");
+      setCourseExamTime("10:00");
+      alert("Exam scheduled successfully!");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingCourseExam(false);
+    }
+  }
+
   if (error || (!loading && !subject)) {
     return (
       <div className="max-w-4xl mx-auto py-20 text-center space-y-4">
@@ -871,6 +912,57 @@ export default function SubjectDetailPage({ params }: { params: { id: string } }
           </div>
         )}
       </div>
+
+      {/* Course Exam Scheduling */}
+      {currentOrUpcomingExam && (
+        <div
+          className="card-3d p-6 sm:p-7"
+          style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 225ms forwards" }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-2xl bg-[#06d6a0] border-2 border-[#04b082] text-white flex items-center justify-center shadow-[0_3px_0_0_#038c67]">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-black text-base text-text">Schedule Course Exam</h3>
+              <p className="text-xs font-semibold text-text-muted">
+                {currentOrUpcomingExam.name} ({new Date(currentOrUpcomingExam.startDate).toLocaleDateString()} - {new Date(currentOrUpcomingExam.endDate).toLocaleDateString()})
+              </p>
+            </div>
+          </div>
+          <form onSubmit={handleScheduleCourseExam} className="flex gap-4 items-end flex-wrap sm:flex-nowrap">
+            <div className="flex-1 min-w-[140px] w-full">
+              <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Exam Date</label>
+              <input
+                type="date"
+                required
+                min={new Date(currentOrUpcomingExam.startDate).toISOString().slice(0, 10)}
+                max={new Date(currentOrUpcomingExam.endDate).toISOString().slice(0, 10)}
+                value={courseExamDate}
+                onChange={(e) => setCourseExamDate(e.target.value)}
+                className="input-3d w-full text-sm font-semibold"
+              />
+            </div>
+            <div className="flex-1 min-w-[140px] w-full">
+              <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Exam Time</label>
+              <input
+                type="time"
+                required
+                value={courseExamTime}
+                onChange={(e) => setCourseExamTime(e.target.value)}
+                className="input-3d w-full text-sm font-semibold"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={savingCourseExam}
+              className="btn-3d-primary w-full sm:w-auto px-6 py-2.5 text-sm font-black h-[46px] flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+            >
+              {savingCourseExam ? <Loader2 className="w-4 h-4 animate-spin" /> : "Schedule Exam"}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Subject Reminders & Tasks */}
       <div
