@@ -112,22 +112,21 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
 
   return (
     <div
-      className="relative overflow-hidden p-6 sm:p-7 mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/90 to-teal-600/90 backdrop-blur-xl border border-white/20 shadow-xl"
+      className="relative overflow-hidden p-6 sm:p-7 mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-600/10 dark:from-emerald-500/15 dark:to-teal-600/15 backdrop-blur-xl border-2 border-emerald-500/20 dark:border-emerald-500/20 shadow-[0_6px_0_0_#10B9811A]"
       style={{ opacity: 0, animation: "fadeSlideUp 0.5s ease-out 150ms forwards" }}
     >
-      <div className="absolute inset-0 bg-white/5 pointer-events-none mix-blend-overlay"></div>
       <div className="flex items-center gap-3 mb-5 relative z-10">
-        <div className="w-10 h-10 rounded-2xl bg-white/20 border-2 border-white/30 flex items-center justify-center text-white shadow-sm backdrop-blur-md">
+        <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm backdrop-blur-md">
           <CheckCircle2 className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-black text-lg text-white drop-shadow-sm">Quick Mark Attendance</h3>
-          <p className="text-xs font-semibold text-white/80">Record your status for any subject's session</p>
+          <h3 className="font-black text-lg text-[#1a1a2e] dark:text-white">Quick Mark Attendance</h3>
+          <p className="text-xs font-semibold text-[#4a4a5a] dark:text-[#6b6b80]">Record your status for any subject's session</p>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-end">
         <div className="flex-1 w-full lg:min-w-[140px]">
-          <label className="block text-xs font-bold text-white/90 drop-shadow-sm mb-1.5">Subject</label>
+          <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Subject</label>
           <select
             value={markSubjectId}
             onChange={(e) => setMarkSubjectId(e.target.value)}
@@ -140,7 +139,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
           </select>
         </div>
         <div className="flex-1 w-full lg:min-w-[140px]">
-          <label className="block text-xs font-bold text-white/90 drop-shadow-sm mb-1.5">Date</label>
+          <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Date</label>
           <input
             type="date"
             value={markDate}
@@ -150,7 +149,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
         </div>
         {markSubjectId && (
           <div className="flex-1 w-full lg:min-w-[140px]">
-            <label className="block text-xs font-bold text-white/90 drop-shadow-sm mb-1.5">Slot</label>
+            <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Slot</label>
             <select
               value={markScheduleId}
               onChange={(e) => setMarkScheduleId(e.target.value)}
@@ -173,7 +172,7 @@ export function DashboardQuickMark({ subjects }: { subjects: SubjectSummary[] })
           </div>
         )}
         <div className="flex-1 w-full lg:min-w-[140px]">
-          <label className="block text-xs font-bold text-white/90 drop-shadow-sm mb-1.5">Status</label>
+          <label className="block text-xs font-bold text-[#1a1a2e] dark:text-[#c4c4d4] mb-1.5">Status</label>
           <select
             value={markStatus}
             onChange={(e) => setMarkStatus(e.target.value)}

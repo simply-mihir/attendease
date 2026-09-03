@@ -16,18 +16,17 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
   const nextProgress = getBadgeProgress(streak, longestStreak);
 
   return (
-    <div className="relative overflow-hidden p-5 transition-all duration-150 rounded-2xl bg-gradient-to-br from-orange-500/90 to-red-600/90 backdrop-blur-xl border border-white/20 shadow-xl">
-      <div className="absolute inset-0 bg-white/5 pointer-events-none mix-blend-overlay"></div>
+    <div className="relative overflow-hidden p-5 transition-all duration-150 rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-600/10 dark:from-orange-500/15 dark:to-red-600/15 backdrop-blur-xl border-2 border-orange-500/20 dark:border-orange-500/20 shadow-[0_6px_0_0_#f973161A]">
       
       {/* Section header */}
       <div className="relative z-10 flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="bg-white/20 p-1.5 rounded-lg border border-white/30 shadow-sm backdrop-blur-md flex items-center justify-center">
-            <Sparkles className="h-4 w-4 text-white" style={{ animation: "badgeSparkle 2s ease-in-out infinite" }} />
+          <div className="bg-orange-500/15 dark:bg-orange-500/20 p-1.5 rounded-lg border border-orange-500/30 shadow-sm backdrop-blur-md flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-orange-500" style={{ animation: "badgeSparkle 2s ease-in-out infinite" }} />
           </div>
-          <h3 className="font-extrabold text-white text-lg drop-shadow-sm tracking-tight">Streak Badges</h3>
+          <h3 className="font-extrabold text-[#1a1a2e] dark:text-white text-lg tracking-tight">Streak Badges</h3>
         </div>
-        <Link href="/achievements" className="text-sm font-bold text-white hover:text-white/80 transition-colors flex items-center gap-1 drop-shadow-sm">
+        <Link href="/achievements" className="text-sm font-bold text-orange-500 hover:text-orange-600 transition-colors flex items-center gap-1">
           View All <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
@@ -44,41 +43,35 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
               onClick={() => setActiveBadge(activeBadge?.id === badge.id ? null : badge)}
               className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-150
                 ${isEarned
-                  ? `border-white/30 bg-white/10 backdrop-blur-md
-                     shadow-sm
-                     hover:translate-y-[2px]
+                  ? `border-[${badge.color}]/30 bg-[${badge.color}]/[0.06]
+                     shadow-[0_4px_0_0_${badge.color}20]
+                     hover:translate-y-[2px] hover:shadow-[0_2px_0_0_${badge.color}20]
                      cursor-pointer`
-                  : `border-white/10 bg-black/10 backdrop-blur-md
-                     shadow-sm
-                     opacity-60 cursor-default`
+                  : `border-gray-200 dark:border-[#2a2a3d] bg-gray-50 dark:bg-[#0d0d1a]
+                     shadow-[0_4px_0_0_#d1d5db] dark:shadow-[0_4px_0_0_#0d0d1a]
+                     opacity-40 cursor-default`
                 } ${badge.id === "monthly-legend" && isEarned ? "badge-legendary" : ""}`}
               style={isEarned ? {
-                borderColor: `rgba(255,255,255,0.4)`,
-                backgroundColor: `rgba(255,255,255,0.15)`,
-                boxShadow: `0 4px 12px 0 ${badge.color}66`,
+                borderColor: `${badge.color}40`,
+                backgroundColor: `${badge.color}0D`,
+                boxShadow: `0 4px 0 0 ${badge.color}33`,
               } : undefined}
             >
               {/* Badge icon with glow */}
               <div
                 className="relative flex h-12 w-12 items-center justify-center rounded-xl"
                 style={isEarned ? {
-                  backgroundColor: `rgba(255,255,255,0.2)`,
+                  backgroundColor: `${badge.color}1A`,
                   animation: isLatestEarned ? "badgeBounce 2s ease-in-out infinite" : undefined,
-                } : { backgroundColor: "rgba(0,0,0,0.1)" }}
+                } : { backgroundColor: "rgba(156,163,175,0.1)" }}
               >
                 {/* Glow ring for earned badges */}
                 {isEarned && (
-                  <div
-                    className="absolute inset-0 rounded-xl"
-                    style={{
-                      boxShadow: `0 0 15px ${badge.glowColor}, 0 0 30px ${badge.glowColor}`,
-                      animation: "badgeGlow 2s ease-in-out infinite",
-                    }}
-                  />
+                  <div className="absolute inset-0 rounded-xl opacity-50" style={{ boxShadow: `inset 0 0 10px ${badge.color}, 0 0 15px ${badge.glowColor}` }} />
                 )}
                 
                 {isEarned ? (
-                  <badge.Icon className="h-6 w-6 relative z-10" style={{ color: badge.color }} />
+                  <badge.Icon className="h-7 w-7" style={{ color: badge.color }} />
                 ) : (
                   <Lock className="h-5 w-5 text-[#9ca3af] dark:text-[#6b6b80]" />
                 )}
@@ -86,15 +79,15 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
 
               {/* Badge name */}
               <span className={`text-[10px] font-bold text-center leading-tight ${
-                isEarned ? "text-white" : "text-white/60"
+                isEarned ? "text-[#1a1a2e] dark:text-white" : "text-[#9ca3af] dark:text-[#6b6b80]"
               }`}>
                 {badge.name}
               </span>
 
               {/* Streak requirement */}
               <span className={`text-[9px] font-semibold ${
-                isEarned ? "text-white/90" : "text-white/50"
-              }`}>
+                isEarned ? "" : "text-[#9ca3af] dark:text-[#6b6b80]"
+              }`} style={isEarned ? { color: badge.color } : undefined}>
                 {badge.requiredStreak} days
               </span>
 
@@ -113,16 +106,17 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
 
       {/* Active badge detail popover */}
       {activeBadge && (
-        <div className="mt-3 rounded-xl border border-white/40 p-3 transition-all duration-300 relative z-10 backdrop-blur-md shadow-lg"
+        <div className="mt-3 rounded-xl border-2 p-3 transition-all duration-300"
           style={{
-            backgroundColor: `rgba(255,255,255,0.15)`,
+            borderColor: `${activeBadge.color}40`,
+            backgroundColor: `${activeBadge.color}0D`,
             animation: "badgeDetailSlideIn 0.3s ease-out",
           }}>
           <div className="flex items-center gap-3">
-            <activeBadge.Icon className="h-6 w-6 text-white drop-shadow-md" style={{ color: activeBadge.color, filter: 'brightness(1.5)' }} />
+            <activeBadge.Icon className="h-6 w-6" style={{ color: activeBadge.color }} />
             <div>
-              <p className="font-bold text-white text-sm">{activeBadge.name}</p>
-              <p className="text-xs text-white/80">{activeBadge.description}</p>
+              <p className="font-bold text-[#1a1a2e] dark:text-white text-sm">{activeBadge.name}</p>
+              <p className="text-xs text-[#9ca3af] dark:text-[#6b6b80]">{activeBadge.description}</p>
             </div>
           </div>
         </div>
@@ -130,22 +124,22 @@ export function StreakBadges({ streak, longestStreak }: StreakBadgesProps) {
 
       {/* Next badge progress bar */}
       {nextProgress && (
-        <div className="mt-4 relative z-10">
+        <div className="mt-4">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-semibold text-white/80">
+            <span className="text-xs font-semibold text-[#9ca3af] dark:text-[#6b6b80]">
               Next: {nextProgress.badge.name}
             </span>
-            <span className="text-xs font-bold text-white drop-shadow-sm">
+            <span className="text-xs font-bold" style={{ color: nextProgress.badge.color }}>
               {streak}/{nextProgress.badge.requiredStreak} days
             </span>
           </div>
-          <div className="h-3 w-full rounded-full bg-black/20 overflow-hidden border border-white/20">
+          <div className="h-3 w-full rounded-full bg-gray-100 dark:bg-[#0d0d1a] overflow-hidden border border-gray-200/50 dark:border-[#2a2a3d]/50">
             <div
-              className="h-full rounded-full transition-all duration-700 ease-out backdrop-blur-sm"
+              className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
                 width: `${nextProgress.progress}%`,
-                backgroundColor: 'rgba(255,255,255,0.9)',
-                boxShadow: `0 0 12px 2px rgba(255,255,255,0.6)`,
+                backgroundColor: nextProgress.badge.color,
+                boxShadow: `0 0 8px ${nextProgress.badge.glowColor}`,
               }}
             />
           </div>
