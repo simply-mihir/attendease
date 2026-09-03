@@ -537,9 +537,6 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                   </h2>
                 </div>
                 <div className="rounded-2xl p-8 bg-[#0ea5e9]/[0.06] border-2 border-[#0ea5e9]/40 shadow-[0_6px_0_0_#0ea5e9] dark:bg-[#0ea5e9]/[0.08] dark:border-[#0ea5e9]/40 dark:shadow-[0_6px_0_0_#0284c7] text-center relative overflow-hidden">
-                  <div className="absolute -top-10 -right-10 opacity-10">
-                    <GraduationCap className="w-40 h-40 text-[#0ea5e9]" />
-                  </div>
                   <div className="flex justify-center mb-4 relative z-10">
                     <div className="w-14 h-14 rounded-2xl bg-[#0ea5e9]/20 border border-[#0ea5e9]/30 flex items-center justify-center text-[#0ea5e9] shadow-sm">
                       <GraduationCap className="w-7 h-7" />
