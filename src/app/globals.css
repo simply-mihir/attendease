@@ -1581,34 +1581,32 @@ html.dark .feature-glass-card:hover {
   100% { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
 }
 
-@keyframes gradient-flow {
+@keyframes premium-text-flow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-@keyframes playful-jelly-bounce {
-  0%, 15%, 100% { transform: scale(1); }
-  20% { transform: scaleX(1.15) scaleY(0.85); }
-  25% { transform: scaleX(0.85) scaleY(1.15); }
-  30% { transform: scaleX(1.05) scaleY(0.95); }
-  35% { transform: scaleX(0.98) scaleY(1.02); }
-  40% { transform: scaleX(1) scaleY(1); }
+@keyframes premium-snap {
+  0% { transform: scale(1); }
+  60% { transform: scale(1.05); }
+  65% { transform: scale(0.95); }
+  80% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
-.animate-gradient-flow-text {
-  background: linear-gradient(90deg, #ff00ea, #00d0ff, #ffea00, #ff00ea);
+.animate-premium-text-flow {
+  background: linear-gradient(135deg, #0ea5e9, #a855f7, #ec4899, #0ea5e9);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  animation: gradient-flow 4s ease infinite;
+  animation: premium-text-flow 6s ease infinite;
 }
 
-.animate-playful-bounce {
+.animate-premium-snap {
   display: inline-block;
-  animation: playful-jelly-bounce 5s ease-in-out infinite;
-  transform-origin: bottom center;
+  animation: premium-snap 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   will-change: transform;
 }

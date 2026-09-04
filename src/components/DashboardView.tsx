@@ -542,13 +542,15 @@ export function DashboardView({ semesterId }: { semesterId?: string }) {
                       <GraduationCap className="w-7 h-7" />
                     </div>
                   </div>
-                  <div className="relative inline-block mt-2 w-full flex justify-center">
-                    <div className="animate-playful-bounce">
-                      <div className="inline-block px-8 py-5 rounded-[2.5rem] bg-gradient-to-br from-[#111827] to-[#374151] dark:from-[#f3f4f6] dark:to-[#e5e7eb] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.3),0_8px_10px_-6px_rgba(0,0,0,0.1)] border-b-4 border-r-4 border-black/20 dark:border-white/50">
-                        <h3 className="text-xl font-black mb-1 animate-gradient-flow-text drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] dark:drop-shadow-[0_2px_2px_rgba(255,255,255,0.8)]">
+                  <div className="relative inline-block mt-2 w-full flex justify-center z-10">
+                    <div className="animate-premium-snap">
+                      <div className="inline-block px-8 py-5 rounded-[2rem] bg-white/40 dark:bg-black/30 backdrop-blur-2xl border border-white/60 dark:border-white/10 shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] relative overflow-hidden group">
+                        {/* Subtle inner light reflection */}
+                        <div className="absolute inset-0 rounded-[2rem] box-shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)] dark:box-shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] pointer-events-none"></div>
+                        <h3 className="text-xl font-black mb-1 animate-premium-text-flow drop-shadow-sm">
                           No classes. {examName} are going on.
                         </h3>
-                        <p className="font-bold text-gray-300 dark:text-gray-600 text-sm mt-1">
+                        <p className="font-bold text-[#0284c7] dark:text-[#7dd3fc] text-sm mt-1 drop-shadow-sm">
                           Best wishes {userName} for your {examName}!
                         </p>
                       </div>
